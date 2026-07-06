@@ -1,0 +1,55 @@
+{
+  "status": "done",
+  "ts": "2026-07-22T09:01:20.107665Z",
+  "campaigns": [
+    {
+      "campaign_id": "camp-lateral-alice",
+      "host_ids": [
+        "host-a",
+        "host-b"
+      ],
+      "stages": [
+        {
+          "name": "lateral_auth",
+          "user": "alice",
+          "hosts": [
+            "host-a",
+            "host-b"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "kind": "lateral_auth",
+          "host_id": "host-b",
+          "attrs": {
+            "user": "alice",
+            "host_count": 2
+          }
+        },
+        {
+          "kind": "lateral_auth",
+          "host_id": "host-a",
+          "attrs": {
+            "user": "alice",
+            "host_count": 2
+          }
+        }
+      ],
+      "score": 0.9
+    }
+  ],
+  "defended": [
+    "host-a",
+    "host-b",
+    "host-c"
+  ],
+  "attacker": {
+    "kind": "attack_complete",
+    "ts_utc": "2026-07-22T09:01:19.859461Z",
+    "wave1_successes": 2,
+    "wave2_blocked": 3,
+    "outcome": "contained",
+    "updated": "2026-07-22T09:01:19.865027Z"
+  }
+}

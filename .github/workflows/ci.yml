@@ -1,0 +1,56 @@
+name: campaignfuse-ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install
+        run: |
+          python -m pip install -U pip
+          pip install -e ".[dev]"
+          pip install build
+      - name: Detector AST purity
+        run: python -m pytest tests/test_day0.py::test_detectors_ast_purity -q
+      - name: Refuse default HMAC strings in tree
+        run: |
+          if grep -RIn --exclude-dir=.git --exclude-dir=.venv -e 'campaignfuse-shared-secret' -e 'test-shared-hmac' . ; then
+            echo "Forbidden shared HMAC secret found" >&2
+            exit 1
+          fi
+      - name: Unit + abuse tests
+        run: python -m pytest tests -q
+      - name: No destructive verbs in package
+        run: python -c "from campaignfuse.stage_c import find_destructive_verbs_in_package as f; assert f()==[]"
+      - name: Drafts not in wheel
+        run: |
+          python -m build
+          python - <<'PY'
+          import zipfile, pathlib
+          wheels = list(pathlib.Path('dist').glob('*.whl'))
+          assert wheels, 'no wheel'
+          z = zipfile.ZipFile(wheels[0])
+          names = z.namelist()
+          assert not any(n.startswith('drafts/') for n in names), names
+          print('wheel ok', wheels[0])
+          PY
+
+  stageA-gate:
+    runs-on: ubuntu-latest
+    needs: test
+    if: hashFiles('reports/stageA.json') != ''
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -e .
+      - name: stageA-gate
+        run: cfuse gate --report reports/stageA.json

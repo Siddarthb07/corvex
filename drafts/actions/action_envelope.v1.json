@@ -1,0 +1,6 @@
+{
+  "schema_ver": "1",
+  "note": "Draft only — not packaged. No executor.",
+  "verbs": ["IsolateHost", "KillPid", "AddFirewallRule"],
+  "required": ["impact_class", "dry_run", "idempotency_key", "expiry", "policy_version", "target"]
+}

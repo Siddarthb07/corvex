@@ -1,0 +1,46 @@
+{
+  "generated_at": "2026-07-22T09:19:34Z",
+  "gate": "PASS",
+  "heldout_pass": true,
+  "train_pass": true,
+  "care_vs_incumbent": "unproven",
+  "metrics": {
+    "correlator_f1": 1.0,
+    "b1_f1": 0.0,
+    "b2_f1": 1.0,
+    "detector_only_f1": 1.0,
+    "precision_at_1": 1.0,
+    "false_campaign_rate": 0.0,
+    "ttu_seconds": 0.006726400000000021
+  },
+  "ablation": {
+    "raw_f1": 1.0,
+    "detector_only_f1": 1.0,
+    "b1_f1": 0.0,
+    "b2_f1": 1.0
+  },
+  "stage_b_allowed": false,
+  "stage_c_retention_labs": 0,
+  "stage_d": {
+    "checklist_pct": 0.0,
+    "checklist_done": 0,
+    "checklist_total": 11,
+    "items": {
+      "mtls_identities": false,
+      "typed_commands": false,
+      "authz_neq_sig": false,
+      "anti_replay": false,
+      "dual_control": false,
+      "fail_closed": false,
+      "least_privilege": false,
+      "immutable_audit": false,
+      "oversight_off_data_plane": false,
+      "no_free_form_shell": false,
+      "blast_radius_caps": false
+    },
+    "dry_run_lines": 1,
+    "live_contain": false
+  },
+  "cfuse_contain": 0,
+  "version": "0.4.0"
+}

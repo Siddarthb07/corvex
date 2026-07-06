@@ -1,0 +1,11 @@
+{"kind":"attacker_boot","ts_utc":"2026-07-22T09:01:10.970263Z","targets":["host-a","host-b","host-c"]}
+{"kind":"phase","ts_utc":"2026-07-22T09:01:12.510673Z","phase":"wave1_lateral","detail":"Attempting lateral auth as alice from 10.1.0.5"}
+{"kind":"attack_attempt","wave":"wave1","ts_utc":"2026-07-22T09:01:12.568525Z","target":"host-a","url":"http://host-a:8080/auth","user":"alice","src":"10.1.0.5","http_status":200,"ok":true,"result":"success","message":"welcome alice@host-a"}
+{"kind":"attack_attempt","wave":"wave1","ts_utc":"2026-07-22T09:01:14.633242Z","target":"host-b","url":"http://host-b:8080/auth","user":"alice","src":"10.1.0.5","http_status":200,"ok":true,"result":"success","message":"welcome alice@host-b"}
+{"kind":"attack_attempt","wave":"wave1","ts_utc":"2026-07-22T09:01:16.719083Z","target":"host-c","url":"http://host-c:8080/auth","user":"alice","src":"10.1.0.5","http_status":403,"ok":false,"result":"blocked_by_corvex","message":"host-c isolated by Corvex \u2014 auth refused"}
+{"kind":"phase","ts_utc":"2026-07-22T09:01:17.243461Z","phase":"wait_for_defense","detail":"Waiting for Corvex isolate flags\u2026","wave1_successes":2}
+{"kind":"phase","ts_utc":"2026-07-22T09:01:17.286606Z","phase":"wave2_retry","detail":"Retrying auth after Corvex defense \u2014 should be blocked"}
+{"kind":"attack_attempt","wave":"wave2","ts_utc":"2026-07-22T09:01:17.332081Z","target":"host-a","url":"http://host-a:8080/auth","user":"alice","src":"10.1.0.5","http_status":403,"ok":false,"result":"blocked_by_corvex","message":"host-a isolated by Corvex \u2014 auth refused"}
+{"kind":"attack_attempt","wave":"wave2","ts_utc":"2026-07-22T09:01:18.189405Z","target":"host-b","url":"http://host-b:8080/auth","user":"alice","src":"10.1.0.5","http_status":403,"ok":false,"result":"blocked_by_corvex","message":"host-b isolated by Corvex \u2014 auth refused"}
+{"kind":"attack_attempt","wave":"wave2","ts_utc":"2026-07-22T09:01:19.040177Z","target":"host-c","url":"http://host-c:8080/auth","user":"alice","src":"10.1.0.5","http_status":403,"ok":false,"result":"blocked_by_corvex","message":"host-c isolated by Corvex \u2014 auth refused"}
+{"kind":"attack_complete","ts_utc":"2026-07-22T09:01:19.859461Z","wave1_successes":2,"wave2_blocked":3,"outcome":"contained"}
