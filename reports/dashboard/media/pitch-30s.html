@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Corvex — 30s Demo</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg:#05070a; --panel:#0e141d; --line:rgba(255,255,255,.09);
+  --text:#f2f5f8; --muted:#8b96a8; --dim:#5c6778;
+  --attack:#ff5c6a; --detect:#4db8ff; --defend:#2fd67b; --warn:#e8b84a;
+  --font:"Outfit",system-ui,sans-serif; --mono:"IBM Plex Mono",ui-monospace,monospace;
+}
+*{box-sizing:border-box} html,body{margin:0;height:100%;overflow:hidden}
+body{
+  font-family:var(--font); color:var(--text);
+  background:
+    radial-gradient(900px 480px at 8% -10%, rgba(255,92,106,.12), transparent 55%),
+    radial-gradient(700px 400px at 100% 0%, rgba(77,184,255,.08), transparent 50%),
+    var(--bg);
+}
+.frame{
+  width:1280px; height:720px; margin:0 auto; position:relative;
+  padding:28px 32px 24px; display:grid; grid-template-rows:auto 1fr auto;
+}
+.top{display:flex; justify-content:space-between; align-items:center}
+.brand{font-size:1.25rem; font-weight:700; letter-spacing:-.02em}
+.brand span{color:var(--dim); font-weight:500; margin-left:8px; font-size:.95rem}
+.clock{font-family:var(--mono); font-size:.75rem; color:var(--dim)}
+.badge{
+  font-family:var(--mono); font-size:.7rem; letter-spacing:.08em; text-transform:uppercase;
+  padding:6px 10px; border-radius:999px; border:1px solid var(--line); color:var(--muted);
+}
+.badge.attack{color:var(--attack); border-color:rgba(255,92,106,.4); background:rgba(255,92,106,.1)}
+.badge.detect{color:var(--detect); border-color:rgba(77,184,255,.4); background:rgba(77,184,255,.1)}
+.badge.defend{color:var(--defend); border-color:rgba(47,214,123,.4); background:rgba(47,214,123,.1)}
+.badge.dash{color:var(--warn); border-color:rgba(232,184,74,.4); background:rgba(232,184,74,.1)}
+
+.main{display:grid; grid-template-columns:1.15fr .85fr; gap:16px; min-height:0; margin-top:16px}
+.panel{
+  background:rgba(14,20,29,.95); border:1px solid var(--line); border-radius:18px;
+  padding:18px; position:relative; overflow:hidden; min-height:0;
+}
+h2{margin:0 0 8px; font-size:.72rem; letter-spacing:.1em; text-transform:uppercase; color:var(--dim)}
+.title{font-size:1.55rem; font-weight:700; letter-spacing:-.02em; margin:0 0 10px; line-height:1.15}
+.copy{color:#d5dbe6; font-size:.98rem; line-height:1.45; margin:0 0 12px}
+.kv{display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:8px}
+.kv div{
+  border:1px solid var(--line); border-radius:12px; padding:10px 12px; background:#0a1017;
+}
+.kv b{display:block; font-family:var(--mono); font-size:.72rem; color:var(--muted); margin-bottom:4px; font-weight:500}
+.kv span{font-size:.95rem; font-weight:600}
+
+svg{width:100%; height:280px}
+.host{fill:#121821; stroke:#2a3344; stroke-width:2; transition:all .35s}
+.host.hit{stroke:var(--attack); fill:rgba(255,92,106,.14)}
+.host.isolated{stroke:var(--defend); fill:rgba(47,214,123,.14)}
+.attacker{fill:#1a1012; stroke:var(--attack); stroke-width:2}
+.label{fill:var(--text); font-size:12px; font-weight:600}
+.sub{fill:var(--muted); font-size:9px; font-family:var(--mono)}
+.link{fill:none; stroke:var(--attack); stroke-width:2; opacity:0; transition:opacity .3s}
+.link.on{opacity:1}
+.mesh{fill:none; stroke:var(--detect); stroke-width:2; stroke-dasharray:5 5; opacity:0}
+.mesh.on{opacity:1}
+.shield{fill:none; stroke:var(--defend); stroke-width:3; opacity:0}
+.shield.on{opacity:1}
+
+.side-list{list-style:none; margin:0; padding:0}
+.side-list li{
+  border:1px solid var(--line); border-radius:12px; padding:10px 12px; margin-bottom:8px;
+  background:#0a1017; font-size:.88rem; line-height:1.35; opacity:.35; transform:translateY(4px);
+  transition:opacity .3s, transform .3s, border-color .3s;
+}
+.side-list li.on{opacity:1; transform:none}
+.side-list li.attack{border-color:rgba(255,92,106,.35)}
+.side-list li.detect{border-color:rgba(77,184,255,.4)}
+.side-list li.defend{border-color:rgba(47,214,123,.4)}
+.side-list .t{font-family:var(--mono); font-size:.68rem; color:var(--muted); margin-bottom:4px}
+
+.dash-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:8px}
+.metric{
+  border:1px solid var(--line); border-radius:12px; padding:12px; background:#0a1017;
+}
+.metric .l{font-size:.7rem; color:var(--muted)}
+.metric .v{font-family:var(--mono); font-size:1.35rem; font-weight:600; margin-top:4px}
+.metric .v.good{color:var(--defend)} .metric .v.bad{color:var(--attack)}
+
+.bar{height:6px; background:#1b2431; border-radius:99px; margin-top:14px; overflow:hidden}
+.bar>i{display:block; height:100%; width:0; background:linear-gradient(90deg,#4db8ff,#2fd67b); transition:width .4s}
+
+.foot{display:flex; justify-content:space-between; align-items:center; margin-top:12px; color:var(--dim); font-size:.78rem; font-family:var(--mono)}
+.scene{display:none} .scene.show{display:block}
+.right-scene{display:none; height:100%} .right-scene.show{display:flex; flex-direction:column}
+</style>
+</head>
+<body>
+<div class="frame">
+  <header class="top">
+    <div class="brand">Corvex <span>30s product demo</span></div>
+    <div style="display:flex;gap:10px;align-items:center">
+      <div class="badge" id="badge">INTRO</div>
+      <div class="clock" id="clock">0.0s</div>
+    </div>
+  </header>
+
+  <div class="main">
+    <section class="panel">
+      <div class="scene show" id="s-left-1">
+        <h2>Attack type</h2>
+        <p class="title">Lateral authentication campaign</p>
+        <p class="copy">
+          An attacker with a stolen account (<b style="color:var(--warn)">alice</b>) signs into multiple machines
+          from one source IP (<b style="color:var(--attack)">10.1.0.5</b>). Each login alone looks normal —
+          together it’s a multi-host intrusion.
+        </p>
+        <div class="kv">
+          <div><b>Technique</b><span>Lateral auth hopping</span></div>
+          <div><b>MITRE-ish</b><span>Valid Accounts + Lateral Movement</span></div>
+          <div><b>Why it’s hard</b><span>Per-host tools see “ok logins”</span></div>
+          <div><b>Corvex job</b><span>Link hosts into one campaign</span></div>
+        </div>
+      </div>
+
+      <div class="scene" id="s-left-2">
+        <h2>Live sandbox attack</h2>
+        <p class="title" id="mapTitle">Attacker moving across the lab</p>
+        <svg viewBox="0 0 640 280">
+          <circle class="attacker" cx="70" cy="140" r="28"/>
+          <text class="label" x="70" y="145" text-anchor="middle">Attacker</text>
+          <text class="sub" x="70" y="182" text-anchor="middle">10.1.0.5</text>
+          <path id="la" class="link" d="M98 120 C170 70 230 55 278 55"/>
+          <path id="lb" class="link" d="M98 140 C200 140 300 140 388 140"/>
+          <path id="lc" class="link" d="M98 160 C170 210 230 225 278 225"/>
+          <path id="mab" class="mesh" d="M330 70 L390 120"/>
+          <path id="mbc" class="mesh" d="M390 160 L330 210"/>
+          <path id="mac" class="mesh" d="M308 90 L308 190"/>
+          <circle id="ha" class="host" cx="310" cy="55" r="32"/>
+          <circle id="sa" class="shield" cx="310" cy="55" r="42"/>
+          <text class="label" x="310" y="59" text-anchor="middle">host-a</text>
+          <text class="sub" x="310" y="100" text-anchor="middle">workstation</text>
+          <circle id="hb" class="host" cx="420" cy="140" r="32"/>
+          <circle id="sb" class="shield" cx="420" cy="140" r="42"/>
+          <text class="label" x="420" y="144" text-anchor="middle">host-b</text>
+          <text class="sub" x="420" y="185" text-anchor="middle">fileserver</text>
+          <circle id="hc" class="host" cx="310" cy="225" r="32"/>
+          <circle id="sc" class="shield" cx="310" cy="225" r="42"/>
+          <text class="label" x="310" y="229" text-anchor="middle">host-c</text>
+          <text class="sub" x="310" y="270" text-anchor="middle">jump box</text>
+          <text id="camp" x="500" y="36" fill="#4db8ff" font-family="IBM Plex Mono" font-size="11" opacity="0">camp-lateral-alice</text>
+        </svg>
+        <p class="copy" id="mapCopy" style="margin-top:4px">Waiting…</p>
+      </div>
+
+      <div class="scene" id="s-left-3">
+        <h2>Corvex monitor</h2>
+        <p class="title">What the dash showed after the lab</p>
+        <div class="dash-grid">
+          <div class="metric"><div class="l">Sealed eval</div><div class="v good">PASS</div></div>
+          <div class="metric"><div class="l">Campaign found</div><div class="v">1</div></div>
+          <div class="metric"><div class="l">Hosts isolated</div><div class="v good">3/3</div></div>
+          <div class="metric"><div class="l">Wave-1 footholds</div><div class="v bad">2</div></div>
+          <div class="metric"><div class="l">Wave-2 blocked</div><div class="v good">3</div></div>
+          <div class="metric"><div class="l">Outcome</div><div class="v good">contained</div></div>
+        </div>
+        <p class="copy" style="margin-top:14px">
+          Detection is real correlator output. Interrupt in this lab writes isolate flags so further
+          HTTP auth returns <b style="color:var(--defend)">403 blocked_by_corvex</b>.
+        </p>
+      </div>
+    </section>
+
+    <aside class="panel">
+      <div class="right-scene show" id="s-right-1">
+        <h2>Story beats</h2>
+        <ul class="side-list" id="beats"></ul>
+      </div>
+      <div class="right-scene" id="s-right-2">
+        <h2>What Corvex defended</h2>
+        <ul class="side-list" id="defended"></ul>
+      </div>
+    </aside>
+  </div>
+
+  <div class="foot">
+    <div>Docker lab · real HTTP auth · real correlator</div>
+    <div class="bar" style="width:42%"><i id="prog"></i></div>
+    <div id="stepLabel">1 / 6</div>
+  </div>
+</div>
+<script>
+const beatsEl = document.getElementById('beats');
+const defendedEl = document.getElementById('defended');
+const BEATS = [
+  {t:0, cls:'', text:'Intro — name the attack before the fireworks'},
+  {t:5, cls:'attack', text:'Wave 1: alice@10.1.0.5 → host-a (200 OK)'},
+  {t:9, cls:'attack', text:'Wave 1: same identity → host-b fileserver (200 OK)'},
+  {t:13, cls:'detect', text:'Detect: camp-lateral-alice (cross-host link)'},
+  {t:17, cls:'defend', text:'Defend: isolate host-a / b / c in the sandbox'},
+  {t:21, cls:'defend', text:'host-c wave-1 blocked mid-attack (403)'},
+  {t:24, cls:'defend', text:'Wave 2 retries: 3/3 refused — contained'},
+];
+const DEFENDED = [
+  {cls:'defend', text:'Stopped further access to workstation host-a'},
+  {cls:'defend', text:'Stopped further access to fileserver host-b'},
+  {cls:'defend', text:'Prevented jump-box foothold on host-c'},
+  {cls:'defend', text:'Blocked full retry sweep after isolation'},
+  {cls:'detect', text:'Named the campaign: camp-lateral-alice'},
+  {cls:'', text:'Logged IsolateHost actions for audit'},
+];
+
+BEATS.forEach((b,i)=>{
+  const li=document.createElement('li');
+  li.className=b.cls; li.id='beat-'+i;
+  li.innerHTML=`<div class="t">${b.t.toFixed(0)}s</div>${b.text}`;
+  beatsEl.appendChild(li);
+});
+DEFENDED.forEach((d,i)=>{
+  const li=document.createElement('li');
+  li.className=d.cls; li.id='def-'+i;
+  li.innerHTML=`<div class="t">DEFENDED</div>${d.text}`;
+  defendedEl.appendChild(li);
+});
+
+function showLeft(id){ document.querySelectorAll('.scene').forEach(e=>e.classList.remove('show')); document.getElementById(id).classList.add('show'); }
+function showRight(id){ document.querySelectorAll('.right-scene').forEach(e=>e.classList.remove('show')); document.getElementById(id).classList.add('show'); }
+function setBadge(text, cls){ const b=document.getElementById('badge'); b.textContent=text; b.className='badge '+cls; }
+function hit(host){ document.getElementById('h'+host).classList.add('hit'); document.getElementById('l'+host).classList.add('on'); }
+function iso(host){ const el=document.getElementById('h'+host); el.classList.remove('hit'); el.classList.add('isolated'); document.getElementById('s'+host).classList.add('on'); }
+
+const timeline = [
+  {at:0, run(){ setBadge('ATTACK TYPE','attack'); showLeft('s-left-1'); showRight('s-right-1'); document.getElementById('beat-0').classList.add('on'); }},
+  {at:5.0, run(){ setBadge('ATTACK','attack'); showLeft('s-left-2'); document.getElementById('mapTitle').textContent='Foothold on workstation'; document.getElementById('mapCopy').innerHTML='<b style="color:var(--attack)">alice</b> authenticates to <b>host-a</b> — looks like a normal login.'; hit('a'); document.getElementById('beat-1').classList.add('on'); }},
+  {at:9.0, run(){ document.getElementById('mapTitle').textContent='Lateral hop to fileserver'; document.getElementById('mapCopy').innerHTML='Same user + same source IP reaches <b>host-b</b>. Per-host tools still shrug.'; hit('b'); document.getElementById('beat-2').classList.add('on'); }},
+  {at:13.0, run(){ setBadge('DETECT','detect'); document.getElementById('mapTitle').textContent='Corvex stitches the campaign'; document.getElementById('mapCopy').innerHTML='Linked as <b style="color:var(--detect)">camp-lateral-alice</b> — not three unrelated logins.'; ['mab','mbc','mac'].forEach(id=>document.getElementById(id).classList.add('on')); document.getElementById('camp').style.opacity=1; document.getElementById('beat-3').classList.add('on'); }},
+  {at:17.0, run(){ setBadge('DEFEND','defend'); showRight('s-right-2'); document.getElementById('mapTitle').textContent='Sandbox isolate fired'; document.getElementById('mapCopy').innerHTML='Corvex isolates <b>host-a / host-b / host-c</b>. Further auth must fail.'; iso('a'); iso('b'); iso('c'); document.getElementById('beat-4').classList.add('on'); document.getElementById('def-0').classList.add('on'); document.getElementById('def-1').classList.add('on'); document.getElementById('def-2').classList.add('on'); }},
+  {at:21.0, run(){ document.getElementById('mapCopy').innerHTML='Attacker’s attempt on <b>host-c</b> returns <b style="color:var(--defend)">403 blocked_by_corvex</b> — stopped mid-campaign.'; document.getElementById('beat-5').classList.add('on'); document.getElementById('def-4').classList.add('on'); }},
+  {at:24.0, run(){ setBadge('DASH + RESULT','dash'); showLeft('s-left-3'); document.getElementById('beat-6').classList.add('on'); document.getElementById('def-3').classList.add('on'); document.getElementById('def-5').classList.add('on'); }},
+  {at:28.5, run(){ setBadge('CONTAINED','defend'); }},
+];
+
+const start = performance.now();
+function tick(now){
+  const t = (now - start) / 1000;
+  document.getElementById('clock').textContent = Math.min(30, t).toFixed(1) + 's';
+  document.getElementById('prog').style.width = Math.min(100, (t/30)*100) + '%';
+  const step = Math.min(6, Math.floor(t/5)+1);
+  document.getElementById('stepLabel').textContent = step + ' / 6';
+  while (timeline.length && t >= timeline[0].at) timeline.shift().run();
+  if (t < 30.2) requestAnimationFrame(tick);
+}
+timeline[0].run();
+requestAnimationFrame(tick);
+</script>
+</body>
+</html>

@@ -1,0 +1,32 @@
+{
+  "mtls_identities": false,
+  "typed_commands": false,
+  "authz_neq_sig": false,
+  "anti_replay": false,
+  "dual_control": false,
+  "fail_closed": false,
+  "least_privilege": false,
+  "immutable_audit": false,
+  "oversight_off_data_plane": false,
+  "no_free_form_shell": false,
+  "blast_radius_caps": false,
+  "_meta": {
+    "policy": "All items default false. Do not flip true without evidence path below.",
+    "live_contain_unlocked": false,
+    "started": "2026-07-22",
+    "evidence_notes": {
+      "mtls_identities": "NOT STARTED \u2014 JetStream mTLS stub only; no real peer identities.",
+      "typed_commands": "IN PROGRESS \u2014 ActionEnvelope draft + dry-run proposer exist; live executor absent.",
+      "authz_neq_sig": "NOT STARTED \u2014 HMAC proves authenticity, not authorization for contain.",
+      "anti_replay": "CLEARED VIA DASHBOARD @ 2026-07-22T08:35:23Z.",
+      "dual_control": "CLEARED VIA DASHBOARD @ 2026-07-22T08:35:22Z.",
+      "fail_closed": "PARTIAL for ingest (bad HMAC drops); NOT for contain.",
+      "least_privilege": "NOT STARTED \u2014 no contain agent process.",
+      "immutable_audit": "PARTIAL for campaign decisions (hash-chained AuditLog); NOT for contain orders.",
+      "oversight_off_data_plane": "PARTIAL \u2014 Stage A timeline is read-only; no oversight kill plane yet.",
+      "no_free_form_shell": "INTENDED TRUE once verified by CI \u2014 no shell executor in package; keep false until explicit CI attestation lands in reports.",
+      "blast_radius_caps": "NOT STARTED."
+    },
+    "last_dashboard_edit": "2026-07-22T08:35:23Z"
+  }
+}

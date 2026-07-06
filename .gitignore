@@ -1,0 +1,23 @@
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+dist/
+build/
+runs/
+.env
+# plaintext held-out never committed (only .sealed)
+heldout/*.jsonl
+heldout/_scratch/
+# secrets outside preferred path; never commit
+.secrets/
+*.key
+
+# local demo / lab sandboxes
+.sandbox/
+
+# large regenerated demo assets (keep short mp4 if present)
+reports/dashboard/media/*.gif
+*.gif

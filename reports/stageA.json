@@ -1,0 +1,52 @@
+{
+  "split": "heldout",
+  "pass": true,
+  "gate": {
+    "pass": true,
+    "reasons": []
+  },
+  "reasons": [],
+  "metrics": {
+    "correlator": {
+      "campaign_f1": 1.0,
+      "precision_at_1": 1.0,
+      "false_campaign_rate": 0.0,
+      "ttu_seconds": 0.006726400000000021
+    },
+    "b1": {
+      "campaign_f1": 0.0,
+      "precision_at_1": 0.0,
+      "false_campaign_rate": 1.0,
+      "ttu_seconds": 2.689999999999637e-05
+    },
+    "b2": {
+      "campaign_f1": 1.0,
+      "precision_at_1": 1.0,
+      "false_campaign_rate": 0.0,
+      "ttu_seconds": 2.3200000000000998e-05
+    },
+    "detector_only": {
+      "campaign_f1": 1.0,
+      "precision_at_1": 1.0,
+      "false_campaign_rate": 0.0,
+      "ttu_seconds": 0.005741900000000022
+    }
+  },
+  "ablation": {
+    "raw_f1": 1.0,
+    "detector_only_f1": 1.0,
+    "b1_f1": 0.0,
+    "b2_f1": 1.0
+  },
+  "freeze_manifest": {
+    "correlator_sha": "e9a4fd4c27cbb980d5ff69d8ac1244d60a954926ee09ee460c53aa76303879d8",
+    "detectors_sha": "29a6a723fdff22974ffcbe1c2c442017107ee05d36bb5e68f2a8ec767ec26e1c",
+    "scorer_sha": "e1ea401dc6e21ca763f1aade21c18eb268e1a1c7de1b0f79d335602cf16761c3",
+    "b2_sha": "3421cbc802ed76a4571d69fbdbdd02eab28a419268d60977d72ebd24bf943415",
+    "config_sha": "fed0c4ed9eb59049755eda0908b1b0056c19a576ee5bb5e6fbbbc26c446493c9"
+  },
+  "care_vs_incumbent": "unproven",
+  "care_banner": "care vs incumbent unproven",
+  "ood_note": "OOD packs are author-designed; no generalization claim beyond lab grammar.",
+  "b2_train_floor_ok": true
+}
