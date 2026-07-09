@@ -110,8 +110,8 @@ Optional activities-list only, flat and honest, no beta/user claims.
 | Claim | Artifact |
 |-------|----------|
 | Pre-registered bars | `Corvex/eval/__init__.py` PASS_BARS + sealed scorer rules |
-| Held-out sealed before eval | `heldout/*.sealed`, `heldout/SEALED.sha256` |
-| Reported PASS | `reports/stageA_heldout.json`, `reports/RESULTS.md` |
+| Held-out sealed before eval | Generated locally under `heldout/` — **not** in git |
+| Reported PASS | `reports/RESULTS.md` (summary); full JSON stays local |
 | Metaphor banned from metrics | README + RESULTS |
 | Contain not fake-unlocked | `reports/security_l1_checklist.json` all false; dry-run only |
 | Continuous honesty trail | `docs/DAILY_COMMIT_PLAN.md`, `scripts/daily_audit.ps1` |

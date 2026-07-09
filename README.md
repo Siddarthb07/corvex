@@ -1,73 +1,65 @@
 # Corvex
 
-Multi-host **campaign correlator**. Metrics, CLI, and PASS criteria never use immune/swarm metaphor labels.
+Multi-host **campaign correlator** — stitches weak signals across machines into one attack timeline.
 
-> Formerly prototyped as CampaignFuse — product name is **Corvex**.
+Not a swarm / WBC product. Observe and correlate first; containment stays locked behind safety controls.
 
-**Authoritative numbers:** [`reports/RESULTS.md`](reports/RESULTS.md) · [`reports/dashboard/index.html`](reports/dashboard/index.html)
-
-## Monitor
-
-```bash
-python -m campaignfuse.cli dash --build   # write reports/dashboard/
-python -m campaignfuse.cli dash           # serve http://127.0.0.1:8765/
-```
-
-Daily honest GitHub trail: [`docs/DAILY_COMMIT_PLAN.md`](docs/DAILY_COMMIT_PLAN.md) · `scripts/daily_audit.ps1`  
-College spike map (private-ish): [`docs/COLLEGE_SPIKE.md`](docs/COLLEGE_SPIKE.md)
-
-## Hypothesis (H1)
-
-On sealed held-out packs: correlator Campaign-F1 ≥ max(0.70, B2_F1) and ≥ B2_F1, Precision@1 ≥ 0.80, false-campaign rate on benign-only ≤ 0.10, compute TTU ≤ 2s. Ablation required.
-
-**FAIL H1 → stop.** No Stage B.
-
-## Latest held-out result (re-run locally to verify)
-
-Stage A gate: **PASS** — see `reports/stageA_heldout.json`. Care vs commercial hunt tools: **unproven**. Live contain: **locked** (Stage D dry-run only; L1 checklist 0%).
-
-## Quick start
+## Install
 
 ```bash
 pip install -e ".[dev]"
-cfuse seal-day0          # Day 0: train + sealed held-out (key outside repo)
-python scripts/publish_seal.py
-cfuse eval --split train
-cfuse eval --split heldout
-cfuse gate
+python -m campaignfuse.cli dash          # http://127.0.0.1:8765/
 ```
 
-Held-out key: `%USERPROFILE%\.campaignfuse\heldout.key`
+CLI entrypoints: `corvex` or `cfuse`.
 
-## Personas
+## What you get
 
-| Phase | User | Job |
-|-------|------|-----|
-| Stage A | Bake-off operator | Prove H1 with sealed eval |
-| Stage A | BYO-JSONL experimenter | `cfuse ingest-byo` → `cfuse replay` / timeline |
-| Stage B+ | Lab purple-team | Timeline after purple run |
+| Surface | Purpose |
+|---------|---------|
+| Correlator + detectors | Multi-host campaign detection |
+| Monitor dash | Scores, stages, safety toggles |
+| Prevention log | `/logs.html` — attacks stopped/isolated |
+| Contain dry-run | Propose `IsolateHost` (no live mutation yet) |
+
+## Quick demo (synthetic packs)
+
+```bash
+corvex replay train/train-lateral.jsonl --out-dir runs/demo
+corvex timeline runs/demo
+```
+
+BYO events:
+
+```bash
+corvex ingest-byo fixtures/byo_export_sample.jsonl --out-bus runs/byo/events.jsonl
+```
 
 ## Architecture
 
-Feeder / BYO-JSONL → EventBus (`JsonlBus` in Stage A) → detectors → correlator → CampaignStore → eval (no correlator imports).
-
-## BYO-JSONL
-
-Same envelope → enrollment → Bus path as Feeder:
-
-```bash
-cfuse ingest-byo fixtures/byo_export_sample.jsonl --out-bus runs/byo/events.jsonl
-cfuse replay train/train-lateral.jsonl --out-dir runs/demo
-cfuse timeline runs/demo
+```text
+Sensors / Feeder / BYO-JSONL
+        → EventBus (JSONL now; JetStream+mTLS later)
+        → detectors (pure functions)
+        → correlator
+        → CampaignStore + Prevention log
+        → Contain (gated; dry-run only until L1 checklist + executor)
 ```
 
-Ablation toggles on replay: `--ablation-no-cross` / `--detector-only`
+## Safety / stages
 
-## Stages
+- **A** — correlator bake-off (local research eval; sealed packs stay off git)
+- **B** — live sensors + bus (gated)
+- **C** — OSS retention
+- **D** — contain only after Security L1 checklist is evidenced (`campaignfuse/contain/CHECKLIST.md`)
 
-- **A** — sealed bake-off (core)
-- **B** — gated: one sensor + NATS JetStream mTLS; habit-loop metric; no actuators
-- **C** — OSS wheel without destructive Action verbs; retention ≥3 labs×2
-- **D** — Contain only after Security L1 checklist 100%
+Live quarantine is **off** (`CFUSE_CONTAIN=0`) until a real executor and checklist proof exist.
 
-See `THREAT_MODEL.md`, `SECURITY.md`, `campaignfuse/contain/CHECKLIST.md`.
+## Docs
+
+- [`SECURITY.md`](SECURITY.md) · [`THREAT_MODEL.md`](THREAT_MODEL.md)
+- [`docs/STAGE_D.md`](docs/STAGE_D.md) · [`reports/RESULTS.md`](reports/RESULTS.md)
+
+## License
+
+MIT — see `pyproject.toml`.

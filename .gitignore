@@ -8,16 +8,35 @@ dist/
 build/
 runs/
 .env
-# plaintext held-out never committed (only .sealed)
-heldout/*.jsonl
-heldout/_scratch/
-# secrets outside preferred path; never commit
+
+# secrets & local key material — never publish
 .secrets/
 *.key
+**/enrollment.json
+**/.campaignfuse/
 
-# local demo / lab sandboxes
+# sealed / held-out eval artifacts — generate locally only
+heldout/
+*.sealed
+
+# local sandboxes & demos
 .sandbox/
-
-# large regenerated demo assets (keep short mp4 if present)
-reports/dashboard/media/*.gif
 *.gif
+
+# regenerated / machine-local reports (keep RESULTS.md summary only)
+reports/dashboard/
+reports/seal-day0.txt
+reports/eval-*-console.txt
+reports/pytest.txt
+reports/stage_d_dry_run.jsonl
+reports/prevention_log.jsonl
+reports/AUDIT_BENCHMARK.json
+reports/oss_retention.json
+reports/stranger_dry_run.json
+reports/stranger_dry_run.md
+reports/stageA.json
+reports/stageA.md
+reports/stageA_heldout.json
+reports/stageA_train.json
+reports/stageA_train.md
+reports/stageA-gate.txt
