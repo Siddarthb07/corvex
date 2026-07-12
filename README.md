@@ -4,36 +4,104 @@ Multi-host **campaign correlator** — stitches weak signals across machines int
 
 Not a swarm / WBC product. Observe and correlate first; containment stays locked behind safety controls.
 
-## Install
+## Demos
+
+### 30s narrated walkthrough
+Attack type → detect → defend → dash result.
+
+https://github.com/Siddarthb07/corvex/blob/master/docs/assets/corvex-pitch-30s.mp4
+
+### Live Docker lab (real HTTP attack)
+Attacker hits virtual hosts; Corvex isolates mid-campaign; retries return `403`.
+
+https://github.com/Siddarthb07/corvex/blob/master/docs/assets/corvex-live-lab.mp4
+
+### Attack theatre
+Visual lateral-auth hop across `host-a` / `host-b` / `host-c`.
+
+https://github.com/Siddarthb07/corvex/blob/master/docs/assets/corvex-attack-theatre.mp4
+
+> Tip: open the `.mp4` link on GitHub and hit play, or download from [`docs/assets/`](docs/assets/).
+
+## Install (laptop / lab box)
 
 ```bash
-pip install -e ".[dev]"
+git clone https://github.com/Siddarthb07/corvex.git
+cd corvex
+python -m pip install -e ".[dev]"
 python -m campaignfuse.cli dash          # http://127.0.0.1:8765/
 ```
 
 CLI entrypoints: `corvex` or `cfuse`.
 
-## What you get
+| Surface | URL / command |
+|---------|----------------|
+| Monitor | http://127.0.0.1:8765/ |
+| Prevention log | http://127.0.0.1:8765/logs.html |
+| Replay sample attack | `corvex replay train/train-lateral.jsonl --out-dir runs/demo` |
 
-| Surface | Purpose |
-|---------|---------|
-| Correlator + detectors | Multi-host campaign detection |
-| Monitor dash | Scores, stages, safety toggles |
-| Prevention log | `/logs.html` — attacks stopped/isolated |
-| Contain dry-run | Propose `IsolateHost` (no live mutation yet) |
+## Deploy on a network (current reality)
 
-## Quick demo (synthetic packs)
+Corvex today is **observe + correlate**. You can put it where it can *see* events. Live quarantine of real PCs is still **locked**.
+
+### Minimal deploy (single host)
+
+1. Install on a lab/admin machine (commands above).
+2. Point sensors or exporters at Corvex via **BYO JSONL** or the file-tail sensor.
+3. Run the dash; watch campaigns and the **Prevention log**.
+4. Leave contain off (`CFUSE_CONTAIN=0`) until safety checklist + executor exist.
 
 ```bash
-corvex replay train/train-lateral.jsonl --out-dir runs/demo
-corvex timeline runs/demo
+# Ingest your own signed/exported events
+corvex ingest-byo path/to/export.jsonl --out-bus runs/prod/events.jsonl
+corvex dash
 ```
 
-BYO events:
+### Lab deploy with Docker (attack simulation)
+
+Requires Docker Desktop. Runs 3 virtual hosts + attacker + Corvex defender on an isolated bridge network:
 
 ```bash
-corvex ingest-byo fixtures/byo_export_sample.jsonl --out-bus runs/byo/events.jsonl
+python scripts/run_live_lab.py
 ```
+
+This is the same flow as the live-lab video: real HTTP auth across containers, detect, isolate flags, blocked retries. No production machines involved.
+
+### Target production shape (roadmap)
+
+```text
+[Host sensors] --mTLS--> [Event bus] --> [Corvex correlator]
+                                              |
+                                              v
+                                    Prevention log + Monitor
+                                              |
+                         all safety controls ON
+                         + contain switch armed
+                                              v
+                                    Contain executor (IsolateHost)
+```
+
+| Stage | What you deploy | Status |
+|-------|-----------------|--------|
+| A | Correlator + dash + local eval | Ready |
+| B | Sensors + JetStream/mTLS bus | Stub / gated |
+| C | Public OSS retention | Not ready |
+| D | Live isolate behind L1 checklist | Dry-run only |
+
+## Safety controls (why they matter)
+
+Dashboard toggles map to `reports/security_l1_checklist.json`. They are the **gate** between “we saw an attack” and “we change a host”:
+
+- Prove sensor identity (mTLS)
+- Signed ≠ allowed (authz separate from HMAC)
+- Named actions only (no free-form shell)
+- Anti-replay, dual control, blast-radius caps
+- Fail closed, tamper-evident log, off-bus kill switch
+
+**Today:** Corvex can detect and *propose* `IsolateHost` (dry-run / lab isolate flags).  
+**Not today:** flipping toggles does **not** unlock real LAN quarantine — `CFUSE_CONTAIN=0` and no production executor yet.
+
+Details: [`campaignfuse/contain/CHECKLIST.md`](campaignfuse/contain/CHECKLIST.md) · [`docs/STAGE_D.md`](docs/STAGE_D.md)
 
 ## Architecture
 
@@ -43,17 +111,8 @@ Sensors / Feeder / BYO-JSONL
         → detectors (pure functions)
         → correlator
         → CampaignStore + Prevention log
-        → Contain (gated; dry-run only until L1 checklist + executor)
+        → Contain (gated)
 ```
-
-## Safety / stages
-
-- **A** — correlator bake-off (local research eval; sealed packs stay off git)
-- **B** — live sensors + bus (gated)
-- **C** — OSS retention
-- **D** — contain only after Security L1 checklist is evidenced (`campaignfuse/contain/CHECKLIST.md`)
-
-Live quarantine is **off** (`CFUSE_CONTAIN=0`) until a real executor and checklist proof exist.
 
 ## Docs
 

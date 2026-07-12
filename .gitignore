@@ -19,9 +19,13 @@ runs/
 heldout/
 *.sealed
 
-# local sandboxes & demos
+# local sandboxes & large gifs
 .sandbox/
 *.gif
+
+# allow published demo videos in docs
+!docs/assets/
+!docs/assets/*.mp4
 
 # regenerated / machine-local reports (keep RESULTS.md summary only)
 reports/dashboard/
