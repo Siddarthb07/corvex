@@ -1,4 +1,4 @@
-# Security L1 checklist (Stage D gate)
+# Security L1 checklist (contain gate)
 
 All items must be **true** in `reports/security_l1_checklist.json` before Contain unlocks.
 

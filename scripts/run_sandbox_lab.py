@@ -114,7 +114,7 @@ def _try(name: str, fn) -> CaseResult:
 
 
 def scenario_core_detection() -> CaseResult:
-    """Correlator still works regardless of Stage D checklist."""
+    """Correlator still works regardless of contain checklist."""
 
     def run():
         enr = Enrollment(
@@ -326,7 +326,7 @@ def main() -> int:
             "",
             "## What this proves",
             "",
-            "- **Detection still runs** with safety OFF or ON (correlator is independent of Stage D locks).",
+            "- **Detection still runs** with safety OFF or ON (correlator is independent of contain locks).",
             "- **Dry-run isolate** always logs; it never mutates a host.",
             "- **Live contain path stays blocked** even when all 11 safety toggles are ON "
             "(no executor + checklist alone is not enough).",

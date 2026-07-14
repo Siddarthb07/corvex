@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Day 0 wrapper — delegates to `cfuse seal-day0`."""
+"""Wrapper — delegates to `cfuse seal-day0`."""
 
 from __future__ import annotations
 

@@ -1,4 +1,4 @@
-# Stage A results (summary)
+# Evaluation results (summary)
 
 Authoritative local bake-off snapshot. **Do not lead with immune/swarm metaphor.**
 
@@ -20,14 +20,13 @@ Authoritative local bake-off snapshot. **Do not lead with immune/swarm metaphor.
 
 **Does not prove:** Real malware defense, product-market fit, or autonomous containment.
 
-## Stage gates
+## Capability status
 
-| Stage | Status |
-|-------|--------|
-| A bake-off | PASS (local) |
-| B sensors | Gated |
-| C OSS retention | Not ready |
-| D Contain | Dry-run only; live locked |
+| Capability | Status |
+|------------|--------|
+| Held-out bake-off | PASS (local) |
+| Sensors / event bus | Gated |
+| Live contain | Dry-run only; live locked |
 
 ## Reproduce locally
 
@@ -35,7 +34,6 @@ Sealed packs and keys are **not** in this repo. On a lab machine:
 
 ```bash
 pip install -e ".[dev]"
-python -m campaignfuse.cli seal-day0
 python -m campaignfuse.cli eval --split heldout
 python -m campaignfuse.cli gate
 ```

@@ -274,7 +274,7 @@ def build_story(off: Dict[str, Any], on: Dict[str, Any]) -> List[Beat]:
             3,
             "Interrupt (safety OFF)",
             [
-                f"Safety controls: 0/{len(L1_ITEMS)} — Stage D gate locked.",
+                f"Safety controls: 0/{len(L1_ITEMS)} — contain gate locked.",
                 f"Dry-run IsolateHost × {off['interrupts_logged']} logged.",
                 "Live isolate: BLOCKED (as required).",
             ],
