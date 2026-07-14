@@ -53,7 +53,7 @@ def _repo_root() -> Path:
 def seal_day0(
     force: bool = typer.Option(False, help="Regenerate train/heldout from scratch"),
 ) -> None:
-    """Day-0: enrollment, train packs, encrypt held-out, write SEALED.sha256."""
+    """Enrollment, train packs, encrypt held-out, write SEALED.sha256."""
     root = _repo_root()
     train_dir = root / "train"
     heldout_dir = root / "heldout"
@@ -149,7 +149,7 @@ def seal_day0(
     )
     # Immutable-ish local note (git note substitute for solo)
     notes = root / ".git"
-    typer.echo(f"Day-0 seal complete. Key: {key_path()}")
+    typer.echo(f"Seal complete. Key: {key_path()}")
     typer.echo(f"SEALED aggregate: {agg}")
     typer.echo(f"Enrollment: {default_secrets_path()}")
 
@@ -351,7 +351,7 @@ def _file_sha(path: Path) -> str:
 def _render_report(result: Dict[str, Any]) -> str:
     status = "PASS" if result["pass"] else "FAIL"
     lines = [
-        f"# Stage A report ({result['split']}) — **{status}**",
+        f"# Eval report ({result['split']}) — **{status}**",
         "",
         f"Care vs incumbent: **{result.get('care_vs_incumbent', 'unproven')}**",
         "",
@@ -388,16 +388,16 @@ def _render_report(result: Dict[str, Any]) -> str:
 
 @app.command("gate")
 def gate_cmd(
-    report: Path = typer.Option(Path("reports/stageA.json"), help="Held-out Stage A report"),
+    report: Path = typer.Option(Path("reports/stageA.json"), help="Held-out eval report"),
 ) -> None:
-    """CI stageA-gate: exit 0 iff held-out PASS."""
+    """CI gate: exit 0 iff held-out PASS."""
     path = Path(report)
     if not path.exists():
         # fall back to gate txt / heldout report
         alt = Path("reports/stageA_heldout.json")
         path = alt if alt.exists() else path
     if not path.exists():
-        typer.echo("FAIL: no Stage A report")
+        typer.echo("FAIL: no eval report")
         raise typer.Exit(1)
     data = json.loads(path.read_text(encoding="utf-8"))
     passed = bool(data.get("gate", {}).get("pass", data.get("pass")))
@@ -407,7 +407,7 @@ def gate_cmd(
 
 @app.command("stage-b-check")
 def stage_b_check_cmd() -> None:
-    """Refuse Stage B unless held-out PASS + stranger dry-run + stage-b-allowed."""
+    """Refuse sensor unlock unless held-out PASS + stranger dry-run + stage-b-allowed."""
     from campaignfuse.stage_b import stage_b_status
 
     status = stage_b_status()
@@ -463,7 +463,7 @@ def dash_cmd(
 
 @app.command("contain-status")
 def contain_status_cmd() -> None:
-    """Show Stage D checklist + dry-run availability (never claims live contain)."""
+    """Show contain checklist + dry-run availability (never claims live contain)."""
     from campaignfuse.contain.dry_run import status
 
     typer.echo(json.dumps(status(), indent=2))

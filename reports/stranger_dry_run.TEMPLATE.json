@@ -1,5 +1,5 @@
 {
-  "_instructions": "After Stage A PASS, an external operator scores timeline quality blind on sealed packs. Copy to stranger_dry_run.json when done. Then create empty reports/stage-b-allowed only if they did not shrug.",
+  "_instructions": "After held-out eval PASS, an external operator scores timeline quality blind on sealed packs. Copy to stranger_dry_run.json when done. Then create empty reports/stage-b-allowed only if they did not shrug.",
   "operator_id": "REPLACE",
   "packs_scored": [],
   "timeline_quality_ok": false,

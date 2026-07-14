@@ -67,7 +67,7 @@ python scripts/run_live_lab.py
 
 This is the same flow as the live-lab video: real HTTP auth across containers, detect, isolate flags, blocked retries. No production machines involved.
 
-### Target production shape (roadmap)
+### Target production shape
 
 ```text
 [Host sensors] --mTLS--> [Event bus] --> [Corvex correlator]
@@ -81,12 +81,11 @@ This is the same flow as the live-lab video: real HTTP auth across containers, d
                                     Contain executor (IsolateHost)
 ```
 
-| Stage | What you deploy | Status |
-|-------|-----------------|--------|
-| A | Correlator + dash + local eval | Ready |
-| B | Sensors + JetStream/mTLS bus | Stub / gated |
-| C | Public OSS retention | Not ready |
-| D | Live isolate behind L1 checklist | Dry-run only |
+| Capability | Status |
+|------------|--------|
+| Correlator + dash + local eval | Ready |
+| Sensors + JetStream/mTLS bus | Stub / gated |
+| Live isolate behind L1 checklist | Dry-run only |
 
 ## Safety controls (why they matter)
 
@@ -101,7 +100,7 @@ Dashboard toggles map to `reports/security_l1_checklist.json`. They are the **ga
 **Today:** Corvex can detect and *propose* `IsolateHost` (dry-run / lab isolate flags).  
 **Not today:** flipping toggles does **not** unlock real LAN quarantine — `CFUSE_CONTAIN=0` and no production executor yet.
 
-Details: [`campaignfuse/contain/CHECKLIST.md`](campaignfuse/contain/CHECKLIST.md) · [`docs/STAGE_D.md`](docs/STAGE_D.md)
+Details: [`campaignfuse/contain/CHECKLIST.md`](campaignfuse/contain/CHECKLIST.md) · [`docs/contain.md`](docs/contain.md)
 
 ## Architecture
 
@@ -117,7 +116,7 @@ Sensors / Feeder / BYO-JSONL
 ## Docs
 
 - [`SECURITY.md`](SECURITY.md) · [`THREAT_MODEL.md`](THREAT_MODEL.md)
-- [`docs/STAGE_D.md`](docs/STAGE_D.md) · [`reports/RESULTS.md`](reports/RESULTS.md)
+- [`docs/contain.md`](docs/contain.md) · [`reports/RESULTS.md`](reports/RESULTS.md)
 
 ## License
 

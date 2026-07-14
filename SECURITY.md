@@ -1,6 +1,6 @@
 # Security
 
-Corvex is **L0 observe-only** through Stage C.
+Corvex ships as **observe-only** by default.
 
 - No host isolation, process kill, or firewall mutation in the installable package.
 - Destructive action vocabulary (if any) lives under `drafts/actions/` and is **not** packaged.
@@ -13,4 +13,4 @@ Do not treat schemas in `drafts/` as a remote-control toolkit. Public packages o
 
 ## Reporting
 
-See `docs/threat-model.md` and `docs/stage-d-checklist.md`.
+See [`THREAT_MODEL.md`](THREAT_MODEL.md) and [`campaignfuse/contain/CHECKLIST.md`](campaignfuse/contain/CHECKLIST.md).

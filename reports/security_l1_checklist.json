@@ -23,7 +23,7 @@
       "fail_closed": "PARTIAL for ingest (bad HMAC drops); NOT for contain.",
       "least_privilege": "NOT STARTED \u2014 no contain agent process.",
       "immutable_audit": "PARTIAL for campaign decisions (hash-chained AuditLog); NOT for contain orders.",
-      "oversight_off_data_plane": "PARTIAL \u2014 Stage A timeline is read-only; no oversight kill plane yet.",
+      "oversight_off_data_plane": "PARTIAL \u2014 timeline is read-only; no oversight kill plane yet.",
       "no_free_form_shell": "INTENDED TRUE once verified by CI \u2014 no shell executor in package; keep false until explicit CI attestation lands in reports.",
       "blast_radius_caps": "NOT STARTED."
     },
