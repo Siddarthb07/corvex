@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-from campaignfuse.prevention_log import load_prevention_log, seed_from_live_lab
+from corvex.prevention_log import load_prevention_log, seed_from_live_lab
 
 
 def render_logs_html(root: Path, entries: List[Dict[str, Any]]) -> str:

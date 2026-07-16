@@ -68,7 +68,9 @@ def collect_snapshot(root: Path) -> Dict[str, Any]:
             "dry_run_lines": dry_lines,
             "live_contain": False,
         },
-        "cfuse_contain": int(audit.get("CFUSE_CONTAIN", 0) or 0),
+        "corvex_contain": int(
+            audit.get("CORVEX_CONTAIN", audit.get("CFUSE_CONTAIN", 0)) or 0
+        ),
         "version": str(audit.get("version") or "0.4.0"),
     }
 
@@ -378,7 +380,7 @@ body::before {{
     const m = s.metrics || {{}};
     const d = s.stage_d || {{}};
     const pass = s.gate === 'PASS';
-    const containOff = s.cfuse_contain === 0;
+    const containOff = s.corvex_contain === 0;
     const labs = s.stage_c_retention_labs || 0;
     let readyPct = d.checklist_pct || 0;
 
@@ -496,7 +498,7 @@ def write_dashboard(root: Path, out: Optional[Path] = None) -> Path:
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(render_html(snap), encoding="utf-8")
     (out.parent / "snapshot.json").write_text(json.dumps(snap, indent=2), encoding="utf-8")
-    from campaignfuse.logs_page import write_logs_page
+    from corvex.logs_page import write_logs_page
 
     write_logs_page(root, out_dir=out.parent)
     return out

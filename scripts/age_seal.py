@@ -10,7 +10,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from campaignfuse.seal import ensure_key, key_path, seal_file, unseal_file  # noqa: E402
+from corvex.seal import ensure_key, key_path, seal_file, unseal_file  # noqa: E402
 
 
 def main() -> int:

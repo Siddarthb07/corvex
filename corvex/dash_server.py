@@ -8,10 +8,10 @@ from pathlib import Path
 from typing import Type
 from urllib.parse import urlparse
 
-from campaignfuse.contain import L1_ITEMS, set_checklist_item
-from campaignfuse.dashboard import collect_snapshot, write_dashboard
-from campaignfuse.logs_page import write_logs_page
-from campaignfuse.prevention_log import load_prevention_log
+from corvex.contain import L1_ITEMS, set_checklist_item
+from corvex.dashboard import collect_snapshot, write_dashboard
+from corvex.logs_page import write_logs_page
+from corvex.prevention_log import load_prevention_log
 
 
 def make_handler(repo_root: Path, dash_dir: Path) -> Type[SimpleHTTPRequestHandler]:

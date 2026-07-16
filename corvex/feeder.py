@@ -7,10 +7,10 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple
 
-from campaignfuse.auth import Enrollment
-from campaignfuse.bus import JsonlBus
-from campaignfuse.envelope import EventEnvelope, sign_envelope
-from campaignfuse.ingest import publish_verified
+from corvex.auth import Enrollment
+from corvex.bus import JsonlBus
+from corvex.envelope import EventEnvelope, sign_envelope
+from corvex.ingest import publish_verified
 
 
 def _ts(base: datetime, seconds: int) -> str:

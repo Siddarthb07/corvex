@@ -6,9 +6,9 @@ import json
 from pathlib import Path
 from typing import Iterable, List
 
-from campaignfuse.auth import AuthError, Enrollment
-from campaignfuse.bus import EventBus
-from campaignfuse.envelope import EventEnvelope, verify_envelope
+from corvex.auth import AuthError, Enrollment
+from corvex.bus import EventBus
+from corvex.envelope import EventEnvelope, verify_envelope
 
 
 class IngestError(ValueError):

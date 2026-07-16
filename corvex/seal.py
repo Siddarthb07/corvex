@@ -12,10 +12,14 @@ from cryptography.fernet import Fernet
 
 
 def key_path() -> Path:
-    override = os.environ.get("CFUSE_HELDOUT_KEY")
+    override = os.environ.get("CORVEX_HELDOUT_KEY") or os.environ.get("CFUSE_HELDOUT_KEY")
     if override:
         return Path(override)
-    return Path.home() / ".campaignfuse" / "heldout.key"
+    new = Path.home() / ".corvex" / "heldout.key"
+    legacy = Path.home() / ".campaignfuse" / "heldout.key"
+    if new.exists() or not legacy.exists():
+        return new
+    return legacy
 
 
 def ensure_key(path: Optional[Path] = None) -> bytes:

@@ -9,21 +9,21 @@ from pathlib import Path
 
 import pytest
 
-from campaignfuse.audit import AuditLog
-from campaignfuse.auth import AuthError, Enrollment, generate_lab_enrollment
-from campaignfuse.baselines import baseline_b2
-from campaignfuse.bus import JetStreamBus, JsonlBus
-from campaignfuse.contain import ContainGateError, checklist_complete, require_contain
-from campaignfuse.correlator import Correlator
-from campaignfuse.envelope import EventEnvelope, sign_envelope, verify_envelope
-from campaignfuse.eval import aggregate_scores, score_pack
-from campaignfuse.feeder import generate_campaign_events
-from campaignfuse.stage_b import StageBGateError, require_stage_b
-from campaignfuse.stage_c import find_destructive_verbs_in_package
-from campaignfuse.store import CampaignStore
+from corvex.audit import AuditLog
+from corvex.auth import AuthError, Enrollment, generate_lab_enrollment
+from corvex.baselines import baseline_b2
+from corvex.bus import JetStreamBus, JsonlBus
+from corvex.contain import ContainGateError, checklist_complete, require_contain
+from corvex.correlator import Correlator
+from corvex.envelope import EventEnvelope, sign_envelope, verify_envelope
+from corvex.eval import aggregate_scores, score_pack
+from corvex.feeder import generate_campaign_events
+from corvex.stage_b import StageBGateError, require_stage_b
+from corvex.stage_c import find_destructive_verbs_in_package
+from corvex.store import CampaignStore
 
 ROOT = Path(__file__).resolve().parents[1]
-DETECTORS = ROOT / "campaignfuse" / "detectors.py"
+DETECTORS = ROOT / "corvex" / "detectors.py"
 
 
 def test_detectors_ast_purity():
@@ -112,7 +112,7 @@ def test_contain_gate_locked():
 
 
 def test_stage_b_gate_locked(monkeypatch, tmp_path):
-    monkeypatch.delenv("CFUSE_STAGE_B", raising=False)
+    monkeypatch.delenv("CORVEX_STAGE_B", raising=False)
     monkeypatch.chdir(tmp_path)
     (tmp_path / "reports").mkdir()
     with pytest.raises(StageBGateError):

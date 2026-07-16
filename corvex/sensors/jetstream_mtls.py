@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 
-from campaignfuse.stage_b import JetStreamBus, habit_loop_metric, require_stage_b
+from corvex.stage_b import JetStreamBus, habit_loop_metric, require_stage_b
 
 
 @dataclass

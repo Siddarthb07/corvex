@@ -7,8 +7,8 @@ from pathlib import Path
 
 import pytest
 
-from campaignfuse.auth import Enrollment
-from campaignfuse.envelope import EventEnvelope, sign_envelope, verify_envelope
+from corvex.auth import Enrollment
+from corvex.envelope import EventEnvelope, sign_envelope, verify_envelope
 
 
 def test_bad_mac_rejected():
@@ -30,7 +30,7 @@ def test_bad_mac_rejected():
 
 
 def test_package_does_not_import_drafts():
-    import campaignfuse.correlator as c
+    import corvex.correlator as c
 
     src = Path(c.__file__).read_text(encoding="utf-8")
     assert "drafts" not in src
@@ -38,6 +38,6 @@ def test_package_does_not_import_drafts():
 
 def test_executor_import_absent():
     with pytest.raises(ModuleNotFoundError):
-        importlib.import_module("campaignfuse.actions")
+        importlib.import_module("corvex.actions")
     with pytest.raises(ModuleNotFoundError):
-        importlib.import_module("campaignfuse.actuators")
+        importlib.import_module("corvex.actuators")

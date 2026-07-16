@@ -13,4 +13,4 @@ Do not treat schemas in `drafts/` as a remote-control toolkit. Public packages o
 
 ## Reporting
 
-See [`THREAT_MODEL.md`](THREAT_MODEL.md) and [`campaignfuse/contain/CHECKLIST.md`](campaignfuse/contain/CHECKLIST.md).
+See [`THREAT_MODEL.md`](THREAT_MODEL.md) and [`corvex/contain/CHECKLIST.md`](corvex/contain/CHECKLIST.md).

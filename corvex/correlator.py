@@ -7,10 +7,10 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Set, Tuple
 
-from campaignfuse.audit import AuditLog
-from campaignfuse.detectors import Signal, run_all
-from campaignfuse.envelope import EventEnvelope
-from campaignfuse.store import Campaign, CampaignStore
+from corvex.audit import AuditLog
+from corvex.detectors import Signal, run_all
+from corvex.envelope import EventEnvelope
+from corvex.store import Campaign, CampaignStore
 
 
 def _parse_ts(ts: str) -> datetime:

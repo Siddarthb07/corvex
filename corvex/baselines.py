@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections import defaultdict
 from typing import Any, Dict, List, Mapping, Sequence
 
-from campaignfuse.store import Campaign
+from corvex.store import Campaign
 
 
 def baseline_b1(events: Sequence[Mapping[str, Any]]) -> List[Campaign]:

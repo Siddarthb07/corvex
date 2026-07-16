@@ -7,21 +7,28 @@ Not a swarm / WBC product. Observe and correlate first; containment stays locked
 ## Demos
 
 ### 30s narrated walkthrough
+
 Attack type → detect → defend → dash result.
 
-https://github.com/Siddarthb07/corvex/blob/master/docs/assets/corvex-pitch-30s.mp4
+![Corvex 30s pitch](docs/assets/corvex-pitch-30s.gif)
+
+[Full MP4](docs/assets/corvex-pitch-30s.mp4)
 
 ### Live Docker lab (real HTTP attack)
+
 Attacker hits virtual hosts; Corvex isolates mid-campaign; retries return `403`.
 
-https://github.com/Siddarthb07/corvex/blob/master/docs/assets/corvex-live-lab.mp4
+![Corvex live lab](docs/assets/corvex-live-lab.gif)
+
+[Full MP4](docs/assets/corvex-live-lab.mp4)
 
 ### Attack theatre
+
 Visual lateral-auth hop across `host-a` / `host-b` / `host-c`.
 
-https://github.com/Siddarthb07/corvex/blob/master/docs/assets/corvex-attack-theatre.mp4
+![Corvex attack theatre](docs/assets/corvex-attack-theatre.gif)
 
-> Tip: open the `.mp4` link on GitHub and hit play, or download from [`docs/assets/`](docs/assets/).
+[Full MP4](docs/assets/corvex-attack-theatre.mp4)
 
 ## Install (laptop / lab box)
 
@@ -29,7 +36,7 @@ https://github.com/Siddarthb07/corvex/blob/master/docs/assets/corvex-attack-thea
 git clone https://github.com/Siddarthb07/corvex.git
 cd corvex
 python -m pip install -e ".[dev]"
-python -m campaignfuse.cli dash          # http://127.0.0.1:8765/
+python -m corvex.cli dash          # http://127.0.0.1:8765/
 ```
 
 CLI entrypoints: `corvex` or `cfuse`.
@@ -49,7 +56,7 @@ Corvex today is **observe + correlate**. You can put it where it can *see* event
 1. Install on a lab/admin machine (commands above).
 2. Point sensors or exporters at Corvex via **BYO JSONL** or the file-tail sensor.
 3. Run the dash; watch campaigns and the **Prevention log**.
-4. Leave contain off (`CFUSE_CONTAIN=0`) until safety checklist + executor exist.
+4. Leave contain off (`CORVEX_CONTAIN=0`) until safety checklist + executor exist.
 
 ```bash
 # Ingest your own signed/exported events
@@ -98,9 +105,9 @@ Dashboard toggles map to `reports/security_l1_checklist.json`. They are the **ga
 - Fail closed, tamper-evident log, off-bus kill switch
 
 **Today:** Corvex can detect and *propose* `IsolateHost` (dry-run / lab isolate flags).  
-**Not today:** flipping toggles does **not** unlock real LAN quarantine — `CFUSE_CONTAIN=0` and no production executor yet.
+**Not today:** flipping toggles does **not** unlock real LAN quarantine — `CORVEX_CONTAIN=0` and no production executor yet.
 
-Details: [`campaignfuse/contain/CHECKLIST.md`](campaignfuse/contain/CHECKLIST.md) · [`docs/contain.md`](docs/contain.md)
+Details: [`corvex/contain/CHECKLIST.md`](corvex/contain/CHECKLIST.md) · [`docs/contain.md`](docs/contain.md)
 
 ## Architecture
 

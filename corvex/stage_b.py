@@ -1,7 +1,7 @@
 """Stage B — gated: one OS sensor + NATS JetStream mTLS; habit-loop metric; no actuators.
 
 Unlock only after held-out Stage A PASS + stranger dry-run + reports/stage-b-allowed
-(or CFUSE_STAGE_B=1 for local lab).
+(or CORVEX_STAGE_B=1 for local lab).
 """
 
 from __future__ import annotations
@@ -12,7 +12,7 @@ import ssl
 from pathlib import Path
 from typing import Any, Dict, Iterator, Optional
 
-from campaignfuse.envelope import EventEnvelope
+from corvex.envelope import EventEnvelope
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -37,7 +37,9 @@ def stage_b_status(report_dir: Optional[Path] = None) -> Dict[str, Any]:
         data = json.loads(stage_a.read_text(encoding="utf-8"))
         passed = bool(data.get("gate", {}).get("pass", data.get("pass")))
 
-    env_override = os.environ.get("CFUSE_STAGE_B") == "1"
+    env_override = (
+        os.environ.get("CORVEX_STAGE_B") == "1" or os.environ.get("CFUSE_STAGE_B") == "1"
+    )
     stranger_ok = stranger.exists()
     marker_ok = allowed_marker.exists()
     allowed = env_override or (passed and stranger_ok and marker_ok)
@@ -55,7 +57,7 @@ def require_stage_b(report_path: Optional[Path] = None) -> None:
     if not status["allowed"]:
         raise StageBGateError(
             "Stage B locked. Need held-out PASS + reports/stranger_dry_run.json + "
-            "reports/stage-b-allowed (or CFUSE_STAGE_B=1)."
+            "reports/stage-b-allowed (or CORVEX_STAGE_B=1)."
         )
 
 
@@ -81,7 +83,7 @@ class JetStreamBus:
         self,
         url: str,
         *,
-        subject: str = "campaignfuse.events",
+        subject: str = "corvex.events",
         ca_cert: Path,
         client_cert: Path,
         client_key: Path,

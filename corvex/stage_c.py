@@ -22,7 +22,7 @@ _EXECUTOR_NAMES = {
 
 def find_destructive_verbs_in_package(package_root: Optional[Path] = None) -> List[str]:
     """Return hits for FunctionDef/ClassDef names that look like live contain executors."""
-    root = Path(package_root) if package_root else (ROOT / "campaignfuse")
+    root = Path(package_root) if package_root else (ROOT / "corvex")
     hits: List[str] = []
     for path in root.rglob("*.py"):
         try:

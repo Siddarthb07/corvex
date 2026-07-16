@@ -13,25 +13,25 @@ from typing import Any, Dict, List, Optional
 
 import typer
 
-from campaignfuse.audit import AuditLog
-from campaignfuse.auth import (
+from corvex.audit import AuditLog
+from corvex.auth import (
     default_secrets_path,
     generate_lab_enrollment,
     load_enrollment,
     save_enrollment,
 )
-from campaignfuse.baselines import baseline_b1, baseline_b2
-from campaignfuse.bus import JsonlBus
-from campaignfuse.correlator import Correlator, CorrelatorConfig
-from campaignfuse.eval import aggregate_scores, evaluate_pass, score_pack
-from campaignfuse.feeder import (
+from corvex.baselines import baseline_b1, baseline_b2
+from corvex.bus import JsonlBus
+from corvex.correlator import Correlator, CorrelatorConfig
+from corvex.eval import aggregate_scores, evaluate_pass, score_pack
+from corvex.feeder import (
     feed_bus,
     generate_campaign_events,
     load_pack_events,
     write_pack,
 )
-from campaignfuse.ingest import ingest_byo
-from campaignfuse.seal import (
+from corvex.ingest import ingest_byo
+from corvex.seal import (
     ensure_key,
     key_path,
     scorer_rules_blob,
@@ -39,7 +39,7 @@ from campaignfuse.seal import (
     unseal_file,
     write_sealed_manifest,
 )
-from campaignfuse.store import CampaignStore
+from corvex.store import CampaignStore
 
 app = typer.Typer(add_completion=False, no_args_is_help=True)
 ROOT = Path(__file__).resolve().parents[1]
@@ -209,7 +209,7 @@ def ingest_byo_cmd(
 
 
 def _predict_from_events(events, mode: str) -> tuple:
-    from campaignfuse.envelope import EventEnvelope
+    from corvex.envelope import EventEnvelope
 
     dicts = [e.to_dict() if isinstance(e, EventEnvelope) else e for e in events]
     t0 = time.perf_counter()
@@ -272,10 +272,10 @@ def eval_cmd(
 
     # Freeze manifest of source files
     manifest = {
-        "correlator_sha": _file_sha(root / "campaignfuse" / "correlator.py"),
-        "detectors_sha": _file_sha(root / "campaignfuse" / "detectors.py"),
-        "scorer_sha": _file_sha(root / "campaignfuse" / "eval" / "__init__.py"),
-        "b2_sha": _file_sha(root / "campaignfuse" / "baselines.py"),
+        "correlator_sha": _file_sha(root / "corvex" / "correlator.py"),
+        "detectors_sha": _file_sha(root / "corvex" / "detectors.py"),
+        "scorer_sha": _file_sha(root / "corvex" / "eval" / "__init__.py"),
+        "b2_sha": _file_sha(root / "corvex" / "baselines.py"),
         "config_sha": hashlib.sha256(b"window=600;min_hosts=2").hexdigest(),
     }
 
@@ -408,7 +408,7 @@ def gate_cmd(
 @app.command("stage-b-check")
 def stage_b_check_cmd() -> None:
     """Refuse sensor unlock unless held-out PASS + stranger dry-run + stage-b-allowed."""
-    from campaignfuse.stage_b import stage_b_status
+    from corvex.stage_b import stage_b_status
 
     status = stage_b_status()
     typer.echo(json.dumps(status, indent=2))
@@ -422,8 +422,8 @@ def dash_cmd(
     open_file: bool = typer.Option(False, "--open-file", help="Open index.html via file:// only"),
 ) -> None:
     """Build monitoring dashboard from reports/; serve with toggle API unless --build/--open-file."""
-    from campaignfuse.dashboard import write_dashboard
-    from campaignfuse.dash_server import serve
+    from corvex.dashboard import write_dashboard
+    from corvex.dash_server import serve
     import webbrowser
 
     root = _repo_root()
@@ -464,7 +464,7 @@ def dash_cmd(
 @app.command("contain-status")
 def contain_status_cmd() -> None:
     """Show contain checklist + dry-run availability (never claims live contain)."""
-    from campaignfuse.contain.dry_run import status
+    from corvex.contain.dry_run import status
 
     typer.echo(json.dumps(status(), indent=2))
 
@@ -477,7 +477,7 @@ def contain_dry_run_cmd(
     pid: Optional[int] = typer.Option(None, "--pid"),
 ) -> None:
     """Propose a typed contain action as dry-run log only — no host mutation."""
-    from campaignfuse.contain.dry_run import execute_action, propose_action
+    from corvex.contain.dry_run import execute_action, propose_action
 
     target: Dict[str, Any] = {"host_id": host}
     if pid is not None:
@@ -494,10 +494,10 @@ def freeze_check(report: Path = typer.Option(Path("reports/stageA_heldout.json")
     root = _repo_root()
     man = data["freeze_manifest"]
     current = {
-        "correlator_sha": _file_sha(root / "campaignfuse" / "correlator.py"),
-        "detectors_sha": _file_sha(root / "campaignfuse" / "detectors.py"),
-        "scorer_sha": _file_sha(root / "campaignfuse" / "eval" / "__init__.py"),
-        "b2_sha": _file_sha(root / "campaignfuse" / "baselines.py"),
+        "correlator_sha": _file_sha(root / "corvex" / "correlator.py"),
+        "detectors_sha": _file_sha(root / "corvex" / "detectors.py"),
+        "scorer_sha": _file_sha(root / "corvex" / "eval" / "__init__.py"),
+        "b2_sha": _file_sha(root / "corvex" / "baselines.py"),
     }
     bad = [k for k in current if current[k] != man.get(k)]
     if bad:

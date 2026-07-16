@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterator, Optional, Protocol, runtime_checkable
 
-from campaignfuse.envelope import EventEnvelope
+from corvex.envelope import EventEnvelope
 
 
 @runtime_checkable

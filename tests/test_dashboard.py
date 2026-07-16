@@ -8,7 +8,7 @@ from pathlib import Path
 
 import pytest
 
-from campaignfuse.contain import (
+from corvex.contain import (
     L1_ITEMS,
     checklist_complete,
     load_checklist_state,
@@ -16,8 +16,8 @@ from campaignfuse.contain import (
     set_checklist_item,
     ContainGateError,
 )
-from campaignfuse.dash_server import serve
-from campaignfuse.dashboard import collect_snapshot, write_dashboard
+from corvex.dash_server import serve
+from corvex.dashboard import collect_snapshot, write_dashboard
 
 
 def _seed_checklist(tmp_path: Path) -> Path:

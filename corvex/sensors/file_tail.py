@@ -7,10 +7,10 @@ import time
 from pathlib import Path
 from typing import Optional
 
-from campaignfuse.auth import Enrollment
-from campaignfuse.bus import EventBus
-from campaignfuse.envelope import EventEnvelope
-from campaignfuse.ingest import publish_verified
+from corvex.auth import Enrollment
+from corvex.bus import EventBus
+from corvex.envelope import EventEnvelope
+from corvex.ingest import publish_verified
 
 
 def tail_jsonl(
@@ -21,7 +21,7 @@ def tail_jsonl(
     poll_seconds: float = 0.5,
     max_idle_polls: Optional[int] = 1,
 ) -> int:
-    from campaignfuse.stage_b import require_stage_b
+    from corvex.stage_b import require_stage_b
 
     require_stage_b()
     path = Path(path)

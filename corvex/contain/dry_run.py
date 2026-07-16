@@ -9,7 +9,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Literal, Optional
 
-from campaignfuse.contain import ContainGateError, require_contain
+from corvex.contain import ContainGateError, require_contain
 
 ActionVerb = Literal["IsolateHost", "KillPid", "AddFirewallRule"]
 
@@ -82,7 +82,7 @@ def execute_action(envelope: ActionEnvelope, log_path: Optional[Path] = None) ->
 
 
 def status() -> Dict[str, Any]:
-    from campaignfuse.contain import contain_status
+    from corvex.contain import contain_status
 
     return {
         "phase": "Stage D started — dry-run proposals only",

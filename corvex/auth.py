@@ -13,7 +13,7 @@ FORBIDDEN_DEFAULT_SECRETS = {
     "changeme",
     "shared",
     "default",
-    "campaignfuse-shared-secret",
+    "corvex-shared-secret",
     "test-shared-hmac",
 }
 
@@ -67,7 +67,7 @@ def generate_lab_enrollment(
 
 def save_enrollment(path: Path, enrollment: Enrollment) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    # Secrets stored outside repo preference: if under ~/.campaignfuse, OK.
+    # Secrets stored outside repo preference: if under ~/.corvex, OK.
     payload = {
         "hosts": enrollment.to_public_dict(),
         "secrets_hex": {k: v.hex() for k, v in enrollment._secrets.items()},
@@ -83,7 +83,11 @@ def load_enrollment(path: Path) -> Enrollment:
 
 
 def default_secrets_path() -> Path:
-    override = os.environ.get("CFUSE_ENROLLMENT")
+    override = os.environ.get("CORVEX_ENROLLMENT") or os.environ.get("CFUSE_ENROLLMENT")
     if override:
         return Path(override)
-    return Path.home() / ".campaignfuse" / "enrollment.json"
+    new = Path.home() / ".corvex" / "enrollment.json"
+    legacy = Path.home() / ".campaignfuse" / "enrollment.json"
+    if new.exists() or not legacy.exists():
+        return new
+    return legacy
