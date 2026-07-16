@@ -21,7 +21,7 @@ def main() -> int:
         return 0
 
     subprocess.run(
-        ["git", "notes", "--ref", "refs/notes/campaignfuse-seal", "add", "-f", "-m", sealed],
+        ["git", "notes", "--ref", "refs/notes/corvex-seal", "add", "-f", "-m", sealed],
         cwd=ROOT,
         check=False,
     )

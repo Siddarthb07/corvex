@@ -26,19 +26,19 @@ if str(ROOT) not in sys.path:
 
 from PIL import Image, ImageDraw, ImageFont  # noqa: E402
 
-from campaignfuse.audit import AuditLog  # noqa: E402
-from campaignfuse.auth import Enrollment  # noqa: E402
-from campaignfuse.contain import (  # noqa: E402
+from corvex.audit import AuditLog  # noqa: E402
+from corvex.auth import Enrollment  # noqa: E402
+from corvex.contain import (  # noqa: E402
     L1_ITEMS,
     ContainGateError,
     checklist_complete,
     require_contain,
     set_checklist_item,
 )
-from campaignfuse.contain.dry_run import ActionEnvelope, execute_action, propose_action  # noqa: E402
-from campaignfuse.correlator import Correlator, CorrelatorConfig  # noqa: E402
-from campaignfuse.feeder import generate_campaign_events  # noqa: E402
-from campaignfuse.store import CampaignStore  # noqa: E402
+from corvex.contain.dry_run import ActionEnvelope, execute_action, propose_action  # noqa: E402
+from corvex.correlator import Correlator, CorrelatorConfig  # noqa: E402
+from corvex.feeder import generate_campaign_events  # noqa: E402
+from corvex.store import CampaignStore  # noqa: E402
 
 
 @dataclass

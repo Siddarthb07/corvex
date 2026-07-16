@@ -13,6 +13,7 @@ runs/
 .secrets/
 *.key
 **/enrollment.json
+**/.corvex/
 **/.campaignfuse/
 
 # sealed / held-out eval artifacts — generate locally only
@@ -23,9 +24,10 @@ heldout/
 .sandbox/
 *.gif
 
-# allow published demo videos in docs
+# allow published demo media in docs
 !docs/assets/
 !docs/assets/*.mp4
+!docs/assets/*.gif
 
 # regenerated / machine-local reports (keep RESULTS.md summary only)
 reports/dashboard/

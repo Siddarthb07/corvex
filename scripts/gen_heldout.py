@@ -5,7 +5,7 @@ from __future__ import annotations
 
 import sys
 
-from campaignfuse.cli import seal_day0
+from corvex.cli import seal_day0
 
 
 def main() -> int:

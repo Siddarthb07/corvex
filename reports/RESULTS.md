@@ -34,6 +34,6 @@ Sealed packs and keys are **not** in this repo. On a lab machine:
 
 ```bash
 pip install -e ".[dev]"
-python -m campaignfuse.cli eval --split heldout
-python -m campaignfuse.cli gate
+python -m corvex.cli eval --split heldout
+python -m corvex.cli gate
 ```

@@ -2,7 +2,7 @@
 
 Destructive verbs are documented here for contain design review only.
 
-**Do not import from the installable `campaignfuse` package.**
+**Do not import from the installable `corvex` package.**
 
 Reserved verbs: `IsolateHost`, `KillPid`, `AddFirewallRule`.
 

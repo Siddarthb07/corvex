@@ -12,25 +12,25 @@ Write-Host "== CampaignFuse daily audit $date =="
 python -m pytest -q
 if ($LASTEXITCODE -ne 0) { throw "pytest failed — not committing" }
 
-python -m campaignfuse.cli seal-day0 --force
-python -m campaignfuse.cli eval --split train
-python -m campaignfuse.cli eval --split heldout
-python -m campaignfuse.cli dash --build
+python -m corvex.cli seal-day0 --force
+python -m corvex.cli eval --split train
+python -m corvex.cli eval --split heldout
+python -m corvex.cli dash --build
 
 # Refresh compact audit JSON
 python -c @"
 import json
 from pathlib import Path
-from campaignfuse.dashboard import collect_snapshot
-from campaignfuse.contain import contain_status
-from campaignfuse.stage_c import stage_c_ready
-from campaignfuse import CFUSE_CONTAIN, __version__
+from corvex.dashboard import collect_snapshot
+from corvex.contain import contain_status
+from corvex.stage_c import stage_c_ready
+from corvex import CORVEX_CONTAIN, __version__
 root = Path('.')
 snap = collect_snapshot(root)
 audit = {
   'date': '$date',
   'version': __version__,
-  'CFUSE_CONTAIN': CFUSE_CONTAIN,
+  'CORVEX_CONTAIN': CORVEX_CONTAIN,
   'snapshot': snap,
   'stage_c': stage_c_ready(),
   'stage_d': contain_status(),
@@ -49,7 +49,7 @@ if (-not $status) {
 }
 
 # Avoid committing local secrets if ever misplaced
-if (Test-Path .campaignfuse) { git reset -q .campaignfuse 2>$null }
+if (Test-Path .corvex) { git reset -q .corvex 2>$null }
 
 $msg = @"
 audit: daily bake-off refresh $date

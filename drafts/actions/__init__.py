@@ -1,10 +1,10 @@
-"""DRAFT ONLY — not installed in the campaignfuse wheel.
+"""DRAFT ONLY — not installed in the corvex wheel.
 
 Destructive Action verb stubs for Stage D design review.
 CI and packaging must keep these out of the installable package.
 """
 
-# Intentionally not imported by campaignfuse.*
+# Intentionally not imported by corvex.*
 
 
 def isolate_host(host_id: str) -> None:

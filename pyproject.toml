@@ -3,7 +3,7 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "campaignfuse"
+name = "corvex"
 version = "0.4.0"
 description = "Corvex — multi-host campaign correlator"
 readme = "README.md"
@@ -20,16 +20,16 @@ dev = ["pytest>=7.4", "ruff>=0.4", "import-linter>=2.0", "build>=1.0"]
 stageb = ["nats-py>=2.7"]
 
 [project.scripts]
-corvex = "campaignfuse.cli:main"
-cfuse = "campaignfuse.cli:main"
+corvex = "corvex.cli:main"
+cfuse = "corvex.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["campaignfuse*"]
+include = ["corvex*"]
 exclude = ["drafts*", "tests*", "scripts*", "heldout*", "train*", "reports*"]
 
 [tool.setuptools.package-data]
-campaignfuse = ["py.typed"]
+corvex = ["py.typed"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -40,19 +40,19 @@ line-length = 100
 target-version = "py39"
 
 [tool.importlinter]
-root_packages = ["campaignfuse"]
+root_packages = ["corvex"]
 
 [[tool.importlinter.contracts]]
 name = "Eval must not import correlator internals"
 type = "forbidden"
-source_modules = ["campaignfuse.eval"]
+source_modules = ["corvex.eval"]
 forbidden_modules = [
-  "campaignfuse.correlator",
-  "campaignfuse.detectors",
+  "corvex.correlator",
+  "corvex.detectors",
 ]
 
 [[tool.importlinter.contracts]]
 name = "Public package must not import drafts"
 type = "forbidden"
-source_modules = ["campaignfuse"]
+source_modules = ["corvex"]
 forbidden_modules = ["drafts"]

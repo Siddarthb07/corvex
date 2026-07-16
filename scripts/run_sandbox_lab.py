@@ -21,7 +21,7 @@ SANDBOX = ROOT / ".sandbox" / "lab"
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from campaignfuse.contain import (  # noqa: E402
+from corvex.contain import (  # noqa: E402
     L1_ITEMS,
     ContainGateError,
     checklist_complete,
@@ -30,14 +30,14 @@ from campaignfuse.contain import (  # noqa: E402
     require_contain,
     set_checklist_item,
 )
-from campaignfuse.contain.dry_run import ActionEnvelope, execute_action, propose_action  # noqa: E402
-from campaignfuse.correlator import Correlator, CorrelatorConfig  # noqa: E402
-from campaignfuse.dashboard import collect_snapshot, write_dashboard  # noqa: E402
-from campaignfuse.dash_server import serve  # noqa: E402
-from campaignfuse.feeder import generate_campaign_events  # noqa: E402
-from campaignfuse.auth import Enrollment  # noqa: E402
-from campaignfuse.store import CampaignStore  # noqa: E402
-from campaignfuse.audit import AuditLog  # noqa: E402
+from corvex.contain.dry_run import ActionEnvelope, execute_action, propose_action  # noqa: E402
+from corvex.correlator import Correlator, CorrelatorConfig  # noqa: E402
+from corvex.dashboard import collect_snapshot, write_dashboard  # noqa: E402
+from corvex.dash_server import serve  # noqa: E402
+from corvex.feeder import generate_campaign_events  # noqa: E402
+from corvex.auth import Enrollment  # noqa: E402
+from corvex.store import CampaignStore  # noqa: E402
+from corvex.audit import AuditLog  # noqa: E402
 
 
 @dataclass
@@ -64,7 +64,7 @@ def _seed_sandbox() -> Path:
     )
     (reports / "stageA-gate.txt").write_text("PASS\n", encoding="utf-8")
     (reports / "AUDIT_BENCHMARK.json").write_text(
-        json.dumps({"CFUSE_CONTAIN": 0, "version": "0.4.0-sandbox"}, indent=2) + "\n",
+        json.dumps({"CORVEX_CONTAIN": 0, "version": "0.4.0-sandbox"}, indent=2) + "\n",
         encoding="utf-8",
     )
     # Minimal held-out metrics so the dash has numbers
@@ -216,11 +216,11 @@ def scenario_safety(label: str, *, expect_complete: bool) -> List[CaseResult]:
         out = write_dashboard(SANDBOX)
         items_on = sum(1 for v in snap["stage_d"]["items"].values() if v)
         return (
-            f"dash wrote {out.name}; safety {items_on}/{len(L1_ITEMS)} on; contain flag={snap['cfuse_contain']}",
+            f"dash wrote {out.name}; safety {items_on}/{len(L1_ITEMS)} on; contain flag={snap['corvex_contain']}",
             {
                 "checklist_pct": snap["stage_d"]["checklist_pct"],
                 "items_on": items_on,
-                "cfuse_contain": snap["cfuse_contain"],
+                "corvex_contain": snap["corvex_contain"],
                 "gate": snap["gate"],
             },
         )
