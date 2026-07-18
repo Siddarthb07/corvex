@@ -1,4 +1,4 @@
-"""CLI: cfuse replay | eval | timeline | ingest-byo | seal-day0 | freeze."""
+"""CLI: corvex replay | eval | timeline | ingest-byo | dash | seal-day0 | freeze."""
 
 from __future__ import annotations
 
@@ -418,7 +418,17 @@ def stage_b_check_cmd() -> None:
 @app.command("dash")
 def dash_cmd(
     build_only: bool = typer.Option(False, "--build", help="Write HTML and exit"),
-    port: int = typer.Option(8765, help="Local server port"),
+    host: str = typer.Option(
+        "127.0.0.1",
+        "--host",
+        help="Bind address (use 0.0.0.0 to share on a lab LAN)",
+    ),
+    port: int = typer.Option(8765, "--port", help="HTTP port"),
+    open_browser: bool = typer.Option(
+        True,
+        "--open/--no-open",
+        help="Open the monitor in a browser when the server starts",
+    ),
     open_file: bool = typer.Option(False, "--open-file", help="Open index.html via file:// only"),
 ) -> None:
     """Build monitoring dashboard from reports/; serve with toggle API unless --build/--open-file."""
@@ -439,20 +449,25 @@ def dash_cmd(
         return
 
     try:
-        httpd = serve(root, port=port)
+        httpd = serve(root, port=port, host=host)
     except OSError as exc:
-        typer.echo(f"port {port} busy ({exc}); opening file instead (toggles need the server)")
+        typer.echo(f"bind {host}:{port} failed ({exc}); opening file instead (toggles need the server)")
         webbrowser.open(file_url)
         raise typer.Exit(0)
 
-    url = f"http://127.0.0.1:{port}/"
-    typer.echo(f"serving {url}")
-    typer.echo(f"file   {file_url}")
+    bound_host, bound_port = httpd.server_address[:2]
+    display_host = "127.0.0.1" if bound_host in ("0.0.0.0", "::") else bound_host
+    url = f"http://{display_host}:{bound_port}/"
+    typer.echo(f"Monitor:         {url}")
+    typer.echo(f"Prevention log:  {url}logs.html")
+    if host in ("0.0.0.0", "::"):
+        typer.echo(f"Bound on {host}:{bound_port} — reachable from other machines on your network")
     typer.echo("Ctrl+C to stop")
-    try:
-        webbrowser.open(url)
-    except Exception:
-        pass
+    if open_browser:
+        try:
+            webbrowser.open(url)
+        except Exception:
+            pass
     try:
         httpd.serve_forever()
     except KeyboardInterrupt:

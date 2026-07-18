@@ -1,6 +1,6 @@
 # Contain (dry-run only)
 
-## Honest status
+## Status
 
 - **Available:** typed `ActionEnvelope` + dry-run proposer that **only logs**.
 - **Not available:** live isolate / kill / firewall. `CORVEX_CONTAIN=0`.
@@ -8,10 +8,10 @@
 
 Do not flip checklist bits without evidence.
 
-## How to dry-run
+## Dry-run
 
 ```bash
-python -m corvex.cli contain-dry-run IsolateHost --host host-a --rationale "demo"
+corvex contain-dry-run IsolateHost --host host-a --rationale "demo"
 ```
 
 Writes one line to `reports/stage_d_dry_run.jsonl`. No host mutation.
