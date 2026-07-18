@@ -1,4 +1,4 @@
-"""Local Corvex monitor HTTP server (static + checklist API)."""
+"""Monitor HTTP server (static dashboard + checklist API)."""
 
 from __future__ import annotations
 
@@ -91,9 +91,9 @@ def make_handler(repo_root: Path, dash_dir: Path) -> Type[SimpleHTTPRequestHandl
     return Handler
 
 
-def serve(repo_root: Path, port: int = 8765) -> ThreadingHTTPServer:
+def serve(repo_root: Path, port: int = 8765, host: str = "127.0.0.1") -> ThreadingHTTPServer:
     out = write_dashboard(repo_root)
     handler = make_handler(repo_root, out.parent)
     ThreadingHTTPServer.allow_reuse_address = True
-    httpd = ThreadingHTTPServer(("127.0.0.1", port), handler)
+    httpd = ThreadingHTTPServer((host, port), handler)
     return httpd

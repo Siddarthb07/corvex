@@ -1,8 +1,8 @@
 # Evaluation results (summary)
 
-Authoritative local bake-off snapshot. **Do not lead with immune/swarm metaphor.**
+Held-out correlator bake-off on sealed synthetic multi-host packs.
 
-## Held-out gate (last local run)
+## Held-out gate (last published run)
 
 | Field | Value |
 |-------|--------|
@@ -16,7 +16,7 @@ Authoritative local bake-off snapshot. **Do not lead with immune/swarm metaphor.
 
 ## What this proves / does not
 
-**Proves (narrow):** On sealed synthetic multi-host packs (generated locally), the correlator met pre-registered bars and beat per-host B1.
+**Proves (narrow):** On sealed synthetic multi-host packs, the correlator met pre-registered bars and beat per-host B1.
 
 **Does not prove:** Real malware defense, product-market fit, or autonomous containment.
 
@@ -24,16 +24,23 @@ Authoritative local bake-off snapshot. **Do not lead with immune/swarm metaphor.
 
 | Capability | Status |
 |------------|--------|
-| Held-out bake-off | PASS (local) |
+| Held-out eval | PASS |
 | Sensors / event bus | Gated |
 | Live contain | Dry-run only; live locked |
 
-## Reproduce locally
+## Reproduce
 
-Sealed packs and keys are **not** in this repo. On a lab machine:
+Sealed held-out packs and keys are **not** in this repo (generated locally under `~/.corvex/`). With keys available:
 
 ```bash
 pip install -e ".[dev]"
-python -m corvex.cli eval --split heldout
-python -m corvex.cli gate
+corvex eval --split heldout
+corvex gate
+```
+
+Public train packs under `train/` work without sealing:
+
+```bash
+corvex replay train/train-lateral.jsonl --out-dir runs/demo
+corvex dash
 ```

@@ -7,7 +7,7 @@ Set-Location (Split-Path $PSScriptRoot -Parent)
 $env:PYTHONIOENCODING = "utf-8"
 
 $date = Get-Date -Format "yyyy-MM-dd"
-Write-Host "== CampaignFuse daily audit $date =="
+Write-Host "== Corvex daily audit $date =="
 
 python -m pytest -q
 if ($LASTEXITCODE -ne 0) { throw "pytest failed — not committing" }

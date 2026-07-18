@@ -307,7 +307,7 @@ body::before {{
         <a class="active" href="./">Monitor</a>
         <a href="./logs.html">Prevention log</a>
       </nav>
-      <span class="live"><i></i> local</span>
+      <span class="live"><i></i> live</span>
       <span>v{ver}</span>
       <span id="genStamp">{gen}</span>
     </div>
@@ -315,7 +315,7 @@ body::before {{
 
   <section class="hero">
     <div class="panel status-card">
-      <div class="status-label">Hidden test</div>
+      <div class="status-label">Eval gate</div>
       <div class="status-word {'pass' if passed else 'fail'}" id="gateWord">{gate}</div>
       <div class="pill-row" id="pills"></div>
     </div>
@@ -344,7 +344,7 @@ body::before {{
         <div class="note" id="honesty" hidden></div>
       </div>
       <div class="panel card">
-        <div class="card-title">Stages</div>
+        <div class="card-title">Capability</div>
         <div class="roadmap" id="roadmap"></div>
       </div>
     </div>
@@ -384,11 +384,11 @@ body::before {{
     const labs = s.stage_c_retention_labs || 0;
     let readyPct = d.checklist_pct || 0;
 
-    document.getElementById('gateWord').textContent = s.gate;
+    document.getElementById('gateWord').textContent = pass ? 'PASS' : (s.gate === 'UNKNOWN' || !s.gate ? '—' : s.gate);
     document.getElementById('gateWord').className = 'status-word ' + (pass ? 'pass' : 'fail');
     document.getElementById('genStamp').textContent = s.generated_at || '';
     document.getElementById('pills').innerHTML = [
-      `<span class="pill ${{s.train_pass ? 'on' : ''}}">Train ${{s.train_pass ? 'ok' : 'fail'}}</span>`,
+      `<span class="pill ${{s.train_pass ? 'on' : ''}}">Train ${{s.train_pass ? 'ok' : '—'}}</span>`,
       `<span class="pill warn">vs tools: ${{s.care_vs_incumbent || 'unproven'}}</span>`,
       `<span class="pill">Isolate ${{containOff ? 'off' : 'on'}}</span>`,
     ].join('');
@@ -400,7 +400,7 @@ body::before {{
     const keys = Object.keys(items).sort();
     const onCount = keys.filter(k => items[k]).length;
     readyPct = keys.length ? Math.round(1000 * onCount / keys.length) / 10 : readyPct;
-    document.getElementById('readyTitle').textContent = `${{onCount}}/${{keys.length}} · ${{labs}}/3 labs`;
+    document.getElementById('readyTitle').textContent = `${{onCount}}/${{keys.length}} controls`;
     document.getElementById('ctrlSummary').textContent = `${{onCount}}/${{keys.length}} on`;
 
     document.getElementById('metrics').innerHTML = [
@@ -435,9 +435,9 @@ body::before {{
     }}
 
     document.getElementById('roadmap').innerHTML = [
-      {{ name:'Prove', desc:'Locked test', cls: pass?'done':'locked', badge: pass?'PASS':'FAIL' }},
+      {{ name:'Eval', desc:'Held-out gate', cls: pass?'done':'locked', badge: pass?'PASS':(s.gate||'—') }},
       {{ name:'Sensors', desc:'Live hosts', cls: s.stage_b_allowed?'done':(pass?'active':'locked'), badge: s.stage_b_allowed?'open':'locked' }},
-      {{ name:'Share', desc:'Outside labs', cls: labs>=3?'done':'locked', badge: `${{labs}}/3` }},
+      {{ name:'Share', desc:'External labs', cls: labs>=3?'done':'locked', badge: `${{labs}}/3` }},
       {{ name:'Isolate', desc:'Quarantine', cls: readyPct>=100?'done':'locked', badge: `${{readyPct}}%` }},
     ].map(st => `<div class="step ${{st.cls}}"><div class="dot"></div><div class="name">${{st.name}}</div>
       <div class="desc">${{st.desc}}</div><span class="badge">${{st.badge}}</span></div>`).join('');
