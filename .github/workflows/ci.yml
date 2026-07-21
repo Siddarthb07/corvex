@@ -30,12 +30,12 @@ jobs:
         run: python -m pytest tests -q
       - name: Clean-clone replay smoke
         run: |
-          rm -rf /tmp/corvex-enroll
           mkdir -p /tmp/corvex-enroll
-          CORVEX_ENROLLMENT=/tmp/corvex-enroll/enrollment.json \
-            corvex replay train/train-lateral.jsonl --out-dir runs/ci-demo
+          export CORVEX_ENROLLMENT=/tmp/corvex-enroll/enrollment.json
+          corvex replay train/train-lateral.jsonl --out-dir runs/ci-demo
           test -f runs/ci-demo/timeline.json
-          CORVEX_RUN_DIR="$PWD/runs/ci-demo" corvex dash --build --no-open
+          export CORVEX_RUN_DIR="$PWD/runs/ci-demo"
+          corvex dash --build --no-open
       - name: No destructive verbs in package
         run: python -c "from corvex.stage_c import find_destructive_verbs_in_package as f; assert f()==[]"
       - name: Drafts not in wheel
