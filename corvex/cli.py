@@ -23,7 +23,14 @@ from corvex.auth import (
 from corvex.baselines import baseline_b1, baseline_b2
 from corvex.bus import JsonlBus
 from corvex.correlator import Correlator, CorrelatorConfig
-from corvex.eval import aggregate_scores, evaluate_pass, score_pack
+from corvex.eval import (
+    aggregate_by_family,
+    aggregate_isolate_dry_run,
+    aggregate_scores,
+    evaluate_pass,
+    score_pack,
+    vs_baseline_lift,
+)
 from corvex.feeder import (
     feed_bus,
     generate_campaign_events,
@@ -326,26 +333,48 @@ def eval_cmd(
         "b2": "b2",
         "detector_only": "detector_only",
     }
+    pack_meta: List[Dict[str, Any]] = []
     for pack in packs:
         events, gt = load_pack_events(pack)
         benign = gt.get("family") == "benign"
+        pack_meta.append(
+            {
+                "pack": pack.name,
+                "family": gt.get("family"),
+                "ood": bool(gt.get("ood")),
+            }
+        )
         for mode in modes:
             pred, ttu = _predict_from_events(events, mode_alias[mode])
             per_mode[mode].append(score_pack(pred, gt, ttu_seconds=ttu, benign=benign))
 
     metrics = {m: aggregate_scores(per_mode[m]) for m in modes}
+    by_family = {
+        m: aggregate_by_family(per_mode[m]) for m in modes
+    }
+    contain_dry_run = aggregate_isolate_dry_run(per_mode["correlator"])
+    vs_b1 = vs_baseline_lift(metrics["correlator"], metrics["b1"])
     ablation = {
         "raw_f1": metrics["correlator"]["campaign_f1"],
         "detector_only_f1": metrics["detector_only"]["campaign_f1"],
         "b1_f1": metrics["b1"]["campaign_f1"],
         "b2_f1": metrics["b2"]["campaign_f1"],
+        "correlator_precision": metrics["correlator"]["precision"],
+        "correlator_recall": metrics["correlator"]["recall"],
+        "b1_precision": metrics["b1"]["precision"],
+        "b1_recall": metrics["b1"]["recall"],
     }
     # B2 train floor check when split=train
     b2_train_ok = True
     if split == "train":
         b2_train_ok = metrics["b2"]["campaign_f1"] >= 0.40
 
-    passed, reasons = evaluate_pass(metrics["correlator"], metrics["b2"], ablation)
+    passed, reasons = evaluate_pass(
+        metrics["correlator"],
+        metrics["b2"],
+        ablation,
+        contain_metrics=contain_dry_run,
+    )
     if split == "train" and not b2_train_ok:
         passed = False
         reasons.append("B2 train F1 < 0.40 (sandbag)")
@@ -356,6 +385,10 @@ def eval_cmd(
         "gate": {"pass": passed, "reasons": reasons},
         "reasons": reasons,
         "metrics": metrics,
+        "by_family": by_family,
+        "vs_b1": vs_b1,
+        "contain_dry_run": contain_dry_run,
+        "packs": pack_meta,
         "ablation": ablation,
         "freeze_manifest": manifest,
         "care_vs_incumbent": "unproven",
@@ -388,12 +421,35 @@ def _file_sha(path: Path) -> str:
 
 def _render_report(result: Dict[str, Any]) -> str:
     status = "PASS" if result["pass"] else "FAIL"
+    c = result["metrics"]["correlator"]
+    b1 = result["metrics"]["b1"]
     lines = [
         f"# Eval report ({result['split']}) — **{status}**",
         "",
         f"Care vs incumbent: **{result.get('care_vs_incumbent', 'unproven')}**",
         "",
-        "## Metrics",
+        "## Detection (publish P+R, not a lone accuracy)",
+        f"- precision **{c.get('precision', 0):.3f}** · recall **{c.get('recall', 0):.3f}** · F1 **{c.get('campaign_f1', 0):.3f}**",
+        f"- Precision@1 **{c.get('precision_at_1', 0):.3f}**",
+        f"- benign false-campaign rate **{c.get('false_campaign_rate', 0):.3f}**",
+        f"- time-to-correlate **{c.get('ttu_seconds', 0):.4f}s**",
+        "",
+        "## vs single-host baseline (B1)",
+        f"- correlator F1 **{c.get('campaign_f1', 0):.3f}** vs B1 **{b1.get('campaign_f1', 0):.3f}** "
+        f"(lift **{result.get('vs_b1', {}).get('f1_lift', 0):+.3f}**)",
+        f"- correlator recall **{c.get('recall', 0):.3f}** vs B1 **{b1.get('recall', 0):.3f}**",
+        "",
+        "## Contain dry-run (IsolateHost hosts)",
+        "```json",
+        json.dumps(result.get("contain_dry_run") or {}, indent=2),
+        "```",
+        "",
+        "## By attack family",
+        "```json",
+        json.dumps((result.get("by_family") or {}).get("correlator") or {}, indent=2),
+        "```",
+        "",
+        "## Full metrics",
         "```json",
         json.dumps(result["metrics"], indent=2),
         "```",

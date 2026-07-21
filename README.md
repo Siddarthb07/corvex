@@ -128,7 +128,7 @@ Sensors / Feeder / BYO-JSONL
 ## Docs
 
 - [`SECURITY.md`](SECURITY.md) · [`THREAT_MODEL.md`](THREAT_MODEL.md) · [`LICENSE`](LICENSE)
-- [`docs/contain.md`](docs/contain.md) · [`reports/RESULTS.md`](reports/RESULTS.md)
+- [`docs/contain.md`](docs/contain.md) · [`reports/RESULTS.md`](reports/RESULTS.md) — precision+recall, benign FCR, vs B1, train/held-out gap, dry-run isolates
 
 ## License
 
