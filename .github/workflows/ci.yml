@@ -28,6 +28,14 @@ jobs:
           fi
       - name: Unit + abuse tests
         run: python -m pytest tests -q
+      - name: Clean-clone replay smoke
+        run: |
+          rm -rf /tmp/corvex-enroll
+          mkdir -p /tmp/corvex-enroll
+          CORVEX_ENROLLMENT=/tmp/corvex-enroll/enrollment.json \
+            corvex replay train/train-lateral.jsonl --out-dir runs/ci-demo
+          test -f runs/ci-demo/timeline.json
+          CORVEX_RUN_DIR="$PWD/runs/ci-demo" corvex dash --build --no-open
       - name: No destructive verbs in package
         run: python -c "from corvex.stage_c import find_destructive_verbs_in_package as f; assert f()==[]"
       - name: Drafts not in wheel
@@ -43,7 +51,7 @@ jobs:
           print('wheel ok', wheels[0])
           PY
 
-  stageA-gate:
+  eval-gate:
     runs-on: ubuntu-latest
     needs: test
     if: hashFiles('reports/stageA.json') != ''
@@ -53,5 +61,5 @@ jobs:
         with:
           python-version: "3.11"
       - run: pip install -e .
-      - name: stageA-gate
-        run: cfuse gate --report reports/stageA.json
+      - name: eval-gate
+        run: corvex gate --report reports/stageA.json

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Corvex — Live Lab</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg:#05070a; --panel:#0d1219; --line:rgba(255,255,255,.08); --text:#eef3f8;
+  --muted:#8b96a8; --dim:#5a6578; --attack:#ff5c6a; --detect:#4db8ff; --defend:#2fd67b;
+  --font:"Outfit",system-ui,sans-serif; --mono:"IBM Plex Mono",ui-monospace,monospace;
+}
+*{box-sizing:border-box} html,body{margin:0;height:100%}
+body{font-family:var(--font);color:var(--text);background:radial-gradient(800px 420px at 8% 0%,rgba(255,92,106,.09),transparent 50%),var(--bg);overflow:hidden}
+.app{height:100%;max-width:1280px;margin:0 auto;padding:16px;display:grid;grid-template-rows:auto 1fr}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.brand{font-weight:700}.brand span{color:var(--dim);font-weight:500;margin-left:8px}
+.phase{font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;padding:6px 10px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
+.phase.ATTACK_SEEN,.phase.wave1_lateral{color:var(--attack);border-color:rgba(255,92,106,.35);background:rgba(255,92,106,.08)}
+.phase.DETECT{color:var(--detect);border-color:rgba(77,184,255,.35);background:rgba(77,184,255,.08)}
+.phase.DEFEND,.phase.CONTAINED,.phase.DONE{color:var(--defend);border-color:rgba(47,214,123,.35);background:rgba(47,214,123,.08)}
+.stage{display:grid;grid-template-columns:1.3fr .9fr;gap:12px;min-height:0}
+.panel{background:rgba(13,18,25,.94);border:1px solid var(--line);border-radius:16px;position:relative;overflow:hidden;min-height:0}
+.map{min-height:480px}
+svg{width:100%;height:100%}
+.host{fill:#121821;stroke:#2a3344;stroke-width:2;transition:all .35s}
+.host.hit{stroke:var(--attack);fill:rgba(255,92,106,.14)}
+.host.isolated{stroke:var(--defend);fill:rgba(47,214,123,.14)}
+.attacker{fill:#1a1012;stroke:var(--attack);stroke-width:2}
+.label{font-family:var(--font);font-size:13px;fill:var(--text);font-weight:600}
+.sub{font-family:var(--mono);font-size:10px;fill:var(--muted)}
+.link{fill:none;stroke:var(--attack);stroke-width:2;opacity:.15;transition:opacity .3s}
+.link.on{opacity:1}
+.mesh{fill:none;stroke:var(--detect);stroke-width:2;stroke-dasharray:6 6;opacity:0;transition:opacity .35s}
+.mesh.on{opacity:1}
+.shield{fill:none;stroke:var(--defend);stroke-width:3;opacity:0;transition:opacity .35s}
+.shield.on{opacity:1}
+.caption{position:absolute;left:14px;right:14px;bottom:14px;background:rgba(5,7,10,.75);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:.95rem;backdrop-filter:blur(8px)}
+.feed{display:flex;flex-direction:column}
+.feed h2{margin:0;padding:14px;font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
+.stream{flex:1;overflow:auto;padding:0 10px 10px;font-family:var(--mono);font-size:.72rem}
+.evt{border:1px solid var(--line);border-radius:10px;padding:10px;margin-bottom:8px;background:#0a0f16}
+.evt.auth{border-color:rgba(255,92,106,.35)}
+.evt.detect{border-color:rgba(77,184,255,.4)}
+.evt.defend,.evt.blocked{border-color:rgba(47,214,123,.4)}
+.evt .t{color:var(--muted);margin-bottom:4px;display:flex;justify-content:space-between}
+.live{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:.7rem;color:var(--muted)}
+.live i{width:7px;height:7px;border-radius:50%;background:var(--defend);box-shadow:0 0 0 3px rgba(47,214,123,.2);animation:pulse 1.4s infinite}
+@keyframes pulse{50%{opacity:.35}}
+@media(max-width:900px){body{overflow:auto}.stage{grid-template-columns:1fr}.map{height:420px}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div class="brand">Corvex <span>live virtual lab</span></div>
+    <div style="display:flex;gap:10px;align-items:center">
+      <div class="live"><i></i> docker sandbox</div>
+      <div class="phase" id="phase">BOOT</div>
+    </div>
+  </header>
+  <div class="stage">
+    <section class="panel map">
+      <svg viewBox="0 0 900 560">
+        <circle class="attacker" cx="120" cy="280" r="34"/>
+        <text class="label" x="120" y="286" text-anchor="middle">Attacker</text>
+        <text class="sub" x="120" y="330" text-anchor="middle">10.1.0.5</text>
+
+        <path id="link-a" class="link" d="M154 260 C260 180 320 150 378 145"/>
+        <path id="link-b" class="link" d="M154 280 C300 280 480 280 578 280"/>
+        <path id="link-c" class="link" d="M154 300 C260 380 320 410 378 415"/>
+        <path id="mesh-ab" class="mesh" d="M462 155 L578 255"/>
+        <path id="mesh-bc" class="mesh" d="M578 305 L462 405"/>
+        <path id="mesh-ac" class="mesh" d="M420 182 L420 378"/>
+
+        <circle id="host-a" class="host" cx="420" cy="140" r="42"/>
+        <circle id="shield-a" class="shield" cx="420" cy="140" r="54"/>
+        <text class="label" x="420" y="146" text-anchor="middle">host-a</text>
+        <text class="sub" x="420" y="198" text-anchor="middle">workstation</text>
+
+        <circle id="host-b" class="host" cx="620" cy="280" r="42"/>
+        <circle id="shield-b" class="shield" cx="620" cy="280" r="54"/>
+        <text class="label" x="620" y="286" text-anchor="middle">host-b</text>
+        <text class="sub" x="620" y="338" text-anchor="middle">fileserver</text>
+
+        <circle id="host-c" class="host" cx="420" cy="420" r="42"/>
+        <circle id="shield-c" class="shield" cx="420" cy="420" r="54"/>
+        <text class="label" x="420" y="426" text-anchor="middle">host-c</text>
+        <text class="sub" x="420" y="478" text-anchor="middle">jump box</text>
+
+        <text id="camp" x="700" y="60" fill="#4db8ff" font-family="IBM Plex Mono, monospace" font-size="12" opacity="0"></text>
+      </svg>
+      <div class="caption" id="caption">Waiting for live lab…</div>
+    </section>
+    <aside class="panel feed">
+      <h2>Live event stream</h2>
+      <div class="stream" id="stream"></div>
+    </aside>
+  </div>
+</div>
+<script>
+const stream = document.getElementById('stream');
+let lastFeedLen = -1;
+
+function render(state) {
+  if (!state) return;
+  const phase = state.phase || 'BOOT';
+  document.getElementById('phase').textContent = phase;
+  document.getElementById('phase').className = 'phase ' + phase;
+  document.getElementById('caption').textContent = state.caption || '';
+
+  const hosts = state.hosts || {};
+  ['host-a','host-b','host-c'].forEach(id => {
+    const st = (hosts[id] && hosts[id].state) || 'open';
+    const el = document.getElementById(id);
+    el.className = 'host' + (st === 'hit' || st === 'isolated' ? ' ' + (st === 'isolated' ? 'isolated' : 'hit') : '');
+    const sh = document.getElementById('shield-' + id.split('-')[1]);
+    sh.className = 'shield' + (st === 'isolated' ? ' on' : '');
+    const link = document.getElementById('link-' + id.split('-')[1]);
+    if (st === 'hit' || st === 'isolated') link.classList.add('on');
+  });
+
+  const camps = state.campaigns || [];
+  const campEl = document.getElementById('camp');
+  if (camps.length) {
+    campEl.textContent = camps[0].id;
+    campEl.style.opacity = '1';
+    document.getElementById('mesh-ab').classList.add('on');
+    document.getElementById('mesh-bc').classList.add('on');
+    document.getElementById('mesh-ac').classList.add('on');
+  }
+
+  const feed = state.feed || [];
+  if (feed.length !== lastFeedLen) {
+    lastFeedLen = feed.length;
+    stream.innerHTML = '';
+    [...feed].reverse().forEach(item => {
+      const div = document.createElement('div');
+      div.className = 'evt ' + (item.type || '');
+      div.innerHTML = `<div class="t"><span>${(item.ts || '').toString().slice(11,19)}</span><span>${(item.host || item.type || '').toString().toUpperCase()}</span></div>
+        <div>${item.text || ''}</div>`;
+      stream.appendChild(div);
+    });
+  }
+}
+
+async function tick() {
+  try {
+    const res = await fetch('./theatre_state.json?ts=' + Date.now(), {cache:'no-store'});
+    if (res.ok) render(await res.json());
+  } catch (e) {}
+}
+setInterval(tick, 400);
+tick();
+</script>
+</body>
+</html>

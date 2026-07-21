@@ -62,6 +62,11 @@ def make_handler(repo_root: Path, dash_dir: Path) -> Type[SimpleHTTPRequestHandl
             if path != "/api/checklist":
                 self.send_error(404, "not found")
                 return
+            # Refuse remote checklist mutations (LAN bind is view-only).
+            peer = self.client_address[0] if self.client_address else ""
+            if peer not in ("127.0.0.1", "::1", "localhost"):
+                self._json(403, {"ok": False, "error": "checklist toggles are loopback-only"})
+                return
             try:
                 data = self._read_json()
                 key = str(data.get("key") or "")
