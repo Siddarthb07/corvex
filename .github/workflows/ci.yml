@@ -21,7 +21,9 @@ jobs:
         run: python -m pytest tests/test_day0.py::test_detectors_ast_purity -q
       - name: Refuse default HMAC strings in tree
         run: |
-          if grep -RIn --exclude-dir=.git --exclude-dir=.venv --exclude=auth.py \
+          # auth.py may list poison values; the workflow itself mentions them — ignore both.
+          if grep -RIn --exclude-dir=.git --exclude-dir=.venv --exclude-dir=.github \
+            --exclude=auth.py \
             -e 'corvex-shared-secret' -e 'test-shared-hmac' . ; then
             echo "Forbidden shared HMAC secret found" >&2
             exit 1
