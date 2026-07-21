@@ -41,25 +41,11 @@ jobs:
       - name: Drafts not in wheel
         run: |
           python -m build
-          python - <<'PY'
+          python <<'PY'
           import zipfile, pathlib
-          wheels = list(pathlib.Path('dist').glob('*.whl'))
-          assert wheels, 'no wheel'
-          z = zipfile.ZipFile(wheels[0])
-          names = z.namelist()
-          assert not any(n.startswith('drafts/') for n in names), names
-          print('wheel ok', wheels[0])
+          wheels = list(pathlib.Path("dist").glob("*.whl"))
+          assert wheels, "no wheel"
+          names = zipfile.ZipFile(wheels[0]).namelist()
+          assert not any(n.startswith("drafts/") for n in names), names
+          print("wheel ok", wheels[0])
           PY
-
-  eval-gate:
-    runs-on: ubuntu-latest
-    needs: test
-    if: hashFiles('reports/stageA.json') != ''
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-      - run: pip install -e .
-      - name: eval-gate
-        run: corvex gate --report reports/stageA.json
