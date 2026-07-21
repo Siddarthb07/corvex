@@ -20,17 +20,23 @@ runs/
 heldout/
 *.sealed
 
-# local sandboxes & large gifs
+# local sandboxes & large media (except published docs/assets)
 .sandbox/
 *.gif
+*.mp4
 
 # allow published demo media in docs
 !docs/assets/
 !docs/assets/*.mp4
 !docs/assets/*.gif
 
+# lab runtime (sources under labs/live are tracked)
+labs/live/shared/
+labs/**/__pycache__/
+
 # regenerated / machine-local reports (keep RESULTS.md summary only)
 reports/dashboard/
+reports/daily/
 reports/seal-day0.txt
 reports/eval-*-console.txt
 reports/pytest.txt
@@ -46,3 +52,4 @@ reports/stageA_heldout.json
 reports/stageA_train.json
 reports/stageA_train.md
 reports/stageA-gate.txt
+reports/stage-b-allowed

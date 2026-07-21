@@ -28,9 +28,11 @@ from corvex.feeder import (
     feed_bus,
     generate_campaign_events,
     load_pack_events,
+    resign_events,
     write_pack,
 )
 from corvex.ingest import ingest_byo
+from corvex.lab_enroll import DEMO_HOSTS, ensure_lab_enrollment
 from corvex.seal import (
     ensure_key,
     key_path,
@@ -42,11 +44,36 @@ from corvex.seal import (
 from corvex.store import CampaignStore
 
 app = typer.Typer(add_completion=False, no_args_is_help=True)
-ROOT = Path(__file__).resolve().parents[1]
+_PKG_ROOT = Path(__file__).resolve().parents[1]
 
 
 def _repo_root() -> Path:
-    return ROOT
+    """Prefer CORVEX_ROOT, then cwd if it looks like the checkout, else editable package parent."""
+    env = os.environ.get("CORVEX_ROOT")
+    if env:
+        return Path(env).resolve()
+    cwd = Path.cwd().resolve()
+    if (cwd / "pyproject.toml").exists() and (
+        (cwd / "corvex").is_dir() or (cwd / "train").is_dir()
+    ):
+        return cwd
+    return _PKG_ROOT
+
+
+@app.command("init")
+def init_cmd(
+    force: bool = typer.Option(False, help="Overwrite existing lab enrollment"),
+) -> None:
+    """Create a local lab enrollment under ~/.corvex/ (required for replay / ingest)."""
+    path = default_secrets_path()
+    if path.exists() and not force:
+        typer.echo(f"enrollment already present: {path}")
+        typer.echo("pass --force to regenerate")
+        return
+    enrollment = generate_lab_enrollment(DEMO_HOSTS)
+    save_enrollment(path, enrollment)
+    typer.echo(f"wrote lab enrollment: {path}")
+    typer.echo("secrets stay outside the repo — do not commit this file")
 
 
 @app.command("seal-day0")
@@ -162,8 +189,10 @@ def replay(
     detector_only: bool = typer.Option(False, help="Detector alerts path only"),
 ) -> None:
     """Run correlator on a pack and write campaign store + timeline."""
-    enrollment = load_enrollment(default_secrets_path())
+    enrollment = ensure_lab_enrollment()
     events, gt = load_pack_events(pack)
+    # Committed train packs were signed with a prior enrollment — re-HMAC for this machine.
+    events = resign_events(events, enrollment)
     out_dir = Path(out_dir)
     if out_dir.exists():
         shutil.rmtree(out_dir)
@@ -184,7 +213,16 @@ def replay(
         "campaigns": [c.to_dict() for c in store.all()],
     }
     (out_dir / "timeline.json").write_text(json.dumps(timeline, indent=2), encoding="utf-8")
-    typer.echo(json.dumps({"campaigns": len(store.all()), "ttu_seconds": ttu}, indent=2))
+    # Pointer so `corvex dash` can show the latest replay without extra flags.
+    latest = _repo_root() / "runs" / "latest"
+    latest.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        if latest.exists() or latest.is_symlink():
+            latest.unlink()
+        latest.symlink_to(out_dir.resolve(), target_is_directory=True)
+    except OSError:
+        latest.write_text(str(out_dir.resolve()), encoding="utf-8")
+    typer.echo(json.dumps({"campaigns": len(store.all()), "ttu_seconds": ttu, "out_dir": str(out_dir)}, indent=2))
 
 
 @app.command("timeline")
@@ -202,7 +240,7 @@ def ingest_byo_cmd(
     path: Path = typer.Argument(..., help="BYO JSONL envelopes"),
     out_bus: Path = typer.Option(Path("runs/byo/events.jsonl")),
 ) -> None:
-    enrollment = load_enrollment(default_secrets_path())
+    enrollment = ensure_lab_enrollment()
     bus = JsonlBus(out_bus)
     n = ingest_byo(bus, path, enrollment)
     typer.echo(f"ingested {n} events into {out_bus}")
@@ -268,7 +306,7 @@ def eval_cmd(
             _ = unseal_file(rules_sealed, key)
 
     if not packs:
-        raise typer.Exit("no packs found — run cfuse seal-day0 first")
+        raise typer.Exit("no packs found — run `corvex seal-day0` first")
 
     # Freeze manifest of source files
     manifest = {
@@ -424,6 +462,11 @@ def dash_cmd(
         help="Bind address (use 0.0.0.0 to share on a lab LAN)",
     ),
     port: int = typer.Option(8765, "--port", help="HTTP port"),
+    run_dir: Optional[Path] = typer.Option(
+        None,
+        "--run-dir",
+        help="Replay/run directory with timeline.json (default: runs/latest)",
+    ),
     open_browser: bool = typer.Option(
         True,
         "--open/--no-open",
@@ -437,6 +480,8 @@ def dash_cmd(
     import webbrowser
 
     root = _repo_root()
+    if run_dir is not None:
+        os.environ["CORVEX_RUN_DIR"] = str(Path(run_dir).resolve())
     out = write_dashboard(root)
     typer.echo(f"wrote {out}")
     file_url = out.resolve().as_uri()

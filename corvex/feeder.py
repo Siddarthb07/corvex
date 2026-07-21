@@ -228,6 +228,29 @@ def load_pack_events(path: Path) -> Tuple[List[EventEnvelope], Dict[str, Any]]:
     return events, gt
 
 
+def resign_events(
+    events: Sequence[EventEnvelope],
+    enrollment: Enrollment,
+) -> List[EventEnvelope]:
+    """Re-HMAC pack events with the caller's lab enrollment (demo / clean-clone path)."""
+    out: List[EventEnvelope] = []
+    for env in events:
+        secret = enrollment.require(env.producer_id, env.host_id)
+        out.append(
+            sign_envelope(
+                producer_id=env.producer_id,
+                host_id=env.host_id,
+                payload_type=env.payload_type,
+                payload=env.payload,
+                secret=secret,
+                event_id=env.event_id,
+                ts_utc=env.ts_utc,
+                nonce=env.nonce,
+            )
+        )
+    return out
+
+
 def feed_bus(
     bus: JsonlBus,
     events: Sequence[EventEnvelope],

@@ -37,32 +37,28 @@ git clone https://github.com/Siddarthb07/corvex.git
 cd corvex
 python -m pip install -e ".[dev]"
 
-# 1) Replay a sample multi-host attack into the store
+# Replay a sample multi-host attack (auto-creates ~/.corvex/enrollment.json)
 corvex replay train/train-lateral.jsonl --out-dir runs/demo
 
-# 2) Open the monitor (default port 8765)
-corvex dash
+# Open the monitor (prints URLs after bind)
+corvex dash --run-dir runs/demo
 ```
 
-After `corvex dash` starts, open the URLs it prints:
-
-| Surface | Path |
-|---------|------|
-| Monitor | `/` |
+| Surface | Path (after `corvex dash`) |
+|---------|----------------------------|
+| Monitor | `/` — campaigns + eval + safety controls |
 | Prevention log | `/logs.html` |
 
-Defaults bind to loopback only. To share the dash on a lab LAN:
+Defaults bind to loopback. Share on a lab LAN (view-only checklist from remote hosts):
 
 ```bash
-corvex dash --host 0.0.0.0 --port 8765
-# then browse http://<this-machine-ip>:8765/
+corvex dash --host 0.0.0.0 --port 8765 --run-dir runs/demo
+# browse http://<this-machine-ip>:8765/
 ```
 
-CLI name: `corvex` (legacy alias: `cfuse`).
+CLI: `corvex` (legacy alias `cfuse`). Optional: `corvex init` to create enrollment without replaying.
 
 ## Bring your own events
-
-Point exporters or sensors at Corvex with signed JSONL, then run the dash on that bus:
 
 ```bash
 corvex ingest-byo path/to/export.jsonl --out-bus runs/prod/events.jsonl
@@ -71,15 +67,17 @@ corvex dash
 
 Enrollment / HMAC secrets live **outside** the repo (`~/.corvex/` by default). Do not commit keys.
 
+Public train packs are re-signed with your local enrollment on replay so a clean clone works without sealed held-out material.
+
 ## Docker attack lab
 
-Needs Docker. Spins up 3 virtual hosts + attacker + Corvex on an isolated bridge network:
+Needs Docker. Sources live in `labs/live/`:
 
 ```bash
 python scripts/run_live_lab.py
 ```
 
-Same flow as the live-lab demo: detect → isolate flags → blocked retries. No production machines involved.
+Spins up 3 virtual hosts + attacker + Corvex on an isolated bridge network. Same flow as the live-lab demo.
 
 ## What works today vs later
 
@@ -89,8 +87,6 @@ Same flow as the live-lab demo: detect → isolate flags → blocked retries. No
 | Replay / BYO JSONL ingest | Ready |
 | Sensors + JetStream/mTLS bus | Stub / gated |
 | Live host isolate | Dry-run only (`CORVEX_CONTAIN=0`) |
-
-Target shape when contain is unlocked:
 
 ```text
 [Host sensors] --mTLS--> [Event bus] --> [Corvex correlator]
@@ -106,7 +102,7 @@ Target shape when contain is unlocked:
 
 ## Safety
 
-Dashboard toggles map to `reports/security_l1_checklist.json`. They gate “we saw an attack” → “we change a host”:
+Dashboard toggles map to `reports/security_l1_checklist.json`. They gate detect → act:
 
 - Prove sensor identity (mTLS)
 - Signed ≠ allowed (authz separate from HMAC)
@@ -114,7 +110,7 @@ Dashboard toggles map to `reports/security_l1_checklist.json`. They gate “we s
 - Anti-replay, dual control, blast-radius caps
 - Fail closed, tamper-evident log, off-bus kill switch
 
-Flipping toggles does **not** unlock real LAN quarantine. Dry-run only until a real executor exists.
+Flipping toggles does **not** unlock real LAN quarantine. When the dash is bound on `0.0.0.0`, checklist POSTs are still **loopback-only**.
 
 Details: [`corvex/contain/CHECKLIST.md`](corvex/contain/CHECKLIST.md) · [`docs/contain.md`](docs/contain.md)
 
@@ -131,9 +127,9 @@ Sensors / Feeder / BYO-JSONL
 
 ## Docs
 
-- [`SECURITY.md`](SECURITY.md) · [`THREAT_MODEL.md`](THREAT_MODEL.md)
+- [`SECURITY.md`](SECURITY.md) · [`THREAT_MODEL.md`](THREAT_MODEL.md) · [`LICENSE`](LICENSE)
 - [`docs/contain.md`](docs/contain.md) · [`reports/RESULTS.md`](reports/RESULTS.md)
 
 ## License
 
-MIT — see `pyproject.toml`.
+MIT — see [`LICENSE`](LICENSE).

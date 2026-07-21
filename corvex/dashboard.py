@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 from datetime import datetime, timezone
 from html import escape
 from pathlib import Path
@@ -13,6 +14,29 @@ def _load(path: Path) -> Optional[Dict[str, Any]]:
     if not path.exists():
         return None
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+def _resolve_run_dir(root: Path) -> Optional[Path]:
+    env = os.environ.get("CORVEX_RUN_DIR")
+    if env:
+        p = Path(env)
+        return p if p.exists() else None
+    latest = root / "runs" / "latest"
+    if latest.is_symlink() or latest.is_dir():
+        return latest.resolve()
+    if latest.is_file():
+        target = Path(latest.read_text(encoding="utf-8").strip())
+        return target if target.exists() else None
+    # Fall back to newest runs/*/timeline.json
+    runs = root / "runs"
+    if not runs.is_dir():
+        return None
+    candidates = sorted(
+        (p.parent for p in runs.glob("*/timeline.json")),
+        key=lambda p: p.stat().st_mtime,
+        reverse=True,
+    )
+    return candidates[0] if candidates else None
 
 
 def collect_snapshot(root: Path) -> Dict[str, Any]:
@@ -41,6 +65,15 @@ def collect_snapshot(root: Path) -> Dict[str, Any]:
         block = hm.get(block_name) or {}
         val = block.get(field)
         return float(val) if val is not None else 0.0
+
+    run_dir = _resolve_run_dir(root)
+    timeline: Dict[str, Any] = {}
+    campaigns: list = []
+    if run_dir is not None:
+        tl_path = run_dir / "timeline.json"
+        if tl_path.exists():
+            timeline = json.loads(tl_path.read_text(encoding="utf-8"))
+            campaigns = list(timeline.get("campaigns") or [])
 
     return {
         "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
@@ -72,6 +105,10 @@ def collect_snapshot(root: Path) -> Dict[str, Any]:
             audit.get("CORVEX_CONTAIN", audit.get("CFUSE_CONTAIN", 0)) or 0
         ),
         "version": str(audit.get("version") or "0.4.0"),
+        "run_dir": str(run_dir) if run_dir else None,
+        "campaigns": campaigns,
+        "timeline_pack": timeline.get("pack"),
+        "timeline_ttu": timeline.get("ttu_seconds"),
     }
 
 
@@ -332,6 +369,11 @@ body::before {{
   </section>
 
   <section class="section">
+    <div class="section-head"><h2>Campaigns</h2><p id="runHint"></p></div>
+    <div class="panel card" id="campaigns">No replay loaded yet — run <code>corvex replay train/train-lateral.jsonl</code></div>
+  </section>
+
+  <section class="section">
     <div class="section-head"><h2>Detection</h2></div>
     <div class="metrics" id="metrics"></div>
   </section>
@@ -395,6 +437,24 @@ body::before {{
 
     document.getElementById('containTitle').textContent = containOff ? 'Dry-run only' : 'Live on';
     document.getElementById('containTitle').style.color = containOff ? 'var(--muted)' : 'var(--warn)';
+
+    const camps = s.campaigns || [];
+    const runHint = document.getElementById('runHint');
+    if (s.run_dir) {{
+      runHint.textContent = `${{camps.length}} campaign(s) · ${{s.timeline_pack || s.run_dir}}`;
+    }} else {{
+      runHint.textContent = 'Load a replay with `corvex replay …` or `corvex dash --run-dir runs/demo`';
+    }}
+    const campEl = document.getElementById('campaigns');
+    if (!camps.length) {{
+      campEl.innerHTML = 'No campaigns yet. Replay a train pack first.';
+    }} else {{
+      campEl.innerHTML = camps.map(c => {{
+        const hosts = (c.host_ids || []).join(', ');
+        const stages = (c.stages || []).map(st => st.name || st.stage || '?').join(' → ');
+        return `<div class="ctrl-row"><div class="ctrl-name"><strong>${{c.campaign_id || 'campaign'}}</strong><div class="desc" style="color:var(--muted);font-size:12px;margin-top:4px">${{hosts}}</div><div class="desc" style="color:var(--muted);font-size:12px;margin-top:2px">${{stages || '—'}}</div></div><span class="badge">${{Number(c.score||0).toFixed(2)}}</span></div>`;
+      }}).join('');
+    }}
 
     const items = d.items || {{}};
     const keys = Object.keys(items).sort();

@@ -24,23 +24,27 @@ Held-out correlator bake-off on sealed synthetic multi-host packs.
 
 | Capability | Status |
 |------------|--------|
-| Held-out eval | PASS |
+| Held-out eval | PASS (local key + sealed packs required) |
 | Sensors / event bus | Gated |
 | Live contain | Dry-run only; live locked |
 
 ## Reproduce
 
-Sealed held-out packs and keys are **not** in this repo (generated locally under `~/.corvex/`). With keys available:
+### Public path (no secrets)
 
 ```bash
 pip install -e ".[dev]"
-corvex eval --split heldout
-corvex gate
+corvex replay train/train-lateral.jsonl --out-dir runs/demo
+corvex dash --run-dir runs/demo
 ```
 
-Public train packs under `train/` work without sealing:
+Replay auto-creates `~/.corvex/enrollment.json` and re-signs the public train pack for your machine.
+
+### Held-out eval (local only)
+
+Sealed packs live under `heldout/` (gitignored). The unlock key is `~/.corvex/heldout.key` (or `CORVEX_HELDOUT_KEY`). On a machine that already ran `corvex seal-day0`:
 
 ```bash
-corvex replay train/train-lateral.jsonl --out-dir runs/demo
-corvex dash
+corvex eval --split heldout
+corvex gate
 ```

@@ -11,7 +11,7 @@ import time
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-LAB = ROOT / ".sandbox" / "live-lab"
+LAB = ROOT / "labs" / "live"
 SHARED = LAB / "shared"
 THEATRE_SRC = LAB / "theatre" / "index.html"
 OUT_DIR = ROOT / ".sandbox" / "demo"
