@@ -83,6 +83,8 @@ def collect_snapshot(root: Path) -> Dict[str, Any]:
         "care_vs_incumbent": held.get("care_vs_incumbent", "unproven"),
         "metrics": {
             "correlator_f1": mget("correlator"),
+            "precision": mget("correlator", "precision"),
+            "recall": mget("correlator", "recall"),
             "b1_f1": mget("b1"),
             "b2_f1": mget("b2"),
             "detector_only_f1": mget("detector_only"),
@@ -464,10 +466,10 @@ body::before {{
     document.getElementById('ctrlSummary').textContent = `${{onCount}}/${{keys.length}} on`;
 
     document.getElementById('metrics').innerHTML = [
-      ['Our score', m.correlator_f1],
-      ['Naive', m.b1_f1],
-      ['Classic', m.b2_f1],
-      ['False alarms', m.false_campaign_rate],
+      ['Precision', m.precision != null ? m.precision : m.correlator_f1],
+      ['Recall', m.recall != null ? m.recall : m.correlator_f1],
+      ['vs naive (B1)', m.b1_f1],
+      ['Benign FCR', m.false_campaign_rate],
     ].map(([label, value]) =>
       `<div class="metric"><div class="label">${{label}}</div><div class="value">${{fmt(value)}}</div></div>`
     ).join('');
