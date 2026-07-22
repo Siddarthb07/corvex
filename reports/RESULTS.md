@@ -12,10 +12,10 @@ This page intentionally avoids a single aggregate “accuracy.” Security corre
 | Recall | **1.00** | Of true multi-host campaigns, share recovered |
 | Campaign F1 | **1.00** | Harmonic mean of the two above |
 | Precision@1 | **1.00** | Top-ranked campaign correct |
-| Benign false-campaign rate | **0.00** | On the held-out benign multi-host pack |
+| Benign false-campaign rate | **0.00** | On held-out benign packs (**N=1**) |
 | Time-to-correlate | **~0.012 s** | Wall time from first ingest to campaigns (lab machine) |
 
-Counts (attack packs only): TP=2, FP=0, FN=0.
+**Sample size (held-out):** attack packs **N=2** (TP=2, FP=0, FN=0); benign packs **N=1**. Same thinness class — the 0.00 FCR is not a discrepancy with train (train has **N_benign=0**); it is just still thin. Expand N before treating FCR as workload evidence.
 
 ### Why naive numbers can lie here
 
@@ -38,8 +38,8 @@ Competitive SIEM-style joins (B2) also hit F1 1.00 on this sealed set. Detector-
 
 | Split | Precision | Recall | F1 | Benign FCR | TTU |
 |-------|-----------|--------|-----|------------|-----|
-| Train (dev) | 1.00 | 1.00 | 1.00 | n/a (no benign pack) | ~0.011 s |
-| Held-out (sealed) | 1.00 | 1.00 | 1.00 | 0.00 | ~0.012 s |
+| Train (dev) | 1.00 | 1.00 | 1.00 | n/a (**N_benign=0**) | ~0.011 s |
+| Held-out (sealed) | 1.00 | 1.00 | 1.00 | 0.00 (**N_benign=1**) | ~0.012 s |
 
 **Gap:** ~0 on headline P/R/F1. Small gap ≠ proof of real-world generalization — packs are author-designed synthetic grammar; OOD is timing/noise within that grammar.
 
@@ -51,9 +51,9 @@ Train numbers are **dev/tuning context only**. They are not the sealed result.
 |--------|-----------|--------|-----|------------|
 | lateral (OOD timing) | 1.00 | 1.00 | 1.00 | — |
 | exfil | 1.00 | 1.00 | 1.00 | — |
-| benign multi-host | — | — | — | **0.00** |
+| benign multi-host (**N=1**) | — | — | — | **0.00** |
 
-No family-level failure on this sealed set. If a future pack shows exfil ≪ lateral (or the reverse), that split is what gets published — not a buried row under a single F1.
+No family-level failure on this sealed set. Benign FCR is a single-pack observation until N grows. If a future pack shows exfil ≪ lateral (or the reverse), that split is what gets published — not a buried row under a single F1.
 
 ## Containment dry-run (not live)
 

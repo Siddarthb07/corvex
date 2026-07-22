@@ -70,10 +70,10 @@ Synthetic multi-host packs. **Care vs commercial tools: unproven.** We do not pu
 | Recall | **1.00** | True multi-host campaigns recovered |
 | Campaign F1 | **1.00** | Harmonic mean of P+R |
 | Precision@1 | **1.00** | Top-ranked campaign correct |
-| Benign false-campaign rate | **0.00** | Held-out benign multi-host pack |
+| Benign false-campaign rate | **0.00** | Held-out benign packs (**N=1**) |
 | Time-to-correlate | **~0.012 s** | First ingest → campaigns (lab machine) |
 
-Attack-pack counts: TP=2, FP=0, FN=0.
+**N:** attack packs **2** (TP=2, FP=0, FN=0); benign packs **1**. Train has **N_benign=0**. Thin on purpose until expanded — not a train/held-out discrepancy.
 
 ### vs single-host baseline (why a correlator)
 
@@ -92,8 +92,8 @@ B2 (SIEM-style joins) and detector-only also hit F1 1.00 on this sealed set. On 
 
 | Split | Precision | Recall | F1 | Benign FCR | TTU |
 |-------|-----------|--------|-----|------------|-----|
-| Train (dev only) | 1.00 | 1.00 | 1.00 | n/a | ~0.011 s |
-| Held-out (sealed) | 1.00 | 1.00 | 1.00 | 0.00 | ~0.012 s |
+| Train (dev only) | 1.00 | 1.00 | 1.00 | n/a (N=0) | ~0.011 s |
+| Held-out (sealed) | 1.00 | 1.00 | 1.00 | 0.00 (N=1) | ~0.012 s |
 
 Train is **context**, not the sealed claim. Small gap ≠ real-world generalization.
 
