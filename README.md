@@ -4,6 +4,69 @@ Multi-host **campaign correlator** — stitches weak signals across machines int
 
 Observe and correlate first. Live containment stays locked behind safety controls.
 
+## Results (sealed held-out)
+
+Synthetic multi-host packs. **Care vs commercial tools: unproven.** We do not publish a lone “accuracy” — recall without precision (or without a benign false-alarm rate) is how correlators look strong and fail in a SOC.
+
+### Detection
+
+| Metric | Corvex | Notes |
+|--------|--------|--------|
+| Precision | **1.00** | Flagged campaigns that matched ground truth |
+| Recall | **1.00** | True multi-host campaigns recovered |
+| Campaign F1 | **1.00** | Harmonic mean of P+R |
+| Precision@1 | **1.00** | Top-ranked campaign correct |
+| Benign false-campaign rate | **0.00** | Held-out benign multi-host pack |
+| Time-to-correlate | **~0.012 s** | First ingest → campaigns (lab machine) |
+
+Attack-pack counts: TP=2, FP=0, FN=0.
+
+### vs single-host baseline (why a correlator)
+
+| | Corvex | B1 (per-host naive) |
+|--|--------|---------------------|
+| F1 | **1.00** | **0.00** |
+| Recall | **1.00** | **0.00** |
+| Precision | **1.00** | **0.00** |
+| Benign false-campaign rate | **0.00** | **1.00** |
+
+B1 misses the multi-host campaigns and still cries wolf on benign traffic. That gap is the premise — not the absolute Corvex score alone.
+
+B2 (SIEM-style joins) and detector-only also hit F1 1.00 on this sealed set. On **train**, detector-only was **0.89** vs correlator **1.00** — fusion helps there; held-out does not separate them yet. Honest limit of this pack grammar.
+
+### Held-out vs train
+
+| Split | Precision | Recall | F1 | Benign FCR | TTU |
+|-------|-----------|--------|-----|------------|-----|
+| Train (dev only) | 1.00 | 1.00 | 1.00 | n/a | ~0.011 s |
+| Held-out (sealed) | 1.00 | 1.00 | 1.00 | 0.00 | ~0.012 s |
+
+Train is **context**, not the sealed claim. Small gap ≠ real-world generalization.
+
+### By attack pattern (held-out)
+
+| Family | Precision | Recall | F1 | Benign FCR |
+|--------|-----------|--------|-----|------------|
+| lateral (OOD timing) | 1.00 | 1.00 | 1.00 | — |
+| exfil | 1.00 | 1.00 | 1.00 | — |
+| benign multi-host | — | — | — | **0.00** |
+
+### Contain dry-run (`IsolateHost`, not live)
+
+| Metric | Held-out |
+|--------|----------|
+| Hosts proposed | 6 |
+| Correct isolates | 6 |
+| False isolates | **0** |
+| False-isolate rate | **0.00** |
+
+`CORVEX_CONTAIN=0`. A future nonzero false-isolate rate gets published, not footnoted.
+
+**Proves (narrow):** Sealed synthetic packs; pre-registered P+R + benign FCR + TTU bars; beats B1; dry-run host sets clean.  
+**Does not prove:** Real malware defense, SOC workload cut, commercial parity, or that live contain is safe to arm.
+
+Full write-up: [`reports/RESULTS.md`](reports/RESULTS.md).
+
 ## Demos
 
 ### 30s walkthrough
@@ -128,7 +191,7 @@ Sensors / Feeder / BYO-JSONL
 ## Docs
 
 - [`SECURITY.md`](SECURITY.md) · [`THREAT_MODEL.md`](THREAT_MODEL.md) · [`LICENSE`](LICENSE)
-- [`docs/contain.md`](docs/contain.md) · [`reports/RESULTS.md`](reports/RESULTS.md) — precision+recall, benign FCR, vs B1, train/held-out gap, dry-run isolates
+- [`docs/contain.md`](docs/contain.md) · [`reports/RESULTS.md`](reports/RESULTS.md)
 
 ## License
 
