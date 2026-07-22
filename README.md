@@ -4,6 +4,60 @@ Multi-host **campaign correlator** — stitches weak signals across machines int
 
 Observe and correlate first. Live containment stays locked behind safety controls.
 
+## Demos
+
+### 30s walkthrough
+
+![Corvex 30s pitch](docs/assets/corvex-pitch-30s.gif)
+
+[Full MP4](docs/assets/corvex-pitch-30s.mp4)
+
+### Live Docker lab
+
+Real HTTP attack across virtual hosts; Corvex isolates mid-campaign; retries return `403`.
+
+![Corvex live lab](docs/assets/corvex-live-lab.gif)
+
+[Full MP4](docs/assets/corvex-live-lab.mp4)
+
+### Attack theatre
+
+Lateral-auth hop across `host-a` / `host-b` / `host-c`.
+
+![Corvex attack theatre](docs/assets/corvex-attack-theatre.gif)
+
+[Full MP4](docs/assets/corvex-attack-theatre.mp4)
+
+## Quick start
+
+Requires Python 3.9+.
+
+```bash
+git clone https://github.com/Siddarthb07/corvex.git
+cd corvex
+python -m pip install -e ".[dev]"
+
+# Replay a sample multi-host attack (auto-creates ~/.corvex/enrollment.json)
+corvex replay train/train-lateral.jsonl --out-dir runs/demo
+
+# Open the monitor (prints URLs after bind)
+corvex dash --run-dir runs/demo
+```
+
+| Surface | Path (after `corvex dash`) |
+|---------|----------------------------|
+| Monitor | `/` — campaigns + eval + safety controls |
+| Prevention log | `/logs.html` |
+
+Defaults bind to loopback. Share on a lab LAN (view-only checklist from remote hosts):
+
+```bash
+corvex dash --host 0.0.0.0 --port 8765 --run-dir runs/demo
+# browse http://<this-machine-ip>:8765/
+```
+
+CLI: `corvex` (legacy alias `cfuse`). Optional: `corvex init` to create enrollment without replaying.
+
 ## Results (sealed held-out)
 
 Synthetic multi-host packs. **Care vs commercial tools: unproven.** We do not publish a lone “accuracy” — recall without precision (or without a benign false-alarm rate) is how correlators look strong and fail in a SOC.
@@ -66,60 +120,6 @@ Train is **context**, not the sealed claim. Small gap ≠ real-world generalizat
 **Does not prove:** Real malware defense, SOC workload cut, commercial parity, or that live contain is safe to arm.
 
 Full write-up: [`reports/RESULTS.md`](reports/RESULTS.md).
-
-## Demos
-
-### 30s walkthrough
-
-![Corvex 30s pitch](docs/assets/corvex-pitch-30s.gif)
-
-[Full MP4](docs/assets/corvex-pitch-30s.mp4)
-
-### Live Docker lab
-
-Real HTTP attack across virtual hosts; Corvex isolates mid-campaign; retries return `403`.
-
-![Corvex live lab](docs/assets/corvex-live-lab.gif)
-
-[Full MP4](docs/assets/corvex-live-lab.mp4)
-
-### Attack theatre
-
-Lateral-auth hop across `host-a` / `host-b` / `host-c`.
-
-![Corvex attack theatre](docs/assets/corvex-attack-theatre.gif)
-
-[Full MP4](docs/assets/corvex-attack-theatre.mp4)
-
-## Quick start
-
-Requires Python 3.9+.
-
-```bash
-git clone https://github.com/Siddarthb07/corvex.git
-cd corvex
-python -m pip install -e ".[dev]"
-
-# Replay a sample multi-host attack (auto-creates ~/.corvex/enrollment.json)
-corvex replay train/train-lateral.jsonl --out-dir runs/demo
-
-# Open the monitor (prints URLs after bind)
-corvex dash --run-dir runs/demo
-```
-
-| Surface | Path (after `corvex dash`) |
-|---------|----------------------------|
-| Monitor | `/` — campaigns + eval + safety controls |
-| Prevention log | `/logs.html` |
-
-Defaults bind to loopback. Share on a lab LAN (view-only checklist from remote hosts):
-
-```bash
-corvex dash --host 0.0.0.0 --port 8765 --run-dir runs/demo
-# browse http://<this-machine-ip>:8765/
-```
-
-CLI: `corvex` (legacy alias `cfuse`). Optional: `corvex init` to create enrollment without replaying.
 
 ## Bring your own events
 
