@@ -13,11 +13,27 @@ import requests
 LAB = Path(os.environ.get("LAB_DIR", "/lab"))
 ATTACKER_SRC = os.environ.get("ATTACKER_SRC", "10.1.0.5")
 USER = os.environ.get("ATTACK_USER", "alice")
-TARGETS = [
+
+_DEFAULT_TARGETS = [
     ("host-a", "http://host-a:8080"),
     ("host-b", "http://host-b:8080"),
     ("host-c", "http://host-c:8080"),
 ]
+
+
+def _targets_from_env() -> list:
+    raw = os.environ.get("ATTACK_TARGETS", "").strip()
+    if not raw:
+        return list(_DEFAULT_TARGETS)
+    out = []
+    for name in raw.split(","):
+        name = name.strip()
+        if name:
+            out.append((name, f"http://{name}:8080"))
+    return out or list(_DEFAULT_TARGETS)
+
+
+TARGETS = _targets_from_env()
 LOG = LAB / "attacker.jsonl"
 STATE = LAB / "attacker_state.json"
 
@@ -130,11 +146,12 @@ def main() -> None:
             "wave1_successes": successes,
         }
     )
-    # Wait until all hosts isolated or timeout
+    # Wait until all targets isolated or timeout
+    need = len(TARGETS)
     deadline = time.time() + 25
     while time.time() < deadline:
         flags = list((LAB / "isolated").glob("*.flag")) if (LAB / "isolated").exists() else []
-        if len(flags) >= 3:
+        if len(flags) >= need:
             break
         time.sleep(0.4)
 
@@ -159,7 +176,7 @@ def main() -> None:
             "ts_utc": now(),
             "wave1_successes": successes,
             "wave2_blocked": blocked,
-            "outcome": "contained" if blocked >= 3 else "partial",
+            "outcome": "contained" if blocked >= need else "partial",
         }
     )
 

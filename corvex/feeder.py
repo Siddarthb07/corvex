@@ -50,8 +50,12 @@ def generate_campaign_events(
     ood: bool = False,
 ) -> Tuple[List[EventEnvelope], Dict[str, Any]]:
     """
-    families: lateral | exfil | recon_lateral | benign
+    families: lateral | exfil | recon_lateral | fusion_chain | benign
     ood: different TTP timing/noise (slow drip, alternate ports, service accounts)
+
+    fusion_chain: multi-key hop chain across ≥4 hosts. Each detector key covers a
+    thin host pair; only cross-key fusion recovers the full truth set — the pack
+    that makes detector-only lose and the correlator win.
     """
     events: List[EventEnvelope] = []
     eid = 0
@@ -163,6 +167,80 @@ def generate_campaign_events(
         stages = [
             {"name": "recon_fanout", "hosts": [scanner]},
             {"name": "lateral_auth", "hosts": truth_hosts},
+        ]
+    elif family == "fusion_chain":
+        # Need ≥4 hosts so pair-sized detector alerts stay below Jaccard 0.5 vs truth.
+        if len(host_list) < 4:
+            raise ValueError("fusion_chain requires ≥4 hosts")
+        user_a = "svc-backup" if ood else "alice"
+        user_b = "svc-deploy" if ood else "bob"
+        dst_bridge = "198.51.100.77" if ood else "203.0.113.50"
+        dst_tail = "198.51.100.88" if ood else "203.0.113.60"
+        step = 75 if ood else 18
+        nbytes = 900 if ood else 11_000
+        # Pair hops: auth A–B, exfil B–C, auth C–D, optional exfil D–E
+        a_host, a_prod = host_list[0]
+        b_host, b_prod = host_list[1]
+        c_host, c_prod = host_list[2]
+        d_host, d_prod = host_list[3]
+        for i, (host, prod, user) in enumerate(
+            [
+                (a_host, a_prod, user_a),
+                (b_host, b_prod, user_a),
+                (c_host, c_prod, user_b),
+                (d_host, d_prod, user_b),
+            ]
+        ):
+            events.append(
+                _sign(
+                    enrollment,
+                    prod,
+                    host,
+                    "auth",
+                    {"user": user, "result": "success", "src": "10.1.0.5"},
+                    _ts(base_time, i * step),
+                    next_id("auth"),
+                )
+            )
+        for i, (host, prod) in enumerate([(b_host, b_prod), (c_host, c_prod)]):
+            events.append(
+                _sign(
+                    enrollment,
+                    prod,
+                    host,
+                    "net_conn",
+                    {
+                        "dst_ip": dst_bridge,
+                        "dst_port": 8443 if ood else 443,
+                        "bytes": nbytes,
+                        "egress": True,
+                    },
+                    _ts(base_time, 200 + i * step),
+                    next_id("exfil"),
+                )
+            )
+        if len(host_list) >= 5:
+            e_host, e_prod = host_list[4]
+            for i, (host, prod) in enumerate([(d_host, d_prod), (e_host, e_prod)]):
+                events.append(
+                    _sign(
+                        enrollment,
+                        prod,
+                        host,
+                        "net_conn",
+                        {
+                            "dst_ip": dst_tail,
+                            "dst_port": 8443 if ood else 443,
+                            "bytes": nbytes,
+                            "egress": True,
+                        },
+                        _ts(base_time, 400 + i * step),
+                        next_id("exfil"),
+                    )
+                )
+        stages = [
+            {"name": "lateral_auth", "hosts": truth_hosts[:4]},
+            {"name": "micro_exfil", "hosts": truth_hosts[1:]},
         ]
     else:
         raise ValueError(f"unknown family {family}")

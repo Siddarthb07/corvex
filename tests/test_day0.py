@@ -121,20 +121,28 @@ def test_stage_b_gate_locked(monkeypatch, tmp_path):
 
 def test_b2_anti_sandbag_on_train():
     enr = generate_lab_enrollment(
-        {"host-a": "prod-a", "host-b": "prod-b", "host-c": "prod-c"}
+        {
+            "host-a": "prod-a",
+            "host-b": "prod-b",
+            "host-c": "prod-c",
+            "host-d": "prod-d",
+            "host-e": "prod-e",
+        }
     )
     base = datetime(2026, 1, 15, 12, 0, 0, tzinfo=timezone.utc)
-    hosts = [("host-a", "prod-a"), ("host-b", "prod-b"), ("host-c", "prod-c")]
+    hosts3 = [("host-a", "prod-a"), ("host-b", "prod-b"), ("host-c", "prod-c")]
+    hosts5 = hosts3 + [("host-d", "prod-d"), ("host-e", "prod-e")]
     results = []
-    for cid, family in [
-        ("t1", "lateral"),
-        ("t2", "exfil"),
-        ("t3", "recon_lateral"),
+    for cid, family, hs in [
+        ("t1", "lateral", hosts3),
+        ("t2", "exfil", hosts3),
+        ("t3", "recon_lateral", hosts3),
+        ("t4", "fusion_chain", hosts5),
     ]:
         events, gt = generate_campaign_events(
             campaign_id=cid,
             family=family,
-            hosts=hosts,
+            hosts=hs,
             enrollment=enr,
             base_time=base,
         )

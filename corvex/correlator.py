@@ -83,23 +83,42 @@ class Correlator:
     def _campaigns_from_signals(
         self, signals: Sequence[Signal], events: Sequence[Mapping[str, Any]]
     ) -> List[Campaign]:
-        by_kind: Dict[str, List[Signal]] = defaultdict(list)
+        """
+        Detector-alert path: one campaign per detector key, no cross-key merge.
+
+        Grouping keys mirror how a SIEM alert row would look before correlation:
+        - lateral_auth → user
+        - micro_exfil → dst_ip
+        - recon_fanout → host (single-host scan alert)
+
+        Cross-key / overlapping-host merge is correlator fusion's job. Unioning
+        all hosts per kind here previously hid the fusion gap on sealed packs.
+        """
+        groups: Dict[Tuple[str, str], List[Signal]] = defaultdict(list)
         for s in signals:
-            by_kind[s.kind].append(s)
+            if s.kind == "lateral_auth":
+                key = str(s.attrs.get("user") or "_")
+            elif s.kind == "micro_exfil":
+                key = str(s.attrs.get("dst_ip") or "_")
+            else:
+                key = s.host_id
+            groups[(s.kind, key)].append(s)
+
         out: List[Campaign] = []
-        for kind, sigs in by_kind.items():
+        for (kind, key), sigs in groups.items():
             hosts = sorted({s.host_id for s in sigs})
-            if len(hosts) < self.config.min_hosts and kind != "recon_fanout":
-                # recon can be single-host in detector-only mode
-                if kind != "recon_fanout":
-                    continue
-            cid = f"det-{kind}"
+            if kind != "recon_fanout" and len(hosts) < self.config.min_hosts:
+                continue
+            safe = key.replace(".", "-").replace(" ", "_")
+            cid = f"det-{kind}-{safe}"
             out.append(
                 Campaign(
                     campaign_id=cid,
                     host_ids=hosts,
                     stages=[{"name": kind, "hosts": hosts}],
-                    evidence=[{"kind": s.kind, "host_id": s.host_id, "attrs": s.attrs} for s in sigs],
+                    evidence=[
+                        {"kind": s.kind, "host_id": s.host_id, "attrs": s.attrs} for s in sigs
+                    ],
                     score=min(1.0, sum(s.weight for s in sigs) / max(1, len(sigs))),
                 )
             )
@@ -200,21 +219,28 @@ class Correlator:
                 )
             )
 
-        # Merge overlapping clusters
-        merged: List[Tuple[str, Set[str], List[Dict[str, Any]]]] = []
-        for cid, hosts, stages in clusters:
-            absorbed = False
-            for i, (mcid, mhosts, mstages) in enumerate(merged):
-                if hosts & mhosts:
-                    mhosts |= hosts
-                    # keep stable id from first
-                    for st in stages:
-                        if st not in mstages:
-                            mstages.append(st)
-                    absorbed = True
-                    break
-            if not absorbed:
-                merged.append((cid, set(hosts), list(stages)))
+        # Merge overlapping clusters (transitive: repeat until stable)
+        merged: List[Tuple[str, Set[str], List[Dict[str, Any]]]] = [
+            (cid, set(hosts), list(stages)) for cid, hosts, stages in clusters
+        ]
+        changed = True
+        while changed:
+            changed = False
+            out_m: List[Tuple[str, Set[str], List[Dict[str, Any]]]] = []
+            for cid, hosts, stages in merged:
+                absorbed = False
+                for i, (mcid, mhosts, mstages) in enumerate(out_m):
+                    if hosts & mhosts:
+                        mhosts |= hosts
+                        for st in stages:
+                            if st not in mstages:
+                                mstages.append(st)
+                        absorbed = True
+                        changed = True
+                        break
+                if not absorbed:
+                    out_m.append((cid, set(hosts), list(stages)))
+            merged = out_m
 
         out: List[Campaign] = []
         for cid, hosts, stages in merged:

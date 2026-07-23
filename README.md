@@ -20,6 +20,14 @@ Real HTTP attack across virtual hosts; Corvex isolates mid-campaign; retries ret
 
 [Full MP4](docs/assets/corvex-live-lab.mp4)
 
+### ART break-test (5 hosts, sequential)
+
+Manifest-driven Atomic Red Team–style chains (multi-user + exfil/recon) — not single-user easy lateral. Mid-chain isolate; later hops blocked.
+
+![Corvex ART break-test](docs/assets/corvex-breaktest.gif)
+
+[Full MP4](docs/assets/corvex-breaktest.mp4) · more recordings: [cred-hop](docs/assets/corvex-breaktest-art_cred_hop.mp4) · [recon-pivot](docs/assets/corvex-breaktest-art_recon_pivot.mp4) · [Break-test lab](labs/breaktest/README.md)
+
 ### Attack theatre
 
 Lateral-auth hop across `host-a` / `host-b` / `host-c`.
@@ -103,7 +111,7 @@ Train is **context**, not the sealed claim. Small gap ≠ real-world generalizat
 |--------|-----------|--------|-----|------------|
 | lateral (OOD timing) | 1.00 | 1.00 | 1.00 | — |
 | exfil | 1.00 | 1.00 | 1.00 | — |
-| benign multi-host | — | — | — | **0.00** |
+| benign multi-host (N=1) | — | — | — | **0.00** |
 
 ### Contain dry-run (`IsolateHost`, not live)
 
@@ -148,6 +156,8 @@ Spins up 3 virtual hosts + attacker + Corvex on an isolated bridge network. Same
 |------------|--------|
 | Correlator + monitor + prevention log | Ready |
 | Replay / BYO JSONL ingest | Ready |
+| Fusion-gap packs (`fusion_chain`) + break-test lab | Scaffolded — re-seal/eval not published yet |
+| Windows auth export → BYO (`adapt-windows`) | Scaffolded (observe-only) |
 | Sensors + JetStream/mTLS bus | Stub / gated |
 | Live host isolate | Dry-run only (`CORVEX_CONTAIN=0`) |
 
@@ -191,7 +201,8 @@ Sensors / Feeder / BYO-JSONL
 ## Docs
 
 - [`SECURITY.md`](SECURITY.md) · [`THREAT_MODEL.md`](THREAT_MODEL.md) · [`LICENSE`](LICENSE)
-- [`docs/contain.md`](docs/contain.md) · [`reports/RESULTS.md`](reports/RESULTS.md)
+- [`docs/contain.md`](docs/contain.md) · [`docs/sensor-windows.md`](docs/sensor-windows.md) · [`reports/RESULTS.md`](reports/RESULTS.md)
+- [`labs/breaktest/README.md`](labs/breaktest/README.md) · [`future-plans.md`](future-plans.md)
 
 ## License
 

@@ -1,0 +1,90 @@
+services:
+  host-a:
+    build: ../live/host
+    environment:
+      HOST_ID: host-a
+      HOST_ROLE: workstation
+      LAB_DIR: /lab
+    volumes:
+      - ./shared:/lab
+    networks: [breaknet]
+
+  host-b:
+    build: ../live/host
+    environment:
+      HOST_ID: host-b
+      HOST_ROLE: fileserver
+      LAB_DIR: /lab
+    volumes:
+      - ./shared:/lab
+    networks: [breaknet]
+
+  host-c:
+    build: ../live/host
+    environment:
+      HOST_ID: host-c
+      HOST_ROLE: jump box
+      LAB_DIR: /lab
+    volumes:
+      - ./shared:/lab
+    networks: [breaknet]
+
+  host-d:
+    build: ../live/host
+    environment:
+      HOST_ID: host-d
+      HOST_ROLE: db
+      LAB_DIR: /lab
+    volumes:
+      - ./shared:/lab
+    networks: [breaknet]
+
+  host-e:
+    build: ../live/host
+    environment:
+      HOST_ID: host-e
+      HOST_ROLE: egress proxy
+      LAB_DIR: /lab
+    volumes:
+      - ./shared:/lab
+    networks: [breaknet]
+
+  corvex:
+    build: ../live/corvex
+    environment:
+      LAB_DIR: /lab
+      PYTHONPATH: /app
+      CORVEX_LAB_HOSTS: host-a,host-b,host-c,host-d,host-e
+    volumes:
+      - ./shared:/lab
+      - ../..:/app
+    depends_on:
+      - host-a
+      - host-b
+      - host-c
+      - host-d
+      - host-e
+    networks: [breaknet]
+
+  attacker:
+    build: ./attacker
+    environment:
+      LAB_DIR: /lab
+      ATTACKER_SRC: 10.1.0.5
+      # Override: ATTACK_MANIFEST=/manifests/<file>.json
+      ATTACK_MANIFEST: ${ATTACK_MANIFEST:-/manifests/art_lateral_chain.json}
+    volumes:
+      - ./shared:/lab
+      - ./manifests:/manifests:ro
+    depends_on:
+      - host-a
+      - host-b
+      - host-c
+      - host-d
+      - host-e
+      - corvex
+    networks: [breaknet]
+
+networks:
+  breaknet:
+    driver: bridge
