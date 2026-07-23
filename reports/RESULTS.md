@@ -11,7 +11,7 @@ Sealed synthetic multi-host packs after `corvex seal-day0 --force` (fusion_chain
 | Campaign F1 | **1.00** | Harmonic mean of P+R |
 | Precision@1 | **1.00** | Top-ranked campaign correct |
 | Benign false-campaign rate | **0.00** | Held-out benign packs (**N=5**) |
-| Time-to-correlate | **~0.005 s** | Wall time ingest→campaigns (lab machine) |
+| Time-to-correlate | **~0.01 s** | Wall time ingest→campaigns (lab machine) |
 
 **Sample size (held-out):** attack packs **N=3** (lateral OOD, exfil, fusion_chain); benign packs **N=5**.
 
@@ -25,14 +25,14 @@ Sealed synthetic multi-host packs after `corvex seal-day0 --force` (fusion_chain
 
 **Lift:** correlator F1 **+0.33** vs detector-only on this sealed set (fusion_chain is what separates them). B1 still misses multi-host campaigns entirely.
 
-Break-test / public-TTP manifests (`corvex score-non-author`): correlator F1 **1.00** vs detector-only **0.16** (lift **+0.84**). Necessary for P3 non-author gate; **not** stranger Windows telemetry.
+Break-test / public-TTP manifests (`corvex score-non-author`): correlator F1 **~0.63** vs detector-only **~0.19** (lift **~+0.44** after window/anti-jumpbox honesty). Necessary for P3 non-author gate; **not** stranger Windows telemetry.
 
 ## Held-out vs train
 
 | Split | Precision | Recall | F1 | Det-only F1 | Benign FCR | TTU |
 |-------|-----------|--------|-----|-------------|------------|-----|
-| Train | 1.00 | 1.00 | 1.00 | 0.67 | 0.00 (N=2) | ~0.006 s |
-| Held-out | 1.00 | 1.00 | 1.00 | 0.67 | 0.00 (N=5) | ~0.005 s |
+| Train | 1.00 | 1.00 | 1.00 | 0.67 | 0.00 (N=2) | ~0.01 s |
+| Held-out | 1.00 | 1.00 | 1.00 | 0.67 | 0.00 (N=5) | ~0.01 s |
 
 ## By attack pattern (held-out)
 
@@ -42,6 +42,17 @@ Break-test / public-TTP manifests (`corvex score-non-author`): correlator F1 **1
 | exfil | 1.00 | 1.00 | 1.00 | — |
 | fusion_chain | 1.00 | 1.00 | 1.00 | — |
 | benign (N=5) | — | — | — | **0.00** |
+
+## Stage A correlator honesty (post CDN Bridge)
+
+| Control | Status |
+|---------|--------|
+| `window_seconds` enforced on key-clusters | **shipped** |
+| Fleet-wide / poisoned SaaS dst skip | **shipped** |
+| Jumpbox: no lateral↔lateral 1-host glue | **shipped** |
+| Auth↔exfil 1-host bridges (fusion_chain) | **kept** |
+
+**Operation CDN Bridge** (`labs/breaktest/manifests/break_cdn_bridge_compound.json`): best Jaccard vs truth **1.0** (APT `{a,b,c}` no longer fat-merged with CDN). Residual: separate helpdesk campaign still contributes `host-d` to the all-campaigns union; DNS / >50KB blob remain invisible by design.
 
 ## Reconstruction regression
 
@@ -62,14 +73,14 @@ Break-test / public-TTP manifests (`corvex score-non-author`): correlator F1 **1
 
 | Gate | Status |
 |------|--------|
-| non_author_fusion_lift | pass (breaktest lift +0.84) |
+| non_author_fusion_lift | pass (breaktest lift ~+0.44) |
 | benign_fcr_real_n | pass (N=5, FCR=0) |
 | stranger_success | **fail** (pending external operator) |
 | **claim_allowed** | **false** |
 
 ## What this does / does not prove
 
-**Proves (narrow):** Sealed packs now separate fusion from detector-only; benign FCR holds at N=5; reconstruction round-trips; breaktest fusion lift is large.
+**Proves (narrow):** Sealed packs separate fusion from detector-only; window/anti-jumpbox honesty holds without collapsing Stage A gate; benign FCR holds at N=5; reconstruction round-trips; breaktest fusion lift remains positive.
 
 **Does not prove:** Real malware defense, stranger Windows success, commercial parity, or that live contain is safe to arm.
 

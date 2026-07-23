@@ -812,10 +812,11 @@ def _render_report(result: Dict[str, Any]) -> str:
             json.dumps(result["freeze_manifest"], indent=2),
             "```",
             "",
-            "FAIL->stop: do not create `stage-b-allowed` unless held-out PASS.",
-            "",
         ]
     )
+    if not result["pass"]:
+        lines.append("FAIL->stop: do not create `stage-b-allowed` unless held-out PASS.")
+        lines.append("")
     return "\n".join(lines)
 
 

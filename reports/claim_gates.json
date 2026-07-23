@@ -1,13 +1,13 @@
 {
   "schema_ver": "1",
-  "generated_at": "2026-07-23T10:55:29Z",
+  "generated_at": "2026-07-23T14:04:21Z",
   "claim_allowed": false,
   "claim_language": "lab / BYO campaign stitch only \u2014 claim locked",
   "gates": {
     "non_author_fusion_lift": {
       "id": "non_author_fusion_lift",
       "pass": true,
-      "f1_lift": 0.84,
+      "f1_lift": 0.44074074074074077,
       "min_lift": 0.05,
       "source": "C:\\Users\\siddu\\projects\\corvex\\labs\\breaktest\\manifests",
       "note": "Public-TTP/breaktest manifest score. Still not stranger Windows telemetry \u2014 necessary but not sufficient for claim_allowed."

@@ -31,8 +31,22 @@ corvex dash --run-dir runs/stranger-wedge --build
 
 Save as `reports/stranger_dry_run.json`.
 
+## After stranger PASS — Stage B marker
+
+```bash
+# Author (or CI) only after stranger_dry_run.json has pass:true:
+# Create an empty marker file — do not invent the attestation.
+#   reports/stage-b-allowed
+
+corvex stage-b-check   # allowed:true only if Stage A PASS + stranger pass + marker
+corvex claim-gates     # claim_allowed still needs all P3 gates
+```
+
+**Lab override (not for claims):** `CORVEX_STAGE_B=1` unlocks Stage B stubs locally without stranger attestation.
+
 ## Rules
 
 - Author may not write `pass: true` for themselves.
 - Shrugging / cannot finish → leave file absent or `"pass": false`.
+- File present with `"pass": false` does **not** count as stranger success.
 - This gate alone does not unlock live contain.
