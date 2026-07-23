@@ -9,7 +9,7 @@ Observe and correlate first. Live containment stays locked behind safety control
 Requires Python 3.9+.
 
 ```bash
-git clone <this-repo-url>
+git clone https://github.com/Siddarthb07/corvex.git
 cd corvex
 python -m pip install -e ".[dev]"
 
