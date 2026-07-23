@@ -45,7 +45,7 @@
   },
   "source": {
     "style": "Compound purple-team scenario — genuine correlator failure modes",
-    "repo": "https://github.com/Siddarthb07/corvex",
+    "repo": "corvex",
     "techniques": ["T1078", "T1021", "T1041", "T1071.004", "T1105"],
     "note": "Compound purple-team scenario. After Stage A honesty fix: window_seconds is enforced; fleet CDN dst is poisoned; APT {a,b,c} no longer fat-merges with innocents via jumpbox. Residual: separate helpdesk lateral can still flag host-d. DNS / >50KB blob remain invisible."
   },

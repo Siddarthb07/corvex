@@ -1,5 +1,5 @@
 {
-  "source": "C:\\Users\\siddu\\projects\\corvex\\labs\\breaktest\\manifests",
+  "source": "labs/breaktest/manifests",
   "packs": [
     "art_cred_hop.json",
     "art_lateral_chain.json",
@@ -17,7 +17,7 @@
     "recall": 0.6666666666666666,
     "precision_at_1": 0.6666666666666666,
     "false_campaign_rate": 0.0,
-    "ttu_seconds": 0.014584299999999994,
+    "ttu_seconds": 0.014095299999999977,
     "tp": 6.0,
     "fp": 4.0,
     "fn": 3.0
@@ -28,7 +28,7 @@
     "recall": 0.4444444444444444,
     "precision_at_1": 0.2222222222222222,
     "false_campaign_rate": 0.0,
-    "ttu_seconds": 0.011146600000000007,
+    "ttu_seconds": 0.018660200000000016,
     "tp": 4.0,
     "fp": 27.0,
     "fn": 5.0
