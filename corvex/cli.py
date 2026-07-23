@@ -93,6 +93,8 @@ def seal_day0(
     heldout_dir = root / "heldout"
     if force and train_dir.exists():
         shutil.rmtree(train_dir)
+    if force and heldout_dir.exists():
+        shutil.rmtree(heldout_dir)
     train_dir.mkdir(parents=True, exist_ok=True)
     heldout_dir.mkdir(parents=True, exist_ok=True)
 
@@ -117,6 +119,8 @@ def seal_day0(
         ("train-exfil", "exfil", host_pairs[1:4], False),
         ("train-recon-lateral", "recon_lateral", host_pairs[:3], False),
         ("train-fusion-chain", "fusion_chain", host_pairs[:5], False),
+        ("train-benign-a", "benign", host_pairs[:3], False),
+        ("train-benign-b", "benign", host_pairs[1:4], False),
     ]
     for cid, family, hs, ood in train_specs:
         events, gt = generate_campaign_events(
@@ -143,7 +147,7 @@ def seal_day0(
         for env in sample_events[:20]:
             fh.write(json.dumps(env.to_dict(), separators=(",", ":")) + "\n")
 
-    # Held-out plaintext in temp, then seal: ≥2 including ≥1 OOD + benign
+    # Held-out plaintext in temp, then seal: ≥2 including ≥1 OOD + multiple benign
     key = ensure_key()
     rules_path = heldout_dir / "scorer_rules.json"
     rules_path.write_text(scorer_rules_blob(), encoding="utf-8")
@@ -152,7 +156,11 @@ def seal_day0(
         ("held-lateral-ood", "lateral", host_pairs[:3], True),
         ("held-exfil", "exfil", host_pairs[1:4], False),
         ("held-fusion-chain", "fusion_chain", host_pairs[:5], True),
-        ("held-benign", "benign", host_pairs[:3], False),
+        ("held-benign-a", "benign", host_pairs[:3], False),
+        ("held-benign-b", "benign", host_pairs[1:4], False),
+        ("held-benign-c", "benign", host_pairs[2:5], False),
+        ("held-benign-d", "benign", host_pairs[:4], False),
+        ("held-benign-e", "benign", host_pairs[0:5:2], False),
     ]
     digests = []
     with tempfile.TemporaryDirectory() as tmp:
@@ -315,6 +323,262 @@ def quarantine_status_cmd() -> None:
     from corvex.contain.quarantine import resolve_quarantine_mode
 
     typer.echo(json.dumps(resolve_quarantine_mode(root=_repo_root()), indent=2))
+
+
+@app.command("eval-recon")
+def eval_recon_cmd(
+    split: str = typer.Option("train", help="train|heldout"),
+    report: Path = typer.Option(Path("reports/reconstruction_regression.json")),
+) -> None:
+    """Reconstruction→manifest regression on sealed/train packs (honesty engine)."""
+    from corvex.eval.recon_regression import run_recon_regression, write_recon_regression
+    from corvex.seal import ensure_key, unseal_file
+
+    root = _repo_root()
+    enrollment = load_enrollment(default_secrets_path())
+    packs: List[Path] = []
+    tmp_keep = None
+    if split == "train":
+        packs = sorted((root / "train").glob("*.jsonl"))
+    else:
+        key = ensure_key()
+        tmp_keep = tempfile.TemporaryDirectory()
+        tmp = Path(tmp_keep.name)
+        for sealed in sorted((root / "heldout").glob("*.jsonl.sealed")):
+            plain = tmp / sealed.name.replace(".sealed", "")
+            plain.write_bytes(unseal_file(sealed, key))
+            packs.append(plain)
+    if not packs:
+        raise typer.Exit("no packs — run corvex seal-day0 first")
+    result = run_recon_regression(packs, enrollment)
+    write_recon_regression(result, Path(report))
+    typer.echo(json.dumps({k: result[k] for k in ("pass", "n_ok", "n_packs", "attack_ok", "benign_ok", "honesty") if k in result}, indent=2))
+    if tmp_keep:
+        tmp_keep.cleanup()
+    raise typer.Exit(0 if result.get("pass") else 1)
+
+
+@app.command("claim-gates")
+def claim_gates_cmd(
+    report: Path = typer.Option(Path("reports/claim_gates.json")),
+) -> None:
+    """Evaluate P3 claim gates — claim_allowed stays false until all pass."""
+    from corvex.eval.claim_gates import evaluate_claim_gates, write_claim_gates
+
+    result = evaluate_claim_gates(_repo_root())
+    write_claim_gates(result, Path(report))
+    typer.echo(json.dumps(result, indent=2))
+    raise typer.Exit(0 if result.get("claim_allowed") else 1)
+
+
+@app.command("score-non-author")
+def score_non_author_cmd(
+    manifests: Optional[Path] = typer.Option(
+        None,
+        help="Directory of breaktest/public TTP manifests (default: labs/breaktest/manifests)",
+    ),
+    report: Path = typer.Option(Path("reports/non_author_fusion.json")),
+) -> None:
+    """Score fusion vs detector-only on public-TTP/breaktest manifests (P3 gate input)."""
+    from corvex.adapters.attack_repos import adapt_attack_manifest, load_manifest
+    from corvex.envelope import sign_envelope
+    from corvex.eval import aggregate_scores, score_pack, vs_baseline_lift
+
+    root = _repo_root()
+    man_dir = Path(manifests) if manifests else root / "labs" / "breaktest" / "manifests"
+    enrollment = ensure_lab_enrollment()
+    if not man_dir.is_dir():
+        raise typer.Exit(f"missing manifests dir {man_dir}")
+    corr_scores = []
+    det_scores = []
+    pack_rows = []
+    for path in sorted(man_dir.glob("*.json")):
+        man = load_manifest(path)
+        raw_events, gt = adapt_attack_manifest(man)
+        signed = []
+        for rec in raw_events:
+            secret = enrollment.require(rec["producer_id"], rec["host_id"])
+            signed.append(
+                sign_envelope(
+                    producer_id=rec["producer_id"],
+                    host_id=rec["host_id"],
+                    payload_type=rec["payload_type"],
+                    payload=rec["payload"],
+                    secret=secret,
+                    event_id=rec["event_id"],
+                    ts_utc=rec["ts_utc"],
+                    nonce=rec["nonce"],
+                )
+            )
+        benign = gt.get("family") == "benign"
+        pred_c, ttu_c = _predict_from_events(signed, "raw")
+        pred_d, ttu_d = _predict_from_events(signed, "detector_only")
+        corr_scores.append(score_pack(pred_c, gt, ttu_seconds=ttu_c, benign=benign))
+        det_scores.append(score_pack(pred_d, gt, ttu_seconds=ttu_d, benign=benign))
+        pack_rows.append(path.name)
+    if not corr_scores:
+        raise typer.Exit("no manifests scored")
+    m_c = aggregate_scores(corr_scores)
+    m_d = aggregate_scores(det_scores)
+    lift = vs_baseline_lift(m_c, m_d)
+    f1_lift = float(lift.get("f1_lift") or 0.0)
+    # Author-adjacent ART manifests still aren't stranger telemetry — require lift AND label honesty
+    passed = f1_lift >= 0.05
+    result = {
+        "source": str(man_dir),
+        "packs": pack_rows,
+        "correlator": m_c,
+        "detector_only": m_d,
+        "f1_lift": f1_lift,
+        "pass": passed,
+        "note": (
+            "Public-TTP/breaktest manifest score. Still not stranger Windows telemetry — "
+            "necessary but not sufficient for claim_allowed."
+            if passed
+            else "Fusion lift < 0.05 on breaktest manifests — gate stays closed."
+        ),
+        "honesty": "Breaktest manifests are public-TTP shaped, not independent enterprise traffic.",
+    }
+    Path(report).parent.mkdir(parents=True, exist_ok=True)
+    Path(report).write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
+    typer.echo(json.dumps(result, indent=2))
+    raise typer.Exit(0 if passed else 1)
+
+
+@app.command("correlate-byo")
+def correlate_byo_cmd(
+    path: Path = typer.Argument(..., help="Signed BYO JSONL"),
+    out_dir: Path = typer.Option(Path("runs/byo"), help="Output run directory"),
+) -> None:
+    """Correlate signed BYO events → timeline + reconstruction (Windows wedge)."""
+    from corvex.contain.quarantine import resolve_quarantine_mode
+    from corvex.ingest import load_byo_jsonl
+    from corvex.reconstruct import write_reconstruction
+
+    enrollment = ensure_lab_enrollment()
+    events = load_byo_jsonl(Path(path))
+    events = resign_events(events, enrollment)
+    out_dir = Path(out_dir)
+    if out_dir.exists():
+        shutil.rmtree(out_dir)
+    out_dir.mkdir(parents=True)
+    bus = JsonlBus(out_dir / "events.jsonl")
+    feed_bus(bus, events, enrollment)
+    store = CampaignStore(out_dir / "campaigns.jsonl")
+    audit = AuditLog(out_dir / "audit.jsonl")
+    t0 = time.perf_counter()
+    Correlator(store, audit).ingest(events)
+    ttu = time.perf_counter() - t0
+    timeline = {
+        "pack": str(path),
+        "ground_truth": None,
+        "ttu_seconds": ttu,
+        "campaigns": [c.to_dict() for c in store.all()],
+        "source": "byo",
+    }
+    (out_dir / "timeline.json").write_text(json.dumps(timeline, indent=2), encoding="utf-8")
+    qmode = resolve_quarantine_mode(root=_repo_root())["mode"]
+    recon_path = write_reconstruction(out_dir, quarantine_mode=qmode)
+    latest = _repo_root() / "runs" / "latest"
+    latest.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        if latest.exists() or latest.is_symlink():
+            latest.unlink()
+        latest.symlink_to(out_dir.resolve(), target_is_directory=True)
+    except OSError:
+        latest.write_text(str(out_dir.resolve()), encoding="utf-8")
+    typer.echo(
+        json.dumps(
+            {
+                "campaigns": len(store.all()),
+                "ttu_seconds": ttu,
+                "out_dir": str(out_dir),
+                "reconstruction": str(recon_path),
+            },
+            indent=2,
+        )
+    )
+
+
+@app.command("byo-windows")
+def byo_windows_cmd(
+    export: Path = typer.Argument(..., help="Windows Security JSON/JSONL export"),
+    out_dir: Path = typer.Option(Path("runs/windows-wedge"), help="Run output"),
+    host_map: Optional[Path] = typer.Option(
+        None, "--host-map", help="JSON map Computer→host_id (e.g. fixtures/windows_host_map.json)"
+    ),
+    default_host: str = typer.Option("host-a"),
+) -> None:
+    """Full wedge: Windows 4624 export → adapt → correlate → reconstruct."""
+    # Reuse adapt-windows logic then correlate-byo
+    adapted = Path(out_dir) / "windows_auth.jsonl"
+    # Call adapt inline
+    from corvex.adapters.windows_security import adapt_windows_security_export
+    from corvex.envelope import sign_envelope
+
+    enrollment = ensure_lab_enrollment()
+    hmap: Dict[str, str] = {h: h for h in DEMO_HOSTS}
+    if host_map and Path(host_map).exists():
+        loaded = json.loads(Path(host_map).read_text(encoding="utf-8"))
+        if isinstance(loaded, dict):
+            hmap.update({str(k).lower(): str(v) for k, v in loaded.items()})
+            hmap.update({str(k): str(v) for k, v in loaded.items()})
+    raw = adapt_windows_security_export(
+        Path(export),
+        producer_id=DEMO_HOSTS.get(default_host, "prod-a"),
+        default_host=default_host,
+        host_map=hmap,
+    )
+    adapted.parent.mkdir(parents=True, exist_ok=True)
+    n = 0
+    with adapted.open("w", encoding="utf-8") as fh:
+        for rec in raw:
+            host_id = str(rec["host_id"])
+            # Apply map values that point at enrolled hosts
+            if host_id not in DEMO_HOSTS:
+                # try lowercase computer already mapped
+                mapped = hmap.get(host_id) or hmap.get(host_id.lower())
+                host_id = mapped if mapped in DEMO_HOSTS else default_host
+            prod = DEMO_HOSTS[host_id]
+            secret = enrollment.require(prod, host_id)
+            env = sign_envelope(
+                producer_id=prod,
+                host_id=host_id,
+                payload_type=rec["payload_type"],
+                payload=rec["payload"],
+                secret=secret,
+                event_id=rec["event_id"],
+                ts_utc=rec["ts_utc"],
+                nonce=rec["nonce"],
+            )
+            fh.write(json.dumps(env.to_dict(), separators=(",", ":")) + "\n")
+            n += 1
+    if n == 0:
+        raise typer.Exit("no 4624 events adapted — check export")
+    # Correlate into out_dir (correlate-byo clears out_dir — preserve adapted by writing to subpath first)
+    auth_copy = Path(tempfile.mkdtemp()) / "windows_auth.jsonl"
+    shutil.copy(adapted, auth_copy)
+    correlate_byo_cmd(auth_copy, out_dir=Path(out_dir))
+    # Restore adapted artifact into out_dir
+    shutil.copy(auth_copy, Path(out_dir) / "windows_auth.jsonl")
+    typer.echo(json.dumps({"adapted": n, "out_dir": str(out_dir)}, indent=2))
+
+
+@app.command("hostile-bus-test")
+def hostile_bus_test_cmd(
+    report: Path = typer.Option(Path("reports/hostile_bus_selftest.json")),
+) -> None:
+    """Run hostile-bus selftest (P4 gate evidence) — does not unlock OS quarantine."""
+    from corvex.contain.hostile_bus import write_hostile_bus_report
+
+    with tempfile.TemporaryDirectory() as tmp:
+        result = write_hostile_bus_report(_repo_root(), Path(tmp))
+    # Allow custom report path override
+    if Path(report).resolve() != (_repo_root() / "reports" / "hostile_bus_selftest.json").resolve():
+        Path(report).parent.mkdir(parents=True, exist_ok=True)
+        Path(report).write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
+    typer.echo(json.dumps(result, indent=2))
+    raise typer.Exit(0 if result.get("pass") else 1)
 
 
 @app.command("ingest-byo")
@@ -689,6 +953,9 @@ def adapt_windows_cmd(
     path: Path = typer.Argument(..., help="Windows Security JSON/JSONL export"),
     out: Path = typer.Option(Path("runs/sensors/windows_auth.jsonl"), help="Signed BYO JSONL"),
     default_host: str = typer.Option("host-a", help="Fallback host_id"),
+    host_map: Optional[Path] = typer.Option(
+        None, "--host-map", help="JSON map Computer name → enrolled host_id"
+    ),
 ) -> None:
     """Convert Windows Security auth export → signed BYO JSONL (observe-only)."""
     from corvex.adapters.windows_security import adapt_windows_security_export
@@ -696,12 +963,17 @@ def adapt_windows_cmd(
 
     enrollment = ensure_lab_enrollment()
     # Prefer demo host→producer map; unknown computers fall back to default_host
-    host_map = {h: h for h in DEMO_HOSTS}
+    hmap: Dict[str, str] = {h: h for h in DEMO_HOSTS}
+    if host_map and Path(host_map).exists():
+        loaded = json.loads(Path(host_map).read_text(encoding="utf-8"))
+        if isinstance(loaded, dict):
+            hmap.update({str(k): str(v) for k, v in loaded.items()})
+            hmap.update({str(k).lower(): str(v) for k, v in loaded.items()})
     raw = adapt_windows_security_export(
         path,
         producer_id=DEMO_HOSTS.get(default_host, "prod-a"),
         default_host=default_host,
-        host_map=host_map,
+        host_map=hmap,
     )
     out = Path(out)
     out.parent.mkdir(parents=True, exist_ok=True)
@@ -710,7 +982,8 @@ def adapt_windows_cmd(
         for rec in raw:
             host_id = str(rec["host_id"])
             if host_id not in DEMO_HOSTS:
-                host_id = default_host
+                mapped = hmap.get(host_id) or hmap.get(host_id.lower())
+                host_id = mapped if mapped in DEMO_HOSTS else default_host
             prod = DEMO_HOSTS[host_id]
             secret = enrollment.require(prod, host_id)
             env = sign_envelope(

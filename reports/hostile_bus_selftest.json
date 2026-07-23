@@ -1,0 +1,23 @@
+{
+  "pass": true,
+  "cases": [
+    {
+      "case": "missing_authz",
+      "pass": true
+    },
+    {
+      "case": "free_form_verb",
+      "pass": true
+    },
+    {
+      "case": "replay",
+      "pass": true
+    },
+    {
+      "case": "expired",
+      "pass": true
+    }
+  ],
+  "honesty": "Hostile-bus selftest \u2260 live OS quarantine unlocked.",
+  "generated_at": "2026-07-23T10:53:22Z"
+}

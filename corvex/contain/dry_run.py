@@ -9,8 +9,6 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Literal, Optional
 
-from corvex.contain import ContainGateError, require_contain
-
 ActionVerb = Literal["IsolateHost", "KillPid", "AddFirewallRule"]
 
 
@@ -73,9 +71,10 @@ def execute_action(envelope: ActionEnvelope, log_path: Optional[Path] = None) ->
         "result": "dry_run_logged",
     }
     if not envelope.dry_run:
-        # Even if someone flips dry_run, live path still hits the gate.
-        require_contain()
-        raise ContainGateError("Live contain executor not implemented — checklist alone is insufficient")
+        # Even if someone flips dry_run, live path still hits the gate + hostile bus.
+        from corvex.contain.live import execute_live
+
+        return execute_live(envelope)
     with path.open("a", encoding="utf-8") as fh:
         fh.write(json.dumps(record, separators=(",", ":")) + "\n")
     return record

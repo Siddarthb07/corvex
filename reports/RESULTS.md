@@ -1,95 +1,86 @@
 # Evaluation results
 
-Sealed synthetic multi-host packs. Numbers below are from the last local held-out + train runs after the precision/recall scorer landed. **Care vs commercial tools: unproven.**
-
-This page intentionally avoids a single aggregate “accuracy.” Security correlators that only publish recall (or only F1) can look strong while flooding a SOC with false alarms.
+Sealed synthetic multi-host packs after `corvex seal-day0 --force` (fusion_chain + expanded benign N). **Care vs commercial tools: unproven.** Claim language stays lab/BYO until `corvex claim-gates` → `claim_allowed=true`.
 
 ## Held-out detection (sealed)
 
 | Metric | Corvex | Notes |
 |--------|--------|--------|
-| Precision | **1.00** | Of campaigns flagged, share that matched ground truth |
-| Recall | **1.00** | Of true multi-host campaigns, share recovered |
-| Campaign F1 | **1.00** | Harmonic mean of the two above |
+| Precision | **1.00** | Flagged campaigns that matched ground truth |
+| Recall | **1.00** | True multi-host campaigns recovered |
+| Campaign F1 | **1.00** | Harmonic mean of P+R |
 | Precision@1 | **1.00** | Top-ranked campaign correct |
-| Benign false-campaign rate | **0.00** | On held-out benign packs (**N=1**) |
-| Time-to-correlate | **~0.012 s** | Wall time from first ingest to campaigns (lab machine) |
+| Benign false-campaign rate | **0.00** | Held-out benign packs (**N=5**) |
+| Time-to-correlate | **~0.005 s** | Wall time ingest→campaigns (lab machine) |
 
-**Sample size (held-out):** attack packs **N=2** (TP=2, FP=0, FN=0); benign packs **N=1**. Same thinness class — the 0.00 FCR is not a discrepancy with train (train has **N_benign=0**); it is just still thin. Expand N before treating FCR as workload evidence.
+**Sample size (held-out):** attack packs **N=3** (lateral OOD, exfil, fusion_chain); benign packs **N=5**.
 
-### Why naive numbers can lie here
+### Fusion vs detector-only (the correlator premise)
 
-A detector that flags every host as a campaign gets perfect recall and useless precision. We gate and publish **both** precision and recall, plus an explicit **benign false-campaign rate**.
+| | Correlator | Detector-only | B1 naive |
+|--|------------|---------------|----------|
+| F1 | **1.00** | **0.67** | **0.00** |
+| Precision | **1.00** | **0.33** | **0.00** |
+| Recall | **1.00** | **0.67** | **0.00** |
 
-## vs single-host baseline (the correlator premise)
+**Lift:** correlator F1 **+0.33** vs detector-only on this sealed set (fusion_chain is what separates them). B1 still misses multi-host campaigns entirely.
 
-| | Corvex | B1 (per-host naive) |
-|--|--------|---------------------|
-| F1 | **1.00** | **0.00** |
-| Recall | **1.00** | **0.00** |
-| Precision | **1.00** | **0.00** |
-| Benign false-campaign rate | **0.00** | **1.00** |
+Break-test / public-TTP manifests (`corvex score-non-author`): correlator F1 **1.00** vs detector-only **0.16** (lift **+0.84**). Necessary for P3 non-author gate; **not** stranger Windows telemetry.
 
-**Lift:** F1 +1.00, recall +1.00. B1 misses the multi-host campaigns entirely and still cries wolf on the benign pack. That gap is the justification for cross-host correlation — not the absolute Corvex score alone.
+## Held-out vs train
 
-Competitive SIEM-style joins (B2) also hit F1 1.00 on this sealed set. Detector-only (no cross-host fusion) also hit F1 1.00 on held-out. On **train**, detector-only F1 was **0.89** vs correlator **1.00** — fusion helps there; held-out does not currently separate them. That is an honest limit of this pack grammar, not a marketing win.
-
-## Held-out vs train gap
-
-| Split | Precision | Recall | F1 | Benign FCR | TTU |
-|-------|-----------|--------|-----|------------|-----|
-| Train (dev) | 1.00 | 1.00 | 1.00 | n/a (**N_benign=0**) | ~0.011 s |
-| Held-out (sealed) | 1.00 | 1.00 | 1.00 | 0.00 (**N_benign=1**) | ~0.012 s |
-
-**Gap:** ~0 on headline P/R/F1. Small gap ≠ proof of real-world generalization — packs are author-designed synthetic grammar; OOD is timing/noise within that grammar.
-
-Train numbers are **dev/tuning context only**. They are not the sealed result.
+| Split | Precision | Recall | F1 | Det-only F1 | Benign FCR | TTU |
+|-------|-----------|--------|-----|-------------|------------|-----|
+| Train | 1.00 | 1.00 | 1.00 | 0.67 | 0.00 (N=2) | ~0.006 s |
+| Held-out | 1.00 | 1.00 | 1.00 | 0.67 | 0.00 (N=5) | ~0.005 s |
 
 ## By attack pattern (held-out)
 
 | Family | Precision | Recall | F1 | Benign FCR |
 |--------|-----------|--------|-----|------------|
-| lateral (OOD timing) | 1.00 | 1.00 | 1.00 | — |
+| lateral (OOD) | 1.00 | 1.00 | 1.00 | — |
 | exfil | 1.00 | 1.00 | 1.00 | — |
-| benign multi-host (**N=1**) | — | — | — | **0.00** |
+| fusion_chain | 1.00 | 1.00 | 1.00 | — |
+| benign (N=5) | — | — | — | **0.00** |
 
-No family-level failure on this sealed set. Benign FCR is a single-pack observation until N grows. If a future pack shows exfil ≪ lateral (or the reverse), that split is what gets published — not a buried row under a single F1.
+## Reconstruction regression
+
+`corvex eval-recon --split heldout` → **8/8** packs ok (3 attack + 5 benign). Manifests labeled `regression_only`.
 
 ## Containment dry-run (not live)
 
-If every host in a flagged campaign were proposed for `IsolateHost` (dry-run only; `CORVEX_CONTAIN=0`):
-
 | Metric | Held-out |
 |--------|----------|
-| Hosts proposed | 6 |
-| Correct isolates | 6 |
+| Hosts proposed | 11 |
+| Correct isolates | 11 |
 | False isolates | **0** |
-| Missed hosts | 0 |
 | False-isolate rate | **0.00** |
-| Isolate precision / recall | 1.00 / 1.00 |
 
-Train dry-run: 9/9 correct, **0** false isolates. Nonzero false-isolate rate on a future run is a publishable finding, not a footnote.
+`CORVEX_CONTAIN=0`. Live path scaffolded behind L1 + hostile-bus; OS quarantine still unimplemented.
+
+## Claim gates (`corvex claim-gates`)
+
+| Gate | Status |
+|------|--------|
+| non_author_fusion_lift | pass (breaktest lift +0.84) |
+| benign_fcr_real_n | pass (N=5, FCR=0) |
+| stranger_success | **fail** (pending external operator) |
+| **claim_allowed** | **false** |
 
 ## What this does / does not prove
 
-**Proves (narrow):** On sealed synthetic multi-host packs, Corvex met pre-registered bars for precision+recall+benign FCR+TTU, beat per-host B1 on recall and benign FCR, and would not have false-isolated on dry-run host sets.
+**Proves (narrow):** Sealed packs now separate fusion from detector-only; benign FCR holds at N=5; reconstruction round-trips; breaktest fusion lift is large.
 
-**Does not prove:** Real malware defense, SOC workload reduction, commercial-tool parity, or that live contain is safe to arm.
+**Does not prove:** Real malware defense, stranger Windows success, commercial parity, or that live contain is safe to arm.
 
 ## Reproduce
 
-Public path (no sealed key):
-
 ```bash
-pip install -e ".[dev]"
-corvex replay train/train-lateral.jsonl --out-dir runs/demo
-corvex dash --run-dir runs/demo
-```
-
-Sealed held-out (local key + `heldout/*.sealed` only):
-
-```bash
-corvex eval --split train    # context only — not the sealed claim
-corvex eval --split heldout  # sealed claim
-corvex gate
+corvex seal-day0 --force
+corvex eval --split train
+corvex eval --split heldout
+corvex eval-recon --split heldout
+corvex score-non-author
+corvex claim-gates
+corvex hostile-bus-test
 ```

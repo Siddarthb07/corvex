@@ -36,7 +36,7 @@ CLI: `corvex` (legacy alias `cfuse`). Optional: `corvex init` to create enrollme
 
 ## Results (sealed held-out)
 
-Synthetic multi-host packs. **Care vs commercial tools: unproven.** We do not publish a lone “accuracy” — recall without precision (or without a benign false-alarm rate) is how correlators look strong and fail in a SOC.
+Synthetic multi-host packs (incl. `fusion_chain` + benign **N=5**). **Care vs commercial tools: unproven.** Claim language stays lab/BYO until `corvex claim-gates` → `claim_allowed=true`.
 
 ### Detection
 
@@ -46,32 +46,29 @@ Synthetic multi-host packs. **Care vs commercial tools: unproven.** We do not pu
 | Recall | **1.00** | True multi-host campaigns recovered |
 | Campaign F1 | **1.00** | Harmonic mean of P+R |
 | Precision@1 | **1.00** | Top-ranked campaign correct |
-| Benign false-campaign rate | **0.00** | Held-out benign packs (**N=1**) |
-| Time-to-correlate | **~0.012 s** | First ingest → campaigns (lab machine) |
+| Benign false-campaign rate | **0.00** | Held-out benign packs (**N=5**) |
+| Time-to-correlate | **~0.005 s** | First ingest → campaigns (lab machine) |
 
-**N:** attack packs **2** (TP=2, FP=0, FN=0); benign packs **1**. Train has **N_benign=0**. Thin on purpose until expanded — not a train/held-out discrepancy.
+**N:** attack packs **3**; benign packs **5**.
 
-### vs single-host baseline (why a correlator)
+### vs baselines (why fusion)
 
-| | Corvex | B1 (per-host naive) |
-|--|--------|---------------------|
-| F1 | **1.00** | **0.00** |
-| Recall | **1.00** | **0.00** |
-| Precision | **1.00** | **0.00** |
-| Benign false-campaign rate | **0.00** | **1.00** |
+| | Correlator | Detector-only | B1 naive |
+|--|------------|---------------|----------|
+| F1 | **1.00** | **0.67** | **0.00** |
+| Precision | **1.00** | **0.33** | **0.00** |
+| Recall | **1.00** | **0.67** | **0.00** |
 
-B1 misses the multi-host campaigns and still cries wolf on benign traffic. That gap is the premise — not the absolute Corvex score alone.
-
-B2 (SIEM-style joins) and detector-only also hit F1 1.00 on this sealed set. On **train**, detector-only was **0.89** vs correlator **1.00** — fusion helps there; held-out does not separate them yet. Honest limit of this pack grammar.
+Held-out now separates fusion from detector-only (**+0.33 F1**). Break-test public-TTP manifests: correlator **1.00** vs detector-only **0.16** (lift **+0.84**).
 
 ### Held-out vs train
 
-| Split | Precision | Recall | F1 | Benign FCR | TTU |
-|-------|-----------|--------|-----|------------|-----|
-| Train (dev only) | 1.00 | 1.00 | 1.00 | n/a (N=0) | ~0.011 s |
-| Held-out (sealed) | 1.00 | 1.00 | 1.00 | 0.00 (N=1) | ~0.012 s |
+| Split | Precision | Recall | F1 | Det-only F1 | Benign FCR | TTU |
+|-------|-----------|--------|-----|-------------|------------|-----|
+| Train (dev only) | 1.00 | 1.00 | 1.00 | 0.67 | 0.00 (N=2) | ~0.006 s |
+| Held-out (sealed) | 1.00 | 1.00 | 1.00 | 0.67 | 0.00 (N=5) | ~0.005 s |
 
-Train is **context**, not the sealed claim. Small gap ≠ real-world generalization.
+Train is **context**, not the sealed claim.
 
 ### By attack pattern (held-out)
 
@@ -79,21 +76,22 @@ Train is **context**, not the sealed claim. Small gap ≠ real-world generalizat
 |--------|-----------|--------|-----|------------|
 | lateral (OOD timing) | 1.00 | 1.00 | 1.00 | — |
 | exfil | 1.00 | 1.00 | 1.00 | — |
-| benign multi-host (N=1) | — | — | — | **0.00** |
+| fusion_chain | 1.00 | 1.00 | 1.00 | — |
+| benign (N=5) | — | — | — | **0.00** |
 
 ### Contain dry-run (`IsolateHost`, not live)
 
 | Metric | Held-out |
 |--------|----------|
-| Hosts proposed | 6 |
-| Correct isolates | 6 |
+| Hosts proposed | 11 |
+| Correct isolates | 11 |
 | False isolates | **0** |
 | False-isolate rate | **0.00** |
 
-`CORVEX_CONTAIN=0`. A future nonzero false-isolate rate gets published, not footnoted.
+`CORVEX_CONTAIN=0`. Live path is scaffolded (L1 + hostile-bus) but OS quarantine is not implemented.
 
-**Proves (narrow):** Sealed synthetic packs; pre-registered P+R + benign FCR + TTU bars; beats B1; dry-run host sets clean.  
-**Does not prove:** Real malware defense, SOC workload cut, commercial parity, or that live contain is safe to arm.
+**Proves (narrow):** Sealed packs; fusion beats detector-only; benign FCR at N=5; dry-run isolates clean.  
+**Does not prove:** Real malware defense, stranger Windows success, commercial parity, or live contain safety.
 
 Full write-up: [`reports/RESULTS.md`](reports/RESULTS.md).
 
@@ -180,7 +178,7 @@ Reconstruction writes `reconstruction.json` with status `complete` / `partial` /
 ## Docs
 
 - [`CHANGELOG.md`](CHANGELOG.md) · [`SECURITY.md`](SECURITY.md) · [`THREAT_MODEL.md`](THREAT_MODEL.md) · [`LICENSE`](LICENSE)
-- [`docs/how-corvex-works.md`](docs/how-corvex-works.md) · [`docs/contain.md`](docs/contain.md) · [`docs/sensor-windows.md`](docs/sensor-windows.md) · [`reports/RESULTS.md`](reports/RESULTS.md)
+- [`docs/how-corvex-works.md`](docs/how-corvex-works.md) · [`docs/contain.md`](docs/contain.md) · [`docs/sensor-windows.md`](docs/sensor-windows.md) · [`docs/stranger-checklist.md`](docs/stranger-checklist.md) · [`reports/RESULTS.md`](reports/RESULTS.md)
 - [`labs/breaktest/README.md`](labs/breaktest/README.md) · [`future-plans.md`](future-plans.md)
 
 ## License

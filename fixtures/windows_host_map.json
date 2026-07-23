@@ -1,0 +1,11 @@
+{
+  "host-a.lab.local": "host-a",
+  "host-b.lab.local": "host-b",
+  "host-c.lab.local": "host-c",
+  "host-a": "host-a",
+  "host-b": "host-b",
+  "host-c": "host-c",
+  "WORKSTATION01": "host-a",
+  "FILESERVER01": "host-b",
+  "JUMPBOX01": "host-c"
+}

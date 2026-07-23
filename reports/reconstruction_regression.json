@@ -1,0 +1,93 @@
+{
+  "schema_ver": "1",
+  "purpose": "regression_only",
+  "honesty": "Reconstruction exports are for lab pack scoring \u2014 not attack playbooks. Partial/insufficient statuses are publishable findings.",
+  "n_packs": 8,
+  "n_ok": 8,
+  "pass": true,
+  "attack_ok": 3,
+  "attack_n": 3,
+  "benign_ok": 5,
+  "benign_n": 5,
+  "packs": [
+    {
+      "pack": "held-benign-a.jsonl",
+      "family": "benign",
+      "ok": true,
+      "note": "no campaigns on benign \u2014 correct",
+      "host_jaccard": 1.0,
+      "status": "empty"
+    },
+    {
+      "pack": "held-benign-b.jsonl",
+      "family": "benign",
+      "ok": true,
+      "note": "no campaigns on benign \u2014 correct",
+      "host_jaccard": 1.0,
+      "status": "empty"
+    },
+    {
+      "pack": "held-benign-c.jsonl",
+      "family": "benign",
+      "ok": true,
+      "note": "no campaigns on benign \u2014 correct",
+      "host_jaccard": 1.0,
+      "status": "empty"
+    },
+    {
+      "pack": "held-benign-d.jsonl",
+      "family": "benign",
+      "ok": true,
+      "note": "no campaigns on benign \u2014 correct",
+      "host_jaccard": 1.0,
+      "status": "empty"
+    },
+    {
+      "pack": "held-benign-e.jsonl",
+      "family": "benign",
+      "ok": true,
+      "note": "no campaigns on benign \u2014 correct",
+      "host_jaccard": 1.0,
+      "status": "empty"
+    },
+    {
+      "pack": "held-exfil.jsonl",
+      "family": "exfil",
+      "campaign_id": "camp-exfil-203-0-113-50",
+      "status": "complete",
+      "confidence": 0.8,
+      "host_jaccard": 1.0,
+      "gaps": [],
+      "round_trip_ok": true,
+      "manifest_purpose": "regression_only",
+      "ok": true,
+      "note": "reconstruction matches GT hosts at Jaccard>=0.5"
+    },
+    {
+      "pack": "held-fusion-chain.jsonl",
+      "family": "fusion_chain",
+      "campaign_id": "camp-lateral-svc-backup",
+      "status": "complete",
+      "confidence": 0.95,
+      "host_jaccard": 1.0,
+      "gaps": [],
+      "round_trip_ok": true,
+      "manifest_purpose": "regression_only",
+      "ok": true,
+      "note": "reconstruction matches GT hosts at Jaccard>=0.5"
+    },
+    {
+      "pack": "held-lateral-ood.jsonl",
+      "family": "lateral",
+      "campaign_id": "camp-lateral-svc-backup",
+      "status": "complete",
+      "confidence": 0.8,
+      "host_jaccard": 1.0,
+      "gaps": [],
+      "round_trip_ok": true,
+      "manifest_purpose": "regression_only",
+      "ok": true,
+      "note": "reconstruction matches GT hosts at Jaccard>=0.5"
+    }
+  ]
+}
