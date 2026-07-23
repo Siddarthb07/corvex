@@ -26,7 +26,7 @@ Manifest-driven Atomic Red Team–style chains (multi-user + exfil/recon) — no
 
 ![Corvex ART break-test](docs/assets/corvex-breaktest.gif)
 
-[Full MP4](docs/assets/corvex-breaktest.mp4) · more recordings: [cred-hop](docs/assets/corvex-breaktest-art_cred_hop.mp4) · [recon-pivot](docs/assets/corvex-breaktest-art_recon_pivot.mp4) · [Break-test lab](labs/breaktest/README.md)
+[Full MP4](docs/assets/corvex-breaktest.mp4) · [Break-test lab](labs/breaktest/README.md)
 
 ### Attack theatre
 

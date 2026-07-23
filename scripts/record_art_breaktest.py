@@ -125,7 +125,8 @@ def docker_art_run(manifest_name: str) -> Path:
     return dest
 
 
-def export_video(theatre_dir: Path, stem: str) -> None:
+def export_video(theatre_dir: Path, stem: str = "breaktest") -> None:
+    """Write the single published demo: docs/assets/corvex-breaktest.{gif,mp4}."""
     sys.path.insert(0, str(ROOT / "scripts"))
     from export_live_lab_video import export_replay
     from run_breaktest_lab import _replay_html
@@ -142,7 +143,6 @@ def export_video(theatre_dir: Path, stem: str) -> None:
     replay = theatre_dir / "breaktest-replay.html"
     replay.write_text(_replay_html(state), encoding="utf-8")
     OUT_DIR.mkdir(parents=True, exist_ok=True)
-    # Longer capture for multi-step ART feeds
     import export_live_lab_video as ev
 
     old = ev.DURATION_S
@@ -150,8 +150,8 @@ def export_video(theatre_dir: Path, stem: str) -> None:
     try:
         export_replay(
             replay,
-            OUT_DIR / f"corvex-breaktest-{stem}.gif",
-            OUT_DIR / f"corvex-breaktest-{stem}.mp4",
+            OUT_DIR / "corvex-breaktest.gif",
+            OUT_DIR / "corvex-breaktest.mp4",
         )
     finally:
         ev.DURATION_S = old
@@ -164,22 +164,14 @@ def main() -> int:
 
     score_all()
 
-    primary = None
-    for name in LIVE_MANIFESTS:
+    # Live-run every sequential ART attack; publish only one demo video (primary).
+    for i, name in enumerate(LIVE_MANIFESTS):
         print(f"\n######## LIVE ART RUN: {name} ########", flush=True)
         dest = docker_art_run(name)
-        stem = Path(name).stem
-        export_video(dest, stem)
-        if primary is None:
-            primary = stem
-            # Also publish canonical names used by README
-            for ext in ("gif", "mp4"):
-                src = OUT_DIR / f"corvex-breaktest-{stem}.{ext}"
-                dst = OUT_DIR / f"corvex-breaktest.{ext}"
-                if src.exists():
-                    shutil.copy2(src, dst)
+        if i == 0:
+            export_video(dest, Path(name).stem)
 
-    print("\nArtifacts under", OUT_DIR, flush=True)
+    print("\nPublished demo:", OUT_DIR / "corvex-breaktest.mp4", flush=True)
     return 0
 
 
