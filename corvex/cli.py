@@ -67,6 +67,16 @@ def _repo_root() -> Path:
     return _PKG_ROOT
 
 
+def _repo_rel(path: Path, root: Optional[Path] = None) -> str:
+    """Repo-relative POSIX path for reports — never leak machine usernames/home dirs."""
+    p = Path(path).resolve()
+    base = Path(root or _repo_root()).resolve()
+    try:
+        return p.relative_to(base).as_posix()
+    except ValueError:
+        return p.name
+
+
 @app.command("init")
 def init_cmd(
     force: bool = typer.Option(False, help="Overwrite existing lab enrollment"),
@@ -425,7 +435,7 @@ def score_non_author_cmd(
     # Author-adjacent ART manifests still aren't stranger telemetry — require lift AND label honesty
     passed = f1_lift >= 0.05
     result = {
-        "source": str(man_dir),
+        "source": _repo_rel(man_dir, root),
         "packs": pack_rows,
         "correlator": m_c,
         "detector_only": m_d,

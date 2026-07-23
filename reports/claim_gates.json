@@ -1,6 +1,6 @@
 {
   "schema_ver": "1",
-  "generated_at": "2026-07-23T14:04:21Z",
+  "generated_at": "2026-07-23T14:09:47Z",
   "claim_allowed": false,
   "claim_language": "lab / BYO campaign stitch only \u2014 claim locked",
   "gates": {
@@ -9,13 +9,13 @@
       "pass": true,
       "f1_lift": 0.44074074074074077,
       "min_lift": 0.05,
-      "source": "C:\\Users\\siddu\\projects\\corvex\\labs\\breaktest\\manifests",
+      "source": "labs/breaktest/manifests",
       "note": "Public-TTP/breaktest manifest score. Still not stranger Windows telemetry \u2014 necessary but not sufficient for claim_allowed."
     },
     "stranger_success": {
       "id": "stranger_success",
       "pass": false,
-      "path": "C:\\Users\\siddu\\projects\\corvex\\reports\\stranger_dry_run.json",
+      "path": "reports/stranger_dry_run.json",
       "operator": null,
       "note": "Pending external operator. Legacy Stage-B self-check was not a P3 stranger attestation \u2014 see docs/stranger-checklist.md."
     },

@@ -20,6 +20,20 @@ MAX_BENIGN_FCR = 0.10
 MIN_FUSION_LIFT = 0.05  # correlator F1 - detector_only F1 on non-author set
 
 
+def _repo_rel(root: Path, path: Any) -> str:
+    """Repo-relative POSIX path for published reports (no home-dir leak)."""
+    p = Path(path)
+    try:
+        return p.resolve().relative_to(Path(root).resolve()).as_posix()
+    except (ValueError, OSError):
+        text = str(path).replace("\\", "/")
+        for marker in ("labs/", "reports/", "heldout/", "train/", "fixtures/"):
+            idx = text.lower().find(marker)
+            if idx >= 0:
+                return text[idx:]
+        return p.name
+
+
 def _load(path: Path) -> Optional[Dict[str, Any]]:
     if not path.exists():
         return None
@@ -68,7 +82,11 @@ def evaluate_claim_gates(
             "pass": bool(non_author.get("pass")) and lift >= min_fusion_lift,
             "f1_lift": lift,
             "min_lift": min_fusion_lift,
-            "source": non_author.get("source"),
+            "source": (
+                _repo_rel(root, non_author["source"])
+                if non_author.get("source")
+                else None
+            ),
             "note": non_author.get("note")
             or "Loaded reports/non_author_fusion.json",
         }
@@ -98,7 +116,7 @@ def evaluate_claim_gates(
         stranger_gate = {
             "id": "stranger_success",
             "pass": bool(stranger.get("pass")),
-            "path": str(stranger_path),
+            "path": _repo_rel(root, stranger_path),
             "operator": stranger.get("operator"),
             "note": stranger.get("note")
             or ("Stranger attestation pass=true" if stranger.get("pass") else "Stranger attestation present but pass!=true"),
@@ -107,7 +125,7 @@ def evaluate_claim_gates(
         stranger_gate = {
             "id": "stranger_success",
             "pass": False,
-            "path": str(stranger_path),
+            "path": _repo_rel(root, stranger_path),
             "note": (
                 "FAIL: reports/stranger_dry_run.json exists but lacks P3 schema field "
                 "'pass' (legacy Stage-B file). Replace with docs/stranger-checklist.md attestation."
@@ -117,7 +135,7 @@ def evaluate_claim_gates(
         stranger_gate = {
             "id": "stranger_success",
             "pass": False,
-            "path": str(stranger_path),
+            "path": _repo_rel(root, stranger_path),
             "note": (
                 "FAIL: missing reports/stranger_dry_run.json. "
                 "External operator must run Windows export→timeline and write attestation "

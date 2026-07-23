@@ -15,10 +15,14 @@ from typing import Any, Dict, List, Optional
 from corvex import CORVEX_CONTAIN, __version__
 
 
-def _load(path: Path) -> Optional[Dict[str, Any]]:
-    if not path.exists():
+def _public_path(path: Optional[Path], root: Path) -> Optional[str]:
+    """Repo-relative path for snapshots — avoid leaking home-dir usernames."""
+    if path is None:
         return None
-    return json.loads(path.read_text(encoding="utf-8"))
+    try:
+        return Path(path).resolve().relative_to(Path(root).resolve()).as_posix()
+    except ValueError:
+        return Path(path).name
 
 
 def _load_jsonl(path: Path, *, limit: int = 400) -> List[Dict[str, Any]]:
@@ -334,7 +338,7 @@ def collect_snapshot(root: Path) -> Dict[str, Any]:
             "by_kind": by_kind,
         },
         "run": {
-            "dir": str(run_dir) if run_dir else None,
+            "dir": _public_path(run_dir, root),
             "pack": timeline.get("pack"),
             "loaded": run_dir is not None,
             "ttu_seconds": timeline.get("ttu_seconds"),
@@ -349,7 +353,7 @@ def collect_snapshot(root: Path) -> Dict[str, Any]:
         "feed": {
             "mode": "file_tail",
             "poll_ms": 2000,
-            "events_path": str(events_path) if events_path else None,
+            "events_path": _public_path(events_path, root),
             "events_mtime": events_mtime,
             "events_count": len(activity),
             "note": (
