@@ -341,7 +341,7 @@ body::before {
           <div class="label">This run</div>
           <div class="status ${heroClass(hero.status)}">${esc(hero.status||"—")}</div>
           <div class="detail">${esc(hero.detail||"")}</div>
-          <div class="meta">${esc(run.dir||"no run")} · pack ${esc(run.pack||"—")}</div>
+          <div class="meta">${run.loaded ? `pack ${esc(run.pack||"—")}` : "no run loaded"}</div>
         </section>
         <section class="kpis">
           <div class="kpi"><div class="n">${k.events||0}</div><div class="l">Events</div></div>
@@ -391,8 +391,8 @@ body::before {
     const note = document.getElementById("feedNote");
     if (note) {
       note.textContent = feed.events_path
-        ? `Following ${feed.events_path} · ${feed.events_count||0} lines · ${feed.note||""}`
-        : (feed.note || "No run loaded — dash cannot see attacks until --run-dir points at a writing run.");
+        ? `Live tail · ${feed.events_count||0} lines · ${feed.note||""}`
+        : (feed.note || "No run loaded — start with corvex dash --run-dir <path>.");
     }
     const pulse = document.getElementById("pulse");
     const feedMode = document.getElementById("feedMode");
