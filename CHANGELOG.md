@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.1.0] — 2026-07-23
+
+### Added
+- P1: expanded sealed benign N=5; `corvex eval-recon` reconstruction→manifest regression.
+- P2: `corvex byo-windows` / `correlate-byo`; `--host-map` on `adapt-windows`; stranger checklist.
+- P3: `corvex claim-gates` + `score-non-author` (claim_allowed locked until stranger attestation).
+- P4: `corvex.contain.live` + `hostile-bus-test` (OS quarantine still unimplemented; lab flags only).
+
+### Changed
+- Held-out now separates correlator F1 **1.00** from detector-only **0.67** (fusion_chain).
+- `seal-day0 --force` clears held-out as well as train.
+- Published RESULTS / README metrics refreshed after re-seal.
+
+### Safety
+- Live contain still gated; `CORVEX_CONTAIN=0` default. Hostile-bus pass ≠ OS isolate unlocked.
+
 ## [1.0.1] — 2026-07-23
 
 ### Removed

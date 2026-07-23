@@ -1,55 +1,27 @@
 # Corvex — future plans
 
-Where Corvex is today: observe/correlate ready; **reconstruction + quarantine honesty shipped**; contain live executor still locked; sealed eval honest but synthetic. Held-out still ties Corvex to detector-only on some packs (both F1 1.0) — that’s the soft spot.
+Where Corvex is today: **P1–P4 scaffolded and published**. Fusion beats detector-only on sealed held-out (+0.33 F1) and breaktest (+0.84). Benign FCR 0 at N=5. Reconstruction regression green. Claim still locked on stranger attestation. Live OS quarantine still unimplemented.
 
-**Just shipped:** `corvex reconstruct` / `corvex quarantine` (+ status); replay writes `reconstruction.json`; dashboard Reconstruction + Quarantine panels; [`docs/how-corvex-works.md`](docs/how-corvex-works.md); deep-dive at `portfolio-study/Corvex_DEEP_DIVE.md`.
+## Done this wave
 
-## 1. Make the correlator premise undeniable
+- Re-seal + RESULTS refresh
+- `eval-recon`, `byo-windows`, `claim-gates`, `score-non-author`, `hostile-bus-test`
+- Live contain scaffold (`contain/live.py`) — lab flags only when gated
 
-- Add sealed packs where **single-host / detector-only fail** and **cross-host fusion wins**
-- Keep publishing P+R, benign FCR, vs B1, per-family — if fusion lift is real, it’ll show up as a gap, not a story
-- **Scaffolded:** `fusion_chain` family; detector-only per-key (no cross-key merge); `seal-day0` registers fusion-chain packs. **Next:** `corvex seal-day0 --force` then publish numbers.
+## Still open
 
-## 2. Hard break-testing: 4–5 hosts + real attack repos
+1. **Stranger attestation** — external operator completes [`docs/stranger-checklist.md`](docs/stranger-checklist.md) → flip `reports/stranger_dry_run.json` `pass: true` (author cannot self-attest).
+2. **Real Windows multi-host export** (not just the fixture) through `byo-windows`.
+3. **OS/EDR/VLAN quarantine executor** — only after L1 evidenced with real notes (not dashboard toggles) + hostile-bus + published false-isolate rates on larger sets.
+4. Optional: streaming correlator / JetStream — deferred.
 
-- 5-host break-test lab + ART-style manifests already scaffolded under `labs/breaktest/`
-- Score P+R, FCR, dry-run false-isolate; **publish break points**
-- Reconstruction manifests round-trip as regression only (not weaponized packs)
+## What not to do
 
-## 3. One real sensor path
-
-- Windows Security → `corvex adapt-windows` → BYO → correlator → dash/reconstruct
-- Harden [`docs/sensor-windows.md`](docs/sensor-windows.md) until a stranger can follow it
-
-## 4. Deploy shape (observe + honest quarantine status)
-
-- Admin-box correlator + dash; quarantine panel shows dry-run / lab_flag / blocked
-- Keep live isolate clearly off until P4
-
-## 5. Containment — isolate stays on the roadmap
-
-Attempt quarantine always; enforce only when mode allows:
-
-| Mode | Meaning |
-|------|---------|
-| `dry_run` | Log IsolateHost only |
-| `lab_flag` | Sandbox flag files (virtual hosts) |
-| `blocked` | Refuse — say cannot quarantine real hosts |
-
-Live OS/EDR/VLAN executor only after L1 evidenced + hostile-bus + published false-isolate rates. **Never bullshit success.**
-
-## 6. External check
-
-- Stranger dry-run of Windows → timeline / reconstruct
-- If they shrug, don’t unlock “useful on real attacks”
-
-## What not to do next
-
-- More pitch polish / GIFs
-- Claiming commercial-tool parity
-- Arming `CORVEX_CONTAIN` without an executor + hostile-bus tests
-- Inventing reconstruction hops or CVEs when status is partial/insufficient
+- Set `claim_allowed` by hand
+- Flip L1 checklist without evidence
+- Claim “useful on real attacks” while stranger gate is false
+- Fake OS isolate success
 
 ## If only one thing
 
-Re-seal and publish fusion lift (or the honest lack of it) on held-out + break-test — then harden the Windows BYO path so reconstruction + quarantine honesty show up on stranger logs.
+Get one outsider through the stranger checklist. That unlocks the last P3 gate.

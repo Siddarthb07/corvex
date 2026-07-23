@@ -136,14 +136,24 @@ def adapt_windows_security_export(
     """
     path = Path(path)
     wanted = set(event_ids) if event_ids is not None else set(_AUTH_SUCCESS_IDS)
-    # Normalize wanted to strings for comparison
-    wanted_norm = {str(int(x)) if str(x).replace(".", "", 1).isdigit() else str(x) for x in wanted}
+    # Normalize wanted to digit strings for comparison (handles 4624, "4624", "4624.0")
+    wanted_norm = set()
+    for x in wanted:
+        s = str(x)
+        if s.replace(".", "", 1).isdigit():
+            wanted_norm.add(str(int(float(s))))
+        else:
+            wanted_norm.add(s)
     host_map = dict(host_map or {})
     out: List[Dict[str, Any]] = []
     seq = 0
     for rec in _iter_records(path):
         eid = _event_id(rec)
-        eid_norm = str(int(eid)) if str(eid).replace(".", "", 1).isdigit() else str(eid)
+        eid_s = str(eid)
+        if eid_s.replace(".", "", 1).isdigit():
+            eid_norm = str(int(float(eid_s)))
+        else:
+            eid_norm = eid_s
         if eid_norm not in wanted_norm and eid not in wanted:
             continue
         raw_host = _host_id(rec, default_host)
