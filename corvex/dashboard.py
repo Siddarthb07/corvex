@@ -69,11 +69,19 @@ def collect_snapshot(root: Path) -> Dict[str, Any]:
     run_dir = _resolve_run_dir(root)
     timeline: Dict[str, Any] = {}
     campaigns: list = []
+    reconstruction: Dict[str, Any] = {}
     if run_dir is not None:
         tl_path = run_dir / "timeline.json"
         if tl_path.exists():
             timeline = json.loads(tl_path.read_text(encoding="utf-8"))
             campaigns = list(timeline.get("campaigns") or [])
+        recon_path = run_dir / "reconstruction.json"
+        if recon_path.exists():
+            reconstruction = json.loads(recon_path.read_text(encoding="utf-8"))
+
+    from corvex.contain.quarantine import resolve_quarantine_mode
+
+    quarantine_caps = resolve_quarantine_mode(root=root)
 
     return {
         "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
@@ -111,6 +119,8 @@ def collect_snapshot(root: Path) -> Dict[str, Any]:
         "campaigns": campaigns,
         "timeline_pack": timeline.get("pack"),
         "timeline_ttu": timeline.get("ttu_seconds"),
+        "reconstruction": reconstruction,
+        "quarantine": quarantine_caps,
     }
 
 
@@ -376,6 +386,22 @@ body::before {{
   </section>
 
   <section class="section">
+    <div class="section-head">
+      <h2>Reconstruction</h2>
+      <p id="reconHint">Honest rebuild from correlator output — gaps listed, never invented</p>
+    </div>
+    <div class="panel card" id="reconstruction">No reconstruction yet — run <code>corvex replay …</code> or <code>corvex reconstruct runs/…</code></div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <h2>Quarantine</h2>
+      <p id="quarantineHint"></p>
+    </div>
+    <div class="panel card" id="quarantinePanel">—</div>
+  </section>
+
+  <section class="section">
     <div class="section-head"><h2>Detection</h2></div>
     <div class="metrics" id="metrics"></div>
   </section>
@@ -437,8 +463,18 @@ body::before {{
       `<span class="pill">Isolate ${{containOff ? 'off' : 'on'}}</span>`,
     ].join('');
 
-    document.getElementById('containTitle').textContent = containOff ? 'Dry-run only' : 'Live on';
-    document.getElementById('containTitle').style.color = containOff ? 'var(--muted)' : 'var(--warn)';
+    document.getElementById('containTitle').textContent = (() => {{
+      const q = s.quarantine || {{}};
+      if (q.mode === 'lab_flag') return 'Lab flags';
+      if (q.mode === 'blocked') return 'Blocked';
+      return 'Dry-run only';
+    }})();
+    document.getElementById('containTitle').style.color = (() => {{
+      const q = s.quarantine || {{}};
+      if (q.mode === 'blocked') return 'var(--bad)';
+      if (q.mode === 'lab_flag') return 'var(--warn)';
+      return 'var(--muted)';
+    }})();
 
     const camps = s.campaigns || [];
     const runHint = document.getElementById('runHint');
@@ -458,9 +494,62 @@ body::before {{
       }}).join('');
     }}
 
-    const items = d.items || {{}};
-    const keys = Object.keys(items).sort();
-    const onCount = keys.filter(k => items[k]).length;
+    const recon = s.reconstruction || {{}};
+    const reconEl = document.getElementById('reconstruction');
+    const reconHint = document.getElementById('reconHint');
+    const items = recon.campaign_reconstructions || [];
+    if (!items.length) {{
+      reconHint.textContent = 'Honest rebuild from correlator output — gaps listed, never invented';
+      reconEl.innerHTML = 'No reconstruction yet — run <code>corvex replay …</code> or <code>corvex reconstruct runs/…</code>';
+    }} else {{
+      const agg = recon.aggregate_status || '—';
+      reconHint.textContent = `${{agg}} · ${{recon.summary || ''}}`;
+      reconEl.innerHTML = items.map(r => {{
+        const status = r.status || '—';
+        const statusColor = status === 'complete' ? 'var(--good)' : (status === 'partial' ? 'var(--warn)' : 'var(--bad)');
+        const steps = (r.steps || []).map(st => {{
+          const techs = (st.attack_techniques || []).join(', ') || 'unmapped';
+          return `<div style="margin-top:6px;font-size:12px;color:var(--muted)">` +
+            `${{st.order}}. <strong style="color:var(--text)">${{st.name}}</strong> · ${{(st.hosts||[]).join(', ')}} · ${{techs}}` +
+            (st.verified ? '' : ' · <em>unverified</em>') +
+            `</div>`;
+        }}).join('');
+        const gaps = (r.gaps || []).length
+          ? `<div class="note" style="margin-top:10px">Gaps: ${{(r.gaps || []).map(g => String(g)).join('; ')}}</div>`
+          : '';
+        const q = r.quarantine || null;
+        const qline = q
+          ? `<div style="margin-top:8px;font-size:12px;color:var(--muted)">Isolate plan: ${{(q.host_ids||[]).join(', ')}}` +
+            (q.cut_point_host ? ` · cut ${{q.cut_point_host}}` : '') +
+            ` · ${{q.mode}} — ${{q.honesty || ''}}</div>`
+          : `<div style="margin-top:8px;font-size:12px;color:var(--bad)">No isolate plan (insufficient evidence)</div>`;
+        return `<div class="ctrl-row" style="align-items:start">
+          <div class="ctrl-name">
+            <strong>${{r.campaign_id || 'campaign'}}</strong>
+            <span style="margin-left:8px;color:${{statusColor}};font-family:var(--mono);font-size:11px">${{status}}</span>
+            <span style="margin-left:8px;font-family:var(--mono);font-size:11px;color:var(--dim)">conf ${{Number(r.confidence||0).toFixed(2)}}</span>
+            ${{steps}}${{gaps}}${{qline}}
+          </div>
+        </div>`;
+      }}).join('') +
+        ((recon.honesty || []).length
+          ? `<div class="note" style="margin:12px">${{(recon.honesty || []).join(' ')}}</div>`
+          : '');
+    }}
+
+    const qcaps = s.quarantine || {{}};
+    document.getElementById('quarantineHint').textContent = qcaps.mode
+      ? `mode=${{qcaps.mode}} · live_executor=${{!!qcaps.live_executor}}`
+      : '';
+    document.getElementById('quarantinePanel').innerHTML =
+      `<div class="ctrl-name"><strong>${{qcaps.mode || 'unknown'}}</strong>` +
+      `<div style="margin-top:8px;font-size:13px;color:var(--muted)">${{qcaps.message || '—'}}</div>` +
+      `<div class="note" style="margin-top:12px">${{(qcaps.honesty || []).join(' ') || 'Live quarantine not claimed.'}}</div>` +
+      `</div>`;
+
+    const ctrlItems = d.items || {{}};
+    const keys = Object.keys(ctrlItems).sort();
+    const onCount = keys.filter(k => ctrlItems[k]).length;
     readyPct = keys.length ? Math.round(1000 * onCount / keys.length) / 10 : readyPct;
     document.getElementById('readyTitle').textContent = `${{onCount}}/${{keys.length}} controls`;
     document.getElementById('ctrlSummary').textContent = `${{onCount}}/${{keys.length}} on`;
@@ -496,17 +585,18 @@ body::before {{
       honesty.hidden = true;
     }}
 
+    const qMode = (s.quarantine || {{}}).mode || 'dry_run';
     document.getElementById('roadmap').innerHTML = [
       {{ name:'Eval', desc:'Held-out gate', cls: pass?'done':'locked', badge: pass?'PASS':(s.gate||'—') }},
       {{ name:'Sensors', desc:'Live hosts', cls: s.stage_b_allowed?'done':(pass?'active':'locked'), badge: s.stage_b_allowed?'open':'locked' }},
       {{ name:'Share', desc:'External labs', cls: labs>=3?'done':'locked', badge: `${{labs}}/3` }},
-      {{ name:'Isolate', desc:'Quarantine', cls: readyPct>=100?'done':'locked', badge: `${{readyPct}}%` }},
+      {{ name:'Isolate', desc: qMode === 'lab_flag' ? 'Lab flags' : (qMode === 'blocked' ? 'Blocked honest' : 'Dry-run'), cls: readyPct>=100?'done':(qMode==='lab_flag'?'active':'locked'), badge: qMode }},
     ].map(st => `<div class="step ${{st.cls}}"><div class="dot"></div><div class="name">${{st.name}}</div>
       <div class="desc">${{st.desc}}</div><span class="badge">${{st.badge}}</span></div>`).join('');
 
     document.getElementById('controls').innerHTML = keys.map(k => {{
       const copy = checklist_copy[k] || [k, ''];
-      const on = !!items[k];
+      const on = !!ctrlItems[k];
       return `<div class="ctrl-row" title="${{copy[1]}}">
         <div class="ctrl-name">${{copy[0]}}</div>
         <label class="switch">

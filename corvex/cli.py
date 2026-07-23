@@ -1,4 +1,4 @@
-"""CLI: corvex replay | eval | timeline | ingest-byo | adapt-windows | build-breaktest | dash | seal-day0 | freeze."""
+"""CLI: corvex replay | eval | timeline | reconstruct | quarantine | ingest-byo | adapt-windows | build-breaktest | dash | seal-day0 | freeze."""
 
 from __future__ import annotations
 
@@ -223,6 +223,11 @@ def replay(
         "campaigns": [c.to_dict() for c in store.all()],
     }
     (out_dir / "timeline.json").write_text(json.dumps(timeline, indent=2), encoding="utf-8")
+    from corvex.contain.quarantine import resolve_quarantine_mode
+    from corvex.reconstruct import write_reconstruction
+
+    qmode = resolve_quarantine_mode(root=_repo_root())["mode"]
+    recon_path = write_reconstruction(out_dir, quarantine_mode=qmode)
     # Pointer so `corvex dash` can show the latest replay without extra flags.
     latest = _repo_root() / "runs" / "latest"
     latest.parent.mkdir(parents=True, exist_ok=True)
@@ -232,7 +237,17 @@ def replay(
         latest.symlink_to(out_dir.resolve(), target_is_directory=True)
     except OSError:
         latest.write_text(str(out_dir.resolve()), encoding="utf-8")
-    typer.echo(json.dumps({"campaigns": len(store.all()), "ttu_seconds": ttu, "out_dir": str(out_dir)}, indent=2))
+    typer.echo(
+        json.dumps(
+            {
+                "campaigns": len(store.all()),
+                "ttu_seconds": ttu,
+                "out_dir": str(out_dir),
+                "reconstruction": str(recon_path),
+            },
+            indent=2,
+        )
+    )
 
 
 @app.command("timeline")
@@ -243,6 +258,63 @@ def timeline(
     if not path.exists():
         raise typer.BadParameter(f"missing {path}")
     typer.echo(path.read_text(encoding="utf-8"))
+
+
+@app.command("reconstruct")
+def reconstruct_cmd(
+    run_dir: Path = typer.Argument(..., help="Run directory with timeline.json"),
+) -> None:
+    """Rebuild attack timeline from campaigns — honest gaps, no invented TTPs."""
+    from corvex.contain.quarantine import resolve_quarantine_mode
+    from corvex.reconstruct import write_reconstruction
+
+    qmode = resolve_quarantine_mode(root=_repo_root())["mode"]
+    out = write_reconstruction(Path(run_dir), quarantine_mode=qmode)
+    report = json.loads(out.read_text(encoding="utf-8"))
+    typer.echo(
+        json.dumps(
+            {
+                "out": str(out),
+                "aggregate_status": report.get("aggregate_status"),
+                "summary": report.get("summary"),
+                "honesty": report.get("honesty"),
+            },
+            indent=2,
+        )
+    )
+
+
+@app.command("quarantine")
+def quarantine_cmd(
+    hosts: str = typer.Argument(..., help="Comma-separated host_ids"),
+    rationale: str = typer.Option(..., "--rationale"),
+    lab_dir: Optional[Path] = typer.Option(
+        None, "--lab-dir", help="Lab shared dir (enables lab_flag isolate)"
+    ),
+    log: Path = typer.Option(Path("reports/stage_d_dry_run.jsonl"), help="Dry-run log path"),
+) -> None:
+    """Attempt isolate/quarantine — dry-run, lab flags, or honest refusal."""
+    from corvex.contain.quarantine import attempt_quarantine
+
+    host_ids = [h.strip() for h in hosts.split(",") if h.strip()]
+    result = attempt_quarantine(
+        host_ids,
+        rationale=rationale,
+        lab_dir=lab_dir,
+        log_path=log,
+        root=_repo_root(),
+    )
+    typer.echo(json.dumps(result, indent=2))
+    if not result.get("ok") and result.get("aggregate") == "cannot_quarantine":
+        raise typer.Exit(2)
+
+
+@app.command("quarantine-status")
+def quarantine_status_cmd() -> None:
+    """Honest quarantine capability (dry-run / lab_flag / blocked)."""
+    from corvex.contain.quarantine import resolve_quarantine_mode
+
+    typer.echo(json.dumps(resolve_quarantine_mode(root=_repo_root()), indent=2))
 
 
 @app.command("ingest-byo")
@@ -582,10 +654,16 @@ def dash_cmd(
 
 @app.command("contain-status")
 def contain_status_cmd() -> None:
-    """Show contain checklist + dry-run availability (never claims live contain)."""
+    """Show contain checklist + quarantine capability (never claims live contain)."""
     from corvex.contain.dry_run import status
+    from corvex.contain.quarantine import resolve_quarantine_mode
 
-    typer.echo(json.dumps(status(), indent=2))
+    typer.echo(
+        json.dumps(
+            {"contain": status(), "quarantine": resolve_quarantine_mode(root=_repo_root())},
+            indent=2,
+        )
+    )
 
 
 @app.command("contain-dry-run")

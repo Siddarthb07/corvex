@@ -102,6 +102,10 @@ def contain_status(root: Optional[Path] = None) -> dict:
         "pct": 100.0 * done / len(L1_ITEMS),
         "live_executor": False,
         "dry_run_available": True,
+        "honesty": (
+            "Live OS/EDR/VLAN quarantine is not implemented. "
+            "Dry-run IsolateHost logs proposals; lab_flag mode writes sandbox flags only."
+        ),
     }
 
 

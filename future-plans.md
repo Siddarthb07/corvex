@@ -1,63 +1,55 @@
 # Corvex — future plans
 
-Where Corvex is today: observe/correlate ready, contain locked, sealed eval honest but synthetic. Held-out still ties Corvex to detector-only (both F1 1.0) — that’s the soft spot.
+Where Corvex is today: observe/correlate ready; **reconstruction + quarantine honesty shipped**; contain live executor still locked; sealed eval honest but synthetic. Held-out still ties Corvex to detector-only on some packs (both F1 1.0) — that’s the soft spot.
 
-**Build status (scaffolded, eval not re-run yet):** fusion_chain family + honest per-key detector-only ablation; 5-host break-test lab + attack-repo manifests; Windows auth → BYO adapter; break-point reporter. Next action: `corvex seal-day0 --force` then sealed eval / breaktest scoring.
+**Just shipped:** `corvex reconstruct` / `corvex quarantine` (+ status); replay writes `reconstruction.json`; dashboard Reconstruction + Quarantine panels; [`docs/how-corvex-works.md`](docs/how-corvex-works.md); deep-dive at `portfolio-study/Corvex_DEEP_DIVE.md`.
 
 ## 1. Make the correlator premise undeniable
 
 - Add sealed packs where **single-host / detector-only fail** and **cross-host fusion wins**
 - Keep publishing P+R, benign FCR, vs B1, per-family — if fusion lift is real, it’ll show up as a gap, not a story
-- **Scaffolded:** `fusion_chain` family in `feeder.py`; detector-only now groups per alert key (user / dst / host) without cross-key merge; `seal-day0` registers `train-fusion-chain` + `held-fusion-chain` (5 hosts). Re-seal + eval still needed to publish numbers.
+- **Scaffolded:** `fusion_chain` family; detector-only per-key (no cross-key merge); `seal-day0` registers fusion-chain packs. **Next:** `corvex seal-day0 --force` then publish numbers.
 
 ## 2. Hard break-testing: 4–5 hosts + real attack repos
 
-Synthetic packs are too clean. Stress where Corvex actually fails:
+- 5-host break-test lab + ART-style manifests already scaffolded under `labs/breaktest/`
+- Score P+R, FCR, dry-run false-isolate; **publish break points**
+- Reconstruction manifests round-trip as regression only (not weaponized packs)
 
-- Spin a lab of **4–5 hosts** (not the current 2–3 hop theatre)
-- Drive campaigns from **public GitHub attack / red-team repos** (known TTPs, not hand-authored JSONL) — adapted into Corvex’s event schema / BYO ingest
-- Score the same bars: P+R, benign FCR, vs B1 / detector-only, time-to-correlate, dry-run false-isolate
-- **Publish the break points** — missed hops, over-merged campaigns, timing windows that collapse, hosts that never fuse — not just the wins
-- Treat this as the honesty gate before claiming sensor or network-deploy readiness
-- **Scaffolded:** `labs/breaktest/` (5-host compose), ART-style sequential manifests
-  (`art_lateral_chain`, `art_cred_hop`, `art_slow_drip`, `art_recon_pivot`,
-  `art_recon_exfil_split`), manifest-driven attacker, `corvex build-breaktest`,
-  `scripts/record_art_breaktest.py` (score + live record + video).
+## 3. One real sensor path
 
-## 3. One real sensor path (not more demos)
+- Windows Security → `corvex adapt-windows` → BYO → correlator → dash/reconstruct
+- Harden [`docs/sensor-windows.md`](docs/sensor-windows.md) until a stranger can follow it
 
-- One OS export → JSONL → correlator on a lab machine (Windows Event / auth logs is enough)
-- Document the exact pipeline strangers can copy
-- This is the unlock before JetStream/mTLS theater
-- **Scaffolded:** `corvex adapt-windows`, `corvex/adapters/windows_security.py`, `docs/sensor-windows.md`, `fixtures/windows_security_sample.json`. Stage B live sensors stay gated.
+## 4. Deploy shape (observe + honest quarantine status)
 
-## 4. Deploy shape for a stranger’s network
+- Admin-box correlator + dash; quarantine panel shows dry-run / lab_flag / blocked
+- Keep live isolate clearly off until P4
 
-- Harden the “admin box that can *see* events” story: bind, enrollment, BYO ingest, dash
-- Optional: systemd/docker compose for correlator+dash only (no contain)
-- Keep live isolate clearly off
+## 5. Containment — isolate stays on the roadmap
 
-## 5. Containment evidence, not toggle theater
+Attempt quarantine always; enforce only when mode allows:
 
-Only flip L1 checklist bits when evidenced:
+| Mode | Meaning |
+|------|---------|
+| `dry_run` | Log IsolateHost only |
+| `lab_flag` | Sandbox flag files (virtual hosts) |
+| `blocked` | Refuse — say cannot quarantine real hosts |
 
-- Typed authz ≠ HMAC
-- Durable anti-replay
-- Blast-radius caps with tests
-- Then: dry-run isolate **false-isolate rate** on a larger set — publish nonzero if that’s the truth
+Live OS/EDR/VLAN executor only after L1 evidenced + hostile-bus + published false-isolate rates. **Never bullshit success.**
 
-## 6. External check (cheap, high signal)
+## 6. External check
 
-- One person outside you runs sealed/blind timeline scoring (`stranger_dry_run`)
-- If they shrug, don’t unlock sensors/“share” claims
+- Stranger dry-run of Windows → timeline / reconstruct
+- If they shrug, don’t unlock “useful on real attacks”
 
 ## What not to do next
 
-- More GIFs / pitch polish
+- More pitch polish / GIFs
 - Claiming commercial-tool parity
 - Arming `CORVEX_CONTAIN` without an executor + hostile-bus tests
-- Another Stage letter roadmap doc
+- Inventing reconstruction hops or CVEs when status is partial/insufficient
 
 ## If only one thing
 
-Harden the eval so cross-host correlation beats detector-only on held-out — then prove it still holds (or document where it breaks) on a 4–5 host lab driven by real public attack repos. Everything else (sensors, network deploy, contain) reads stronger once that gap is real.
+Re-seal and publish fusion lift (or the honest lack of it) on held-out + break-test — then harden the Windows BYO path so reconstruction + quarantine honesty show up on stranger logs.
