@@ -1,0 +1,30 @@
+[
+  {
+    "EventID": 4624,
+    "Computer": "host-a.lab.local",
+    "TimeCreated": "2026-06-10T12:00:00.000000Z",
+    "TargetUserName": "alice",
+    "IpAddress": "10.1.0.5"
+  },
+  {
+    "EventID": 4624,
+    "Computer": "host-b.lab.local",
+    "TimeCreated": "2026-06-10T12:00:25.000000Z",
+    "TargetUserName": "alice",
+    "IpAddress": "10.1.0.5"
+  },
+  {
+    "EventID": 4624,
+    "Computer": "host-c.lab.local",
+    "TimeCreated": "2026-06-10T12:00:50.000000Z",
+    "TargetUserName": "alice",
+    "IpAddress": "10.1.0.5"
+  },
+  {
+    "EventID": 4625,
+    "Computer": "host-a.lab.local",
+    "TimeCreated": "2026-06-10T12:01:00.000000Z",
+    "TargetUserName": "alice",
+    "IpAddress": "10.1.0.9"
+  }
+]

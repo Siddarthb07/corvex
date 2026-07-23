@@ -1,4 +1,4 @@
-"""CLI: corvex replay | eval | timeline | ingest-byo | dash | seal-day0 | freeze."""
+"""CLI: corvex replay | eval | timeline | ingest-byo | adapt-windows | build-breaktest | dash | seal-day0 | freeze."""
 
 from __future__ import annotations
 
@@ -101,6 +101,7 @@ def seal_day0(
         "host-b": "prod-b",
         "host-c": "prod-c",
         "host-d": "prod-d",
+        "host-e": "prod-e",
     }
     enrollment = generate_lab_enrollment(hosts)
     save_enrollment(default_secrets_path(), enrollment)
@@ -110,11 +111,12 @@ def seal_day0(
     base = datetime(2026, 1, 15, 12, 0, 0, tzinfo=timezone.utc)
     host_pairs = [(h, p) for h, p in hosts.items()]
 
-    # Train: ≤3 campaigns
+    # Train packs — includes fusion_chain (5 hosts) where detector-only must lose
     train_specs = [
         ("train-lateral", "lateral", host_pairs[:3], False),
         ("train-exfil", "exfil", host_pairs[1:4], False),
         ("train-recon-lateral", "recon_lateral", host_pairs[:3], False),
+        ("train-fusion-chain", "fusion_chain", host_pairs[:5], False),
     ]
     for cid, family, hs, ood in train_specs:
         events, gt = generate_campaign_events(
@@ -149,6 +151,7 @@ def seal_day0(
     heldout_specs = [
         ("held-lateral-ood", "lateral", host_pairs[:3], True),
         ("held-exfil", "exfil", host_pairs[1:4], False),
+        ("held-fusion-chain", "fusion_chain", host_pairs[:5], True),
         ("held-benign", "benign", host_pairs[:3], False),
     ]
     digests = []
@@ -601,6 +604,103 @@ def contain_dry_run_cmd(
     env = propose_action(verb, target, rationale=rationale)  # type: ignore[arg-type]
     rec = execute_action(env)
     typer.echo(json.dumps(rec, indent=2))
+
+
+@app.command("adapt-windows")
+def adapt_windows_cmd(
+    path: Path = typer.Argument(..., help="Windows Security JSON/JSONL export"),
+    out: Path = typer.Option(Path("runs/sensors/windows_auth.jsonl"), help="Signed BYO JSONL"),
+    default_host: str = typer.Option("host-a", help="Fallback host_id"),
+) -> None:
+    """Convert Windows Security auth export → signed BYO JSONL (observe-only)."""
+    from corvex.adapters.windows_security import adapt_windows_security_export
+    from corvex.envelope import sign_envelope
+
+    enrollment = ensure_lab_enrollment()
+    # Prefer demo host→producer map; unknown computers fall back to default_host
+    host_map = {h: h for h in DEMO_HOSTS}
+    raw = adapt_windows_security_export(
+        path,
+        producer_id=DEMO_HOSTS.get(default_host, "prod-a"),
+        default_host=default_host,
+        host_map=host_map,
+    )
+    out = Path(out)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    n = 0
+    with out.open("w", encoding="utf-8") as fh:
+        for rec in raw:
+            host_id = str(rec["host_id"])
+            if host_id not in DEMO_HOSTS:
+                host_id = default_host
+            prod = DEMO_HOSTS[host_id]
+            secret = enrollment.require(prod, host_id)
+            env = sign_envelope(
+                producer_id=prod,
+                host_id=host_id,
+                payload_type=rec["payload_type"],
+                payload=rec["payload"],
+                secret=secret,
+                event_id=rec["event_id"],
+                ts_utc=rec["ts_utc"],
+                nonce=rec["nonce"],
+            )
+            fh.write(json.dumps(env.to_dict(), separators=(",", ":")) + "\n")
+            n += 1
+    typer.echo(json.dumps({"adapted": n, "out": str(out)}, indent=2))
+
+
+@app.command("build-breaktest")
+def build_breaktest_cmd(
+    manifest: Path = typer.Argument(..., help="Break-test manifest JSON"),
+    out: Path = typer.Option(
+        Path("runs/breaktest/pack.jsonl"), help="Signed pack JSONL with ground_truth"
+    ),
+    report: Optional[Path] = typer.Option(
+        None, help="Write break-point JSON (correlator vs detector-only)"
+    ),
+) -> None:
+    """Expand an attack-repo manifest into a signed pack + optional break report."""
+    from corvex.adapters.attack_repos import adapt_attack_manifest, load_manifest
+    from corvex.envelope import EventEnvelope, sign_envelope
+    from corvex.eval.break_points import analyze_break_points, write_break_report
+
+    enrollment = ensure_lab_enrollment()
+    man = load_manifest(manifest)
+    raw_events, gt = adapt_attack_manifest(man)
+    signed = []
+    for rec in raw_events:
+        secret = enrollment.require(rec["producer_id"], rec["host_id"])
+        signed.append(
+            sign_envelope(
+                producer_id=rec["producer_id"],
+                host_id=rec["host_id"],
+                payload_type=rec["payload_type"],
+                payload=rec["payload"],
+                secret=secret,
+                event_id=rec["event_id"],
+                ts_utc=rec["ts_utc"],
+                nonce=rec["nonce"],
+            )
+        )
+    write_pack(Path(out), signed, gt)
+
+    payload: Dict[str, Any] = {"pack": str(out), "hosts": gt.get("host_ids"), "events": len(signed)}
+    if report is not None:
+        corr_camps, _ = _predict_from_events(signed, "correlator")
+        det_camps, _ = _predict_from_events(signed, "detector_only")
+        b1_camps, _ = _predict_from_events(signed, "b1")
+        br = analyze_break_points(
+            truth=gt,
+            correlator=corr_camps,
+            detector_only=det_camps,
+            b1=b1_camps,
+        )
+        write_break_report(Path(report), br)
+        payload["break_report"] = str(report)
+        payload["fusion_lift"] = br["break_points"]["fusion_lift"]
+        payload["break_points"] = br["break_points"]
+    typer.echo(json.dumps(payload, indent=2))
 
 
 @app.command("freeze-check")

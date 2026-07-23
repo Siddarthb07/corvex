@@ -23,11 +23,22 @@ RUNS = LAB / "corvex"
 STATE = LAB / "corvex_state.json"
 THEATRE = LAB / "theatre_state.json"
 
-HOST_META = {
+_ALL_HOST_META = {
     "host-a": ("prod-a", "workstation"),
     "host-b": ("prod-b", "fileserver"),
     "host-c": ("prod-c", "jump box"),
+    "host-d": ("prod-d", "db"),
+    "host-e": ("prod-e", "egress proxy"),
 }
+
+# Default live lab = 3 hosts. Break-test sets CORVEX_LAB_HOSTS=host-a,...,host-e
+_lab_hosts_env = os.environ.get("CORVEX_LAB_HOSTS", "").strip()
+if _lab_hosts_env:
+    _wanted = {h.strip() for h in _lab_hosts_env.split(",") if h.strip()}
+    HOST_META = {h: _ALL_HOST_META[h] for h in _wanted if h in _ALL_HOST_META}
+else:
+    HOST_META = {h: _ALL_HOST_META[h] for h in ("host-a", "host-b", "host-c")}
+
 
 
 def now() -> str:
@@ -73,20 +84,134 @@ def to_envelope(raw: dict, enrollment: Enrollment, seq: int):
     host_id = raw["host_id"]
     producer, _role = HOST_META[host_id]
     secret = enrollment.require(producer, host_id)
-    payload = {
-        "user": raw.get("user"),
-        "result": raw.get("result"),
-        "src": raw.get("src"),
-    }
+    kind = raw.get("kind")
+    if kind == "net_conn" or raw.get("payload_type") == "net_conn":
+        payload = {
+            "dst_ip": raw.get("dst_ip"),
+            "dst_port": int(raw.get("dst_port") or 443),
+            "bytes": int(raw.get("bytes") or 0),
+            "egress": bool(raw.get("egress", False)),
+        }
+        payload_type = "net_conn"
+        prefix = "live-net"
+    else:
+        payload = {
+            "user": raw.get("user"),
+            "result": raw.get("result"),
+            "src": raw.get("src"),
+        }
+        payload_type = "auth"
+        prefix = "live-auth"
     return sign_envelope(
         producer_id=producer,
         host_id=host_id,
-        payload_type="auth",
+        payload_type=payload_type,
         payload=payload,
         secret=secret,
-        event_id=f"live-{host_id}-{seq:04d}",
+        event_id=f"{prefix}-{host_id}-{seq:04d}",
         ts_utc=raw.get("ts_utc") or now(),
-        nonce=f"live-{host_id}-{seq:04d}-{raw.get('ts_utc','')}",
+        nonce=f"{prefix}-{host_id}-{seq:04d}-{raw.get('ts_utc','')}",
+    )
+
+
+def _after_ingest(
+    *,
+    host_id: str,
+    feed: list,
+    defended: set,
+    store: CampaignStore,
+    corr_note: str,
+) -> None:
+    hit_hosts = {f["host"] for f in feed if f.get("type") in ("auth", "exfil", "recon")}
+    hosts_state = {
+        h: {
+            "role": role,
+            "state": (
+                "isolated"
+                if h in defended
+                else ("hit" if h in hit_hosts else "open")
+            ),
+        }
+        for h, (_, role) in HOST_META.items()
+    }
+    camps = store.all()
+    update_theatre(
+        phase="ATTACK_SEEN",
+        caption=corr_note,
+        hosts=hosts_state,
+        campaigns=[
+            {"id": c.campaign_id, "hosts": c.host_ids, "score": c.score}
+            for c in camps
+        ],
+        feed=feed[-20:],
+    )
+
+
+def _maybe_isolate(
+    *,
+    store: CampaignStore,
+    defended: set,
+    feed: list,
+) -> None:
+    camps = store.all()
+    if not camps:
+        return
+    camp = camps[0]
+    targets = list(dict.fromkeys([*camp.host_ids, *HOST_META.keys()]))
+    new_targets = [h for h in targets if h not in defended]
+    if not new_targets:
+        return
+    update_theatre(
+        phase="DETECT",
+        caption=f"Campaign {camp.campaign_id} across {', '.join(camp.host_ids)}",
+        campaigns=[
+            {"id": c.campaign_id, "hosts": c.host_ids, "score": c.score}
+            for c in camps
+        ],
+        feed=feed[-20:]
+        + [
+            {
+                "ts": now(),
+                "type": "detect",
+                "text": f"Detected {camp.campaign_id} ({len(camp.host_ids)} hosts)",
+            }
+        ],
+    )
+    print(f"[corvex] DETECT {camp.campaign_id} hosts={camp.host_ids}", flush=True)
+    isolates = []
+    for h in new_targets:
+        rec = isolate_host(
+            h,
+            f"Live lab: quarantine {h} after {camp.campaign_id}",
+        )
+        defended.add(h)
+        isolates.append(rec)
+        feed.append(
+            {
+                "ts": now(),
+                "type": "defend",
+                "host": h,
+                "text": f"Isolated {h} — further auth will be refused",
+            }
+        )
+        print(f"[corvex] ISOLATE {h}", flush=True)
+        time.sleep(0.35)
+    update_theatre(
+        phase="DEFEND",
+        caption="Corvex isolated compromised hosts — later ART steps blocked",
+        hosts={
+            h: {
+                "role": role,
+                "state": "isolated" if h in defended else "open",
+            }
+            for h, (_, role) in HOST_META.items()
+        },
+        campaigns=[
+            {"id": c.campaign_id, "hosts": c.host_ids, "score": c.score}
+            for c in store.all()
+        ],
+        feed=feed[-30:],
+        isolates=isolates,
     )
 
 
@@ -103,6 +228,8 @@ def main() -> None:
             "prod-a": b"live-lab-secret-aaaa-bbbb-cccc",
             "prod-b": b"live-lab-secret-dddd-eeee-ffff",
             "prod-c": b"live-lab-secret-gggg-hhhh-iiii",
+            "prod-d": b"live-lab-secret-jjjj-kkkk-llll",
+            "prod-e": b"live-lab-secret-mmmm-nnnn-oooo",
         },
     )
     store = CampaignStore(RUNS / "campaigns.jsonl")
@@ -125,7 +252,7 @@ def main() -> None:
     write_json(STATE, {"status": "watching", "ts": now()})
     print("[corvex] watching", EVENTS, flush=True)
 
-    deadline = time.time() + 120
+    deadline = time.time() + 180
     while time.time() < deadline:
         if EVENTS.exists():
             lines = EVENTS.read_text(encoding="utf-8").splitlines()
@@ -149,92 +276,47 @@ def main() -> None:
                             "text": f"{raw.get('user')} logged into {host_id} from {raw.get('src')}",
                         }
                     )
-                    hit_hosts = {f["host"] for f in feed if f.get("type") == "auth"}
-                    hosts_state = {
-                        h: {
-                            "role": role,
-                            "state": (
-                                "isolated"
-                                if h in defended
-                                else ("hit" if h in hit_hosts else "open")
+                    print(
+                        f"[corvex] ingested auth on {host_id}; campaigns={len(store.all())}",
+                        flush=True,
+                    )
+                    _after_ingest(
+                        host_id=host_id,
+                        feed=feed,
+                        defended=defended,
+                        store=store,
+                        corr_note=f"Live auth on {host_id} — correlator recomputing…",
+                    )
+                    _maybe_isolate(store=store, defended=defended, feed=feed)
+                elif kind == "net_conn" and host_id in HOST_META:
+                    seq += 1
+                    env = to_envelope(raw, enrollment, seq)
+                    corr.ingest([env])
+                    egress = bool(raw.get("egress"))
+                    feed.append(
+                        {
+                            "ts": raw.get("ts_utc"),
+                            "type": "exfil" if egress else "recon",
+                            "host": host_id,
+                            "text": (
+                                f"{'Egress' if egress else 'Scan'} from {host_id} -> "
+                                f"{raw.get('dst_ip')}:{raw.get('dst_port')}"
                             ),
                         }
-                        for h, (_, role) in HOST_META.items()
-                    }
-                    camps = store.all()
-                    update_theatre(
-                        phase="ATTACK_SEEN",
-                        caption=f"Live auth on {host_id} — correlator recomputing…",
-                        hosts=hosts_state,
-                        campaigns=[
-                            {"id": c.campaign_id, "hosts": c.host_ids, "score": c.score}
-                            for c in camps
-                        ],
-                        feed=feed[-20:],
                     )
-                    print(f"[corvex] ingested auth on {host_id}; campaigns={len(camps)}", flush=True)
-
-                    if camps:
-                        camp = camps[0]
-                        # Isolate campaign members + remaining lab hosts (sandbox blast radius)
-                        targets = list(dict.fromkeys([*camp.host_ids, *HOST_META.keys()]))
-                        new_targets = [h for h in targets if h not in defended]
-                        if new_targets:
-                            update_theatre(
-                                phase="DETECT",
-                                caption=f"Campaign {camp.campaign_id} across {', '.join(camp.host_ids)}",
-                                campaigns=[
-                                    {"id": c.campaign_id, "hosts": c.host_ids, "score": c.score}
-                                    for c in camps
-                                ],
-                                feed=feed[-20:]
-                                + [
-                                    {
-                                        "ts": now(),
-                                        "type": "detect",
-                                        "text": f"Detected {camp.campaign_id} ({len(camp.host_ids)} hosts)",
-                                    }
-                                ],
-                            )
-                            print(
-                                f"[corvex] DETECT {camp.campaign_id} hosts={camp.host_ids}",
-                                flush=True,
-                            )
-                            isolates = []
-                            for h in new_targets:
-                                rec = isolate_host(
-                                    h,
-                                    f"Live lab: quarantine {h} after {camp.campaign_id}",
-                                )
-                                defended.add(h)
-                                isolates.append(rec)
-                                feed.append(
-                                    {
-                                        "ts": now(),
-                                        "type": "defend",
-                                        "host": h,
-                                        "text": f"Isolated {h} — further auth will be refused",
-                                    }
-                                )
-                                print(f"[corvex] ISOLATE {h}", flush=True)
-                                time.sleep(0.35)
-                            update_theatre(
-                                phase="DEFEND",
-                                caption="Corvex isolated compromised hosts — attacker retries will fail",
-                                hosts={
-                                    h: {
-                                        "role": role,
-                                        "state": "isolated" if h in defended else "open",
-                                    }
-                                    for h, (_, role) in HOST_META.items()
-                                },
-                                campaigns=[
-                                    {"id": c.campaign_id, "hosts": c.host_ids, "score": c.score}
-                                    for c in store.all()
-                                ],
-                                feed=feed[-30:],
-                                isolates=isolates,
-                            )
+                    print(
+                        f"[corvex] ingested net_conn on {host_id} egress={egress}; "
+                        f"campaigns={len(store.all())}",
+                        flush=True,
+                    )
+                    _after_ingest(
+                        host_id=host_id,
+                        feed=feed,
+                        defended=defended,
+                        store=store,
+                        corr_note=f"Net event on {host_id} — correlator recomputing…",
+                    )
+                    _maybe_isolate(store=store, defended=defended, feed=feed)
                 elif kind == "auth_blocked":
                     feed.append(
                         {
@@ -267,7 +349,9 @@ def main() -> None:
                     update_theatre(
                         phase="DONE",
                         caption=(
-                            f"Live lab complete — wave1 ok, wave2 blocked={st.get('wave2_blocked')}"
+                            f"Break-test complete — wave1 ok={st.get('wave1_successes')}, "
+                            f"mid-chain blocked={st.get('blocked_mid_chain')}, "
+                            f"wave2 blocked={st.get('wave2_blocked')}"
                         ),
                         outcome=st,
                         feed=feed[-40:],
