@@ -869,7 +869,7 @@ def dash_cmd(
     ),
     open_file: bool = typer.Option(False, "--open-file", help="Open index.html via file:// only"),
 ) -> None:
-    """Build monitoring dashboard from reports/; serve with toggle API unless --build/--open-file."""
+    """Build read-only run monitor from reports/; serve unless --build/--open-file."""
     from corvex.dashboard import write_dashboard
     from corvex.dash_server import serve
     import webbrowser
@@ -891,15 +891,14 @@ def dash_cmd(
     try:
         httpd = serve(root, port=port, host=host)
     except OSError as exc:
-        typer.echo(f"bind {host}:{port} failed ({exc}); opening file instead (toggles need the server)")
+        typer.echo(f"bind {host}:{port} failed ({exc}); opening file instead (server needed for live snapshot)")
         webbrowser.open(file_url)
         raise typer.Exit(0)
 
     bound_host, bound_port = httpd.server_address[:2]
     display_host = "127.0.0.1" if bound_host in ("0.0.0.0", "::") else bound_host
     url = f"http://{display_host}:{bound_port}/"
-    typer.echo(f"Monitor:         {url}")
-    typer.echo(f"Prevention log:  {url}logs.html")
+    typer.echo(f"Monitor (read-only): {url}")
     if host in ("0.0.0.0", "::"):
         typer.echo(f"Bound on {host}:{bound_port} — reachable from other machines on your network")
     typer.echo("Ctrl+C to stop")

@@ -1,19 +1,38 @@
-"""Generate Corvex monitoring dashboard from reports/*.json."""
+"""Corvex Monitor — Orqis-style mission control for a loaded run.
+
+Shows attack events, campaigns, correlator audit, and quarantine honesty.
+Read-only. No checklist toggles. No fake live isolate. Sealed eval is secondary.
+"""
 
 from __future__ import annotations
 
 import json
 import os
 from datetime import datetime, timezone
-from html import escape
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
+
+from corvex import CORVEX_CONTAIN, __version__
 
 
 def _load(path: Path) -> Optional[Dict[str, Any]]:
     if not path.exists():
         return None
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+def _load_jsonl(path: Path, *, limit: int = 400) -> List[Dict[str, Any]]:
+    if not path.exists():
+        return []
+    rows: List[Dict[str, Any]] = []
+    for line in path.read_text(encoding="utf-8").splitlines():
+        if not line.strip():
+            continue
+        try:
+            rows.append(json.loads(line))
+        except json.JSONDecodeError:
+            continue
+    return rows[-limit:]
 
 
 def _resolve_run_dir(root: Path) -> Optional[Path]:
@@ -27,7 +46,6 @@ def _resolve_run_dir(root: Path) -> Optional[Path]:
     if latest.is_file():
         target = Path(latest.read_text(encoding="utf-8").strip())
         return target if target.exists() else None
-    # Fall back to newest runs/*/timeline.json
     runs = root / "runs"
     if not runs.is_dir():
         return None
@@ -39,37 +57,168 @@ def _resolve_run_dir(root: Path) -> Optional[Path]:
     return candidates[0] if candidates else None
 
 
+def _product_version() -> str:
+    return str(__version__)
+
+
+def _event_line(ev: Dict[str, Any]) -> Dict[str, Any]:
+    """Normalize EventEnvelope OR live-lab flat bus rows into a log-row shape."""
+    # Live Docker lab writes flat {kind, host_id, ...}; replay writes envelopes.
+    if ev.get("payload_type"):
+        payload = ev.get("payload") or {}
+        ptype = str(ev.get("payload_type") or "event")
+        host = str(ev.get("host_id") or "—")
+        ts = str(ev.get("ts_utc") or "")
+    else:
+        kind = str(ev.get("kind") or "event")
+        if kind in ("auth", "auth_blocked"):
+            ptype = "auth"
+            payload = {
+                "user": ev.get("user"),
+                "result": ev.get("result"),
+                "src": ev.get("src"),
+                "technique": ev.get("technique"),
+            }
+        elif kind == "net_conn":
+            ptype = "net_conn"
+            payload = {
+                "dst_ip": ev.get("dst_ip"),
+                "dst_port": ev.get("dst_port"),
+                "bytes": ev.get("bytes"),
+                "egress": ev.get("egress"),
+                "technique": ev.get("technique"),
+            }
+        elif kind == "dns":
+            ptype = "dns"
+            payload = {
+                "query": ev.get("query"),
+                "qtype": ev.get("qtype"),
+                "technique": ev.get("technique"),
+            }
+        else:
+            # attacker_state / theatre noise — keep as INFO log line
+            return {
+                "id": str(ev.get("event_id") or ev.get("ts_utc") or kind),
+                "ts": str(ev.get("ts_utc") or ""),
+                "level": "INFO",
+                "kind": kind.upper()[:12],
+                "host": str(ev.get("host_id") or ev.get("target") or "—"),
+                "producer": "lab",
+                "line": json.dumps(
+                    {k: v for k, v in ev.items() if k not in ("kind", "ts_utc")},
+                    separators=(",", ":"),
+                )[:160],
+                "payload_type": kind,
+            }
+        host = str(ev.get("host_id") or ev.get("target") or "—")
+        ts = str(ev.get("ts_utc") or "")
+
+    level = "INFO"
+    kind = ptype.upper()
+    if ptype == "auth":
+        level = "WARNING" if payload.get("result") == "success" else "INFO"
+        if payload.get("result") == "blocked_by_corvex" or str(ev.get("kind")) == "auth_blocked":
+            level = "ERROR"
+            kind = "BLOCKED"
+        else:
+            kind = "AUTH"
+        detail = (
+            f"user={payload.get('user') or '?'} result={payload.get('result') or '?'}"
+            f" src={payload.get('src') or '?'}"
+        )
+        technique = payload.get("technique")
+    elif ptype == "net_conn":
+        egress = bool(payload.get("egress"))
+        nbytes = int(payload.get("bytes") or 0)
+        if egress and 0 < nbytes <= 50_000:
+            level = "WARNING"
+            kind = "EXFIL"
+        elif egress and nbytes > 50_000:
+            level = "ERROR"
+            kind = "BLOB"
+        else:
+            kind = "NET"
+            level = "INFO"
+        detail = (
+            f"dst={payload.get('dst_ip') or '?'}:{payload.get('dst_port') or '?'}"
+            f" bytes={nbytes} egress={str(egress).lower()}"
+        )
+        technique = payload.get("technique")
+    elif ptype == "dns":
+        level = "WARNING"
+        kind = "DNS"
+        detail = f"q={payload.get('query') or '?'} type={payload.get('qtype') or 'A'}"
+        technique = payload.get("technique")
+    else:
+        detail = json.dumps(payload, separators=(",", ":"))[:160]
+        technique = payload.get("technique") if isinstance(payload, dict) else None
+
+    if technique:
+        detail = f"{detail} · {technique}"
+
+    return {
+        "id": str(ev.get("event_id") or f"{host}-{ts}-{kind}"),
+        "ts": ts,
+        "level": level,
+        "kind": kind,
+        "host": host,
+        "producer": str(ev.get("producer_id") or "lab"),
+        "line": detail,
+        "payload_type": ptype,
+    }
+
+
+def _audit_line(row: Dict[str, Any]) -> Dict[str, Any]:
+    payload = row.get("payload") or {}
+    kind = str(row.get("kind") or "audit")
+    hosts = payload.get("hosts") or []
+    return {
+        "id": str(row.get("entry_hash") or kind)[:16],
+        "ts": "",
+        "level": "INFO",
+        "kind": kind.upper().replace("_", " "),
+        "host": ", ".join(str(h) for h in hosts[:6]) if hosts else "—",
+        "producer": "correlator",
+        "line": (
+            f"{payload.get('campaign_id') or '—'} · "
+            f"hosts={len(hosts)} stages={payload.get('stages') or '?'}"
+        ),
+        "payload_type": "audit",
+    }
+
+
 def collect_snapshot(root: Path) -> Dict[str, Any]:
+    """Run-centric snapshot (schema_version 3) with activity feed."""
+    root = Path(root)
     reports = root / "reports"
     held = _load(reports / "stageA_heldout.json") or {}
     train = _load(reports / "stageA_train.json") or {}
-    audit = _load(reports / "AUDIT_BENCHMARK.json") or {}
+    claim = _load(reports / "claim_gates.json") or {}
     checklist = _load(reports / "security_l1_checklist.json") or {}
     gate_path = reports / "stageA-gate.txt"
     gate = gate_path.read_text(encoding="utf-8").strip() if gate_path.exists() else "UNKNOWN"
-    retention = _load(reports / "oss_retention.json") or {"labs": []}
-    dry_lines = 0
-    dry = reports / "stage_d_dry_run.jsonl"
-    if dry.exists():
-        dry_lines = sum(1 for line in dry.read_text(encoding="utf-8").splitlines() if line.strip())
 
     l1_items = {
-        k: v
+        k: bool(v)
         for k, v in checklist.items()
         if not str(k).startswith("_") and isinstance(v, bool)
     }
     l1_done = sum(1 for v in l1_items.values() if v)
+    l1_total = max(1, len(l1_items)) if l1_items else 11
+
     hm = held.get("metrics") or {}
 
-    def mget(block_name: str, field: str = "campaign_f1") -> float:
-        block = hm.get(block_name) or {}
-        val = block.get(field)
-        return float(val) if val is not None else 0.0
+    def mget(block: str, field: str = "campaign_f1") -> Optional[float]:
+        b = hm.get(block) or {}
+        val = b.get(field)
+        return float(val) if val is not None else None
 
     run_dir = _resolve_run_dir(root)
     timeline: Dict[str, Any] = {}
-    campaigns: list = []
+    campaigns: List[Dict[str, Any]] = []
     reconstruction: Dict[str, Any] = {}
+    raw_events: List[Dict[str, Any]] = []
+    raw_audit: List[Dict[str, Any]] = []
     if run_dir is not None:
         tl_path = run_dir / "timeline.json"
         if tl_path.exists():
@@ -78,579 +227,205 @@ def collect_snapshot(root: Path) -> Dict[str, Any]:
         recon_path = run_dir / "reconstruction.json"
         if recon_path.exists():
             reconstruction = json.loads(recon_path.read_text(encoding="utf-8"))
+        raw_events = _load_jsonl(run_dir / "events.jsonl", limit=500)
+        # Replay puts audit next to timeline; live Docker lab uses shared/corvex/
+        raw_audit = _load_jsonl(run_dir / "audit.jsonl", limit=200)
+        if not raw_audit:
+            raw_audit = _load_jsonl(run_dir / "corvex" / "audit.jsonl", limit=200)
+        # Live lab: campaigns live in corvex_state.json / campaigns.jsonl
+        if not campaigns:
+            state = _load(run_dir / "corvex_state.json") or {}
+            live_camps = state.get("campaigns") or []
+            if live_camps:
+                campaigns = [
+                    {
+                        "campaign_id": c.get("campaign_id") or c.get("id") or "campaign",
+                        "host_ids": c.get("host_ids") or c.get("hosts") or [],
+                        "stages": c.get("stages") or [{"name": "live", "hosts": c.get("host_ids") or c.get("hosts") or []}],
+                        "score": c.get("score"),
+                    }
+                    for c in live_camps
+                    if isinstance(c, dict)
+                ]
+                timeline = {
+                    "pack": "docker-live",
+                    "campaigns": campaigns,
+                    "source": "corvex_state.json",
+                }
+            else:
+                for row in _load_jsonl(run_dir / "corvex" / "campaigns.jsonl", limit=50):
+                    campaigns.append(
+                        {
+                            "campaign_id": row.get("campaign_id") or "campaign",
+                            "host_ids": row.get("host_ids") or [],
+                            "stages": row.get("stages") or [],
+                            "score": row.get("score"),
+                        }
+                    )
+                if campaigns:
+                    timeline = {
+                        "pack": "docker-live",
+                        "campaigns": campaigns,
+                        "source": "corvex/campaigns.jsonl",
+                    }
 
     from corvex.contain.quarantine import resolve_quarantine_mode
+    from corvex.prevention_log import load_prevention_log
 
-    quarantine_caps = resolve_quarantine_mode(root=root)
+    quarantine = resolve_quarantine_mode(root=root)
+    prevention = load_prevention_log(root, limit=50)
+
+    activity = [_event_line(ev) for ev in raw_events]
+    activity = list(reversed(activity))
+    audit_feed = list(reversed([_audit_line(a) for a in raw_audit]))
+
+    events_path = (run_dir / "events.jsonl") if run_dir is not None else None
+    events_mtime = None
+    if events_path is not None and events_path.exists():
+        events_mtime = datetime.fromtimestamp(
+            events_path.stat().st_mtime, tz=timezone.utc
+        ).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+    hosts_seen = sorted({str(ev.get("host_id")) for ev in raw_events if ev.get("host_id")})
+    by_kind: Dict[str, int] = {}
+    for row in activity:
+        by_kind[row["kind"]] = by_kind.get(row["kind"], 0) + 1
+
+    recon_status = reconstruction.get("aggregate_status") if reconstruction else None
+    claim_allowed = bool(claim.get("claim_allowed")) if claim else False
+
+    if not run_dir:
+        hero = "NO_RUN"
+        hero_detail = "No run loaded — corvex replay … or corvex dash --run-dir …"
+    elif recon_status == "insufficient_evidence":
+        hero = "REFUSE"
+        hero_detail = "Insufficient evidence — will not invent a timeline"
+    elif recon_status == "partial":
+        hero = "PARTIAL"
+        hero_detail = reconstruction.get("summary") or "Partial rebuild — gaps listed, not filled"
+    elif campaigns:
+        hero = "CAMPAIGN"
+        hero_detail = f"{len(campaigns)} campaign(s) · {len(activity)} events in this run"
+    elif activity:
+        hero = "EMPTY"
+        hero_detail = f"{len(activity)} events ingested — correlator found no campaign"
+    else:
+        hero = "EMPTY"
+        hero_detail = "Run loaded but no events or campaigns"
+
+    recon_by_id = {
+        str(r.get("campaign_id")): r
+        for r in (reconstruction.get("campaign_reconstructions") or [])
+        if isinstance(r, dict)
+    }
 
     return {
+        "schema_version": 3,
         "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
-        "gate": gate,
-        "heldout_pass": bool(held.get("pass")),
-        "train_pass": bool(train.get("pass")),
-        "care_vs_incumbent": held.get("care_vs_incumbent", "unproven"),
-        "metrics": {
-            "correlator_f1": mget("correlator"),
-            "precision": mget("correlator", "precision"),
-            "recall": mget("correlator", "recall"),
-            "b1_f1": mget("b1"),
-            "b2_f1": mget("b2"),
-            "detector_only_f1": mget("detector_only"),
-            "precision_at_1": mget("correlator", "precision_at_1"),
-            "false_campaign_rate": mget("correlator", "false_campaign_rate"),
-            "ttu_seconds": mget("correlator", "ttu_seconds"),
+        "product": {"name": "corvex", "version": _product_version()},
+        "hero": {"status": hero, "detail": hero_detail},
+        "kpis": {
+            "events": len(activity),
+            "hosts": len(hosts_seen),
+            "campaigns": len(campaigns),
+            "auth": by_kind.get("AUTH", 0),
+            "exfil": by_kind.get("EXFIL", 0) + by_kind.get("BLOB", 0),
+            "dns": by_kind.get("DNS", 0),
+            "by_kind": by_kind,
         },
-        "ablation": held.get("ablation") or {},
-        "stage_b_allowed": (reports / "stage-b-allowed").exists(),
-        "stage_c_retention_labs": len(retention.get("labs") or []),
-        "stage_d": {
-            "checklist_pct": round(100.0 * l1_done / max(1, len(l1_items)), 1) if l1_items else 0.0,
-            "checklist_done": l1_done,
-            "checklist_total": len(l1_items),
+        "run": {
+            "dir": str(run_dir) if run_dir else None,
+            "pack": timeline.get("pack"),
+            "loaded": run_dir is not None,
+            "ttu_seconds": timeline.get("ttu_seconds"),
+            "campaigns": campaigns,
+            "reconstruction": reconstruction,
+            "hosts": hosts_seen,
+        },
+        "activity": activity,
+        "audit": audit_feed,
+        "prevention": prevention,
+        "recon_by_id": recon_by_id,
+        "feed": {
+            "mode": "file_tail",
+            "poll_ms": 2000,
+            "events_path": str(events_path) if events_path else None,
+            "events_mtime": events_mtime,
+            "events_count": len(activity),
+            "note": (
+                "Polls events.jsonl + timeline.json on the loaded --run-dir. "
+                "Not a WebSocket to the bus. New attack lines appear if that file grows "
+                "(live lab / replay writing into the same run dir)."
+            ),
+        },
+        "quarantine": {
+            "mode": quarantine.get("mode"),
+            "can_attempt": quarantine.get("can_attempt"),
+            "live_executor": bool(quarantine.get("live_executor")),
+            "corvex_contain": int(quarantine.get("corvex_contain") or CORVEX_CONTAIN or 0),
+            "l1_complete": bool(quarantine.get("l1_complete")),
+            "l1_pct": quarantine.get("l1_pct"),
+            "message": quarantine.get("message"),
+            "honesty": quarantine.get("honesty") or [],
+        },
+        "claim": {
+            "allowed": claim_allowed,
+            "language": claim.get("claim_language")
+            or "lab / BYO campaign stitch only — claim locked",
+        },
+        "checklist": {
+            "role": "engineering_notebook",
+            "unlocks_contain": False,
+            "done": l1_done,
+            "total": len(l1_items) or l1_total,
             "items": l1_items,
-            "dry_run_lines": dry_lines,
+            "note": "L1 evidence count only — does not unlock OS quarantine.",
+        },
+        "sealed_eval": {
+            "binds_to_run": False,
+            "label": "Sealed Day-0 heldout — not this run",
+            "gate": gate,
+            "heldout_pass": bool(held.get("pass")),
+            "train_pass": bool(train.get("pass")),
+            "care_vs_incumbent": held.get("care_vs_incumbent", "unproven"),
+            "metrics": {
+                "precision": mget("correlator", "precision"),
+                "recall": mget("correlator", "recall"),
+                "correlator_f1": mget("correlator"),
+                "detector_only_f1": mget("detector_only"),
+                "b1_f1": mget("b1"),
+                "false_campaign_rate": mget("correlator", "false_campaign_rate"),
+            },
+        },
+        "gate": gate,
+        "version": _product_version(),
+        "campaigns": campaigns,
+        "reconstruction": reconstruction,
+        "corvex_contain": int(quarantine.get("corvex_contain") or CORVEX_CONTAIN or 0),
+        "stage_d": {
+            "checklist_done": l1_done,
+            "checklist_total": len(l1_items) or l1_total,
+            "checklist_pct": round(100.0 * l1_done / max(1, len(l1_items) or l1_total), 1),
+            "items": l1_items,
             "live_contain": False,
         },
-        "corvex_contain": int(
-            audit.get("CORVEX_CONTAIN", audit.get("CFUSE_CONTAIN", 0)) or 0
-        ),
-        "version": str(audit.get("version") or "0.4.0"),
-        "run_dir": str(run_dir) if run_dir else None,
-        "campaigns": campaigns,
-        "timeline_pack": timeline.get("pack"),
-        "timeline_ttu": timeline.get("ttu_seconds"),
-        "reconstruction": reconstruction,
-        "quarantine": quarantine_caps,
     }
 
 
-CHECKLIST_COPY = {
-    "mtls_identities": ("Prove who’s talking", "Sensors must prove TLS identity."),
-    "typed_commands": ("Named actions only", "Fixed actions only — no free-form shell."),
-    "authz_neq_sig": ("Signed ≠ allowed", "Signature alone is not permission."),
-    "anti_replay": ("Block reused commands", "Old quarantine messages can’t be resent."),
-    "dual_control": ("Two-person approval", "Destructive actions need two approvals."),
-    "fail_closed": ("Stop if unsure", "Refuse when auth/policy breaks."),
-    "least_privilege": ("Min permissions", "Only the OS rights required."),
-    "immutable_audit": ("Tamper-proof log", "Hash-chained quarantine decisions."),
-    "oversight_off_data_plane": ("Separate kill switch", "Stop control off the data channel."),
-    "no_free_form_shell": ("No remote shell", "Cannot open arbitrary shells."),
-    "blast_radius_caps": ("Limit blast radius", "Cap how many hosts per window."),
-}
-
-
 def render_html(snap: Dict[str, Any]) -> str:
-    payload = json.dumps({"snap": snap, "checklist_copy": CHECKLIST_COPY}, separators=(",", ":"))
-    gen = escape(snap["generated_at"])
-    ver = escape(str(snap.get("version")))
-    gate = escape(str(snap.get("gate")))
-    passed = snap.get("gate") == "PASS"
+    """Run-feed shell. Paint from embedded snapshot + /api/snapshot poll."""
+    boot = json.dumps(snap, ensure_ascii=False).replace("<", "\\u003c")
+    ver = str((snap.get("product") or {}).get("version") or snap.get("version") or "")
+    template = Path(__file__).resolve().parent / "dash_static" / "monitor.html"
+    html = template.read_text(encoding="utf-8")
+    return html.replace("__BOOT__", boot).replace("__VER__", ver)
 
-    return f"""<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Corvex</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet"/>
-<style>
-:root {{
-  --bg: #06080b; --panel: #10151d; --panel-hover: #141b25;
-  --line: rgba(255,255,255,0.07); --line-strong: rgba(255,255,255,0.12);
-  --text: #f2f5f8; --muted: #8b96a8; --dim: #5c6778;
-  --good: #2fd67b; --good-bg: rgba(47,214,123,0.12);
-  --bad: #ff5c6a; --warn: #e8b84a; --warn-bg: rgba(232,184,74,0.1);
-  --accent: #4db8ff; --radius: 12px;
-  --font: "Outfit", system-ui, sans-serif;
-  --mono: "IBM Plex Mono", ui-monospace, monospace;
-}}
-* {{ box-sizing: border-box; }}
-html, body {{ margin: 0; min-height: 100%; }}
-body {{
-  font-family: var(--font); color: var(--text); background: var(--bg);
-  -webkit-font-smoothing: antialiased;
-}}
-body::before {{
-  content:""; position:fixed; inset:0; pointer-events:none; z-index:0;
-  background:
-    radial-gradient(ellipse 80% 50% at 0% -10%, rgba(77,184,255,0.09), transparent 50%),
-    radial-gradient(ellipse 60% 40% at 100% 0%, rgba(47,214,123,0.05), transparent 45%);
-}}
-.app {{ position:relative; z-index:1; max-width:1080px; margin:0 auto; padding:0 20px 48px; }}
-.top {{
-  display:flex; align-items:center; justify-content:space-between; gap:16px;
-  padding:18px 0 16px; border-bottom:1px solid var(--line);
-}}
-.brand-row {{ display:flex; align-items:center; gap:12px; }}
-.mark {{
-  width:28px; height:28px; border-radius:8px; display:grid; place-items:center;
-  background:linear-gradient(145deg,#1a3040,#0e1822); border:1px solid var(--line-strong);
-}}
-.mark svg {{ width:14px; height:14px; }}
-.brand {{ font-size:1.05rem; font-weight:600; letter-spacing:-0.02em; margin:0; }}
-.brand span {{ color:var(--dim); font-weight:500; margin-left:6px; font-size:0.85rem; }}
-.top-meta {{
-  display:flex; align-items:center; gap:10px; flex-wrap:wrap; justify-content:flex-end;
-  font-family:var(--mono); font-size:0.7rem; color:var(--dim);
-}}
-.live {{
-  display:inline-flex; align-items:center; gap:6px; padding:4px 9px; border-radius:999px;
-  border:1px solid var(--line); background:#0c1016; color:var(--muted);
-}}
-.live i {{
-  width:6px; height:6px; border-radius:50%; background:var(--good);
-  box-shadow:0 0 0 3px rgba(47,214,123,0.2);
-}}
-.hero {{ display:grid; grid-template-columns:1.4fr 1fr; gap:12px; margin-top:20px; }}
-.panel {{ background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); }}
-.status-card {{ padding:22px 24px; }}
-.status-label {{
-  font-size:0.7rem; font-weight:500; letter-spacing:0.08em;
-  text-transform:uppercase; color:var(--dim); margin-bottom:10px;
-}}
-.status-word {{
-  font-size:clamp(2.4rem,5vw,3.2rem); font-weight:700;
-  letter-spacing:-0.04em; line-height:1;
-}}
-.status-word.pass {{ color:var(--good); }}
-.status-word.fail {{ color:var(--bad); }}
-.pill-row {{ display:flex; flex-wrap:wrap; gap:8px; margin-top:16px; }}
-.pill {{
-  font-size:0.75rem; font-weight:500; padding:5px 10px; border-radius:999px;
-  border:1px solid var(--line); color:var(--muted); background:#0c1016;
-}}
-.pill.on {{ color:var(--good); border-color:rgba(47,214,123,0.28); background:var(--good-bg); }}
-.pill.warn {{ color:var(--warn); border-color:rgba(232,184,74,0.28); background:var(--warn-bg); }}
-.side-stack {{ display:flex; flex-direction:column; gap:12px; }}
-.mini {{ flex:1; padding:16px 18px; }}
-.mini .k {{ font-size:0.7rem; letter-spacing:0.06em; text-transform:uppercase; color:var(--dim); }}
-.mini .v {{ font-size:1.35rem; font-weight:600; letter-spacing:-0.02em; margin-top:6px; }}
-.section {{ margin-top:24px; }}
-.section-head {{ display:flex; align-items:baseline; justify-content:space-between; gap:12px; margin-bottom:12px; }}
-.section-head h2 {{ margin:0; font-size:0.95rem; font-weight:600; }}
-.section-head p {{ margin:0; font-size:0.8rem; color:var(--dim); }}
-.metrics {{ display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }}
-.metric {{
-  padding:16px; background:var(--panel); border:1px solid var(--line); border-radius:var(--radius);
-}}
-.metric .label {{ font-size:0.72rem; color:var(--muted); font-weight:500; }}
-.metric .value {{
-  font-family:var(--mono); font-size:1.55rem; font-weight:600;
-  letter-spacing:-0.03em; margin-top:10px; font-variant-numeric:tabular-nums;
-}}
-.grid-2 {{ display:grid; grid-template-columns:1.15fr 0.85fr; gap:12px; }}
-.card {{ padding:18px; }}
-.card-title {{
-  font-size:0.72rem; letter-spacing:0.07em; text-transform:uppercase;
-  color:var(--dim); margin-bottom:14px; font-weight:500;
-}}
-.bar {{ margin-bottom:14px; }}
-.bar:last-child {{ margin-bottom:0; }}
-.bar-top {{ display:flex; justify-content:space-between; margin-bottom:6px; gap:8px; }}
-.bar-top strong {{ font-size:0.85rem; font-weight:500; }}
-.bar-top span {{ font-family:var(--mono); font-size:0.72rem; color:var(--muted); }}
-.track {{ height:6px; border-radius:999px; background:rgba(255,255,255,0.06); overflow:hidden; }}
-.fill {{ height:100%; border-radius:inherit; background:var(--good); }}
-.fill.warn {{ background:var(--warn); }}
-.fill.bad {{ background:var(--bad); min-width:4px; }}
-.note {{
-  margin-top:14px; padding:10px 12px; border-radius:8px; font-size:0.78rem;
-  color:#e8d4a0; background:var(--warn-bg); border:1px solid rgba(232,184,74,0.22);
-}}
-.note[hidden] {{ display:none; }}
-.roadmap {{ display:grid; grid-template-columns:repeat(4,1fr); gap:0; position:relative; }}
-.roadmap::before {{
-  content:""; position:absolute; left:12%; right:12%; top:27px; height:1px;
-  background:var(--line-strong); z-index:0;
-}}
-.step {{ position:relative; z-index:1; text-align:center; padding:0 8px 4px; }}
-.dot {{
-  width:14px; height:14px; border-radius:50%; margin:20px auto 12px;
-  border:2px solid var(--line-strong); background:var(--bg);
-}}
-.step.done .dot {{ background:var(--good); border-color:var(--good); }}
-.step.active .dot {{ border-color:var(--warn); background:var(--warn); }}
-.step .name {{ font-size:0.82rem; font-weight:600; }}
-.step .desc {{ font-size:0.72rem; color:var(--dim); margin-top:4px; }}
-.step .badge {{
-  display:inline-block; margin-top:8px; font-family:var(--mono); font-size:0.65rem;
-  padding:3px 7px; border-radius:999px; border:1px solid var(--line); color:var(--muted);
-}}
-.step.done .badge {{ color:var(--good); border-color:rgba(47,214,123,0.3); background:var(--good-bg); }}
-.step.active .badge {{ color:var(--warn); border-color:rgba(232,184,74,0.3); background:var(--warn-bg); }}
-.controls {{ overflow:hidden; }}
-.ctrl-row {{
-  display:grid; grid-template-columns:1fr auto; gap:12px; align-items:center;
-  padding:12px 16px; border-bottom:1px solid var(--line);
-}}
-.ctrl-row:last-child {{ border-bottom:none; }}
-.ctrl-row:hover {{ background:var(--panel-hover); }}
-.ctrl-name {{ font-size:0.86rem; font-weight:500; }}
-.switch {{
-  position:relative; width:44px; height:26px; flex-shrink:0;
-}}
-.switch input {{
-  opacity:0; width:0; height:0; position:absolute;
-}}
-.switch span {{
-  position:absolute; inset:0; cursor:pointer; border-radius:999px;
-  background:rgba(255,255,255,0.1); border:1px solid var(--line-strong);
-  transition: background .15s ease, border-color .15s ease;
-}}
-.switch span::before {{
-  content:""; position:absolute; width:20px; height:20px; border-radius:50%;
-  left:2px; top:2px; background:#d7dde8; transition: transform .15s ease, background .15s ease;
-}}
-.switch input:checked + span {{
-  background:var(--good-bg); border-color:rgba(47,214,123,0.45);
-}}
-.switch input:checked + span::before {{
-  transform: translateX(18px); background:var(--good);
-}}
-.switch input:disabled + span {{ opacity:0.45; cursor:not-allowed; }}
-.switch.busy span {{ opacity:0.6; }}
-.toast {{
-  position:fixed; bottom:20px; left:50%; transform:translateX(-50%);
-  background:#1a2230; border:1px solid var(--line-strong); color:var(--text);
-  padding:10px 14px; border-radius:10px; font-size:0.82rem; z-index:20;
-  box-shadow:0 12px 40px rgba(0,0,0,0.45); display:none;
-}}
-.toast.show {{ display:block; }}
-.toast.err {{ border-color:rgba(255,92,106,0.4); color:#ffc4c9; }}
-.toast.err {{ border-color:rgba(255,92,106,0.4); color:#ffc4c9; }}
-.nav {{ display:flex; gap:8px; align-items:center; }}
-.nav a {{
-  color:var(--muted); text-decoration:none; font-size:0.84rem; font-weight:500;
-  padding:6px 10px; border-radius:8px; border:1px solid transparent;
-}}
-.nav a:hover {{ color:var(--text); background:var(--panel); }}
-.nav a.active {{ color:var(--text); border-color:var(--line); background:var(--panel); }}
-@media (max-width:860px) {{
-  .hero,.grid-2,.metrics {{ grid-template-columns:1fr 1fr; }}
-  .roadmap {{ grid-template-columns:1fr 1fr; gap:16px; }}
-  .roadmap::before {{ display:none; }}
-}}
-@media (max-width:560px) {{
-  .hero,.grid-2,.metrics,.roadmap {{ grid-template-columns:1fr; }}
-  .top {{ flex-direction:column; align-items:flex-start; }}
-}}
-</style>
-</head>
-<body>
-<div class="app">
-  <header class="top">
-    <div class="brand-row">
-      <div class="mark" aria-hidden="true">
-        <svg viewBox="0 0 16 16" fill="none">
-          <path d="M3 11.5C5.5 11.5 7 9.2 8.2 6.8C9.1 5 10.2 3.5 12.5 3.2" stroke="#4db8ff" stroke-width="1.5" stroke-linecap="round"/>
-          <path d="M8.2 6.8C7.2 8.5 6.8 10.2 8 12.2" stroke="#4db8ff" stroke-width="1.5" stroke-linecap="round"/>
-          <circle cx="12.6" cy="3.2" r="1.1" fill="#4db8ff"/>
-        </svg>
-      </div>
-      <h1 class="brand">Corvex <span>Monitor</span></h1>
-    </div>
-    <div class="top-meta">
-      <nav class="nav">
-        <a class="active" href="./">Monitor</a>
-        <a href="./logs.html">Prevention log</a>
-      </nav>
-      <span class="live"><i></i> live</span>
-      <span>v{ver}</span>
-      <span id="genStamp">{gen}</span>
-    </div>
-  </header>
-
-  <section class="hero">
-    <div class="panel status-card">
-      <div class="status-label">Eval gate</div>
-      <div class="status-word {'pass' if passed else 'fail'}" id="gateWord">{gate}</div>
-      <div class="pill-row" id="pills"></div>
-    </div>
-    <div class="side-stack">
-      <div class="panel mini">
-        <div class="k">Containment</div>
-        <div class="v" id="containTitle">—</div>
-      </div>
-      <div class="panel mini">
-        <div class="k">Safety ready</div>
-        <div class="v" id="readyTitle">—</div>
-      </div>
-    </div>
-  </section>
-
-  <section class="section">
-    <div class="section-head"><h2>Campaigns</h2><p id="runHint"></p></div>
-    <div class="panel card" id="campaigns">No replay loaded yet — run <code>corvex replay train/train-lateral.jsonl</code></div>
-  </section>
-
-  <section class="section">
-    <div class="section-head">
-      <h2>Reconstruction</h2>
-      <p id="reconHint">Honest rebuild from correlator output — gaps listed, never invented</p>
-    </div>
-    <div class="panel card" id="reconstruction">No reconstruction yet — run <code>corvex replay …</code> or <code>corvex reconstruct runs/…</code></div>
-  </section>
-
-  <section class="section">
-    <div class="section-head">
-      <h2>Quarantine</h2>
-      <p id="quarantineHint"></p>
-    </div>
-    <div class="panel card" id="quarantinePanel">—</div>
-  </section>
-
-  <section class="section">
-    <div class="section-head"><h2>Detection</h2></div>
-    <div class="metrics" id="metrics"></div>
-  </section>
-
-  <section class="section">
-    <div class="grid-2">
-      <div class="panel card">
-        <div class="card-title">Comparison</div>
-        <div id="bars"></div>
-        <div class="note" id="honesty" hidden></div>
-      </div>
-      <div class="panel card">
-        <div class="card-title">Capability</div>
-        <div class="roadmap" id="roadmap"></div>
-      </div>
-    </div>
-  </section>
-
-  <section class="section">
-    <div class="section-head">
-      <h2>Safety controls</h2>
-      <p id="ctrlSummary"></p>
-    </div>
-    <div class="panel controls" id="controls"></div>
-  </section>
-</div>
-<div class="toast" id="toast"></div>
-<script type="application/json" id="data">{payload}</script>
-<script>
-(function(){{
-  let {{ snap, checklist_copy }} = JSON.parse(document.getElementById('data').textContent);
-  const fmt = (x, digits=2) => x==null ? '—' : Number(x).toLocaleString(undefined, {{
-    minimumFractionDigits: digits, maximumFractionDigits: digits
-  }});
-  const pct = (x) => Math.max(0, Math.min(100, Number(x||0)*100));
-  const toast = (msg, err=false) => {{
-    const el = document.getElementById('toast');
-    el.textContent = msg;
-    el.className = 'toast show' + (err ? ' err' : '');
-    clearTimeout(toast._t);
-    toast._t = setTimeout(() => el.classList.remove('show'), 2200);
-  }};
-
-  function render(s) {{
-    snap = s;
-    const m = s.metrics || {{}};
-    const d = s.stage_d || {{}};
-    const pass = s.gate === 'PASS';
-    const containOff = s.corvex_contain === 0;
-    const labs = s.stage_c_retention_labs || 0;
-    let readyPct = d.checklist_pct || 0;
-
-    document.getElementById('gateWord').textContent = pass ? 'PASS' : (s.gate === 'UNKNOWN' || !s.gate ? '—' : s.gate);
-    document.getElementById('gateWord').className = 'status-word ' + (pass ? 'pass' : 'fail');
-    document.getElementById('genStamp').textContent = s.generated_at || '';
-    document.getElementById('pills').innerHTML = [
-      `<span class="pill ${{s.train_pass ? 'on' : ''}}">Train ${{s.train_pass ? 'ok' : '—'}}</span>`,
-      `<span class="pill warn">vs tools: ${{s.care_vs_incumbent || 'unproven'}}</span>`,
-      `<span class="pill">Isolate ${{containOff ? 'off' : 'on'}}</span>`,
-    ].join('');
-
-    document.getElementById('containTitle').textContent = (() => {{
-      const q = s.quarantine || {{}};
-      if (q.mode === 'lab_flag') return 'Lab flags';
-      if (q.mode === 'blocked') return 'Blocked';
-      return 'Dry-run only';
-    }})();
-    document.getElementById('containTitle').style.color = (() => {{
-      const q = s.quarantine || {{}};
-      if (q.mode === 'blocked') return 'var(--bad)';
-      if (q.mode === 'lab_flag') return 'var(--warn)';
-      return 'var(--muted)';
-    }})();
-
-    const camps = s.campaigns || [];
-    const runHint = document.getElementById('runHint');
-    if (s.run_dir) {{
-      runHint.textContent = `${{camps.length}} campaign(s) · ${{s.timeline_pack || s.run_dir}}`;
-    }} else {{
-      runHint.textContent = 'Load a replay with `corvex replay …` or `corvex dash --run-dir runs/demo`';
-    }}
-    const campEl = document.getElementById('campaigns');
-    if (!camps.length) {{
-      campEl.innerHTML = 'No campaigns yet. Replay a train pack first.';
-    }} else {{
-      campEl.innerHTML = camps.map(c => {{
-        const hosts = (c.host_ids || []).join(', ');
-        const stages = (c.stages || []).map(st => st.name || st.stage || '?').join(' → ');
-        return `<div class="ctrl-row"><div class="ctrl-name"><strong>${{c.campaign_id || 'campaign'}}</strong><div class="desc" style="color:var(--muted);font-size:12px;margin-top:4px">${{hosts}}</div><div class="desc" style="color:var(--muted);font-size:12px;margin-top:2px">${{stages || '—'}}</div></div><span class="badge">${{Number(c.score||0).toFixed(2)}}</span></div>`;
-      }}).join('');
-    }}
-
-    const recon = s.reconstruction || {{}};
-    const reconEl = document.getElementById('reconstruction');
-    const reconHint = document.getElementById('reconHint');
-    const items = recon.campaign_reconstructions || [];
-    if (!items.length) {{
-      reconHint.textContent = 'Honest rebuild from correlator output — gaps listed, never invented';
-      reconEl.innerHTML = 'No reconstruction yet — run <code>corvex replay …</code> or <code>corvex reconstruct runs/…</code>';
-    }} else {{
-      const agg = recon.aggregate_status || '—';
-      reconHint.textContent = `${{agg}} · ${{recon.summary || ''}}`;
-      reconEl.innerHTML = items.map(r => {{
-        const status = r.status || '—';
-        const statusColor = status === 'complete' ? 'var(--good)' : (status === 'partial' ? 'var(--warn)' : 'var(--bad)');
-        const steps = (r.steps || []).map(st => {{
-          const techs = (st.attack_techniques || []).join(', ') || 'unmapped';
-          return `<div style="margin-top:6px;font-size:12px;color:var(--muted)">` +
-            `${{st.order}}. <strong style="color:var(--text)">${{st.name}}</strong> · ${{(st.hosts||[]).join(', ')}} · ${{techs}}` +
-            (st.verified ? '' : ' · <em>unverified</em>') +
-            `</div>`;
-        }}).join('');
-        const gaps = (r.gaps || []).length
-          ? `<div class="note" style="margin-top:10px">Gaps: ${{(r.gaps || []).map(g => String(g)).join('; ')}}</div>`
-          : '';
-        const q = r.quarantine || null;
-        const qline = q
-          ? `<div style="margin-top:8px;font-size:12px;color:var(--muted)">Isolate plan: ${{(q.host_ids||[]).join(', ')}}` +
-            (q.cut_point_host ? ` · cut ${{q.cut_point_host}}` : '') +
-            ` · ${{q.mode}} — ${{q.honesty || ''}}</div>`
-          : `<div style="margin-top:8px;font-size:12px;color:var(--bad)">No isolate plan (insufficient evidence)</div>`;
-        return `<div class="ctrl-row" style="align-items:start">
-          <div class="ctrl-name">
-            <strong>${{r.campaign_id || 'campaign'}}</strong>
-            <span style="margin-left:8px;color:${{statusColor}};font-family:var(--mono);font-size:11px">${{status}}</span>
-            <span style="margin-left:8px;font-family:var(--mono);font-size:11px;color:var(--dim)">conf ${{Number(r.confidence||0).toFixed(2)}}</span>
-            ${{steps}}${{gaps}}${{qline}}
-          </div>
-        </div>`;
-      }}).join('') +
-        ((recon.honesty || []).length
-          ? `<div class="note" style="margin:12px">${{(recon.honesty || []).join(' ')}}</div>`
-          : '');
-    }}
-
-    const qcaps = s.quarantine || {{}};
-    document.getElementById('quarantineHint').textContent = qcaps.mode
-      ? `mode=${{qcaps.mode}} · live_executor=${{!!qcaps.live_executor}}`
-      : '';
-    document.getElementById('quarantinePanel').innerHTML =
-      `<div class="ctrl-name"><strong>${{qcaps.mode || 'unknown'}}</strong>` +
-      `<div style="margin-top:8px;font-size:13px;color:var(--muted)">${{qcaps.message || '—'}}</div>` +
-      `<div class="note" style="margin-top:12px">${{(qcaps.honesty || []).join(' ') || 'Live quarantine not claimed.'}}</div>` +
-      `</div>`;
-
-    const ctrlItems = d.items || {{}};
-    const keys = Object.keys(ctrlItems).sort();
-    const onCount = keys.filter(k => ctrlItems[k]).length;
-    readyPct = keys.length ? Math.round(1000 * onCount / keys.length) / 10 : readyPct;
-    document.getElementById('readyTitle').textContent = `${{onCount}}/${{keys.length}} controls`;
-    document.getElementById('ctrlSummary').textContent = `${{onCount}}/${{keys.length}} on`;
-
-    document.getElementById('metrics').innerHTML = [
-      ['Precision', m.precision != null ? m.precision : m.correlator_f1],
-      ['Recall', m.recall != null ? m.recall : m.correlator_f1],
-      ['vs naive (B1)', m.b1_f1],
-      ['Benign FCR', m.false_campaign_rate],
-    ].map(([label, value]) =>
-      `<div class="metric"><div class="label">${{label}}</div><div class="value">${{fmt(value)}}</div></div>`
-    ).join('');
-
-    document.getElementById('bars').innerHTML = [
-      ['Ours', m.correlator_f1],
-      ['Patterns only', m.detector_only_f1],
-      ['Classic', m.b2_f1],
-      ['Naive', m.b1_f1],
-    ].map(([label, value]) => {{
-      const v = Number(value||0);
-      const cls = v < 0.05 ? 'fill bad' : (v < 0.7 ? 'fill warn' : 'fill');
-      const width = v < 0.05 ? '4px' : (pct(v) + '%');
-      return `<div class="bar"><div class="bar-top"><strong>${{label}}</strong><span>${{fmt(v)}}</span></div>
-        <div class="track"><div class="${{cls}}" style="width:${{width}}"></div></div></div>`;
-    }}).join('');
-
-    const honesty = document.getElementById('honesty');
-    const det = Number(m.detector_only_f1||0), corr = Number(m.correlator_f1||0);
-    if (Math.abs(det - corr) < 0.05) {{
-      honesty.hidden = false;
-      honesty.textContent = 'Patterns-only matched full linking on this test.';
-    }} else {{
-      honesty.hidden = true;
-    }}
-
-    const qMode = (s.quarantine || {{}}).mode || 'dry_run';
-    document.getElementById('roadmap').innerHTML = [
-      {{ name:'Eval', desc:'Held-out gate', cls: pass?'done':'locked', badge: pass?'PASS':(s.gate||'—') }},
-      {{ name:'Sensors', desc:'Live hosts', cls: s.stage_b_allowed?'done':(pass?'active':'locked'), badge: s.stage_b_allowed?'open':'locked' }},
-      {{ name:'Share', desc:'External labs', cls: labs>=3?'done':'locked', badge: `${{labs}}/3` }},
-      {{ name:'Isolate', desc: qMode === 'lab_flag' ? 'Lab flags' : (qMode === 'blocked' ? 'Blocked honest' : 'Dry-run'), cls: readyPct>=100?'done':(qMode==='lab_flag'?'active':'locked'), badge: qMode }},
-    ].map(st => `<div class="step ${{st.cls}}"><div class="dot"></div><div class="name">${{st.name}}</div>
-      <div class="desc">${{st.desc}}</div><span class="badge">${{st.badge}}</span></div>`).join('');
-
-    document.getElementById('controls').innerHTML = keys.map(k => {{
-      const copy = checklist_copy[k] || [k, ''];
-      const on = !!ctrlItems[k];
-      return `<div class="ctrl-row" title="${{copy[1]}}">
-        <div class="ctrl-name">${{copy[0]}}</div>
-        <label class="switch">
-          <input type="checkbox" data-key="${{k}}" ${{on?'checked':''}} aria-label="${{copy[0]}}"/>
-          <span></span>
-        </label>
-      </div>`;
-    }}).join('') || '<div class="ctrl-row"><div class="ctrl-name">No controls loaded</div></div>';
-
-    document.querySelectorAll('#controls input[type=checkbox]').forEach(input => {{
-      input.addEventListener('change', async () => {{
-        const key = input.getAttribute('data-key');
-        const enabled = !!input.checked;
-        const label = input.closest('.switch');
-        label.classList.add('busy');
-        input.disabled = true;
-        try {{
-          const res = await fetch('/api/checklist', {{
-            method: 'POST',
-            headers: {{ 'Content-Type': 'application/json' }},
-            body: JSON.stringify({{ key, enabled }}),
-          }});
-          const data = await res.json();
-          if (!res.ok || !data.ok) throw new Error((data && data.error) || res.statusText);
-          render(data.snap);
-          toast((checklist_copy[key]||[key])[0] + (enabled ? ' on' : ' off'));
-        }} catch (err) {{
-          input.checked = !enabled;
-          toast(String(err.message || err), true);
-          input.disabled = false;
-          label.classList.remove('busy');
-        }}
-      }});
-    }});
-
-  }}
-
-  render(snap);
-  // Prefer live API so toggles match disk after rebuilds
-  fetch('/api/snapshot').then(r => r.json()).then(s => render(s)).catch(() => {{}});
-}})();
-</script>
-</body>
-</html>
-"""
 
 
 def write_dashboard(root: Path, out: Optional[Path] = None) -> Path:
     snap = collect_snapshot(root)
-    out = Path(out or (root / "reports" / "dashboard" / "index.html"))
+    out = Path(out or (Path(root) / "reports" / "dashboard" / "index.html"))
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(render_html(snap), encoding="utf-8")
     (out.parent / "snapshot.json").write_text(json.dumps(snap, indent=2), encoding="utf-8")
-    from corvex.logs_page import write_logs_page
-
-    write_logs_page(root, out_dir=out.parent)
     return out

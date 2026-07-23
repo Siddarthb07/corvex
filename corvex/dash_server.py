@@ -1,4 +1,10 @@
-"""Monitor HTTP server (static dashboard + checklist API)."""
+"""Monitor HTTP server — static HTML + read-only snapshot API.
+
+Council rebuild rules:
+- GET /api/snapshot returns JSON only (does not rewrite HTML)
+- No POST mutation endpoints on this server
+- No prevention-log page
+"""
 
 from __future__ import annotations
 
@@ -8,10 +14,7 @@ from pathlib import Path
 from typing import Type
 from urllib.parse import urlparse
 
-from corvex.contain import L1_ITEMS, set_checklist_item
 from corvex.dashboard import collect_snapshot, write_dashboard
-from corvex.logs_page import write_logs_page
-from corvex.prevention_log import load_prevention_log
 
 
 def make_handler(repo_root: Path, dash_dir: Path) -> Type[SimpleHTTPRequestHandler]:
@@ -34,64 +37,30 @@ def make_handler(repo_root: Path, dash_dir: Path) -> Type[SimpleHTTPRequestHandl
             self.end_headers()
             self.wfile.write(body)
 
-        def _read_json(self) -> dict:
-            length = int(self.headers.get("Content-Length") or 0)
-            raw = self.rfile.read(length) if length else b"{}"
-            if not raw:
-                return {}
-            data = json.loads(raw.decode("utf-8"))
-            if not isinstance(data, dict):
-                raise ValueError("expected JSON object")
-            return data
-
         def do_GET(self) -> None:  # noqa: N802
             path = urlparse(self.path).path
             if path == "/api/snapshot":
-                snap = collect_snapshot(root)
-                write_dashboard(root, out=Path(directory) / "index.html")
-                self._json(200, snap)
+                self._json(200, collect_snapshot(root))
                 return
-            if path == "/api/prevention":
-                write_logs_page(root, out_dir=Path(directory))
-                self._json(200, {"entries": load_prevention_log(root)})
+            if path in ("/api/checklist", "/api/prevention"):
+                self._json(
+                    410,
+                    {
+                        "ok": False,
+                        "error": "removed — monitor is read-only; use CLI for checklist evidence",
+                    },
+                )
                 return
             super().do_GET()
 
         def do_POST(self) -> None:  # noqa: N802
-            path = urlparse(self.path).path
-            if path != "/api/checklist":
-                self.send_error(404, "not found")
-                return
-            # Refuse remote checklist mutations (LAN bind is view-only).
-            peer = self.client_address[0] if self.client_address else ""
-            if peer not in ("127.0.0.1", "::1", "localhost"):
-                self._json(403, {"ok": False, "error": "checklist toggles are loopback-only"})
-                return
-            try:
-                data = self._read_json()
-                key = str(data.get("key") or "")
-                if key not in L1_ITEMS:
-                    self._json(400, {"ok": False, "error": f"unknown key: {key}"})
-                    return
-                if "enabled" not in data:
-                    self._json(400, {"ok": False, "error": "enabled required"})
-                    return
-                enabled = bool(data["enabled"])
-                items = set_checklist_item(key, enabled, root=root, source="dashboard")
-                snap = collect_snapshot(root)
-                write_dashboard(root, out=Path(directory) / "index.html")
-                self._json(
-                    200,
-                    {
-                        "ok": True,
-                        "key": key,
-                        "enabled": enabled,
-                        "items": items,
-                        "snap": snap,
-                    },
-                )
-            except Exception as exc:  # noqa: BLE001 — surface to UI
-                self._json(500, {"ok": False, "error": str(exc)})
+            self._json(
+                405,
+                {
+                    "ok": False,
+                    "error": "monitor is read-only — no dashboard mutations",
+                },
+            )
 
     return Handler
 
