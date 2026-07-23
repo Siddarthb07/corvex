@@ -40,7 +40,13 @@ def stage_b_status(report_dir: Optional[Path] = None) -> Dict[str, Any]:
     env_override = (
         os.environ.get("CORVEX_STAGE_B") == "1" or os.environ.get("CFUSE_STAGE_B") == "1"
     )
-    stranger_ok = stranger.exists()
+    stranger_ok = False
+    if stranger.exists():
+        try:
+            sdata = json.loads(stranger.read_text(encoding="utf-8"))
+            stranger_ok = bool(sdata.get("pass"))
+        except (json.JSONDecodeError, OSError):
+            stranger_ok = False
     marker_ok = allowed_marker.exists()
     allowed = env_override or (passed and stranger_ok and marker_ok)
     return {

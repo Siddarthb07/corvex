@@ -144,6 +144,27 @@ def adapt_attack_manifest(
                     }
                 )
             stage_names.setdefault("recon_fanout", []).append(host)
+        elif kind == "dns":
+            # Blind-channel noise — Corvex has no DNS multi-host detector today.
+            host = str(step["host"])
+            seq += 1
+            eid = f"{manifest['campaign_id']}-dns-{seq:04d}"
+            events.append(
+                {
+                    "schema_ver": "1",
+                    "event_id": eid,
+                    "producer_id": host_producer[host],
+                    "host_id": host,
+                    "ts_utc": _ts(base, offset),
+                    "nonce": eid,
+                    "payload_type": "dns",
+                    "payload": {
+                        "query": str(step.get("query") or f"c2-{seq}.example.com"),
+                        "qtype": str(step.get("qtype") or "A"),
+                        "technique": step.get("technique"),
+                    },
+                }
+            )
         else:
             raise ValueError(f"unknown step kind: {kind!r}")
 
@@ -151,13 +172,16 @@ def adapt_attack_manifest(
     stages = [
         {"name": name, "hosts": sorted(set(hs))} for name, hs in stage_names.items()
     ]
+    # Optional truth_hosts: for over-merge / partial-intent break packs
+    truth_hosts = list(manifest.get("truth_hosts") or hosts)
     gt: Dict[str, Any] = {
         "campaign_id": str(manifest["campaign_id"]),
-        "host_ids": list(hosts),
+        "host_ids": truth_hosts,
         "stages": stages,
         "family": str(manifest.get("family") or "attack_repo"),
         "ood": bool(manifest.get("ood", False)),
         "source": manifest.get("source") or {},
+        "break_intent": manifest.get("break_intent"),
     }
     return events, gt
 

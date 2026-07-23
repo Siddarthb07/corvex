@@ -1,0 +1,31 @@
+{
+  "campaign_id": "break-blind-dns-c2",
+  "family": "breaker",
+  "ood": true,
+  "break_intent": "Multi-host C2 beaconing via DNS only — Corvex has no DNS correlator. Expect both_missed / empty campaigns vs 5-host truth.",
+  "hosts": ["host-a", "host-b", "host-c", "host-d", "host-e"],
+  "producers": {
+    "host-a": "prod-a",
+    "host-b": "prod-b",
+    "host-c": "prod-c",
+    "host-d": "prod-d",
+    "host-e": "prod-e"
+  },
+  "base_time_utc": "2026-07-01T11:00:00Z",
+  "source": {
+    "style": "Adversarial break-test (detector blind spot)",
+    "repo": "https://github.com/redcanaryco/atomic-red-team",
+    "techniques": ["T1071.004"],
+    "note": "DNS application-layer C2 — outside auth/net_conn detectors."
+  },
+  "steps": [
+    {"kind": "dns", "host": "host-a", "query": "a1.malware-c2.example", "offset_seconds": 0, "technique": "T1071.004"},
+    {"kind": "dns", "host": "host-b", "query": "b2.malware-c2.example", "offset_seconds": 30, "technique": "T1071.004"},
+    {"kind": "dns", "host": "host-c", "query": "c3.malware-c2.example", "offset_seconds": 60, "technique": "T1071.004"},
+    {"kind": "dns", "host": "host-d", "query": "d4.malware-c2.example", "offset_seconds": 90, "technique": "T1071.004"},
+    {"kind": "dns", "host": "host-e", "query": "e5.malware-c2.example", "offset_seconds": 120, "technique": "T1071.004"},
+    {"kind": "dns", "host": "host-a", "query": "a6.malware-c2.example", "offset_seconds": 180, "technique": "T1071.004"},
+    {"kind": "dns", "host": "host-c", "query": "c7.malware-c2.example", "offset_seconds": 210, "technique": "T1071.004"},
+    {"kind": "dns", "host": "host-e", "query": "e8.malware-c2.example", "offset_seconds": 240, "technique": "T1071.004"}
+  ]
+}

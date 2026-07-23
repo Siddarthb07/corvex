@@ -1,0 +1,35 @@
+{
+  "campaign_id": "break-overmerge-jumpbox",
+  "family": "breaker",
+  "ood": true,
+  "break_intent": "Two unrelated campaigns share jump host-c. Truth is only campaign-1 hosts (a,b). Expect over_merged_hosts including c and possibly d,e.",
+  "hosts": ["host-a", "host-b", "host-c", "host-d", "host-e"],
+  "truth_hosts": ["host-a", "host-b"],
+  "producers": {
+    "host-a": "prod-a",
+    "host-b": "prod-b",
+    "host-c": "prod-c",
+    "host-d": "prod-d",
+    "host-e": "prod-e"
+  },
+  "base_time_utc": "2026-07-01T10:00:00Z",
+  "source": {
+    "style": "Adversarial break-test (over-merge bait)",
+    "repo": "https://github.com/redcanaryco/atomic-red-team",
+    "techniques": ["T1078", "T1021", "T1041"],
+    "note": "Shared jump box forces transitive merge of independent attacks."
+  },
+  "steps": [
+    {"kind": "auth", "host": "host-a", "user": "campaign1", "offset_seconds": 0, "technique": "T1078"},
+    {"kind": "auth", "host": "host-b", "user": "campaign1", "offset_seconds": 15, "technique": "T1021"},
+    {"kind": "auth", "host": "host-c", "user": "campaign1", "offset_seconds": 30, "technique": "T1021"},
+    {"kind": "exfil", "host": "host-b", "dst_ip": "203.0.113.70", "bytes": 12000, "offset_seconds": 45, "technique": "T1041"},
+    {"kind": "exfil", "host": "host-c", "dst_ip": "203.0.113.70", "bytes": 11000, "offset_seconds": 60, "technique": "T1041"},
+
+    {"kind": "auth", "host": "host-c", "user": "campaign2", "offset_seconds": 120, "technique": "T1078"},
+    {"kind": "auth", "host": "host-d", "user": "campaign2", "offset_seconds": 140, "technique": "T1021"},
+    {"kind": "auth", "host": "host-e", "user": "campaign2", "offset_seconds": 160, "technique": "T1021"},
+    {"kind": "exfil", "host": "host-d", "dst_ip": "198.51.100.70", "bytes": 10000, "offset_seconds": 180, "technique": "T1041"},
+    {"kind": "exfil", "host": "host-e", "dst_ip": "198.51.100.70", "bytes": 9500, "offset_seconds": 200, "technique": "T1041"}
+  ]
+}

@@ -20,6 +20,61 @@ def _parse_ts(ts: str) -> datetime:
     return datetime.fromisoformat(ts)
 
 
+def _event_ts(ev: Mapping[str, Any]) -> Optional[datetime]:
+    raw = ev.get("ts_utc")
+    if not raw:
+        return None
+    try:
+        return _parse_ts(str(raw))
+    except ValueError:
+        return None
+
+
+def _connected_host_components(
+    timed_hosts: Sequence[Tuple[datetime, str]],
+    window_seconds: float,
+) -> List[List[Tuple[datetime, str]]]:
+    """Group timed (ts, host) events into chains with consecutive gaps <= window.
+
+    Returns the event slices (not just host sets) so callers get correct
+    per-component time ranges — critical when the same hosts recur later.
+    """
+    if not timed_hosts:
+        return []
+    ordered = sorted(timed_hosts, key=lambda x: x[0])
+    components: List[List[Tuple[datetime, str]]] = []
+    cur: List[Tuple[datetime, str]] = [ordered[0]]
+    prev_t = ordered[0][0]
+    for t, host in ordered[1:]:
+        gap = (t - prev_t).total_seconds()
+        if gap <= window_seconds:
+            cur.append((t, host))
+        else:
+            components.append(cur)
+            cur = [(t, host)]
+        prev_t = t
+    components.append(cur)
+    return components
+
+
+def _ranges_overlap(
+    a: Tuple[Optional[datetime], Optional[datetime]],
+    b: Tuple[Optional[datetime], Optional[datetime]],
+    window_seconds: float,
+) -> bool:
+    """True if time ranges are within window of each other (or either is unknown)."""
+    a0, a1 = a
+    b0, b1 = b
+    if a0 is None or a1 is None or b0 is None or b1 is None:
+        return True
+    # Expand each range by window/2 equivalent: gap between intervals <= window
+    if a1 < b0:
+        return (b0 - a1).total_seconds() <= window_seconds
+    if b1 < a0:
+        return (a0 - b1).total_seconds() <= window_seconds
+    return True
+
+
 @dataclass
 class CorrelatorConfig:
     window_seconds: int = 600
@@ -147,103 +202,179 @@ class Correlator:
     def _fuse(
         self, events: Sequence[Mapping[str, Any]], signals: Sequence[Signal]
     ) -> List[Campaign]:
-        """Cross-host fusion: link hosts sharing users, exfil dst, or joint recon+lateral."""
-        user_hosts: Dict[str, Set[str]] = defaultdict(set)
-        exfil_dst_hosts: Dict[str, Set[str]] = defaultdict(set)
+        """Cross-host fusion with time windows and anti-jumpbox merge limits.
+
+        Stage A honesty:
+        - `window_seconds` bounds which events may stitch into one key-cluster
+        - ubiquitous shared egress (fanout too wide) does not become a campaign
+        - single-host merge only when the bridge is cross-key (auth↔exfil);
+          two laterals sharing a jumpbox do not glue
+        """
+        window = float(self.config.window_seconds)
+        user_timed: Dict[str, List[Tuple[datetime, str]]] = defaultdict(list)
+        exfil_timed: Dict[str, List[Tuple[datetime, str]]] = defaultdict(list)
         recon_hosts: Set[str] = set()
-        stage_hints: Dict[str, List[str]] = defaultdict(list)
+        all_hosts_in_events: Set[str] = set()
 
         for ev in events:
             host = str(ev["host_id"])
+            all_hosts_in_events.add(host)
+            ts = _event_ts(ev)
             ptype = ev.get("payload_type")
             payload = ev.get("payload", {})
             if ptype == "auth":
                 user = str(payload.get("user", ""))
-                if user:
-                    user_hosts[user].add(host)
-                    stage_hints[host].append("auth")
+                if user and ts is not None:
+                    user_timed[user].append((ts, host))
             if ptype == "net_conn" and payload.get("egress"):
                 dst = str(payload.get("dst_ip", ""))
                 nbytes = int(payload.get("bytes", 0))
-                if dst and 0 < nbytes <= 50_000:
-                    exfil_dst_hosts[dst].add(host)
-                    stage_hints[host].append("exfil")
-            if ptype == "net_conn":
-                stage_hints[host].append("net")
+                if dst and 0 < nbytes <= 50_000 and ts is not None:
+                    exfil_timed[dst].append((ts, host))
 
         for s in signals:
             if s.kind == "recon_fanout":
                 recon_hosts.add(s.host_id)
-                stage_hints[s.host_id].append("recon")
-            if s.kind == "lateral_auth":
-                stage_hints[s.host_id].append("lateral")
-            if s.kind == "micro_exfil":
-                stage_hints[s.host_id].append("exfil")
 
-        clusters: List[Tuple[str, Set[str], List[Dict[str, Any]]]] = []
+        # Clusters carry (cid, hosts, stages, t_min, t_max)
+        clusters: List[Tuple[str, Set[str], List[Dict[str, Any]], Optional[datetime], Optional[datetime]]] = []
+        part = 0
 
-        for user, hosts in user_hosts.items():
-            if len(hosts) >= self.config.min_hosts:
+        for user, timed in user_timed.items():
+            for group in _connected_host_components(timed, window):
+                hosts = {h for _, h in group}
+                if len(hosts) < self.config.min_hosts:
+                    continue
+                times = [t for t, _ in group]
+                part += 1
                 clusters.append(
                     (
-                        f"camp-lateral-{user}",
+                        f"camp-lateral-{user}-{part}",
                         set(hosts),
                         [{"name": "lateral_auth", "user": user, "hosts": sorted(hosts)}],
+                        min(times) if times else None,
+                        max(times) if times else None,
                     )
                 )
 
-        for dst, hosts in exfil_dst_hosts.items():
-            if len(hosts) >= self.config.min_hosts:
+        fleet_n = max(1, len(all_hosts_in_events))
+        # If a dst was ever fleet-wide in this run, treat it as poisoned SaaS/CDN —
+        # later 2-host slices of the same dst must not become stitch keys either.
+        poisoned_dst: Set[str] = set()
+        for dst, timed in exfil_timed.items():
+            for group in _connected_host_components(timed, window):
+                hosts = {h for _, h in group}
+                if len(hosts) >= max(4, fleet_n - 1):
+                    poisoned_dst.add(dst)
+
+        for dst, timed in exfil_timed.items():
+            if dst in poisoned_dst:
+                continue
+            for group in _connected_host_components(timed, window):
+                hosts = {h for _, h in group}
+                if len(hosts) < self.config.min_hosts:
+                    continue
+                times = [t for t, _ in group]
+                part += 1
                 clusters.append(
                     (
-                        f"camp-exfil-{dst.replace('.', '-')}",
+                        f"camp-exfil-{dst.replace('.', '-')}-{part}",
                         set(hosts),
                         [{"name": "micro_exfil", "dst_ip": dst, "hosts": sorted(hosts)}],
+                        min(times) if times else None,
+                        max(times) if times else None,
                     )
                 )
 
-        # Recon fanout that co-occurs with lateral/exfil on overlapping hosts → merge
+        # Recon co-occurrence: only fold recon hosts that appear in-window with cluster
         if recon_hosts:
-            for cid, hosts, stages in list(clusters):
+            for i, (cid, hosts, stages, t0, t1) in enumerate(list(clusters)):
                 if hosts & recon_hosts:
+                    stages = list(stages)
                     stages.insert(0, {"name": "recon_fanout", "hosts": sorted(hosts & recon_hosts)})
-                    hosts |= recon_hosts
+                    hosts = set(hosts) | recon_hosts
+                    clusters[i] = (cid, hosts, stages, t0, t1)
 
-        # If recon-only multi-host pattern: multiple hosts scanning
         if len(recon_hosts) >= self.config.min_hosts:
             clusters.append(
                 (
                     "camp-recon-multi",
                     set(recon_hosts),
                     [{"name": "recon_fanout", "hosts": sorted(recon_hosts)}],
+                    None,
+                    None,
                 )
             )
 
-        # Merge overlapping clusters (transitive: repeat until stable)
-        merged: List[Tuple[str, Set[str], List[Dict[str, Any]]]] = [
-            (cid, set(hosts), list(stages)) for cid, hosts, stages in clusters
+        def _host_in_stages(
+            stages: Sequence[Mapping[str, Any]], host: str, names: Set[str]
+        ) -> bool:
+            for st in stages:
+                if str(st.get("name", "")) in names and host in {
+                    str(x) for x in st.get("hosts", [])
+                }:
+                    return True
+            return False
+
+        def _single_host_bridge_ok(
+            hosts_a: Set[str],
+            stages_a: Sequence[Mapping[str, Any]],
+            hosts_b: Set[str],
+            stages_b: Sequence[Mapping[str, Any]],
+        ) -> bool:
+            """Allow 1-host glue only when the bridge is cross-key (auth↔exfil).
+
+            Jumpbox failure mode: two lateral users share a host with no exfil
+            key on that host. fusion_chain needs auth↔exfil bridges on one host.
+            """
+            overlap = hosts_a & hosts_b
+            if len(overlap) >= 2:
+                return True
+            if len(overlap) != 1:
+                return False
+            h = next(iter(overlap))
+            a_lat = _host_in_stages(stages_a, h, {"lateral_auth"})
+            b_lat = _host_in_stages(stages_b, h, {"lateral_auth"})
+            a_ex = _host_in_stages(stages_a, h, {"micro_exfil"})
+            b_ex = _host_in_stages(stages_b, h, {"micro_exfil"})
+            return (a_lat and b_ex) or (b_lat and a_ex)
+
+        # Time-aware merge. Single-host bridges only when cross-key (auth↔exfil).
+        merged: List[Tuple[str, Set[str], List[Dict[str, Any]], Optional[datetime], Optional[datetime]]] = [
+            (cid, set(hosts), list(stages), t0, t1) for cid, hosts, stages, t0, t1 in clusters
         ]
         changed = True
         while changed:
             changed = False
-            out_m: List[Tuple[str, Set[str], List[Dict[str, Any]]]] = []
-            for cid, hosts, stages in merged:
+            out_m: List[
+                Tuple[str, Set[str], List[Dict[str, Any]], Optional[datetime], Optional[datetime]]
+            ] = []
+            for cid, hosts, stages, t0, t1 in merged:
                 absorbed = False
-                for i, (mcid, mhosts, mstages) in enumerate(out_m):
-                    if hosts & mhosts:
-                        mhosts |= hosts
-                        for st in stages:
-                            if st not in mstages:
-                                mstages.append(st)
-                        absorbed = True
-                        changed = True
-                        break
+                for i, (mcid, mhosts, mstages, mt0, mt1) in enumerate(out_m):
+                    overlap = hosts & mhosts
+                    if not overlap:
+                        continue
+                    if not _ranges_overlap((t0, t1), (mt0, mt1), window):
+                        continue
+                    if not _single_host_bridge_ok(hosts, stages, mhosts, mstages):
+                        continue
+                    mhosts |= hosts
+                    for st in stages:
+                        if st not in mstages:
+                            mstages.append(st)
+                    nt0 = min(x for x in (mt0, t0) if x is not None) if (mt0 or t0) else None
+                    nt1 = max(x for x in (mt1, t1) if x is not None) if (mt1 or t1) else None
+                    out_m[i] = (mcid, mhosts, mstages, nt0, nt1)
+                    absorbed = True
+                    changed = True
+                    break
                 if not absorbed:
-                    out_m.append((cid, set(hosts), list(stages)))
+                    out_m.append((cid, set(hosts), list(stages), t0, t1))
             merged = out_m
 
         out: List[Campaign] = []
-        for cid, hosts, stages in merged:
+        for cid, hosts, stages, _t0, _t1 in merged:
             if len(hosts) < self.config.min_hosts:
                 continue
             evidence = []
