@@ -166,10 +166,21 @@ Sensors / Feeder / BYO-JSONL
         → Contain (gated)
 ```
 
+## Reconstruct + quarantine (honest modes)
+
+```bash
+corvex replay train/train-lateral.jsonl
+corvex reconstruct runs/replay
+corvex quarantine-status
+corvex quarantine host-a,host-b --rationale "mid-chain cut"
+```
+
+Reconstruction writes `reconstruction.json` with status `complete` / `partial` / `insufficient_evidence` — gaps listed, no invented TTPs. Quarantine is `dry_run` (default), `lab_flag` (sandbox), or `blocked` (refuse; no live OS executor yet).
+
 ## Docs
 
 - [`CHANGELOG.md`](CHANGELOG.md) · [`SECURITY.md`](SECURITY.md) · [`THREAT_MODEL.md`](THREAT_MODEL.md) · [`LICENSE`](LICENSE)
-- [`docs/contain.md`](docs/contain.md) · [`docs/sensor-windows.md`](docs/sensor-windows.md) · [`reports/RESULTS.md`](reports/RESULTS.md)
+- [`docs/how-corvex-works.md`](docs/how-corvex-works.md) · [`docs/contain.md`](docs/contain.md) · [`docs/sensor-windows.md`](docs/sensor-windows.md) · [`reports/RESULTS.md`](reports/RESULTS.md)
 - [`labs/breaktest/README.md`](labs/breaktest/README.md) · [`future-plans.md`](future-plans.md)
 
 ## License
