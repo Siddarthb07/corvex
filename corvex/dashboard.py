@@ -25,6 +25,12 @@ def _public_path(path: Optional[Path], root: Path) -> Optional[str]:
         return Path(path).name
 
 
+def _load(path: Path) -> Optional[Dict[str, Any]]:
+    if not path.exists():
+        return None
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
 def _load_jsonl(path: Path, *, limit: int = 400) -> List[Dict[str, Any]]:
     if not path.exists():
         return []
