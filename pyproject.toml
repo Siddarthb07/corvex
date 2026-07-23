@@ -34,7 +34,7 @@ include = ["corvex*"]
 exclude = ["drafts*", "tests*", "scripts*", "heldout*", "train*", "reports*"]
 
 [tool.setuptools.package-data]
-corvex = ["py.typed"]
+corvex = ["py.typed", "dash_static/*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
