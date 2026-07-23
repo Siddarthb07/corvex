@@ -4,38 +4,6 @@ Multi-host **campaign correlator** — stitches weak signals across machines int
 
 Observe and correlate first. Live containment stays locked behind safety controls.
 
-## Demos
-
-### 30s walkthrough
-
-![Corvex 30s pitch](docs/assets/corvex-pitch-30s.gif)
-
-[Full MP4](docs/assets/corvex-pitch-30s.mp4)
-
-### Live Docker lab
-
-Real HTTP attack across virtual hosts; Corvex isolates mid-campaign; retries return `403`.
-
-![Corvex live lab](docs/assets/corvex-live-lab.gif)
-
-[Full MP4](docs/assets/corvex-live-lab.mp4)
-
-### ART break-test (5 hosts, sequential)
-
-Manifest-driven Atomic Red Team–style chains (multi-user + exfil/recon) — not single-user easy lateral. Mid-chain isolate; later hops blocked.
-
-![Corvex ART break-test](docs/assets/corvex-breaktest.gif)
-
-[Full MP4](docs/assets/corvex-breaktest.mp4) · [Break-test lab](labs/breaktest/README.md)
-
-### Attack theatre
-
-Lateral-auth hop across `host-a` / `host-b` / `host-c`.
-
-![Corvex attack theatre](docs/assets/corvex-attack-theatre.gif)
-
-[Full MP4](docs/assets/corvex-attack-theatre.mp4)
-
 ## Quick start
 
 Requires Python 3.9+.
@@ -156,7 +124,7 @@ Spins up 3 virtual hosts + attacker + Corvex on an isolated bridge network. Same
 |------------|--------|
 | Correlator + monitor + prevention log | Ready |
 | Replay / BYO JSONL ingest | Ready |
-| Fusion-gap packs (`fusion_chain`) + break-test lab | Scaffolded — re-seal/eval not published yet |
+| Fusion-gap packs (`fusion_chain`) + break-test lab | Ready (run locally — see [`labs/breaktest/README.md`](labs/breaktest/README.md)) |
 | Windows auth export → BYO (`adapt-windows`) | Scaffolded (observe-only) |
 | Sensors + JetStream/mTLS bus | Stub / gated |
 | Live host isolate | Dry-run only (`CORVEX_CONTAIN=0`) |
@@ -200,7 +168,7 @@ Sensors / Feeder / BYO-JSONL
 
 ## Docs
 
-- [`SECURITY.md`](SECURITY.md) · [`THREAT_MODEL.md`](THREAT_MODEL.md) · [`LICENSE`](LICENSE)
+- [`CHANGELOG.md`](CHANGELOG.md) · [`SECURITY.md`](SECURITY.md) · [`THREAT_MODEL.md`](THREAT_MODEL.md) · [`LICENSE`](LICENSE)
 - [`docs/contain.md`](docs/contain.md) · [`docs/sensor-windows.md`](docs/sensor-windows.md) · [`reports/RESULTS.md`](reports/RESULTS.md)
 - [`labs/breaktest/README.md`](labs/breaktest/README.md) · [`future-plans.md`](future-plans.md)
 

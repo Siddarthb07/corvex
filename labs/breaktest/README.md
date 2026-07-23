@@ -36,7 +36,7 @@ Writes:
 
 - `runs/breaktest/*.breaks.json` — correlator vs detector-only break points
 - `runs/breaktest/art_manifest_summary.json`
-- `docs/assets/corvex-breaktest.mp4` (+ `.gif`) — one published recording (primary ART chain)
+- Optional local recording under `docs/assets/` if you run `scripts/record_art_breaktest.py` (not committed; generate on demand)
 
 ## Live Docker (manifest-driven attacker)
 

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "corvex"
-version = "0.4.0"
+version = "1.0.1"
 description = "Corvex — multi-host campaign correlator"
 readme = "README.md"
 requires-python = ">=3.9"
