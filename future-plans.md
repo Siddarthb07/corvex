@@ -1,35 +1,27 @@
 # Corvex — future plans
 
-Where Corvex is today: **Stage A honesty closed for the correlator** (windowing + anti-jumpbox + SaaS dst poison). Sealed held-out still **PASS**. Claim still locked on stranger attestation. Live OS quarantine still unimplemented.
+Where Corvex is today: **Stage A correlator honesty closed**; **Stage B OS-wide Windows sensor shipped** (observe-only, gated). Claim still locked on stranger attestation. Live OS quarantine still unimplemented.
 
 ## Done this wave
 
-- Re-seal + RESULTS refresh
-- `eval-recon`, `byo-windows`, `claim-gates`, `score-non-author`, `hostile-bus-test`
-- Live contain scaffold (`contain/live.py`) — lab flags only when gated
-- Dash run feed (paths hidden from hero/feed)
-- Stage A correlator honesty: `window_seconds`, poisoned CDN dst, jumpbox lateral guard
-- Genuine breakers published under `labs/breaktest/manifests/` (incl. CDN Bridge)
+- Stage A: windowing, poisoned CDN dst, jumpbox guard, breakers, dash path scrub
+- Stage B: `corvex sensor-windows` — Security + Sysmon + Firewall + PowerShell → signed `events.jsonl` → correlator → dash
+- Fixtures under `fixtures/os_wide/`; multi-host exporter smoke (`scripts/smoke_os_wide_multihost.py`)
+- Docs: [`docs/os-wide-sensor.md`](docs/os-wide-sensor.md), [`docs/sensor-windows.md`](docs/sensor-windows.md)
 
-## Stage B — start tomorrow
+## Stage B unlock (claim vs lab)
 
-**Real unlock (honest):** outsider completes [`docs/stranger-checklist.md`](docs/stranger-checklist.md) with `"pass": true`, then create `reports/stage-b-allowed`.
+**Honest unlock:** outsider completes [`docs/stranger-checklist.md`](docs/stranger-checklist.md) → `reports/stranger_dry_run.json` `"pass": true` → create `reports/stage-b-allowed` → `corvex stage-b-check`.
 
-**Lab-only override (not a claim):** `CORVEX_STAGE_B=1` — local sensor/JetStream scaffold only; does **not** flip `claim_allowed`.
-
-### Tomorrow checklist
-
-1. Hand stranger checklist to one external operator (fixture path is fine for dry-run).
-2. After attestation lands: `corvex claim-gates` → confirm `stranger_success`, then touch `reports/stage-b-allowed`.
-3. First Stage B build slice: observe-only Sysmon/JSON sensor path already stubbed in `corvex/stage_b.py` — wire a real export, **no** actuators.
-4. Do **not** start OS-wide sensor or live quarantine.
+**Lab-only:** `CORVEX_STAGE_B=1` — run the sensor locally; does **not** flip `claim_allowed`.
 
 ## Still open
 
-1. **Stranger attestation** — author cannot self-attest.
-2. **Real Windows multi-host export** (not just the fixture) through `byo-windows`.
-3. **OS/EDR/VLAN quarantine executor** — only after L1 evidenced + hostile-bus + published false-isolate rates on larger sets.
-4. Optional: streaming correlator / JetStream — deferred.
+1. **Stranger attestation** — author cannot self-attest (blocks `claim_allowed`).
+2. External habit-loop PASS (`corvex habit-loop --correct`) after purple run without author help.
+3. Real elevated wevtutil follow on a lab PC (fixture path is CI-complete).
+4. **OS/EDR/VLAN quarantine** — only after L1 evidenced + hostile-bus + larger false-isolate rates.
+5. JetStream/mTLS bus — deferred (stubs remain).
 
 ## What not to do
 
@@ -41,4 +33,4 @@ Where Corvex is today: **Stage A honesty closed for the correlator** (windowing 
 
 ## If only one thing
 
-Get one outsider through the stranger checklist. That unlocks the last P3 gate and the honest Stage B marker.
+Get one outsider through the stranger checklist.

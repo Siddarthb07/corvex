@@ -44,6 +44,8 @@ corvex claim-gates     # claim_allowed still needs all P3 gates
 
 **Lab override (not for claims):** `CORVEX_STAGE_B=1` unlocks Stage B stubs locally without stranger attestation.
 
+After Stage B unlock, OS-wide collection: see [`docs/os-wide-sensor.md`](os-wide-sensor.md).
+
 ## Rules
 
 - Author may not write `pass: true` for themselves.

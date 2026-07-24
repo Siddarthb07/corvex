@@ -1,43 +1,55 @@
-# Windows Security → Corvex (observe-only)
+# Windows sensors → Corvex (observe-only)
 
-One real sensor path before JetStream/mTLS: export auth logs, adapt, correlate, reconstruct.
+Two paths: **stranger BYO wedge** (4624 export) and **Stage B OS-wide collector** (Security + Sysmon + Firewall + PowerShell).
 
-## Pipeline strangers can copy
+## Stranger / BYO wedge (ungated converter)
 
 ```bash
-# 1. On a Windows lab box — export successful logons (Event ID 4624)
-#    Event Viewer → Windows Logs → Security → Filter → Save as JSON
-#    or: wevtutil qe Security /q:"*[System[(EventID=4624)]]" /f:json > export.json
-
-# 2a. One-shot wedge (adapt + correlate + reconstruct)
 corvex byo-windows path/to/export.json \
   --host-map fixtures/windows_host_map.json \
   --out-dir runs/windows-wedge
-
-# 2b. Or step-by-step
-corvex adapt-windows path/to/export.json \
-  --host-map fixtures/windows_host_map.json \
-  --out runs/sensors/windows_auth.jsonl
-corvex correlate-byo runs/sensors/windows_auth.jsonl --out-dir runs/windows-wedge
-
-# 3. Monitor (campaigns + reconstruction gaps + quarantine honesty)
 corvex dash --run-dir runs/windows-wedge
 ```
 
-Sample fixture: `fixtures/windows_security_sample.json`  
-Host map: `fixtures/windows_host_map.json` (Computer / hostname → enrolled `host-a`…`host-e`)
+Sample: `fixtures/windows_security_sample.json`  
+Host map: `fixtures/windows_host_map.json`
+
+This is the P3 stranger checklist path. It does **not** by itself unlock Stage B live collection.
+
+## Stage B — OS-wide Windows sensor
+
+Gated by `require_stage_b` (Stage A PASS + stranger PASS + `reports/stage-b-allowed`, **or** lab `CORVEX_STAGE_B=1`).
+
+Full guide: [`docs/os-wide-sensor.md`](os-wide-sensor.md)
+
+```bash
+set CORVEX_STAGE_B=1
+corvex sensor-windows --fixture fixtures/os_wide/multi_channel.jsonl \
+  --allowlist fixtures/os_wide/channels.json \
+  --host-map fixtures/windows_host_map.json \
+  --run-dir runs/os-wide --once
+corvex dash --run-dir runs/os-wide
+```
+
+Live follow (wevtutil, best-effort):
+
+```bash
+corvex sensor-windows --run-dir runs/os-wide-live --follow
+```
+
+Channels: Security (4624/4625/4648), Sysmon (1/3/22 if installed), Firewall, PowerShell (hashed script blocks). Allowlists + rate caps control noise. **No actuators.**
 
 ## Multi-host enrollment map
 
-Corvex signs with local `~/.corvex/enrollment.json`. Map each Windows `Computer` name to an enrolled host id via `--host-map`. Unmapped computers fall back to `--default-host` (usually wrong for multi-host — always provide a map in real labs).
+Corvex signs with local `~/.corvex/enrollment.json`. Map each Windows `Computer` name to an enrolled host id via `--host-map`.
 
 ## What this is / isn't
 
 | Is | Isn't |
 |----|--------|
-| Observe-only converter + correlator wedge | Live Stage B sensor unlock |
-| Event 4624 → `auth` envelopes → campaigns | Full EVTX parser / Sysmon coverage |
-| Reconstruction with honest gaps | Proof of real-attack usefulness (needs P3 gates) |
-| Documented stranger path | mTLS / JetStream bus |
+| Observe-only 4624 BYO wedge | Claim unlock by itself |
+| Stage B OS-wide collector (gated) | JetStream/mTLS bus (still stub) |
+| Fixture CI without admin rights | Proof of real-attack usefulness (`claim_allowed`) |
+| Multi-host exporter shape | Live OS quarantine |
 
-Stage B live sensors stay gated. Claim language stays lab/BYO until `corvex claim-gates` reports `claim_allowed=true`.
+Claim language stays lab/BYO until `corvex claim-gates` → `claim_allowed=true`.

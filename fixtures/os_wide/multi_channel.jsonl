@@ -1,0 +1,11 @@
+{"channel": "security", "EventID": 4624, "Computer": "host-a.lab.local", "TimeCreated": "2026-07-24T10:00:00.000000Z", "TargetUserName": "svc-backup", "IpAddress": "10.1.0.5"}
+{"channel": "security", "EventID": 4624, "Computer": "host-b.lab.local", "TimeCreated": "2026-07-24T10:00:20.000000Z", "TargetUserName": "svc-backup", "IpAddress": "10.1.0.5"}
+{"channel": "security", "EventID": 4624, "Computer": "host-c.lab.local", "TimeCreated": "2026-07-24T10:00:40.000000Z", "TargetUserName": "svc-backup", "IpAddress": "10.1.0.5"}
+{"channel": "sysmon", "EventID": 1, "Computer": "host-a.lab.local", "TimeCreated": "2026-07-24T10:01:00.000000Z", "EventData": {"Image": "C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe", "CommandLine": "powershell -enc ZQBtAG8A", "User": "svc-backup"}}
+{"channel": "sysmon", "EventID": 3, "Computer": "host-b.lab.local", "TimeCreated": "2026-07-24T10:01:15.000000Z", "EventData": {"DestinationIp": "198.51.100.40", "DestinationPort": "443"}, "bytes": 4200}
+{"channel": "sysmon", "EventID": 3, "Computer": "host-c.lab.local", "TimeCreated": "2026-07-24T10:01:30.000000Z", "EventData": {"DestinationIp": "198.51.100.40", "DestinationPort": "443"}, "bytes": 3900}
+{"channel": "sysmon", "EventID": 22, "Computer": "host-b.lab.local", "TimeCreated": "2026-07-24T10:01:45.000000Z", "EventData": {"QueryName": "cdn-sync-updates.example", "QueryType": "TXT"}}
+{"channel": "firewall", "EventID": 5156, "Computer": "host-a.lab.local", "TimeCreated": "2026-07-24T10:02:00.000000Z", "EventData": {"DestAddress": "198.51.100.40", "DestPort": "443"}}
+{"channel": "firewall", "EventID": 5157, "Computer": "host-d.lab.local", "TimeCreated": "2026-07-24T10:02:10.000000Z", "EventData": {"DestAddress": "203.0.113.9", "DestPort": "445", "Action": "block"}}
+{"channel": "powershell", "EventID": 4104, "Computer": "host-a.lab.local", "TimeCreated": "2026-07-24T10:02:30.000000Z", "EventData": {"ScriptBlockText": "Get-Process | Out-Null; # lab only — truncated in adapter", "UserId": "svc-backup"}}
+{"channel": "security", "EventID": 4688, "Computer": "host-a.lab.local", "TimeCreated": "2026-07-24T10:03:00.000000Z", "TargetUserName": "noise", "IpAddress": "10.1.0.8"}

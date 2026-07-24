@@ -1,0 +1,10 @@
+{
+  "allowlist": {
+    "security": [4624, 4625, 4648],
+    "sysmon": [1, 3, 22],
+    "firewall": [2004, 2005, 2006, 5156, 5157],
+    "powershell": [4103, 4104]
+  },
+  "max_per_sec": 50,
+  "honesty": "Default OS-wide noise allowlist. Expand carefully — broad IDs increase correlator blast radius."
+}

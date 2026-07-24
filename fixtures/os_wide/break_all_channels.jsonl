@@ -1,0 +1,11 @@
+{"channel": "security", "EventID": 4624, "Computer": "host-a.lab.local", "TimeCreated": "2026-07-24T14:00:00.000000Z", "TargetUserName": "svc-sensor", "IpAddress": "10.2.0.1", "note": "break-os-wide: auth hop a"}
+{"channel": "security", "EventID": 4624, "Computer": "host-b.lab.local", "TimeCreated": "2026-07-24T14:00:15.000000Z", "TargetUserName": "svc-sensor", "IpAddress": "10.2.0.1", "note": "break-os-wide: auth hop b"}
+{"channel": "security", "EventID": 4624, "Computer": "host-c.lab.local", "TimeCreated": "2026-07-24T14:00:30.000000Z", "TargetUserName": "svc-sensor", "IpAddress": "10.2.0.1", "note": "break-os-wide: auth hop c"}
+{"channel": "sysmon", "EventID": 1, "Computer": "host-a.lab.local", "TimeCreated": "2026-07-24T14:01:00.000000Z", "EventData": {"Image": "C:\\\\Windows\\\\System32\\\\cmd.exe", "CommandLine": "cmd /c whoami", "User": "svc-sensor"}}
+{"channel": "sysmon", "EventID": 3, "Computer": "host-b.lab.local", "TimeCreated": "2026-07-24T14:01:20.000000Z", "EventData": {"DestinationIp": "198.51.100.77", "DestinationPort": "8443"}, "bytes": 8800}
+{"channel": "sysmon", "EventID": 3, "Computer": "host-c.lab.local", "TimeCreated": "2026-07-24T14:01:40.000000Z", "EventData": {"DestinationIp": "198.51.100.77", "DestinationPort": "8443"}, "bytes": 9100}
+{"channel": "sysmon", "EventID": 22, "Computer": "host-b.lab.local", "TimeCreated": "2026-07-24T14:02:00.000000Z", "EventData": {"QueryName": "sensor-c2.example", "QueryType": "A"}}
+{"channel": "firewall", "EventID": 5156, "Computer": "host-a.lab.local", "TimeCreated": "2026-07-24T14:02:20.000000Z", "EventData": {"DestAddress": "198.51.100.77", "DestPort": "8443"}}
+{"channel": "firewall", "EventID": 5157, "Computer": "host-d.lab.local", "TimeCreated": "2026-07-24T14:02:40.000000Z", "EventData": {"DestAddress": "203.0.113.50", "DestPort": "445", "Action": "block"}}
+{"channel": "powershell", "EventID": 4104, "Computer": "host-a.lab.local", "TimeCreated": "2026-07-24T14:03:00.000000Z", "EventData": {"ScriptBlockText": "Invoke-WebRequest http://198.51.100.77/beacon -UseBasicParsing", "UserId": "svc-sensor"}}
+{"channel": "powershell", "EventID": 4103, "Computer": "host-b.lab.local", "TimeCreated": "2026-07-24T14:03:20.000000Z", "EventData": {"Payload": "Module logging sample", "UserId": "svc-sensor"}}

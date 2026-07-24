@@ -1,5 +1,10 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+- Stage B OS-wide Windows sensor: `corvex sensor-windows` (Security + Sysmon + Firewall + PowerShell), fixtures under `fixtures/os_wide/`, `docs/os-wide-sensor.md`, multi-host smoke script, `corvex habit-loop`.
+
 ## [1.1.0] — 2026-07-23
 
 ### Added

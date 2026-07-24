@@ -54,6 +54,20 @@ Break-test / public-TTP manifests (`corvex score-non-author`): correlator F1 **~
 
 **Operation CDN Bridge** (`labs/breaktest/manifests/break_cdn_bridge_compound.json`): best Jaccard vs truth **1.0** (APT `{a,b,c}` no longer fat-merged with CDN). Residual: separate helpdesk campaign still contributes `host-d` to the all-campaigns union; DNS / >50KB blob remain invisible by design.
 
+## Stage B OS-wide sensor
+
+Observe-only Windows collector: `corvex sensor-windows` (Security + Sysmon + Firewall + PowerShell). Fixture CI path: `fixtures/os_wide/multi_channel.jsonl`. Lab unlock `CORVEX_STAGE_B=1`; honest unlock needs stranger PASS + `reports/stage-b-allowed`.
+
+| Check | Status |
+|-------|--------|
+| Fixture `--once` → campaigns | **pass** (unit + smoke) |
+| Multi-host exporter shape | **pass** (`scripts/smoke_os_wide_multihost.py`) |
+| Allowlist + rate cap | **shipped** |
+| wevtutil `--follow` on live PC | best-effort (degrades if channel missing) |
+| Stranger / `claim_allowed` | **still locked** |
+
+Docs: [`docs/os-wide-sensor.md`](../docs/os-wide-sensor.md).
+
 ## Reconstruction regression
 
 `corvex eval-recon --split heldout` → **8/8** packs ok (3 attack + 5 benign). Manifests labeled `regression_only`.
