@@ -1,0 +1,76 @@
+{
+  "campaign_id": "break-os-wide-sensors",
+  "generated_at": "2026-07-24T09:12:39Z",
+  "stage_b": {
+    "allowed": true,
+    "pass": true,
+    "stranger_dry_run": true,
+    "stage_b_allowed_marker": true,
+    "env_override": false
+  },
+  "fixture": "fixtures/os_wide/break_all_channels.jsonl",
+  "run_dir": "runs/breaktest/break_os_wide_sensors",
+  "sensor_stats": {
+    "adapted": 11,
+    "skipped": 0,
+    "published": 11,
+    "rate_limited": 0,
+    "cycles": 1,
+    "channels": {
+      "security": 3,
+      "sysmon": 4,
+      "firewall": 2,
+      "powershell": 2
+    },
+    "source": "fixture",
+    "honesty": "Observe-only OS-wide Windows sensor. No firewall/EDR mutation. Missing channels degrade; Sysmon absence is normal.",
+    "degraded": [],
+    "timeline": {
+      "campaigns": 1,
+      "events": 11,
+      "ttu_seconds": 0.006715899999999997
+    }
+  },
+  "required_channels": [
+    "security",
+    "sysmon",
+    "firewall",
+    "powershell"
+  ],
+  "channels_active": {
+    "security": 3,
+    "sysmon": 4,
+    "firewall": 2,
+    "powershell": 2
+  },
+  "missing_channels": [],
+  "all_channels_active": true,
+  "campaigns": 1,
+  "campaign_ids": [
+    "camp-lateral-svc-sensor-1"
+  ],
+  "live_wevtutil_probe": {
+    "security": {
+      "events_sampled": 0,
+      "active": false
+    },
+    "sysmon": {
+      "events_sampled": 0,
+      "active": false
+    },
+    "firewall": {
+      "events_sampled": 0,
+      "active": false
+    },
+    "powershell": {
+      "events_sampled": 0,
+      "active": false
+    }
+  },
+  "break_points": {
+    "all_channels_active": true,
+    "has_campaign": true,
+    "pass": true
+  },
+  "honesty": "Fixture path proves adapters + correlator for all four channels. live_wevtutil_probe reflects this machine's Event Logs (Sysmon often absent)."
+}

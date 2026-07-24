@@ -394,17 +394,17 @@ def collect_snapshot(root: Path) -> Dict[str, Any]:
         "sealed_eval": {
             "binds_to_run": False,
             "label": "Sealed Day-0 heldout — not this run",
-            "gate": gate,
-            "heldout_pass": bool(held.get("pass")),
-            "train_pass": bool(train.get("pass")),
-            "care_vs_incumbent": held.get("care_vs_incumbent", "unproven"),
-            "metrics": {
-                "precision": mget("correlator", "precision"),
-                "recall": mget("correlator", "recall"),
+        "gate": gate,
+        "heldout_pass": bool(held.get("pass")),
+        "train_pass": bool(train.get("pass")),
+        "care_vs_incumbent": held.get("care_vs_incumbent", "unproven"),
+        "metrics": {
+            "precision": mget("correlator", "precision"),
+            "recall": mget("correlator", "recall"),
                 "correlator_f1": mget("correlator"),
                 "detector_only_f1": mget("detector_only"),
-                "b1_f1": mget("b1"),
-                "false_campaign_rate": mget("correlator", "false_campaign_rate"),
+            "b1_f1": mget("b1"),
+            "false_campaign_rate": mget("correlator", "false_campaign_rate"),
             },
         },
         "gate": gate,
@@ -419,7 +419,7 @@ def collect_snapshot(root: Path) -> Dict[str, Any]:
             "items": l1_items,
             "live_contain": False,
         },
-    }
+}
 
 
 def render_html(snap: Dict[str, Any]) -> str:

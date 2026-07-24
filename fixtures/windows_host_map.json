@@ -5,6 +5,8 @@
   "host-a": "host-a",
   "host-b": "host-b",
   "host-c": "host-c",
+  "host-d": "host-d",
+  "host-d.lab.local": "host-d",
   "WORKSTATION01": "host-a",
   "FILESERVER01": "host-b",
   "JUMPBOX01": "host-c"

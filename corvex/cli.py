@@ -1,4 +1,4 @@
-"""CLI: corvex replay | eval | timeline | reconstruct | quarantine | ingest-byo | adapt-windows | build-breaktest | dash | seal-day0 | freeze."""
+"""CLI: corvex replay | eval | sensor-windows | byo-windows | dash | seal-day0 | …"""
 
 from __future__ import annotations
 
@@ -8,6 +8,7 @@ import os
 import shutil
 import tempfile
 import time
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -857,6 +858,114 @@ def stage_b_check_cmd() -> None:
     status = stage_b_status()
     typer.echo(json.dumps(status, indent=2))
     raise typer.Exit(0 if status["allowed"] else 1)
+
+
+@app.command("sensor-windows")
+def sensor_windows_cmd(
+    run_dir: Path = typer.Option(Path("runs/os-wide"), help="Run directory for events/timeline"),
+    channels: str = typer.Option(
+        "security,sysmon,firewall,powershell",
+        help="Comma-separated channels",
+    ),
+    fixture: Optional[Path] = typer.Option(
+        None,
+        "--fixture",
+        help="JSON/JSONL multi-channel export (CI / no-admin). Omit to poll wevtutil.",
+    ),
+    allowlist: Optional[Path] = typer.Option(
+        None,
+        "--allowlist",
+        help="Channel Event ID allowlist JSON (default: fixtures/os_wide/channels.json)",
+    ),
+    host_id: Optional[str] = typer.Option(
+        None, "--host-id", help="Force enrolled host id (multi-host exporter shape)"
+    ),
+    producer: Optional[str] = typer.Option(
+        None, "--producer", help="Force producer id (default from DEMO_HOSTS[host-id])"
+    ),
+    host_map: Optional[Path] = typer.Option(
+        None, "--host-map", help="Computer→host_id JSON map"
+    ),
+    follow: bool = typer.Option(False, "--follow", help="Continuous poll (wevtutil or wait)"),
+    once: bool = typer.Option(True, "--once/--no-once", help="Single drain cycle (default)"),
+    max_per_sec: float = typer.Option(50.0, help="Soft rate cap (envelopes/sec)"),
+    poll_seconds: float = typer.Option(2.0, help="Follow poll interval"),
+    max_cycles: Optional[int] = typer.Option(
+        None, help="Stop after N cycles (tests / bounded follow)"
+    ),
+) -> None:
+    """Stage B observe-only OS-wide Windows sensor → events.jsonl + timeline."""
+    from corvex.sensors.windows_os import run_sensor_windows
+    from corvex.stage_b import StageBGateError
+
+    enrollment = ensure_lab_enrollment()
+    root = _repo_root()
+    allow = Path(allowlist) if allowlist else root / "fixtures" / "os_wide" / "channels.json"
+    if not allow.exists():
+        allow = None
+    hmap: Dict[str, str] = {h: h for h in DEMO_HOSTS}
+    if host_map and Path(host_map).exists():
+        loaded = json.loads(Path(host_map).read_text(encoding="utf-8"))
+        if isinstance(loaded, dict):
+            hmap.update({str(k).lower(): str(v) for k, v in loaded.items()})
+            hmap.update({str(k): str(v) for k, v in loaded.items()})
+    # Always map *.lab.local style from fixture computers
+    for h in list(DEMO_HOSTS):
+        hmap.setdefault(f"{h}.lab.local", h)
+    chans = [c.strip() for c in channels.split(",") if c.strip()]
+    try:
+        stats = run_sensor_windows(
+            run_dir=Path(run_dir),
+            enrollment=enrollment,
+            channels=chans,
+            allowlist_path=allow,
+            fixture=Path(fixture) if fixture else None,
+            host_id=host_id,
+            producer_id=producer,
+            host_map=hmap,
+            follow=follow,
+            once=once and not follow,
+            max_per_sec=max_per_sec,
+            poll_seconds=poll_seconds,
+            max_cycles=max_cycles,
+        )
+    except StageBGateError as exc:
+        typer.echo(str(exc))
+        typer.echo("Lab unlock: set CORVEX_STAGE_B=1 (does not flip claim_allowed).")
+        raise typer.Exit(2) from exc
+    typer.echo(json.dumps(stats, indent=2))
+    raise typer.Exit(0 if int(stats.get("published", 0)) > 0 or stats.get("timeline") else 1)
+
+
+@app.command("habit-loop")
+def habit_loop_cmd(
+    correct: bool = typer.Option(
+        False, "--correct/--incorrect", help="External operator timeline correct?"
+    ),
+    report: Path = typer.Option(Path("reports/habit_loop.json")),
+    note: str = typer.Option("", help="Optional operator note"),
+) -> None:
+    """Record Stage B habit-loop metric (not a substitute for stranger PASS)."""
+    from corvex.stage_b import habit_loop_metric, require_stage_b
+    from corvex.stage_b import StageBGateError
+
+    try:
+        require_stage_b()
+    except StageBGateError as exc:
+        typer.echo(str(exc))
+        raise typer.Exit(2) from exc
+    payload = habit_loop_metric(correct)
+    payload["note"] = note or payload.get("definition")
+    payload["generated_at"] = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    payload["honesty"] = (
+        "habit_loop_pass is Stage B quality evidence only — "
+        "does not flip claim_allowed or replace stranger_dry_run.json."
+    )
+    Path(report).parent.mkdir(parents=True, exist_ok=True)
+    # repo-relative path only in file
+    Path(report).write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+    typer.echo(json.dumps(payload, indent=2))
+    raise typer.Exit(0 if correct else 1)
 
 
 @app.command("dash")
