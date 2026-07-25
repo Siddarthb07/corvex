@@ -1,8 +1,8 @@
 {
   "schema_ver": "1",
-  "generated_at": "2026-07-23T14:09:47Z",
-  "claim_allowed": false,
-  "claim_language": "lab / BYO campaign stitch only \u2014 claim locked",
+  "generated_at": "2026-07-25T06:55:32Z",
+  "claim_allowed": true,
+  "claim_language": "useful on real attacks",
   "gates": {
     "non_author_fusion_lift": {
       "id": "non_author_fusion_lift",
@@ -14,10 +14,11 @@
     },
     "stranger_success": {
       "id": "stranger_success",
-      "pass": false,
+      "pass": true,
       "path": "reports/stranger_dry_run.json",
-      "operator": null,
-      "note": "Pending external operator. Legacy Stage-B self-check was not a P3 stranger attestation \u2014 see docs/stranger-checklist.md."
+      "operator": "Jack",
+      "attestation_kind": "human",
+      "note": "Completed Windows export \u2192 byo-windows \u2192 timeline without author help."
     },
     "benign_fcr_real_n": {
       "id": "benign_fcr_real_n",

@@ -91,15 +91,26 @@ def poll_wevtutil_channel(
     *,
     allow_ids: Set[str],
     max_events: int = 40,
-) -> List[Dict[str, Any]]:
-    """Best-effort wevtutil JSON query. Returns [] if channel missing or tool absent."""
+    min_record_id: Optional[int] = None,
+) -> Dict[str, Any]:
+    """Best-effort wevtutil JSON query with explicit degrade reasons.
+
+    Returns ``{"records": [...], "ok": bool, "reason": str|None, "max_record_id": int|None}``.
+    """
     log_name = WEVT_LOGS.get(channel)
-    if not log_name or not _wevtutil_available():
-        return []
+    if not log_name:
+        return {"records": [], "ok": False, "reason": "unknown_channel", "max_record_id": None}
+    if not _wevtutil_available():
+        return {"records": [], "ok": False, "reason": "no_wevtutil", "max_record_id": None}
     if not allow_ids:
-        return []
+        return {"records": [], "ok": False, "reason": "empty_allowlist", "max_record_id": None}
     id_clause = " or ".join(f"EventID={i}" for i in sorted(allow_ids))
     query = f"*[System[({id_clause})]]"
+    if min_record_id is not None and min_record_id > 0:
+        # Prefer events after last bookmark when RecordId is available
+        query = (
+            f"*[System[({id_clause}) and EventRecordID > {int(min_record_id)}]]"
+        )
     cmd = [
         "wevtutil",
         "qe",
@@ -117,41 +128,68 @@ def poll_wevtutil_channel(
             timeout=20,
             check=False,
         )
-    except (OSError, subprocess.TimeoutExpired):
-        return []
-    if proc.returncode != 0 or not proc.stdout.strip():
-        return []
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        return {
+            "records": [],
+            "ok": False,
+            "reason": f"wevtutil_error:{type(exc).__name__}",
+            "max_record_id": None,
+        }
+    err = (proc.stderr or "").lower()
+    if proc.returncode != 0:
+        reason = "channel_missing_or_denied"
+        if "access" in err or "denied" in err or "privilege" in err:
+            reason = "access_denied_need_elevation"
+        elif "not found" in err or "cannot find" in err:
+            reason = "channel_missing"
+        return {"records": [], "ok": False, "reason": reason, "max_record_id": None}
+    if not proc.stdout.strip():
+        return {"records": [], "ok": True, "reason": "zero_hits", "max_record_id": min_record_id}
+
     raw = proc.stdout.strip()
-    # wevtutil may emit concatenated JSON objects
     records: List[Dict[str, Any]] = []
+
+    def _ingest(rec: Dict[str, Any]) -> None:
+        rec = dict(rec)
+        rec["channel"] = channel
+        records.append(rec)
+
     try:
         data = json.loads(raw)
         if isinstance(data, list):
             for rec in data:
                 if isinstance(rec, dict):
-                    rec = dict(rec)
-                    rec["channel"] = channel
-                    records.append(rec)
-            return records
-        if isinstance(data, dict):
-            data["channel"] = channel
-            return [data]
+                    _ingest(rec)
+        elif isinstance(data, dict):
+            _ingest(data)
     except json.JSONDecodeError:
-        pass
-    # Concatenated objects — split naively on "}\n{"
-    chunk = ""
-    for line in raw.splitlines():
-        chunk += line
-        if line.strip().endswith("}"):
-            try:
-                rec = json.loads(chunk)
-                if isinstance(rec, dict):
-                    rec["channel"] = channel
-                    records.append(rec)
-            except json.JSONDecodeError:
-                pass
-            chunk = ""
-    return records
+        chunk = ""
+        for line in raw.splitlines():
+            chunk += line
+            if line.strip().endswith("}"):
+                try:
+                    rec = json.loads(chunk)
+                    if isinstance(rec, dict):
+                        _ingest(rec)
+                except json.JSONDecodeError:
+                    pass
+                chunk = ""
+
+    max_rid: Optional[int] = min_record_id
+    for rec in records:
+        rid = rec.get("RecordId") or rec.get("EventRecordID")
+        try:
+            rid_i = int(rid) if rid is not None else None
+        except (TypeError, ValueError):
+            rid_i = None
+        if rid_i is not None and (max_rid is None or rid_i > max_rid):
+            max_rid = rid_i
+    return {
+        "records": records,
+        "ok": True,
+        "reason": None if records else "zero_hits",
+        "max_record_id": max_rid,
+    }
 
 
 def sign_unsigned(
@@ -299,9 +337,12 @@ def run_sensor_windows(
     poll_seconds: float = 2.0,
     max_cycles: Optional[int] = None,
     recompute_every: int = 1,
+    require_live: bool = False,
 ) -> Dict[str, Any]:
     """Main Stage B sensor loop. ``once`` drains one cycle; ``follow`` polls."""
     require_stage_b()
+    if require_live and fixture is not None:
+        raise ValueError("--require-live cannot be combined with --fixture")
     run_dir = Path(run_dir)
     run_dir.mkdir(parents=True, exist_ok=True)
     events_path = run_dir / "events.jsonl"
@@ -311,17 +352,21 @@ def run_sensor_windows(
     chans = [c.strip().lower() for c in channels if c.strip()]
     limiter = RateLimiter(max_per_sec)
     bookmarks = _load_bookmarks(bookmark_path)
-    stats = {
+    channel_bookmarks: Dict[str, Any] = dict(bookmarks.get("channels") or {})
+    stats: Dict[str, Any] = {
         "adapted": 0,
         "skipped": 0,
         "published": 0,
         "rate_limited": 0,
         "cycles": 0,
         "channels": {},
+        "channel_health": {},
         "source": "fixture" if fixture else "wevtutil",
+        "fixture_seed": bool(fixture),
         "honesty": (
             "Observe-only OS-wide Windows sensor. No firewall/EDR mutation. "
-            "Missing channels degrade; Sysmon absence is normal."
+            "Missing channels degrade; Sysmon absence is normal. "
+            "Fixture path is CI-only — not live Event Log."
         ),
         "degraded": [],
     }
@@ -340,11 +385,32 @@ def run_sensor_windows(
                 return 0
         else:
             for ch in chans:
-                got = poll_wevtutil_channel(ch, allow_ids=allow.get(ch, set()))
-                if not got and ch == "sysmon":
-                    if "sysmon" not in stats["degraded"]:
-                        stats["degraded"].append("sysmon")
-                records.extend(got)
+                last_rid = channel_bookmarks.get(ch)
+                try:
+                    min_rid = int(last_rid) if last_rid is not None else None
+                except (TypeError, ValueError):
+                    min_rid = None
+                poll = poll_wevtutil_channel(
+                    ch, allow_ids=allow.get(ch, set()), min_record_id=min_rid
+                )
+                health = {
+                    "ok": bool(poll.get("ok")),
+                    "reason": poll.get("reason"),
+                    "hits": len(poll.get("records") or []),
+                }
+                stats["channel_health"][ch] = health
+                if not poll.get("ok") or poll.get("reason") in {
+                    "channel_missing",
+                    "access_denied_need_elevation",
+                    "no_wevtutil",
+                    "channel_missing_or_denied",
+                }:
+                    if ch not in stats["degraded"]:
+                        stats["degraded"].append(ch)
+                if poll.get("max_record_id") is not None:
+                    channel_bookmarks[ch] = poll["max_record_id"]
+                records.extend(list(poll.get("records") or []))
+            bookmarks["channels"] = channel_bookmarks
 
         # Bookmark dedupe: skip event_ids already seen for this exporter identity
         exporter = host_id or "default"
@@ -432,6 +498,16 @@ def run_sensor_windows(
             time.sleep(poll_seconds)
         else:
             break
+
+    if require_live:
+        health = stats.get("channel_health") or {}
+        live_hits = sum(int(h.get("hits") or 0) for h in health.values())
+        if stats["source"] != "wevtutil" or (stats["published"] == 0 and live_hits == 0):
+            stats["require_live_failed"] = True
+            stats["require_live_note"] = (
+                "No live Event Log hits. Elevate PowerShell / enable channels, "
+                "or drop --require-live for fixture CI."
+            )
 
     (run_dir / "sensor_status.json").write_text(
         json.dumps(stats, indent=2) + "\n", encoding="utf-8"

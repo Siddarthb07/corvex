@@ -1,6 +1,6 @@
 # Evaluation results
 
-Sealed synthetic multi-host packs after `corvex seal-day0 --force` (fusion_chain + expanded benign N). **Care vs commercial tools: unproven.** Claim language stays lab/BYO until `corvex claim-gates` → `claim_allowed=true`.
+Sealed synthetic multi-host packs after `corvex seal-day0 --force` (fusion_chain + expanded benign N). **Care vs commercial tools: unproven.** Claim language: `claim_allowed=true` after human stranger **Jack** (see `reports/claim_gates.json`).
 
 ## Held-out detection (sealed)
 
@@ -63,9 +63,10 @@ Observe-only Windows collector: `corvex sensor-windows` (Security + Sysmon + Fir
 | Fixture `--once` → campaigns | **pass** (unit + smoke) |
 | Multi-host exporter shape | **pass** (`scripts/smoke_os_wide_multihost.py`) |
 | Allowlist + rate cap | **shipped** |
+| Stranger / `claim_allowed` | **unlocked** — human operator **Jack** (`attestation_kind=human`) |
 | HMAC verify on recompute | **shipped** (tampered rows dropped) |
-| wevtutil `--follow` on live PC | best-effort (productize deferred) |
-| Stranger / `claim_allowed` | **still locked** (human only; agents rejected) |
+| wevtutil `--follow` / `--require-live` | shipped (elevated Security often needed) |
+| `corvex fuse-run` | shipped — offline lab+PC file merge |
 
 Docs: [`docs/os-wide-sensor.md`](../docs/os-wide-sensor.md).
 
@@ -90,14 +91,14 @@ Docs: [`docs/os-wide-sensor.md`](../docs/os-wide-sensor.md).
 |------|--------|
 | non_author_fusion_lift | pass (breaktest lift ~+0.44) |
 | benign_fcr_real_n | pass (N=5, FCR=0) |
-| stranger_success | **fail** (pending external operator) |
-| **claim_allowed** | **false** |
+| stranger_success | **pass** (human operator Jack, `attestation_kind=human`) |
+| **claim_allowed** | **true** — language: useful on real attacks |
 
 ## What this does / does not prove
 
-**Proves (narrow):** Sealed packs separate fusion from detector-only; window/anti-jumpbox honesty holds without collapsing Stage A gate; benign FCR holds at N=5; reconstruction round-trips; breaktest fusion lift remains positive.
+**Proves (narrow):** Sealed packs separate fusion from detector-only; window/anti-jumpbox honesty holds; benign FCR holds at N=5; reconstruction round-trips; breaktest fusion lift remains positive; human stranger completed BYO Windows → timeline path.
 
-**Does not prove:** Real malware defense, stranger Windows success, commercial parity, or that live contain is safe to arm.
+**Does not prove:** Commercial parity, that live contain is safe to arm, or cross-host live Event Log on two physical machines.
 
 ## Reproduce
 

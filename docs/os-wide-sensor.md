@@ -28,15 +28,31 @@ corvex sensor-windows --fixture fixtures/os_wide/multi_channel.jsonl \
 corvex dash --run-dir runs/os-wide
 ```
 
-## Live local PC (wevtutil) — deferred productization
+## Live local PC (wevtutil)
+
+Requires elevation for Security log on most machines. Sysmon optional (degrades honestly).
 
 ```bash
-corvex stage-b-lab-unlock --reason "elevated wevtutil probe"
 corvex sensor-windows --run-dir runs/os-wide-live --follow \
-  --channels security,sysmon,firewall,powershell
+  --channels security,sysmon,firewall,powershell \
+  --host-id host-pc --producer prod-pc
+# Fail CI/local if Event Log produced nothing:
+corvex sensor-windows --run-dir runs/os-wide-live --once --require-live
 ```
 
-Missing Sysmon degrades honestly (listed in `sensor_status.json`). Security log often needs elevation.
+`sensor_status.json` includes `channel_health` with reasons (`access_denied_need_elevation`, `channel_missing`, `zero_hits`, …). Fixture path remains CI-only (`fixture_seed: true`).
+
+## Offline fusion CLI
+
+```bash
+# After lab shared events + PC sensor have written JSONL:
+corvex fuse-run --lab labs/breaktest/shared/events.jsonl \
+  --pc runs/pc-sensor --out-dir runs/pc-and-lab --once
+corvex dash --run-dir runs/pc-and-lab
+# Or: corvex fuse-run ... --dash
+```
+
+Mode is **offline_lab_replay** (file merge + HMAC verify). Not JetStream; not a concurrency-safe product bus.
 
 ## Multi-host shape
 

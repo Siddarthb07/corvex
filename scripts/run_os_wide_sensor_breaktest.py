@@ -62,7 +62,13 @@ def main() -> int:
     allow_sets = load_allowlist(allow) if allow.exists() else DEFAULT_ALLOWLIST
     for ch in REQUIRED:
         got = poll_wevtutil_channel(ch, allow_ids=allow_sets.get(ch, set()), max_events=5)
-        live[ch] = {"events_sampled": len(got), "active": len(got) > 0}
+        records = list(got.get("records") or [])
+        live[ch] = {
+            "events_sampled": len(records),
+            "active": len(records) > 0,
+            "ok": bool(got.get("ok")),
+            "reason": got.get("reason"),
+        }
 
     report = {
         "campaign_id": man["campaign_id"],
