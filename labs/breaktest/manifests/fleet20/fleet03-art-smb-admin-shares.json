@@ -1,0 +1,121 @@
+{
+  "campaign_id": "fleet03-art-smb-admin-shares",
+  "family": "attack_repo",
+  "ood": true,
+  "hosts": [
+    "host-a",
+    "host-b",
+    "host-c",
+    "host-d",
+    "host-e"
+  ],
+  "truth_hosts": [
+    "host-a",
+    "host-b",
+    "host-c",
+    "host-d"
+  ],
+  "producers": {
+    "host-a": "prod-a",
+    "host-b": "prod-b",
+    "host-c": "prod-c",
+    "host-d": "prod-d",
+    "host-e": "prod-e"
+  },
+  "base_time_utc": "2026-07-25T14:00:00Z",
+  "fleet_origin": "github_art",
+  "source": {
+    "style": "Black-box fleet \u2014 ATT&CK/Atomic-style telemetry sketches",
+    "repo": "https://github.com/redcanaryco/atomic-red-team",
+    "techniques": [
+      "T1021.002",
+      "T1078",
+      "T1041"
+    ],
+    "note": "Atomic Red Team remote services / admin share hop chain."
+  },
+  "narrative": [
+    "Walk admin$ / C$ style remoting across the segment as fast as auth allows."
+  ],
+  "break_intent": {
+    "name": "fleet03-art-smb-admin-shares",
+    "success_criteria_defender": [
+      "matched truth_hosts",
+      "empty over_merged_hosts"
+    ]
+  },
+  "steps": [
+    {
+      "kind": "recon",
+      "host": "host-a",
+      "dst_ips": [
+        "10.50.0.11",
+        "10.50.0.12",
+        "10.50.0.13",
+        "10.50.0.14",
+        "10.50.0.15",
+        "10.50.0.16"
+      ],
+      "dst_port": 445,
+      "dst_step": 1,
+      "offset_seconds": 0,
+      "technique": "T1021.002"
+    },
+    {
+      "kind": "auth",
+      "host": "host-a",
+      "user": "svc-deploy",
+      "src": "10.50.0.9",
+      "offset_seconds": 10,
+      "technique": "T1078"
+    },
+    {
+      "kind": "auth",
+      "host": "host-b",
+      "user": "svc-deploy",
+      "src": "host-a",
+      "offset_seconds": 14,
+      "technique": "T1021.002"
+    },
+    {
+      "kind": "auth",
+      "host": "host-c",
+      "user": "svc-deploy",
+      "src": "host-b",
+      "offset_seconds": 18,
+      "technique": "T1021.002"
+    },
+    {
+      "kind": "auth",
+      "host": "host-d",
+      "user": "svc-deploy",
+      "src": "host-c",
+      "offset_seconds": 22,
+      "technique": "T1021.002"
+    },
+    {
+      "kind": "auth",
+      "host": "host-d",
+      "user": "svc-deploy",
+      "src": "host-c",
+      "offset_seconds": 25,
+      "technique": "T1021.002"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-d",
+      "dst_ip": "198.51.100.40",
+      "bytes": 30000,
+      "offset_seconds": 35,
+      "technique": "T1041"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-c",
+      "dst_ip": "198.51.100.40",
+      "bytes": 22000,
+      "offset_seconds": 38,
+      "technique": "T1041"
+    }
+  ]
+}

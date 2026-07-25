@@ -1,0 +1,125 @@
+{
+  "campaign_id": "lim04-timing-jitter",
+  "family": "genuine_vuln_breaker",
+  "ood": true,
+  "hosts": [
+    "host-a",
+    "host-b",
+    "host-c",
+    "host-d",
+    "host-e"
+  ],
+  "truth_hosts": [
+    "host-a",
+    "host-b",
+    "host-c"
+  ],
+  "producers": {
+    "host-a": "prod-a",
+    "host-b": "prod-b",
+    "host-c": "prod-c",
+    "host-d": "prod-d",
+    "host-e": "prod-e"
+  },
+  "base_time_utc": "2026-07-25T14:00:00Z",
+  "fleet_origin": "original",
+  "fleet_suite": "limits",
+  "headline": false,
+  "source": {
+    "style": "Fleet-limits breaking-point sketches",
+    "repo": "https://github.com/Siddarthb07/corvex",
+    "techniques": [
+      "T1071.004",
+      "T1078",
+      "T1041"
+    ],
+    "note": "timing jitter evasion"
+  },
+  "narrative": [
+    "Same shape as fleet05/17 with per-stage uniform 0\u20136\u00d7 interval jitter."
+  ],
+  "break_intent": {
+    "name": "timing jitter evasion",
+    "break_criterion": "Jaccard drop vs #5/#17 baseline at matched technique set",
+    "success_criteria_attacker": [
+      "corr_jaccard < reference_jaccard"
+    ]
+  },
+  "steps": [
+    {
+      "kind": "dns",
+      "host": "host-a",
+      "query": "0.c2.evil.test",
+      "offset_seconds": 0.0,
+      "technique": "T1071.004"
+    },
+    {
+      "kind": "dns",
+      "host": "host-a",
+      "query": "1.c2.evil.test",
+      "offset_seconds": 19.18,
+      "technique": "T1071.004"
+    },
+    {
+      "kind": "dns",
+      "host": "host-b",
+      "query": "2.c2.evil.test",
+      "offset_seconds": 19.93,
+      "technique": "T1071.004"
+    },
+    {
+      "kind": "dns",
+      "host": "host-b",
+      "query": "3.c2.evil.test",
+      "offset_seconds": 28.18,
+      "technique": "T1071.004"
+    },
+    {
+      "kind": "dns",
+      "host": "host-c",
+      "query": "4.c2.evil.test",
+      "offset_seconds": 34.88,
+      "technique": "T1071.004"
+    },
+    {
+      "kind": "dns",
+      "host": "host-c",
+      "query": "5.c2.evil.test",
+      "offset_seconds": 56.97,
+      "technique": "T1071.004"
+    },
+    {
+      "kind": "auth",
+      "host": "host-a",
+      "user": "hybrid",
+      "src": "203.0.113.19",
+      "offset_seconds": 87.28,
+      "technique": "T1078"
+    },
+    {
+      "kind": "auth",
+      "host": "host-b",
+      "user": "hybrid",
+      "src": "host-a",
+      "offset_seconds": 114.04,
+      "technique": "T1078"
+    },
+    {
+      "kind": "auth",
+      "host": "host-c",
+      "user": "hybrid",
+      "src": "host-b",
+      "offset_seconds": 119.88,
+      "technique": "T1078"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-c",
+      "dst_ip": "198.51.100.170",
+      "bytes": 14000,
+      "offset_seconds": 157.28,
+      "technique": "T1041"
+    }
+  ],
+  "reference_jaccard": 1.0
+}

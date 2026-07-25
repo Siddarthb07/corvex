@@ -94,7 +94,7 @@ def run_scenario(*, safety_on: bool) -> Dict[str, Any]:
 
     store = CampaignStore(run_dir / "campaigns.jsonl")
     audit = AuditLog(run_dir / "audit.jsonl")
-    corr = Correlator(store, audit, CorrelatorConfig(min_hosts=2))
+    corr = Correlator(store, audit, CorrelatorConfig(min_hosts=2), allow_unverified=True)
     corr.ingest(events)
     camps = store.all()
 

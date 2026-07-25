@@ -1,0 +1,314 @@
+{
+  "campaign_id": "break-sql-continuous-art",
+  "family": "genuine_vuln_breaker",
+  "ood": true,
+  "hosts": ["host-a", "host-b", "host-c", "host-d", "host-e"],
+  "truth_hosts": ["host-a", "host-b", "host-c"],
+  "producers": {
+    "host-a": "prod-a",
+    "host-b": "prod-b",
+    "host-c": "prod-c",
+    "host-d": "prod-d",
+    "host-e": "prod-e"
+  },
+  "base_time_utc": "2026-07-25T12:00:00Z",
+  "break_intent": {
+    "name": "Operation Continuous SQL ART",
+    "target_vulns": [
+      "rapid_retry_auth_burst_overmerge",
+      "shared_sql_svc_account_false_stitch",
+      "sql_port_recon_not_modeled_as_auth",
+      "dns_oob_sqli_blindness",
+      "benign_dba_noise_on_1433",
+      "quarantine_blast_radius_on_innocent_sql_clients"
+    ],
+    "expected_break_points": {
+      "over_merged_hosts": [],
+      "matched_despite_pollution": true,
+      "invisible_to_fusion": ["dns_oob_exfil", "failed_sqli_probe_noise"],
+      "first_compromise_host": "host-a",
+      "first_compromise_offset_seconds": 42,
+      "hosts_saved": ["host-d", "host-e"]
+    },
+    "success_criteria_attacker": [
+      "shared sql-svc on d/e over-merges into APT quarantine blast radius",
+      "DNS OOB dump never appears as micro_exfil stitch"
+    ],
+    "success_criteria_defender": [
+      "campaign equals truth_hosts {a,b,c}",
+      "empty over_merged_hosts",
+      "dry-run isolate proposes only truth hosts (d/e saved)"
+    ]
+  },
+  "source": {
+    "style": "Atomic Red Team–style continuous SQL attack telemetry (adapted, not vendored)",
+    "repo": "https://github.com/redcanaryco/atomic-red-team",
+    "techniques": [
+      "T1190",
+      "T1505.001",
+      "T1078",
+      "T1021",
+      "T1041",
+      "T1071.004",
+      "T1046",
+      "T1110"
+    ],
+    "note": "Repetitive SQLi method spray + stolen SQL cred lateral in a short window. No Atomic scripts or live SQL payloads are executed — event sketches only."
+  },
+  "narrative": [
+    "T+0–40s: Attacker sprays multiple SQLi methods at the public web app on host-a (union, boolean-blind, time-blind, stacked) with rapid retries — mostly failed probes as recon against SQL backends.",
+    "T+42s: First foothold — stacked-query / xp_cmdshell-style success yields interactive auth as sql-web on host-a (first host breached).",
+    "T+50–90s: Stolen sa/sql-svc creds hop host-a→host-b (primary SQL)→host-c (replica/app) with retry bursts.",
+    "T+95–120s: Bulk table dump egress from b/c; parallel DNS OOB channel (invisible to Corvex micro_exfil).",
+    "Same window: Benign DBA on host-d and BI job on host-e authenticate as sql-svc and touch 1433 — shared-account over-merge bait."
+  ],
+  "host_roles": {
+    "host-a": "web-front / SQLi entry (truth compromised)",
+    "host-b": "SQL primary (truth compromised)",
+    "host-c": "SQL replica + app (truth compromised)",
+    "host-d": "DBA workstation (innocent — save target)",
+    "host-e": "BI reporting client (innocent — save target)"
+  },
+  "steps": [
+    {
+      "kind": "recon",
+      "host": "host-a",
+      "dst_ips": ["10.20.1.10", "10.20.1.11", "10.20.1.12", "10.20.1.13"],
+      "dst_port": 1433,
+      "dst_step": 2,
+      "bytes": 80,
+      "offset_seconds": 0,
+      "technique": "T1046",
+      "note": "method=union_select_probe — retry spray start"
+    },
+    {
+      "kind": "recon",
+      "host": "host-a",
+      "dst_ips": ["10.20.1.10", "10.20.1.11"],
+      "dst_port": 1433,
+      "dst_step": 1,
+      "bytes": 64,
+      "offset_seconds": 8,
+      "technique": "T1190",
+      "note": "method=boolean_blind_retry"
+    },
+    {
+      "kind": "recon",
+      "host": "host-a",
+      "dst_ips": ["10.20.1.10", "10.20.1.14", "10.20.1.15"],
+      "dst_port": 1433,
+      "dst_step": 1,
+      "bytes": 90,
+      "offset_seconds": 14,
+      "technique": "T1190",
+      "note": "method=time_based_blind_retry"
+    },
+    {
+      "kind": "recon",
+      "host": "host-a",
+      "dst_ips": ["10.20.1.10", "10.20.1.11", "10.20.1.12", "10.20.1.16", "10.20.1.17", "10.20.1.18"],
+      "dst_port": 1433,
+      "dst_step": 1,
+      "bytes": 72,
+      "offset_seconds": 22,
+      "technique": "T1110",
+      "note": "method=credential_spray_sql_logins"
+    },
+    {
+      "kind": "recon",
+      "host": "host-a",
+      "dst_ips": ["10.20.1.10", "10.20.1.11"],
+      "dst_port": 1433,
+      "dst_step": 1,
+      "bytes": 110,
+      "offset_seconds": 32,
+      "technique": "T1505.001",
+      "note": "method=stacked_query_probe_fail"
+    },
+    {
+      "kind": "auth",
+      "host": "host-a",
+      "user": "sql-web",
+      "src": "203.0.113.88",
+      "offset_seconds": 42,
+      "technique": "T1190",
+      "note": "FIRST_COMPROMISE method=stacked_xp_cmdshell_success"
+    },
+    {
+      "kind": "auth",
+      "host": "host-a",
+      "user": "sql-web",
+      "src": "203.0.113.88",
+      "offset_seconds": 45,
+      "technique": "T1078",
+      "note": "method=retry_persist_session"
+    },
+    {
+      "kind": "auth",
+      "host": "host-b",
+      "user": "sa",
+      "src": "host-a",
+      "offset_seconds": 52,
+      "technique": "T1078",
+      "note": "method=stolen_sa_lateral"
+    },
+    {
+      "kind": "auth",
+      "host": "host-b",
+      "user": "sa",
+      "src": "host-a",
+      "offset_seconds": 55,
+      "technique": "T1021",
+      "note": "method=retry_sa_hop"
+    },
+    {
+      "kind": "auth",
+      "host": "host-c",
+      "user": "sql-svc",
+      "src": "host-b",
+      "offset_seconds": 68,
+      "technique": "T1021",
+      "note": "method=linked_server_hop"
+    },
+    {
+      "kind": "auth",
+      "host": "host-c",
+      "user": "sql-svc",
+      "src": "host-b",
+      "offset_seconds": 72,
+      "technique": "T1078",
+      "note": "method=retry_linked_server"
+    },
+    {
+      "kind": "auth",
+      "host": "host-b",
+      "user": "sql-svc",
+      "src": "host-a",
+      "offset_seconds": 78,
+      "technique": "T1078",
+      "note": "method=svc_account_reuse_burst"
+    },
+    {
+      "kind": "auth",
+      "host": "host-c",
+      "user": "sql-svc",
+      "src": "host-a",
+      "offset_seconds": 82,
+      "technique": "T1078",
+      "note": "method=svc_account_reuse_burst"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-b",
+      "dst_ip": "198.51.100.44",
+      "dst_port": 443,
+      "bytes": 28000,
+      "offset_seconds": 95,
+      "technique": "T1041",
+      "note": "method=bulk_table_dump"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-c",
+      "dst_ip": "198.51.100.44",
+      "dst_port": 443,
+      "bytes": 22000,
+      "offset_seconds": 102,
+      "technique": "T1041",
+      "note": "method=bulk_table_dump_retry"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-b",
+      "dst_ip": "198.51.100.44",
+      "dst_port": 443,
+      "bytes": 15000,
+      "offset_seconds": 108,
+      "technique": "T1041",
+      "note": "method=chunked_dump_retry"
+    },
+    {
+      "kind": "dns",
+      "host": "host-b",
+      "query": "dump1.exfil.attacker.test",
+      "offset_seconds": 110,
+      "technique": "T1071.004",
+      "note": "method=dns_oob_sqli_exfil — invisible"
+    },
+    {
+      "kind": "dns",
+      "host": "host-c",
+      "query": "dump2.exfil.attacker.test",
+      "offset_seconds": 112,
+      "technique": "T1071.004",
+      "note": "method=dns_oob_retry — invisible"
+    },
+    {
+      "kind": "auth",
+      "host": "host-d",
+      "user": "sql-svc",
+      "src": "10.30.0.40",
+      "offset_seconds": 60,
+      "technique": "T1078",
+      "note": "benign DBA — shared sql-svc over-merge bait"
+    },
+    {
+      "kind": "auth",
+      "host": "host-e",
+      "user": "sql-svc",
+      "src": "10.30.0.55",
+      "offset_seconds": 70,
+      "technique": "T1078",
+      "note": "benign BI job — shared sql-svc over-merge bait"
+    },
+    {
+      "kind": "recon",
+      "host": "host-d",
+      "dst_ips": ["10.20.1.10", "10.20.1.11"],
+      "dst_port": 1433,
+      "dst_step": 2,
+      "bytes": 50,
+      "offset_seconds": 65,
+      "technique": "T1046",
+      "note": "benign DBA SSMS browse"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-e",
+      "dst_ip": "104.18.32.7",
+      "dst_port": 443,
+      "bytes": 6000,
+      "offset_seconds": 88,
+      "technique": "T1105",
+      "note": "benign CDN / PowerBI refresh"
+    },
+    {
+      "kind": "auth",
+      "host": "host-a",
+      "user": "sql-web",
+      "src": "203.0.113.88",
+      "offset_seconds": 120,
+      "technique": "T1078",
+      "note": "method=late_retry_persist"
+    },
+    {
+      "kind": "auth",
+      "host": "host-b",
+      "user": "sa",
+      "src": "host-a",
+      "offset_seconds": 125,
+      "technique": "T1021",
+      "note": "method=late_retry_lateral"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-c",
+      "dst_ip": "198.51.100.44",
+      "dst_port": 443,
+      "bytes": 18000,
+      "offset_seconds": 130,
+      "technique": "T1041",
+      "note": "method=final_dump_burst"
+    }
+  ]
+}

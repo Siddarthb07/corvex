@@ -110,7 +110,7 @@ def test_byo_windows_wedge(tmp_path: Path, monkeypatch):
             )
         )
     store = CampaignStore(tmp_path / "c.jsonl")
-    Correlator(store, AuditLog(tmp_path / "a.jsonl")).ingest(events)
+    Correlator(store, AuditLog(tmp_path / "a.jsonl"), enrollment=enrollment).ingest(events)
     camps = store.all()
     assert len(camps) >= 1
     assert len(camps[0].host_ids) >= 2

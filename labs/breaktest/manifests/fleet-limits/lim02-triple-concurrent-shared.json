@@ -1,0 +1,171 @@
+{
+  "campaign_id": "lim02-triple-concurrent-shared",
+  "family": "genuine_vuln_breaker",
+  "ood": true,
+  "hosts": [
+    "host-a",
+    "host-b",
+    "host-c",
+    "host-d",
+    "host-e",
+    "host-f"
+  ],
+  "truth_hosts": [
+    "host-a",
+    "host-b",
+    "host-c",
+    "host-d",
+    "host-e",
+    "host-f"
+  ],
+  "producers": {
+    "host-a": "prod-a",
+    "host-b": "prod-b",
+    "host-c": "prod-c",
+    "host-d": "prod-d",
+    "host-e": "prod-e",
+    "host-f": "prod-f"
+  },
+  "base_time_utc": "2026-07-25T14:00:00Z",
+  "fleet_origin": "original",
+  "fleet_suite": "limits",
+  "headline": false,
+  "source": {
+    "style": "Fleet-limits breaking-point sketches",
+    "repo": "https://github.com/Siddarthb07/corvex",
+    "techniques": [
+      "T1003.001",
+      "T1550.002",
+      "T1110.003",
+      "T1486",
+      "T1078",
+      "T1041"
+    ],
+    "note": "triple concurrent collapse"
+  },
+  "narrative": [
+    "Three concurrent incidents: PtH a-b-c, spray c-d, ransom d-e-f. Shared nodes must not collapse into one blob."
+  ],
+  "break_intent": {
+    "name": "triple concurrent collapse",
+    "break_criterion": "any two of the three campaigns collapse into a single reported campaign",
+    "success_criteria_attacker": [
+      "two truth campaigns covered by one predicted campaign"
+    ]
+  },
+  "steps": [
+    {
+      "kind": "auth",
+      "host": "host-a",
+      "user": "Administrator",
+      "src": "203.0.113.10",
+      "offset_seconds": 0,
+      "technique": "T1003.001"
+    },
+    {
+      "kind": "auth",
+      "host": "host-b",
+      "user": "Administrator",
+      "src": "host-a",
+      "offset_seconds": 8,
+      "technique": "T1550.002"
+    },
+    {
+      "kind": "auth",
+      "host": "host-c",
+      "user": "Administrator",
+      "src": "host-b",
+      "offset_seconds": 16,
+      "technique": "T1550.002"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-c",
+      "dst_ip": "198.51.100.20",
+      "bytes": 22000,
+      "offset_seconds": 28,
+      "technique": "T1041"
+    },
+    {
+      "kind": "auth",
+      "host": "host-c",
+      "user": "spray-hit",
+      "src": "203.0.113.99",
+      "offset_seconds": 12,
+      "technique": "T1110.003"
+    },
+    {
+      "kind": "auth",
+      "host": "host-d",
+      "user": "spray-hit",
+      "src": "host-c",
+      "offset_seconds": 22,
+      "technique": "T1078"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-d",
+      "dst_ip": "198.51.100.60",
+      "bytes": 18000,
+      "offset_seconds": 35,
+      "technique": "T1041"
+    },
+    {
+      "kind": "auth",
+      "host": "host-d",
+      "user": "ransom-op",
+      "src": "203.0.113.77",
+      "offset_seconds": 18,
+      "technique": "T1486"
+    },
+    {
+      "kind": "auth",
+      "host": "host-e",
+      "user": "ransom-op",
+      "src": "host-d",
+      "offset_seconds": 30,
+      "technique": "T1486"
+    },
+    {
+      "kind": "auth",
+      "host": "host-f",
+      "user": "ransom-op",
+      "src": "host-e",
+      "offset_seconds": 42,
+      "technique": "T1486"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-f",
+      "dst_ip": "198.51.100.100",
+      "bytes": 25000,
+      "offset_seconds": 55,
+      "technique": "T1041"
+    }
+  ],
+  "truth_campaigns": [
+    {
+      "id": "camp1-pth",
+      "hosts": [
+        "host-a",
+        "host-b",
+        "host-c"
+      ]
+    },
+    {
+      "id": "camp2-spray",
+      "hosts": [
+        "host-c",
+        "host-d"
+      ]
+    },
+    {
+      "id": "camp3-ransom",
+      "hosts": [
+        "host-d",
+        "host-e",
+        "host-f"
+      ]
+    }
+  ]
+}

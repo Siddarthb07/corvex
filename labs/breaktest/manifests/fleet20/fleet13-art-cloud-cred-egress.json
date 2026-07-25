@@ -1,0 +1,79 @@
+{
+  "campaign_id": "fleet13-art-cloud-cred-egress",
+  "family": "attack_repo",
+  "ood": true,
+  "hosts": [
+    "host-a",
+    "host-b",
+    "host-c",
+    "host-d",
+    "host-e"
+  ],
+  "truth_hosts": [
+    "host-b",
+    "host-c"
+  ],
+  "producers": {
+    "host-a": "prod-a",
+    "host-b": "prod-b",
+    "host-c": "prod-c",
+    "host-d": "prod-d",
+    "host-e": "prod-e"
+  },
+  "base_time_utc": "2026-07-25T14:00:00Z",
+  "fleet_origin": "github_art",
+  "source": {
+    "style": "Black-box fleet \u2014 ATT&CK/Atomic-style telemetry sketches",
+    "repo": "https://github.com/redcanaryco/atomic-red-team",
+    "techniques": [
+      "T1552.005",
+      "T1078",
+      "T1041"
+    ],
+    "note": "Atomic cloud credential access style egress + pivot."
+  },
+  "narrative": [
+    "Grab cloud tokens, pivot, exfil to attacker bucket."
+  ],
+  "break_intent": {
+    "name": "fleet13-art-cloud-cred-egress",
+    "success_criteria_defender": [
+      "matched truth_hosts",
+      "empty over_merged_hosts"
+    ]
+  },
+  "steps": [
+    {
+      "kind": "auth",
+      "host": "host-b",
+      "user": "cloud-role",
+      "src": "203.0.113.14",
+      "offset_seconds": 0,
+      "technique": "T1552.005"
+    },
+    {
+      "kind": "auth",
+      "host": "host-c",
+      "user": "cloud-role",
+      "src": "host-b",
+      "offset_seconds": 12,
+      "technique": "T1078"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-c",
+      "dst_ip": "198.51.100.130",
+      "bytes": 28000,
+      "offset_seconds": 25,
+      "technique": "T1041"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-b",
+      "dst_ip": "198.51.100.130",
+      "bytes": 19000,
+      "offset_seconds": 30,
+      "technique": "T1041"
+    }
+  ]
+}

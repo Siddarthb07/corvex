@@ -1,0 +1,130 @@
+{
+  "campaign_id": "fleet04-art-recon-exfil",
+  "family": "attack_repo",
+  "ood": true,
+  "hosts": [
+    "host-a",
+    "host-b",
+    "host-c",
+    "host-d",
+    "host-e"
+  ],
+  "truth_hosts": [
+    "host-b",
+    "host-c"
+  ],
+  "producers": {
+    "host-a": "prod-a",
+    "host-b": "prod-b",
+    "host-c": "prod-c",
+    "host-d": "prod-d",
+    "host-e": "prod-e"
+  },
+  "base_time_utc": "2026-07-25T14:00:00Z",
+  "fleet_origin": "github_art",
+  "source": {
+    "style": "Black-box fleet \u2014 ATT&CK/Atomic-style telemetry sketches",
+    "repo": "https://github.com/redcanaryco/atomic-red-team",
+    "techniques": [
+      "T1046",
+      "T1048",
+      "T1078"
+    ],
+    "note": "Atomic network service discovery then alternate protocol exfil."
+  },
+  "narrative": [
+    "Map the segment hard, then push loot over an alternate channel."
+  ],
+  "break_intent": {
+    "name": "fleet04-art-recon-exfil",
+    "success_criteria_defender": [
+      "matched truth_hosts",
+      "empty over_merged_hosts"
+    ]
+  },
+  "steps": [
+    {
+      "kind": "recon",
+      "host": "host-b",
+      "dst_ips": [
+        "10.60.1.1",
+        "10.60.2.1",
+        "10.60.3.1",
+        "10.60.4.1",
+        "10.60.5.1",
+        "10.60.6.1",
+        "10.60.7.1",
+        "10.60.8.1",
+        "10.60.9.1",
+        "10.60.10.1",
+        "10.60.11.1"
+      ],
+      "dst_port": 22,
+      "dst_step": 1,
+      "offset_seconds": 0,
+      "technique": "T1046"
+    },
+    {
+      "kind": "recon",
+      "host": "host-c",
+      "dst_ips": [
+        "10.60.1.2",
+        "10.60.2.2",
+        "10.60.3.2",
+        "10.60.4.2",
+        "10.60.5.2",
+        "10.60.6.2",
+        "10.60.7.2",
+        "10.60.8.2",
+        "10.60.9.2"
+      ],
+      "dst_port": 22,
+      "dst_step": 1,
+      "offset_seconds": 15,
+      "technique": "T1046"
+    },
+    {
+      "kind": "auth",
+      "host": "host-b",
+      "user": "scanbot",
+      "src": "203.0.113.70",
+      "offset_seconds": 30,
+      "technique": "T1078"
+    },
+    {
+      "kind": "auth",
+      "host": "host-c",
+      "user": "scanbot",
+      "src": "host-b",
+      "offset_seconds": 36,
+      "technique": "T1078"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-c",
+      "dst_ip": "198.51.100.50",
+      "dst_port": 8443,
+      "bytes": 26000,
+      "offset_seconds": 50,
+      "technique": "T1048"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-b",
+      "dst_ip": "198.51.100.50",
+      "dst_port": 8443,
+      "bytes": 19000,
+      "offset_seconds": 55,
+      "technique": "T1048"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-c",
+      "dst_ip": "198.51.100.50",
+      "dst_port": 8443,
+      "bytes": 15000,
+      "offset_seconds": 60,
+      "technique": "T1048"
+    }
+  ]
+}

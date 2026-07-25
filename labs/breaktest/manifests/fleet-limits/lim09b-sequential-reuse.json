@@ -1,0 +1,130 @@
+{
+  "campaign_id": "lim09b-sequential-reuse",
+  "family": "genuine_vuln_breaker",
+  "ood": true,
+  "hosts": [
+    "host-a",
+    "host-b",
+    "host-c",
+    "host-d",
+    "host-e"
+  ],
+  "truth_hosts": [
+    "host-a",
+    "host-b",
+    "host-c"
+  ],
+  "producers": {
+    "host-a": "prod-a",
+    "host-b": "prod-b",
+    "host-c": "prod-c",
+    "host-d": "prod-d",
+    "host-e": "prod-e"
+  },
+  "base_time_utc": "2026-07-25T14:00:00Z",
+  "fleet_origin": "original",
+  "fleet_suite": "limits",
+  "headline": true,
+  "source": {
+    "style": "Fleet-limits breaking-point sketches",
+    "repo": "https://github.com/Siddarthb07/corvex",
+    "techniques": [
+      "T1071.004",
+      "T1053.005",
+      "T1078",
+      "T1041"
+    ],
+    "note": "sequential reuse"
+  },
+  "narrative": [
+    "DNS C2 shape then scheduled-task shape on same a/b/c after 10 min quiet."
+  ],
+  "break_intent": {
+    "name": "sequential reuse",
+    "break_criterion": "incident1 and incident2 reported as a single continuous campaign",
+    "success_criteria_attacker": [
+      "two incidents collapsed into one campaign"
+    ]
+  },
+  "steps": [
+    {
+      "kind": "dns",
+      "host": "host-a",
+      "query": "a1.c2.evil.test",
+      "offset_seconds": 0,
+      "technique": "T1071.004"
+    },
+    {
+      "kind": "dns",
+      "host": "host-b",
+      "query": "b1.c2.evil.test",
+      "offset_seconds": 10,
+      "technique": "T1071.004"
+    },
+    {
+      "kind": "dns",
+      "host": "host-c",
+      "query": "c1.c2.evil.test",
+      "offset_seconds": 20,
+      "technique": "T1071.004"
+    },
+    {
+      "kind": "auth",
+      "host": "host-a",
+      "user": "dns-only-a",
+      "src": "203.0.113.1",
+      "offset_seconds": 30,
+      "technique": "T1078"
+    },
+    {
+      "kind": "auth",
+      "host": "host-a",
+      "user": "tasksvc",
+      "src": "203.0.113.12",
+      "offset_seconds": 630,
+      "technique": "T1053.005"
+    },
+    {
+      "kind": "auth",
+      "host": "host-b",
+      "user": "tasksvc",
+      "src": "host-a",
+      "offset_seconds": 640,
+      "technique": "T1078"
+    },
+    {
+      "kind": "auth",
+      "host": "host-c",
+      "user": "tasksvc",
+      "src": "host-b",
+      "offset_seconds": 650,
+      "technique": "T1078"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-c",
+      "dst_ip": "198.51.100.110",
+      "bytes": 17000,
+      "offset_seconds": 665,
+      "technique": "T1041"
+    }
+  ],
+  "truth_campaigns": [
+    {
+      "id": "inc1-dns",
+      "hosts": [
+        "host-a",
+        "host-b",
+        "host-c"
+      ]
+    },
+    {
+      "id": "inc2-task",
+      "hosts": [
+        "host-a",
+        "host-b",
+        "host-c"
+      ]
+    }
+  ]
+}

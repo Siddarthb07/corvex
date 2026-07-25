@@ -103,9 +103,40 @@ def detect_micro_exfil(window: Sequence[Mapping[str, Any]]) -> List[Signal]:
     return out
 
 
+def detect_dns_beacon(window: Sequence[Mapping[str, Any]]) -> List[Signal]:
+    """Same DNS apex queried from multiple hosts (C2 / OOB channel)."""
+    apex_hosts: Dict[str, set] = {}
+    for ev in _events(window):
+        if ev.get("payload_type") != "dns":
+            continue
+        query = str(ev.get("payload", {}).get("query") or "")
+        parts = [p for p in query.lower().rstrip(".").split(".") if p]
+        if len(parts) >= 3:
+            apex = ".".join(parts[1:])
+        else:
+            apex = query.lower().rstrip(".")
+        if not apex:
+            continue
+        apex_hosts.setdefault(apex, set()).add(str(ev["host_id"]))
+    out: List[Signal] = []
+    for apex, hosts in apex_hosts.items():
+        if len(hosts) >= 2:
+            for host in hosts:
+                out.append(
+                    Signal(
+                        kind="dns_beacon",
+                        host_id=host,
+                        weight=min(1.0, len(hosts) / 3.0),
+                        attrs={"apex": apex, "host_count": len(hosts)},
+                    )
+                )
+    return out
+
+
 def run_all(window: Sequence[Mapping[str, Any]]) -> List[Signal]:
     signals: List[Signal] = []
     signals.extend(detect_recon_fanout(window))
     signals.extend(detect_lateral_auth(window))
     signals.extend(detect_micro_exfil(window))
+    signals.extend(detect_dns_beacon(window))
     return signals

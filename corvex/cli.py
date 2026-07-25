@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import secrets
 import shutil
 import tempfile
 import time
@@ -231,7 +232,7 @@ def replay(
     store = CampaignStore(out_dir / "campaigns.jsonl")
     audit = AuditLog(out_dir / "audit.jsonl")
     cfg = CorrelatorConfig(cross_host_enabled=not ablation_no_cross)
-    corr = Correlator(store, audit, cfg, detector_only=detector_only)
+    corr = Correlator(store, audit, cfg, detector_only=detector_only, enrollment=enrollment)
     t0 = time.perf_counter()
     corr.ingest(events)
     ttu = time.perf_counter() - t0
@@ -373,13 +374,107 @@ def eval_recon_cmd(
 def claim_gates_cmd(
     report: Path = typer.Option(Path("reports/claim_gates.json")),
 ) -> None:
-    """Evaluate P3 claim gates — claim_allowed stays false until all pass."""
+    """Evaluate claim gates — claim_allowed stays false until integrity + evidence pass."""
     from corvex.eval.claim_gates import evaluate_claim_gates, write_claim_gates
 
     result = evaluate_claim_gates(_repo_root())
     write_claim_gates(result, Path(report))
     typer.echo(json.dumps(result, indent=2))
     raise typer.Exit(0 if result.get("claim_allowed") else 1)
+
+
+@app.command("sign-stranger-attestation")
+def sign_stranger_attestation_cmd(
+    path: Path = typer.Option(
+        Path("reports/stranger_dry_run.json"),
+        help="Stranger attestation JSON to sign",
+    ),
+    ed25519: bool = typer.Option(
+        True,
+        "--ed25519/--hmac",
+        help="Ed25519 stranger self-sign (default) vs legacy author HMAC",
+    ),
+    key: Path = typer.Option(
+        Path("reports/.stranger_ed25519_private.pem"),
+        help="Ed25519 private key PEM (gitignored)",
+    ),
+    hmac_key_out: Path = typer.Option(
+        Path("reports/.claim_attestation_key"),
+        help="Legacy HMAC key file (does not unlock claim_allowed)",
+    ),
+) -> None:
+    """Sign stranger_dry_run.json. Prefer Ed25519 — stranger holds the private key."""
+    from corvex.eval.attestation_crypto import (
+        generate_stranger_keypair,
+        load_attestation_hmac_secret,
+        load_stranger_private_key,
+        sign_attestation_ed25519,
+        sign_attestation_hmac,
+    )
+
+    root = _repo_root()
+    path = Path(path)
+    if not path.is_file():
+        raise typer.Exit(f"missing attestation file: {path}")
+    data = json.loads(path.read_text(encoding="utf-8"))
+    if ed25519:
+        key = Path(key)
+        if not key.is_file():
+            _, pub = generate_stranger_keypair(key)
+            typer.echo(f"created stranger Ed25519 key: {key} (do not commit) pub={pub[:16]}…")
+        priv = load_stranger_private_key(key)
+        signed = sign_attestation_ed25519(data, priv)
+        path.write_text(json.dumps(signed, indent=2) + "\n", encoding="utf-8")
+        typer.echo(
+            json.dumps(
+                {
+                    "signed": True,
+                    "alg": "ed25519",
+                    "custody": "stranger_private_key",
+                    "path": str(path),
+                    "operator": signed.get("operator"),
+                }
+            )
+        )
+        return
+    secret = load_attestation_hmac_secret(root)
+    if secret is None:
+        hmac_key_out = Path(hmac_key_out)
+        hmac_key_out.parent.mkdir(parents=True, exist_ok=True)
+        hmac_key_out.write_text(secrets.token_urlsafe(32), encoding="utf-8")
+        try:
+            os.chmod(hmac_key_out, 0o600)
+        except OSError:
+            pass
+        secret = hmac_key_out.read_text(encoding="utf-8").strip().encode("utf-8")
+        typer.echo(f"created legacy HMAC key: {hmac_key_out} (advisory only)")
+    signed = sign_attestation_hmac(data, secret)
+    path.write_text(json.dumps(signed, indent=2) + "\n", encoding="utf-8")
+    typer.echo(
+        json.dumps(
+            {
+                "signed": True,
+                "alg": "hmac-sha256",
+                "custody": "author_key",
+                "unlocks_claim": False,
+                "path": str(path),
+            }
+        )
+    )
+
+
+@app.command("stranger-keygen")
+def stranger_keygen_cmd(
+    key: Path = typer.Option(Path("reports/.stranger_ed25519_private.pem")),
+) -> None:
+    """Generate Ed25519 private key for the stranger operator (gitignored)."""
+    from corvex.eval.attestation_crypto import generate_stranger_keypair
+
+    key = Path(key)
+    if key.exists():
+        raise typer.Exit(f"refusing to overwrite existing key: {key}")
+    _, pub = generate_stranger_keypair(key)
+    typer.echo(json.dumps({"created": str(key), "attestation_pubkey": pub}))
 
 
 @app.command("score-non-author")
@@ -428,8 +523,8 @@ def score_non_author_cmd(
                 )
             )
         benign = gt.get("family") == "benign"
-        pred_c, ttu_c = _predict_from_events(signed, "raw")
-        pred_d, ttu_d = _predict_from_events(signed, "detector_only")
+        pred_c, ttu_c = _predict_from_events(signed, "raw", enrollment=enrollment)
+        pred_d, ttu_d = _predict_from_events(signed, "detector_only", enrollment=enrollment)
         corr_scores.append(score_pack(pred_c, gt, ttu_seconds=ttu_c, benign=benign))
         det_scores.append(score_pack(pred_d, gt, ttu_seconds=ttu_d, benign=benign))
         pack_rows.append(path.name)
@@ -485,7 +580,7 @@ def correlate_byo_cmd(
     store = CampaignStore(out_dir / "campaigns.jsonl")
     audit = AuditLog(out_dir / "audit.jsonl")
     t0 = time.perf_counter()
-    Correlator(store, audit).ingest(events)
+    Correlator(store, audit, enrollment=enrollment).ingest(events)
     ttu = time.perf_counter() - t0
     timeline = {
         "pack": str(path),
@@ -610,7 +705,7 @@ def ingest_byo_cmd(
     typer.echo(f"ingested {n} events into {out_bus}")
 
 
-def _predict_from_events(events, mode: str) -> tuple:
+def _predict_from_events(events, mode: str, enrollment=None) -> tuple:
     from corvex.envelope import EventEnvelope
 
     dicts = [e.to_dict() if isinstance(e, EventEnvelope) else e for e in events]
@@ -622,19 +717,21 @@ def _predict_from_events(events, mode: str) -> tuple:
     elif mode == "detector_only":
         store = CampaignStore(Path(tempfile.mkdtemp()) / "c.jsonl")
         audit = AuditLog(Path(tempfile.mkdtemp()) / "a.jsonl")
-        corr = Correlator(store, audit, detector_only=True)
+        corr = Correlator(store, audit, detector_only=True, enrollment=enrollment)
         corr.ingest(events)
         camps = store.all()
     elif mode == "ablate":
         store = CampaignStore(Path(tempfile.mkdtemp()) / "c.jsonl")
         audit = AuditLog(Path(tempfile.mkdtemp()) / "a.jsonl")
-        corr = Correlator(store, audit, CorrelatorConfig(cross_host_enabled=False))
+        corr = Correlator(
+            store, audit, CorrelatorConfig(cross_host_enabled=False), enrollment=enrollment
+        )
         corr.ingest(events)
         camps = store.all()
     else:
         store = CampaignStore(Path(tempfile.mkdtemp()) / "c.jsonl")
         audit = AuditLog(Path(tempfile.mkdtemp()) / "a.jsonl")
-        corr = Correlator(store, audit)
+        corr = Correlator(store, audit, enrollment=enrollment)
         corr.ingest(events)
         camps = store.all()
     ttu = time.perf_counter() - t0
@@ -693,6 +790,7 @@ def eval_cmd(
     pack_meta: List[Dict[str, Any]] = []
     for pack in packs:
         events, gt = load_pack_events(pack)
+        events = resign_events(events, enrollment)
         benign = gt.get("family") == "benign"
         pack_meta.append(
             {
@@ -702,7 +800,9 @@ def eval_cmd(
             }
         )
         for mode in modes:
-            pred, ttu = _predict_from_events(events, mode_alias[mode])
+            pred, ttu = _predict_from_events(
+                events, mode_alias[mode], enrollment=enrollment
+            )
             per_mode[mode].append(score_pack(pred, gt, ttu_seconds=ttu, benign=benign))
 
     metrics = {m: aggregate_scores(per_mode[m]) for m in modes}
@@ -1283,8 +1383,24 @@ def build_breaktest_cmd(
     from corvex.envelope import EventEnvelope, sign_envelope
     from corvex.eval.break_points import analyze_break_points, write_break_report
 
-    enrollment = ensure_lab_enrollment()
     man = load_manifest(manifest)
+    # Enroll every host/producer the manifest (and emit_host aliases) may need.
+    wanted = dict(DEMO_HOSTS)
+    for h in man.get("hosts") or []:
+        wanted[str(h)] = str((man.get("producers") or {}).get(h) or wanted.get(h) or f"prod-{str(h)[-1]}")
+    for h, p in (man.get("producers") or {}).items():
+        wanted[str(h)] = str(p)
+    for step in man.get("steps") or []:
+        emit = step.get("emit_host") or step.get("host_id_override")
+        if emit:
+            logical = str(step.get("host") or emit)
+            wanted[str(emit)] = str(
+                (man.get("producers") or {}).get(emit)
+                or (man.get("producers") or {}).get(logical)
+                or wanted.get(logical)
+                or f"prod-{str(emit)[-1]}"
+            )
+    enrollment = ensure_lab_enrollment(hosts=wanted)
     raw_events, gt = adapt_attack_manifest(man)
     signed = []
     for rec in raw_events:
@@ -1305,9 +1421,9 @@ def build_breaktest_cmd(
 
     payload: Dict[str, Any] = {"pack": str(out), "hosts": gt.get("host_ids"), "events": len(signed)}
     if report is not None:
-        corr_camps, _ = _predict_from_events(signed, "correlator")
-        det_camps, _ = _predict_from_events(signed, "detector_only")
-        b1_camps, _ = _predict_from_events(signed, "b1")
+        corr_camps, _ = _predict_from_events(signed, "correlator", enrollment=enrollment)
+        det_camps, _ = _predict_from_events(signed, "detector_only", enrollment=enrollment)
+        b1_camps, _ = _predict_from_events(signed, "b1", enrollment=enrollment)
         br = analyze_break_points(
             truth=gt,
             correlator=corr_camps,

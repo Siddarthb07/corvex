@@ -1,0 +1,110 @@
+{
+  "campaign_id": "fleet05-art-dns-c2-only",
+  "family": "genuine_vuln_breaker",
+  "ood": true,
+  "hosts": [
+    "host-a",
+    "host-b",
+    "host-c",
+    "host-d",
+    "host-e"
+  ],
+  "truth_hosts": [
+    "host-a",
+    "host-b",
+    "host-c"
+  ],
+  "producers": {
+    "host-a": "prod-a",
+    "host-b": "prod-b",
+    "host-c": "prod-c",
+    "host-d": "prod-d",
+    "host-e": "prod-e"
+  },
+  "base_time_utc": "2026-07-25T14:00:00Z",
+  "fleet_origin": "github_art",
+  "source": {
+    "style": "Black-box fleet \u2014 ATT&CK/Atomic-style telemetry sketches",
+    "repo": "https://github.com/redcanaryco/atomic-red-team",
+    "techniques": [
+      "T1071.004",
+      "T1078"
+    ],
+    "note": "Atomic application-layer DNS C2 \u2014 no auth/exfil detectors should fire on DNS alone."
+  },
+  "narrative": [
+    "Beacon and exfil exclusively over DNS. Avoid classic ports."
+  ],
+  "break_intent": {
+    "name": "DNS-only fleet",
+    "expected_break_points": {
+      "both_missed": true,
+      "invisible_to_fusion": [
+        "dns"
+      ]
+    },
+    "success_criteria_attacker": [
+      "correlator misses truth hosts"
+    ]
+  },
+  "steps": [
+    {
+      "kind": "dns",
+      "host": "host-a",
+      "query": "a1.c2.evil.test",
+      "offset_seconds": 0,
+      "technique": "T1071.004"
+    },
+    {
+      "kind": "dns",
+      "host": "host-a",
+      "query": "a2.c2.evil.test",
+      "offset_seconds": 5,
+      "technique": "T1071.004"
+    },
+    {
+      "kind": "dns",
+      "host": "host-b",
+      "query": "b1.c2.evil.test",
+      "offset_seconds": 10,
+      "technique": "T1071.004"
+    },
+    {
+      "kind": "dns",
+      "host": "host-b",
+      "query": "b2.c2.evil.test",
+      "offset_seconds": 15,
+      "technique": "T1071.004"
+    },
+    {
+      "kind": "dns",
+      "host": "host-c",
+      "query": "c1.c2.evil.test",
+      "offset_seconds": 20,
+      "technique": "T1071.004"
+    },
+    {
+      "kind": "dns",
+      "host": "host-c",
+      "query": "payload.c2.evil.test",
+      "offset_seconds": 25,
+      "technique": "T1071.004"
+    },
+    {
+      "kind": "auth",
+      "host": "host-a",
+      "user": "dns-only-a",
+      "src": "203.0.113.1",
+      "offset_seconds": 30,
+      "technique": "T1078"
+    },
+    {
+      "kind": "auth",
+      "host": "host-b",
+      "user": "dns-only-b",
+      "src": "203.0.113.2",
+      "offset_seconds": 35,
+      "technique": "T1078"
+    }
+  ]
+}

@@ -1,0 +1,88 @@
+{
+  "campaign_id": "fleet11-art-scheduled-task",
+  "family": "attack_repo",
+  "ood": true,
+  "hosts": [
+    "host-a",
+    "host-b",
+    "host-c",
+    "host-d",
+    "host-e"
+  ],
+  "truth_hosts": [
+    "host-a",
+    "host-b",
+    "host-c"
+  ],
+  "producers": {
+    "host-a": "prod-a",
+    "host-b": "prod-b",
+    "host-c": "prod-c",
+    "host-d": "prod-d",
+    "host-e": "prod-e"
+  },
+  "base_time_utc": "2026-07-25T14:00:00Z",
+  "fleet_origin": "github_art",
+  "source": {
+    "style": "Black-box fleet \u2014 ATT&CK/Atomic-style telemetry sketches",
+    "repo": "https://github.com/redcanaryco/atomic-red-team",
+    "techniques": [
+      "T1053.005",
+      "T1078",
+      "T1041"
+    ],
+    "note": "Atomic scheduled task persistence then hop."
+  },
+  "narrative": [
+    "Plant tasks, reuse the service identity, pull data."
+  ],
+  "break_intent": {
+    "name": "fleet11-art-scheduled-task",
+    "success_criteria_defender": [
+      "matched truth_hosts",
+      "empty over_merged_hosts"
+    ]
+  },
+  "steps": [
+    {
+      "kind": "auth",
+      "host": "host-a",
+      "user": "tasksvc",
+      "src": "203.0.113.12",
+      "offset_seconds": 0,
+      "technique": "T1053.005"
+    },
+    {
+      "kind": "auth",
+      "host": "host-b",
+      "user": "tasksvc",
+      "src": "host-a",
+      "offset_seconds": 10,
+      "technique": "T1078"
+    },
+    {
+      "kind": "auth",
+      "host": "host-c",
+      "user": "tasksvc",
+      "src": "host-b",
+      "offset_seconds": 20,
+      "technique": "T1078"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-c",
+      "dst_ip": "198.51.100.110",
+      "bytes": 17000,
+      "offset_seconds": 35,
+      "technique": "T1041"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-b",
+      "dst_ip": "198.51.100.110",
+      "bytes": 14000,
+      "offset_seconds": 40,
+      "technique": "T1041"
+    }
+  ]
+}

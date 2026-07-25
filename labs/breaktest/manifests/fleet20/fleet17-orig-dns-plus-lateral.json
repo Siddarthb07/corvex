@@ -1,0 +1,101 @@
+{
+  "campaign_id": "fleet17-orig-dns-plus-lateral",
+  "family": "attack_repo",
+  "ood": true,
+  "hosts": [
+    "host-a",
+    "host-b",
+    "host-c",
+    "host-d",
+    "host-e"
+  ],
+  "truth_hosts": [
+    "host-a",
+    "host-b",
+    "host-c"
+  ],
+  "producers": {
+    "host-a": "prod-a",
+    "host-b": "prod-b",
+    "host-c": "prod-c",
+    "host-d": "prod-d",
+    "host-e": "prod-e"
+  },
+  "base_time_utc": "2026-07-25T14:00:00Z",
+  "fleet_origin": "original",
+  "source": {
+    "style": "Black-box fleet \u2014 ATT&CK/Atomic-style telemetry sketches",
+    "repo": "https://github.com/Siddarthb07/corvex",
+    "techniques": [
+      "T1071.004",
+      "T1078",
+      "T1041"
+    ],
+    "note": "Original: DNS beacon plus short lateral \u2014 should fuse."
+  },
+  "narrative": [
+    "Beacon over DNS while hopping with a real account."
+  ],
+  "break_intent": {
+    "name": "fleet17-orig-dns-plus-lateral",
+    "success_criteria_defender": [
+      "matched truth_hosts",
+      "empty over_merged_hosts"
+    ]
+  },
+  "steps": [
+    {
+      "kind": "dns",
+      "host": "host-a",
+      "query": "1.beacon.evil.test",
+      "offset_seconds": 0,
+      "technique": "T1071.004"
+    },
+    {
+      "kind": "dns",
+      "host": "host-b",
+      "query": "2.beacon.evil.test",
+      "offset_seconds": 5,
+      "technique": "T1071.004"
+    },
+    {
+      "kind": "auth",
+      "host": "host-a",
+      "user": "hybrid",
+      "src": "203.0.113.19",
+      "offset_seconds": 10,
+      "technique": "T1078"
+    },
+    {
+      "kind": "auth",
+      "host": "host-b",
+      "user": "hybrid",
+      "src": "host-a",
+      "offset_seconds": 15,
+      "technique": "T1078"
+    },
+    {
+      "kind": "auth",
+      "host": "host-c",
+      "user": "hybrid",
+      "src": "host-b",
+      "offset_seconds": 20,
+      "technique": "T1078"
+    },
+    {
+      "kind": "dns",
+      "host": "host-c",
+      "query": "3.beacon.evil.test",
+      "offset_seconds": 25,
+      "technique": "T1071.004"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-c",
+      "dst_ip": "198.51.100.170",
+      "bytes": 14000,
+      "offset_seconds": 35,
+      "technique": "T1041"
+    }
+  ]
+}

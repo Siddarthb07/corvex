@@ -422,20 +422,41 @@ def collect_snapshot(root: Path) -> Dict[str, Any]:
 }
 
 
-def render_html(snap: Dict[str, Any]) -> str:
-    """Run-feed shell. Paint from embedded snapshot + /api/snapshot poll."""
-    boot = json.dumps(snap, ensure_ascii=False).replace("<", "\\u003c")
+def render_html(
+    snap: Dict[str, Any],
+    *,
+    embed_snapshot: bool = False,
+) -> str:
+    """Run-feed shell.
+
+    Default: empty boot — browser must fetch ``/api/snapshot`` (token-gated when
+    serving on LAN). Embedding the full snap in HTML bypasses that gate.
+    """
+    if embed_snapshot:
+        boot = json.dumps(snap, ensure_ascii=False).replace("<", "\\u003c")
+    else:
+        boot = "null"
     ver = str((snap.get("product") or {}).get("version") or snap.get("version") or "")
     template = Path(__file__).resolve().parent / "dash_static" / "monitor.html"
     html = template.read_text(encoding="utf-8")
     return html.replace("__BOOT__", boot).replace("__VER__", ver)
 
 
-
-def write_dashboard(root: Path, out: Optional[Path] = None) -> Path:
+def write_dashboard(
+    root: Path,
+    out: Optional[Path] = None,
+    *,
+    embed_snapshot: bool = False,
+) -> Path:
     snap = collect_snapshot(root)
     out = Path(out or (Path(root) / "reports" / "dashboard" / "index.html"))
     out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(render_html(snap), encoding="utf-8")
-    (out.parent / "snapshot.json").write_text(json.dumps(snap, indent=2), encoding="utf-8")
+    out.write_text(render_html(snap, embed_snapshot=embed_snapshot), encoding="utf-8")
+    # Never write snapshot.json next to the served index — that was an auth bypass.
+    stale = out.parent / "snapshot.json"
+    if stale.exists():
+        try:
+            stale.unlink()
+        except OSError:
+            pass
     return out

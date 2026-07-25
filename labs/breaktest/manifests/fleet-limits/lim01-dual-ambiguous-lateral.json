@@ -1,0 +1,114 @@
+{
+  "campaign_id": "lim01-dual-ambiguous-lateral",
+  "family": "genuine_vuln_breaker",
+  "ood": true,
+  "hosts": [
+    "host-a",
+    "host-b",
+    "host-c",
+    "host-d",
+    "host-e"
+  ],
+  "truth_hosts": [
+    "host-a",
+    "host-b",
+    "host-c"
+  ],
+  "producers": {
+    "host-a": "prod-a",
+    "host-b": "prod-b",
+    "host-c": "prod-c",
+    "host-d": "prod-d",
+    "host-e": "prod-e"
+  },
+  "base_time_utc": "2026-07-25T14:00:00Z",
+  "fleet_origin": "original",
+  "fleet_suite": "limits",
+  "headline": false,
+  "source": {
+    "style": "Fleet-limits breaking-point sketches",
+    "repo": "https://github.com/Siddarthb07/corvex",
+    "techniques": [
+      "T1021.001",
+      "T1078",
+      "T1041"
+    ],
+    "note": "shared-node helpdesk overlap"
+  },
+  "narrative": [
+    "APT a\u2192b\u2192c with RDP. Helpdesk RDP also touches c and reaches d/e in the same \u00b190s window."
+  ],
+  "break_intent": {
+    "name": "shared-node helpdesk overlap",
+    "break_criterion": "d or e appears in the malicious campaign's Q dry-run list",
+    "success_criteria_attacker": [
+      "host-d or host-e in best-campaign quarantine"
+    ]
+  },
+  "steps": [
+    {
+      "kind": "auth",
+      "host": "host-a",
+      "user": "apt-rdp",
+      "src": "203.0.113.21",
+      "offset_seconds": 0,
+      "technique": "T1021.001"
+    },
+    {
+      "kind": "auth",
+      "host": "host-b",
+      "user": "apt-rdp",
+      "src": "host-a",
+      "offset_seconds": 20,
+      "technique": "T1021.001"
+    },
+    {
+      "kind": "auth",
+      "host": "host-c",
+      "user": "apt-rdp",
+      "src": "host-b",
+      "offset_seconds": 40,
+      "technique": "T1021.001"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-c",
+      "dst_ip": "198.51.100.190",
+      "bytes": 16000,
+      "offset_seconds": 55,
+      "technique": "T1041"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-b",
+      "dst_ip": "198.51.100.190",
+      "bytes": 14000,
+      "offset_seconds": 60,
+      "technique": "T1041"
+    },
+    {
+      "kind": "auth",
+      "host": "host-c",
+      "user": "helpdesk",
+      "src": "10.30.0.9",
+      "offset_seconds": 35,
+      "technique": "T1021.001"
+    },
+    {
+      "kind": "auth",
+      "host": "host-d",
+      "user": "helpdesk",
+      "src": "host-c",
+      "offset_seconds": 50,
+      "technique": "T1021.001"
+    },
+    {
+      "kind": "auth",
+      "host": "host-e",
+      "user": "helpdesk",
+      "src": "host-d",
+      "offset_seconds": 70,
+      "technique": "T1021.001"
+    }
+  ]
+}

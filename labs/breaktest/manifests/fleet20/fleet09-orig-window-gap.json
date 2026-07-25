@@ -1,0 +1,105 @@
+{
+  "campaign_id": "fleet09-orig-window-gap",
+  "family": "genuine_vuln_breaker",
+  "ood": true,
+  "hosts": [
+    "host-a",
+    "host-b",
+    "host-c",
+    "host-d",
+    "host-e"
+  ],
+  "truth_hosts": [
+    "host-a",
+    "host-b",
+    "host-c"
+  ],
+  "producers": {
+    "host-a": "prod-a",
+    "host-b": "prod-b",
+    "host-c": "prod-c",
+    "host-d": "prod-d",
+    "host-e": "prod-e"
+  },
+  "base_time_utc": "2026-07-25T14:00:00Z",
+  "fleet_origin": "original",
+  "source": {
+    "style": "Black-box fleet \u2014 ATT&CK/Atomic-style telemetry sketches",
+    "repo": "https://github.com/Siddarthb07/corvex",
+    "techniques": [
+      "T1078",
+      "T1041"
+    ],
+    "note": "Original: split campaign across correlator window_seconds=600 boundary."
+  },
+  "narrative": [
+    "Hit hard, go quiet past ten minutes, finish the job on the same hosts."
+  ],
+  "break_intent": {
+    "name": "window gap",
+    "expected_break_points": {
+      "fragmented_campaigns": true
+    },
+    "success_criteria_attacker": [
+      "single campaign does not cover full truth"
+    ]
+  },
+  "steps": [
+    {
+      "kind": "auth",
+      "host": "host-a",
+      "user": "sleeper",
+      "src": "203.0.113.55",
+      "offset_seconds": 0,
+      "technique": "T1078"
+    },
+    {
+      "kind": "auth",
+      "host": "host-b",
+      "user": "sleeper",
+      "src": "host-a",
+      "offset_seconds": 20,
+      "technique": "T1078"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-b",
+      "dst_ip": "198.51.100.90",
+      "bytes": 12000,
+      "offset_seconds": 40,
+      "technique": "T1041"
+    },
+    {
+      "kind": "auth",
+      "host": "host-b",
+      "user": "sleeper",
+      "src": "10.1.0.50",
+      "offset_seconds": 700,
+      "technique": "T1078"
+    },
+    {
+      "kind": "auth",
+      "host": "host-c",
+      "user": "sleeper",
+      "src": "10.1.0.51",
+      "offset_seconds": 720,
+      "technique": "T1078"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-c",
+      "dst_ip": "198.51.100.91",
+      "bytes": 15000,
+      "offset_seconds": 740,
+      "technique": "T1041"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-b",
+      "dst_ip": "198.51.100.91",
+      "bytes": 11000,
+      "offset_seconds": 750,
+      "technique": "T1041"
+    }
+  ]
+}

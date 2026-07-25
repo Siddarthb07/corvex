@@ -20,6 +20,7 @@ from corvex.store import Campaign
 STAGE_ATTACK: Dict[str, List[str]] = {
     "lateral_auth": ["T1078", "T1021"],
     "micro_exfil": ["T1041"],
+    "dns_beacon": ["T1071.004"],
     "recon_fanout": ["T1046"],
     "auth": ["T1078"],
     "exfil": ["T1041"],
@@ -31,6 +32,31 @@ STAGE_ATTACK: Dict[str, List[str]] = {
 MIN_HOSTS_FOR_COMPLETE = 2
 MIN_STAGES_FOR_COMPLETE = 1
 MIN_EVIDENCE_FOR_COMPLETE = 1
+
+# Containment (IsolateHost) requires stronger-than-lateral evidence.
+# Closes attack-shaped-but-clearly-inert (lim10); does NOT solve general FP —
+# exfil-shaped authorized pentests still clear this gate (intent ≠ telemetry).
+CONTAIN_EGRESS_STAGES = frozenset({"micro_exfil", "dns_beacon", "exfil"})
+CONTAIN_RECON_STAGES = frozenset({"recon_fanout", "recon"})
+CONTAIN_LATERAL_STAGES = frozenset({"lateral_auth", "lateral", "auth"})
+
+
+def containment_evidence_ok(steps: Sequence[ReconstructionStep] | Sequence[Mapping[str, Any]]) -> bool:
+    """True if campaign evidence is enough to *propose* IsolateHost.
+
+    Correlate still reports lateral-only campaigns; contain stays gated.
+    """
+    names: set[str] = set()
+    for st in steps:
+        if isinstance(st, ReconstructionStep):
+            names.add(str(st.name or ""))
+        elif isinstance(st, Mapping):
+            names.add(str(st.get("name") or st.get("stage") or ""))
+    if names & CONTAIN_EGRESS_STAGES:
+        return True
+    if (names & CONTAIN_RECON_STAGES) and (names & CONTAIN_LATERAL_STAGES):
+        return True
+    return False
 
 
 @dataclass
@@ -186,6 +212,23 @@ def quarantine_plan_for(
     mode: str,
 ) -> QuarantinePlan:
     hosts = list(host_ids)
+    if not containment_evidence_ok(steps):
+        return QuarantinePlan(
+            verb="IsolateHost",
+            host_ids=[],
+            cut_point_host=None,
+            rationale=(
+                "Refuse IsolateHost: lateral without egress/recon is insufficient "
+                "for containment proposals (correlate-only)."
+            ),
+            mode=mode,
+            honesty=(
+                "Correlate-only: campaign may still be reported, but IsolateHost is gated "
+                "on micro_exfil/dns_beacon or recon_fanout+lateral_auth. "
+                "Closes attack-shaped-but-clearly-inert cases; does not solve general FP "
+                "(exfil-shaped authorized activity can still clear this gate)."
+            ),
+        )
     cut: Optional[str] = None
     if len(hosts) >= 2:
         # Prefer second host in first multi-host stage as mid-chain cut.
@@ -217,6 +260,7 @@ def quarantine_plan_for(
         rationale=(
             f"Propose IsolateHost on campaign hosts"
             + (f"; mid-chain cut at {cut}" if cut else "")
+            + "; containment evidence present (egress and/or recon+lateral)"
         ),
         mode=mode,
         honesty=honesty,

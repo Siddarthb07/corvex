@@ -1,0 +1,166 @@
+{
+  "campaign_id": "t1-lim04-timing-jitter",
+  "family": "genuine_vuln_breaker",
+  "ood": true,
+  "hosts": [
+    "host-00",
+    "host-01",
+    "host-02",
+    "host-03",
+    "host-04",
+    "host-05",
+    "host-06",
+    "host-07",
+    "host-08",
+    "host-09",
+    "host-10",
+    "host-11",
+    "host-12",
+    "host-13",
+    "host-14"
+  ],
+  "truth_hosts": [
+    "host-00",
+    "host-01",
+    "host-02"
+  ],
+  "producers": {
+    "host-00": "prod-00",
+    "host-01": "prod-01",
+    "host-02": "prod-02",
+    "host-03": "prod-03",
+    "host-04": "prod-04",
+    "host-05": "prod-05",
+    "host-06": "prod-06",
+    "host-07": "prod-07",
+    "host-08": "prod-08",
+    "host-09": "prod-09",
+    "host-10": "prod-10",
+    "host-11": "prod-11",
+    "host-12": "prod-12",
+    "host-13": "prod-13",
+    "host-14": "prod-14"
+  },
+  "base_time_utc": "2026-07-25T14:00:00Z",
+  "fleet_origin": "original",
+  "fleet_suite": "limits-t1",
+  "headline": false,
+  "source": {
+    "style": "Fleet-limits breaking-point sketches",
+    "repo": "https://github.com/Siddarthb07/corvex",
+    "techniques": [
+      "T1071.004",
+      "T1078",
+      "T1041"
+    ],
+    "note": "timing jitter evasion"
+  },
+  "narrative": [
+    "Same shape as fleet05/17 with per-stage uniform 0\u20136\u00d7 interval jitter."
+  ],
+  "break_intent": {
+    "name": "timing jitter evasion",
+    "break_criterion": "Jaccard drop vs #5/#17 baseline at matched technique set",
+    "success_criteria_attacker": [
+      "corr_jaccard < reference_jaccard"
+    ]
+  },
+  "steps": [
+    {
+      "kind": "dns",
+      "host": "host-00",
+      "query": "0.c2.evil.test",
+      "offset_seconds": 0.0,
+      "technique": "T1071.004"
+    },
+    {
+      "kind": "dns",
+      "host": "host-00",
+      "query": "1.c2.evil.test",
+      "offset_seconds": 19.18,
+      "technique": "T1071.004"
+    },
+    {
+      "kind": "dns",
+      "host": "host-01",
+      "query": "2.c2.evil.test",
+      "offset_seconds": 19.93,
+      "technique": "T1071.004"
+    },
+    {
+      "kind": "dns",
+      "host": "host-01",
+      "query": "3.c2.evil.test",
+      "offset_seconds": 28.18,
+      "technique": "T1071.004"
+    },
+    {
+      "kind": "dns",
+      "host": "host-02",
+      "query": "4.c2.evil.test",
+      "offset_seconds": 34.88,
+      "technique": "T1071.004"
+    },
+    {
+      "kind": "dns",
+      "host": "host-02",
+      "query": "5.c2.evil.test",
+      "offset_seconds": 56.97,
+      "technique": "T1071.004"
+    },
+    {
+      "kind": "auth",
+      "host": "host-00",
+      "user": "hybrid",
+      "src": "203.0.113.19",
+      "offset_seconds": 87.28,
+      "technique": "T1078"
+    },
+    {
+      "kind": "auth",
+      "host": "host-01",
+      "user": "hybrid",
+      "src": "host-00",
+      "offset_seconds": 114.04,
+      "technique": "T1078"
+    },
+    {
+      "kind": "auth",
+      "host": "host-02",
+      "user": "hybrid",
+      "src": "host-01",
+      "offset_seconds": 119.88,
+      "technique": "T1078"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-02",
+      "dst_ip": "198.51.100.170",
+      "bytes": 14000,
+      "offset_seconds": 157.28,
+      "technique": "T1041"
+    },
+    {
+      "kind": "auth",
+      "host": "host-06",
+      "user": "decoy-jitter",
+      "src": "10.99.0.1",
+      "offset_seconds": 120,
+      "technique": "T1078"
+    },
+    {
+      "kind": "auth",
+      "host": "host-07",
+      "user": "decoy-jitter",
+      "src": "host-06",
+      "offset_seconds": 130,
+      "technique": "T1078"
+    }
+  ],
+  "reference_jaccard": 1.0,
+  "scale": {
+    "tier": "T1",
+    "n_hosts": 15,
+    "source_campaign_id": "lim04-timing-jitter"
+  }
+}

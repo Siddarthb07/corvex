@@ -1,11 +1,15 @@
-"""P3 claim gates — unlock 'useful on real attacks' language only when all pass.
+"""P3 claim gates — unlock 'useful on real attacks' only when integrity + evidence hold.
 
-Gates (all required):
-1. non_author_fusion_lift — fusion beats detector-only on non-feeder / public-TTP packs
-2. stranger_success — external operator attestation file present and pass=true
+Gates (all required for claim_allowed):
+1. non_author_fusion_lift — fusion beats detector-only on breaktest / public-TTP packs
+2. stranger_success — human outsider with Ed25519 self-signature (stranger holds private key)
 3. benign_fcr_real_n — held-out benign N >= min_n and FCR within bar
+4. trust_integrity — functional probes (HMAC at Correlator.ingest, resign verify-first,
+   dash does not embed snapshot, ingest rejects without enrollment)
 
-Until then claim_allowed=false. Never flip by dashboard toggle.
+Author-held HMAC attestations and unsigned JSON are advisory only.
+Until all pass: claim_allowed=false. lab_verified may still be true for sealed/breaktest.
+Never flip by dashboard toggle.
 """
 
 from __future__ import annotations
@@ -13,15 +17,16 @@ from __future__ import annotations
 import json
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Optional, Tuple
+
+from corvex.eval.attestation_crypto import stranger_signature_ok
 
 MIN_BENIGN_N = 5
 MAX_BENIGN_FCR = 0.10
-MIN_FUSION_LIFT = 0.05  # correlator F1 - detector_only F1 on non-author set
+MIN_FUSION_LIFT = 0.05
 
 
 def _repo_rel(root: Path, path: Any) -> str:
-    """Repo-relative POSIX path for published reports (no home-dir leak)."""
     p = Path(path)
     try:
         return p.resolve().relative_to(Path(root).resolve()).as_posix()
@@ -40,8 +45,19 @@ def _load(path: Path) -> Optional[Dict[str, Any]]:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-def _stranger_qualifies(stranger: Dict[str, Any]) -> tuple[bool, str]:
-    """Human outsider only — agents / author self-attestation never unlock claims."""
+# Re-exports for CLI / tests
+from corvex.eval.attestation_crypto import (  # noqa: E402
+    attestation_key_path,
+    load_attestation_hmac_secret as load_attestation_secret,
+    sign_attestation_ed25519,
+    sign_attestation_hmac as sign_attestation,
+    stranger_private_key_path,
+    verify_attestation_ed25519,
+    verify_attestation_hmac as verify_attestation,
+)
+
+
+def _stranger_human_ok(stranger: Dict[str, Any]) -> Tuple[bool, str]:
     if not bool(stranger.get("pass")):
         return False, "Stranger attestation present but pass!=true"
     op = str(stranger.get("operator") or stranger.get("operator_id") or "").strip()
@@ -63,7 +79,100 @@ def _stranger_qualifies(stranger: Dict[str, Any]) -> tuple[bool, str]:
             "FAIL: set attestation_kind=human on stranger_dry_run.json "
             "(agent dry-runs do not qualify).",
         )
-    return True, "Human stranger attestation pass=true"
+    return True, "Human stranger attestation shape ok"
+
+
+def _probe_trust_integrity() -> Dict[str, Any]:
+    from dataclasses import replace
+    import tempfile
+
+    from corvex.audit import AuditLog
+    from corvex.auth import generate_lab_enrollment
+    from corvex.correlator import Correlator
+    from corvex.dashboard import render_html
+    from corvex.envelope import sign_envelope
+    from corvex.feeder import resign_events
+    from corvex.store import CampaignStore
+
+    checks: Dict[str, Any] = {}
+    with tempfile.TemporaryDirectory() as td:
+        root = Path(td)
+        enr = generate_lab_enrollment({"host-a": "prod-a"})
+        secret = enr.require("prod-a", "host-a")
+        good = sign_envelope(
+            producer_id="prod-a",
+            host_id="host-a",
+            payload_type="auth",
+            payload={"user": "a", "result": "success"},
+            secret=secret,
+            event_id="e-good",
+            ts_utc="2026-07-25T00:00:00Z",
+            nonce="n1",
+        )
+        bad = replace(
+            sign_envelope(
+                producer_id="prod-a",
+                host_id="host-a",
+                payload_type="auth",
+                payload={"user": "a", "result": "success"},
+                secret=secret,
+                event_id="e-bad",
+                ts_utc="2026-07-25T00:00:01Z",
+                nonce="n2",
+            ),
+            hmac="00" * 32,
+        )
+        store = CampaignStore(root / "c.jsonl")
+        audit = AuditLog(root / "a.jsonl")
+        corr = Correlator(store, audit, enrollment=enr)
+        corr.ingest([good, bad])
+        checks["correlator_ingest_rejects_bad_hmac"] = corr.hmac_rejected >= 1 and len(
+            corr._events
+        ) == 1
+
+        bare = Correlator(
+            CampaignStore(root / "c2.jsonl"),
+            AuditLog(root / "a2.jsonl"),
+        )
+        bare.ingest([good])
+        checks["correlator_rejects_without_enrollment"] = (
+            bare.hmac_rejected >= 1 and len(bare._events) == 0
+        )
+
+        kept = resign_events([good], enr, allow_local_stamp=True)
+        checks["resign_keeps_verified"] = (
+            len(kept) == 1
+            and kept[0].hmac == good.hmac
+            and "_corvex_provenance" not in (kept[0].payload or {})
+        )
+        foreign = generate_lab_enrollment({"host-a": "prod-a"})
+        stamped = resign_events([good], foreign, allow_local_stamp=True)
+        checks["resign_tags_local_stamp"] = (
+            len(stamped) == 1
+            and (stamped[0].payload or {}).get("_corvex_provenance") == "locally_stamped"
+        )
+
+        html = render_html(
+            {
+                "version": "test",
+                "product": {"version": "test"},
+                "run": {"campaigns": [{"campaign_id": "SECRET-CAMP-XYZ"}]},
+            },
+            embed_snapshot=False,
+        )
+        checks["dash_boot_no_embed"] = "SECRET-CAMP-XYZ" not in html and "null" in html
+
+    passed = all(bool(v) for v in checks.values())
+    return {
+        "id": "trust_integrity",
+        "pass": passed,
+        "checks": checks,
+        "note": (
+            "Functional probes green."
+            if passed
+            else "FAIL: one or more trust probes failed — claim locked."
+        ),
+    }
 
 
 def evaluate_claim_gates(
@@ -78,9 +187,7 @@ def evaluate_claim_gates(
     held = _load(reports / "stageA_heldout.json") or _load(reports / "stageA.json") or {}
     hm = (held.get("metrics") or {}) if held else {}
     corr = hm.get("correlator") or {}
-    det = hm.get("detector_only") or {}
 
-    # Benign N from pack meta
     packs = held.get("packs") or []
     benign_packs = [p for p in packs if (p.get("family") == "benign")]
     n_benign = len(benign_packs)
@@ -99,7 +206,6 @@ def evaluate_claim_gates(
         ),
     }
 
-    # Non-author fusion lift: prefer dedicated breaktest / non_author report
     non_author = _load(reports / "non_author_fusion.json")
     if non_author:
         lift = float(non_author.get("f1_lift") or 0.0)
@@ -117,7 +223,6 @@ def evaluate_claim_gates(
             or "Loaded reports/non_author_fusion.json",
         }
     else:
-        # Soft probe: fusion_chain family on held-out (still author-designed — does NOT pass gate)
         by_fam = ((held.get("by_family") or {}).get("correlator") or {})
         det_fam = ((held.get("by_family") or {}).get("detector_only") or {})
         fc = by_fam.get("fusion_chain") or {}
@@ -139,15 +244,41 @@ def evaluate_claim_gates(
     stranger_path = reports / "stranger_dry_run.json"
     stranger = _load(stranger_path)
     if stranger and "pass" in stranger:
-        ok, note = _stranger_qualifies(stranger)
-        stranger_gate = {
-            "id": "stranger_success",
-            "pass": ok,
-            "path": _repo_rel(root, stranger_path),
-            "operator": stranger.get("operator") or stranger.get("operator_id"),
-            "attestation_kind": stranger.get("attestation_kind"),
-            "note": note if not ok else (stranger.get("note") or note),
-        }
+        human_ok, human_note = _stranger_human_ok(stranger)
+        sig_ok, custody, sig_note = stranger_signature_ok(stranger, root)
+        if human_ok and sig_ok:
+            stranger_gate = {
+                "id": "stranger_success",
+                "pass": True,
+                "path": _repo_rel(root, stranger_path),
+                "operator": stranger.get("operator") or stranger.get("operator_id"),
+                "attestation_kind": stranger.get("attestation_kind"),
+                "attestation_custody": custody,
+                "attestation_signed": True,
+                "note": stranger.get("note") or sig_note,
+            }
+        elif human_ok:
+            stranger_gate = {
+                "id": "stranger_success",
+                "pass": False,
+                "path": _repo_rel(root, stranger_path),
+                "operator": stranger.get("operator") or stranger.get("operator_id"),
+                "attestation_kind": stranger.get("attestation_kind"),
+                "attestation_custody": custody,
+                "attestation_signed": False,
+                "advisory": True,
+                "note": sig_note + " " + human_note,
+            }
+        else:
+            stranger_gate = {
+                "id": "stranger_success",
+                "pass": False,
+                "path": _repo_rel(root, stranger_path),
+                "operator": stranger.get("operator") or stranger.get("operator_id"),
+                "attestation_kind": stranger.get("attestation_kind"),
+                "attestation_signed": False,
+                "note": human_note,
+            }
     elif stranger:
         stranger_gate = {
             "id": "stranger_success",
@@ -170,21 +301,51 @@ def evaluate_claim_gates(
             ),
         }
 
-    gates = [non_author_gate, stranger_gate, benign_gate]
+    integrity_gate = _probe_trust_integrity()
+    live2 = _load(reports / "live_second_host.json") or {}
+    live2_gate = {
+        "id": "live_second_host",
+        "pass": bool(live2.get("pass"))
+        and str(live2.get("source") or "").lower() == "wevtutil"
+        and bool(live2.get("host_id"))
+        and bool(live2.get("security_events_seen")),
+        "path": "reports/live_second_host.json",
+        "note": (
+            live2.get("note")
+            if live2
+            else (
+                "FAIL: missing reports/live_second_host.json — elevated wevtutil on a "
+                "second physical Windows host (see docs/trust-hardening.md)."
+            )
+        ),
+    }
+
+    gates = [non_author_gate, stranger_gate, benign_gate, integrity_gate, live2_gate]
     claim_allowed = all(bool(g.get("pass")) for g in gates)
+    lab_verified = bool(non_author_gate.get("pass")) and bool(benign_gate.get("pass")) and bool(
+        integrity_gate.get("pass")
+    )
+    if claim_allowed:
+        language = "useful on real attacks"
+    elif lab_verified:
+        language = (
+            "lab_verified — sealed held-out + breaktest + trust probes; "
+            "need Ed25519 stranger self-sign + live second host for claim_allowed"
+        )
+    else:
+        language = "lab / BYO campaign stitch only — claim locked"
+
     return {
-        "schema_ver": "1",
+        "schema_ver": "3",
         "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "claim_allowed": claim_allowed,
-        "claim_language": (
-            "useful on real attacks"
-            if claim_allowed
-            else "lab / BYO campaign stitch only — claim locked"
-        ),
+        "lab_verified": lab_verified,
+        "claim_language": language,
         "gates": {g["id"]: g for g in gates},
         "honesty": (
             "Do not publish 'useful on real attacks' until claim_allowed=true. "
-            "Soft probes, author packs, and agent stranger dry-runs never flip this alone."
+            "Author-held HMAC and unsigned stranger JSON are advisory. "
+            "lab_verified means sealed/breaktest + trust probes only."
         ),
     }
 

@@ -1,0 +1,129 @@
+{
+  "campaign_id": "lim03-slow-low-day-gaps",
+  "family": "genuine_vuln_breaker",
+  "ood": true,
+  "hosts": [
+    "host-a",
+    "host-b",
+    "host-c",
+    "host-d",
+    "host-e"
+  ],
+  "truth_hosts": [
+    "host-a",
+    "host-b",
+    "host-c"
+  ],
+  "producers": {
+    "host-a": "prod-a",
+    "host-b": "prod-b",
+    "host-c": "prod-c",
+    "host-d": "prod-d",
+    "host-e": "prod-e"
+  },
+  "base_time_utc": "2026-07-25T14:00:00Z",
+  "fleet_origin": "original",
+  "fleet_suite": "limits",
+  "headline": false,
+  "source": {
+    "style": "Fleet-limits breaking-point sketches",
+    "repo": "https://github.com/Siddarthb07/corvex",
+    "techniques": [
+      "T1078",
+      "T1041"
+    ],
+    "note": "day-scale sleeper"
+  },
+  "narrative": [
+    "Same sleeper identity across 14d / 21d / 9d quiet gaps \u2014 finds lookback cliffs."
+  ],
+  "break_intent": {
+    "name": "day-scale sleeper",
+    "break_criterion": "any truth-host event outside the window silently dropped from campaign reconstruction",
+    "success_criteria_attacker": [
+      "truth hosts fragmented across campaigns or missed"
+    ]
+  },
+  "steps": [
+    {
+      "kind": "auth",
+      "host": "host-a",
+      "user": "sleeper",
+      "src": "203.0.113.55",
+      "offset_seconds": 0,
+      "technique": "T1078"
+    },
+    {
+      "kind": "auth",
+      "host": "host-b",
+      "user": "sleeper",
+      "src": "host-a",
+      "offset_seconds": 30,
+      "technique": "T1078"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-b",
+      "dst_ip": "198.51.100.90",
+      "bytes": 12000,
+      "offset_seconds": 60,
+      "technique": "T1041"
+    },
+    {
+      "kind": "auth",
+      "host": "host-b",
+      "user": "sleeper",
+      "src": "10.1.0.50",
+      "offset_seconds": 1209600,
+      "technique": "T1078"
+    },
+    {
+      "kind": "auth",
+      "host": "host-c",
+      "user": "sleeper",
+      "src": "10.1.0.51",
+      "offset_seconds": 1209720,
+      "technique": "T1078"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-c",
+      "dst_ip": "198.51.100.91",
+      "bytes": 15000,
+      "offset_seconds": 1209840,
+      "technique": "T1041"
+    },
+    {
+      "kind": "auth",
+      "host": "host-c",
+      "user": "sleeper",
+      "src": "10.1.0.52",
+      "offset_seconds": 3024000,
+      "technique": "T1078"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-a",
+      "dst_ip": "198.51.100.92",
+      "bytes": 11000,
+      "offset_seconds": 3024180,
+      "technique": "T1041"
+    },
+    {
+      "kind": "auth",
+      "host": "host-a",
+      "user": "sleeper",
+      "src": "10.1.0.53",
+      "offset_seconds": 3801600,
+      "technique": "T1078"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-b",
+      "dst_ip": "198.51.100.93",
+      "bytes": 13000,
+      "offset_seconds": 3801690,
+      "technique": "T1041"
+    }
+  ]
+}

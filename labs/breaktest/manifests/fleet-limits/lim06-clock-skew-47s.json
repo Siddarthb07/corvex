@@ -1,0 +1,118 @@
+{
+  "campaign_id": "lim06-clock-skew-47s",
+  "family": "genuine_vuln_breaker",
+  "ood": true,
+  "hosts": [
+    "host-a",
+    "host-b",
+    "host-c",
+    "host-d",
+    "host-e"
+  ],
+  "truth_hosts": [
+    "host-a",
+    "host-b",
+    "host-c"
+  ],
+  "producers": {
+    "host-a": "prod-a",
+    "host-b": "prod-b",
+    "host-c": "prod-c",
+    "host-d": "prod-d",
+    "host-e": "prod-e"
+  },
+  "base_time_utc": "2026-07-25T14:00:00Z",
+  "fleet_origin": "original",
+  "fleet_suite": "limits",
+  "headline": false,
+  "source": {
+    "style": "Fleet-limits breaking-point sketches",
+    "repo": "https://github.com/Siddarthb07/corvex",
+    "techniques": [
+      "T1003.001",
+      "T1550.002",
+      "T1021",
+      "T1041"
+    ],
+    "note": "clock skew"
+  },
+  "narrative": [
+    "Cred dump\u2192PtH with host-b clock +47s (unannounced NTP drift)."
+  ],
+  "break_intent": {
+    "name": "clock skew",
+    "break_criterion": "causal ordering a\u2192b\u2192c wrong, or b dropped due to apparent gap",
+    "success_criteria_attacker": [
+      "host-b missed or campaign fragmented"
+    ]
+  },
+  "steps": [
+    {
+      "kind": "auth",
+      "host": "host-a",
+      "user": "Administrator",
+      "src": "203.0.113.10",
+      "offset_seconds": 0,
+      "technique": "T1003.001"
+    },
+    {
+      "kind": "auth",
+      "host": "host-a",
+      "user": "Administrator",
+      "src": "203.0.113.10",
+      "offset_seconds": 3,
+      "technique": "T1003.001"
+    },
+    {
+      "kind": "auth",
+      "host": "host-b",
+      "user": "Administrator",
+      "src": "host-a",
+      "offset_seconds": 8,
+      "technique": "T1550.002"
+    },
+    {
+      "kind": "auth",
+      "host": "host-b",
+      "user": "Administrator",
+      "src": "host-a",
+      "offset_seconds": 11,
+      "technique": "T1550.002"
+    },
+    {
+      "kind": "auth",
+      "host": "host-c",
+      "user": "Administrator",
+      "src": "host-b",
+      "offset_seconds": 16,
+      "technique": "T1021"
+    },
+    {
+      "kind": "auth",
+      "host": "host-c",
+      "user": "Administrator",
+      "src": "host-b",
+      "offset_seconds": 19,
+      "technique": "T1021"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-c",
+      "dst_ip": "198.51.100.20",
+      "bytes": 24000,
+      "offset_seconds": 28,
+      "technique": "T1041"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-b",
+      "dst_ip": "198.51.100.20",
+      "bytes": 18000,
+      "offset_seconds": 32,
+      "technique": "T1041"
+    }
+  ],
+  "host_clock_skew_seconds": {
+    "host-b": 47.0
+  }
+}

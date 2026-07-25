@@ -1,0 +1,88 @@
+{
+  "campaign_id": "fleet12-art-wmi-remote",
+  "family": "attack_repo",
+  "ood": true,
+  "hosts": [
+    "host-a",
+    "host-b",
+    "host-c",
+    "host-d",
+    "host-e"
+  ],
+  "truth_hosts": [
+    "host-a",
+    "host-b",
+    "host-d"
+  ],
+  "producers": {
+    "host-a": "prod-a",
+    "host-b": "prod-b",
+    "host-c": "prod-c",
+    "host-d": "prod-d",
+    "host-e": "prod-e"
+  },
+  "base_time_utc": "2026-07-25T14:00:00Z",
+  "fleet_origin": "github_art",
+  "source": {
+    "style": "Black-box fleet \u2014 ATT&CK/Atomic-style telemetry sketches",
+    "repo": "https://github.com/redcanaryco/atomic-red-team",
+    "techniques": [
+      "T1047",
+      "T1021",
+      "T1041"
+    ],
+    "note": "Atomic WMI remote execution hop chain."
+  },
+  "narrative": [
+    "WMI remoting across the segment; dump and leave."
+  ],
+  "break_intent": {
+    "name": "fleet12-art-wmi-remote",
+    "success_criteria_defender": [
+      "matched truth_hosts",
+      "empty over_merged_hosts"
+    ]
+  },
+  "steps": [
+    {
+      "kind": "auth",
+      "host": "host-a",
+      "user": "wmi-ops",
+      "src": "203.0.113.13",
+      "offset_seconds": 0,
+      "technique": "T1047"
+    },
+    {
+      "kind": "auth",
+      "host": "host-b",
+      "user": "wmi-ops",
+      "src": "host-a",
+      "offset_seconds": 8,
+      "technique": "T1021"
+    },
+    {
+      "kind": "auth",
+      "host": "host-d",
+      "user": "wmi-ops",
+      "src": "host-b",
+      "offset_seconds": 16,
+      "technique": "T1021"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-d",
+      "dst_ip": "198.51.100.120",
+      "bytes": 21000,
+      "offset_seconds": 30,
+      "technique": "T1041"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-b",
+      "dst_ip": "198.51.100.120",
+      "bytes": 16000,
+      "offset_seconds": 34,
+      "technique": "T1041"
+    }
+  ]
+}

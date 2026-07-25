@@ -36,7 +36,7 @@ CLI: `corvex` (legacy alias `cfuse`). Optional: `corvex init` to create enrollme
 
 ## Results (sealed held-out)
 
-Synthetic multi-host packs (incl. `fusion_chain` + benign **N=5**). **Care vs commercial tools: unproven.** Claim language stays lab/BYO until `corvex claim-gates` → `claim_allowed=true`.
+Synthetic multi-host packs (incl. `fusion_chain` + benign **N=5**). **Care vs commercial tools: unproven.** Sealed/breaktest quality is `lab_verified`; publish “useful on real attacks” only when `claim_allowed=true` (signed stranger + trust integrity).
 
 ### Detection
 

@@ -1,0 +1,122 @@
+{
+  "campaign_id": "fleet01-art-cred-dump-pth",
+  "family": "attack_repo",
+  "ood": true,
+  "hosts": [
+    "host-a",
+    "host-b",
+    "host-c",
+    "host-d",
+    "host-e"
+  ],
+  "truth_hosts": [
+    "host-a",
+    "host-b",
+    "host-c"
+  ],
+  "producers": {
+    "host-a": "prod-a",
+    "host-b": "prod-b",
+    "host-c": "prod-c",
+    "host-d": "prod-d",
+    "host-e": "prod-e"
+  },
+  "base_time_utc": "2026-07-25T14:00:00Z",
+  "fleet_origin": "github_art",
+  "source": {
+    "style": "Black-box fleet \u2014 ATT&CK/Atomic-style telemetry sketches",
+    "repo": "https://github.com/redcanaryco/atomic-red-team",
+    "techniques": [
+      "T1003.001",
+      "T1550.002",
+      "T1021",
+      "T1041"
+    ],
+    "note": "Adapted from Atomic Red Team OS Credential Dumping + pass-the-hash lateral patterns."
+  },
+  "narrative": [
+    "Dump creds on the beachhead, reuse the hash everywhere that accepts it, pull data out.",
+    "No regard for defender tooling \u2014 spray until something works."
+  ],
+  "break_intent": {
+    "name": "fleet01-art-cred-dump-pth",
+    "success_criteria_defender": [
+      "matched truth_hosts",
+      "empty over_merged_hosts"
+    ]
+  },
+  "steps": [
+    {
+      "kind": "auth",
+      "host": "host-a",
+      "user": "Administrator",
+      "src": "203.0.113.10",
+      "offset_seconds": 0,
+      "technique": "T1003.001"
+    },
+    {
+      "kind": "auth",
+      "host": "host-a",
+      "user": "Administrator",
+      "src": "203.0.113.10",
+      "offset_seconds": 3,
+      "technique": "T1003.001"
+    },
+    {
+      "kind": "auth",
+      "host": "host-b",
+      "user": "Administrator",
+      "src": "host-a",
+      "offset_seconds": 8,
+      "technique": "T1550.002"
+    },
+    {
+      "kind": "auth",
+      "host": "host-b",
+      "user": "Administrator",
+      "src": "host-a",
+      "offset_seconds": 11,
+      "technique": "T1550.002"
+    },
+    {
+      "kind": "auth",
+      "host": "host-c",
+      "user": "Administrator",
+      "src": "host-b",
+      "offset_seconds": 16,
+      "technique": "T1021"
+    },
+    {
+      "kind": "auth",
+      "host": "host-c",
+      "user": "Administrator",
+      "src": "host-b",
+      "offset_seconds": 19,
+      "technique": "T1021"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-c",
+      "dst_ip": "198.51.100.20",
+      "bytes": 24000,
+      "offset_seconds": 28,
+      "technique": "T1041"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-b",
+      "dst_ip": "198.51.100.20",
+      "bytes": 18000,
+      "offset_seconds": 32,
+      "technique": "T1041"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-c",
+      "dst_ip": "198.51.100.20",
+      "bytes": 16000,
+      "offset_seconds": 36,
+      "technique": "T1041"
+    }
+  ]
+}

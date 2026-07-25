@@ -36,7 +36,7 @@ def score_recon_pack(
     with tempfile.TemporaryDirectory() as tmp:
         store = CampaignStore(Path(tmp) / "c.jsonl")
         audit = AuditLog(Path(tmp) / "a.jsonl")
-        Correlator(store, audit).ingest(events)
+        Correlator(store, audit, enrollment=enrollment).ingest(events)
         camps = store.all()
 
     benign = gt.get("family") == "benign"

@@ -1,0 +1,516 @@
+{
+  "campaign_id": "t1-lim09d-benign-hub-pivot",
+  "family": "genuine_vuln_breaker",
+  "ood": true,
+  "hosts": [
+    "host-00",
+    "host-01",
+    "host-02",
+    "host-03",
+    "host-04",
+    "host-05",
+    "host-06",
+    "host-07",
+    "host-08",
+    "host-09",
+    "host-10",
+    "host-11",
+    "host-12",
+    "host-13",
+    "host-14"
+  ],
+  "truth_hosts": [
+    "host-00",
+    "host-02",
+    "host-04"
+  ],
+  "producers": {
+    "host-00": "prod-00",
+    "host-01": "prod-01",
+    "host-02": "prod-02",
+    "host-03": "prod-03",
+    "host-04": "prod-04",
+    "host-05": "prod-05",
+    "host-06": "prod-06",
+    "host-07": "prod-07",
+    "host-08": "prod-08",
+    "host-09": "prod-09",
+    "host-10": "prod-10",
+    "host-11": "prod-11",
+    "host-12": "prod-12",
+    "host-13": "prod-13",
+    "host-14": "prod-14"
+  },
+  "base_time_utc": "2026-07-25T14:00:00Z",
+  "fleet_origin": "original",
+  "fleet_suite": "limits-t1",
+  "headline": true,
+  "source": {
+    "style": "Fleet-limits breaking-point sketches",
+    "repo": "https://github.com/Siddarthb07/corvex",
+    "techniques": [
+      "T1021.001",
+      "T1021.002",
+      "T1078",
+      "T1041"
+    ],
+    "note": "benign hub masking"
+  },
+  "narrative": [
+    "host-c is a busy legitimate jump box AND the real APT pivot; b/d are normal peers."
+  ],
+  "break_intent": {
+    "name": "benign hub masking",
+    "break_criterion": "attack missed (BROKE) or b/d False Q via association",
+    "success_criteria_attacker": [
+      "truth miss or false quarantine of hub peers"
+    ]
+  },
+  "steps": [
+    {
+      "kind": "auth",
+      "host": "host-02",
+      "user": "biz-a",
+      "src": "host-00",
+      "offset_seconds": 0,
+      "technique": "T1021.001"
+    },
+    {
+      "kind": "auth",
+      "host": "host-00",
+      "user": "biz-a",
+      "src": "host-02",
+      "offset_seconds": 1,
+      "technique": "T1021.002"
+    },
+    {
+      "kind": "auth",
+      "host": "host-02",
+      "user": "biz-a",
+      "src": "host-00",
+      "offset_seconds": 1,
+      "technique": "T1021.001"
+    },
+    {
+      "kind": "auth",
+      "host": "host-00",
+      "user": "biz-a",
+      "src": "host-02",
+      "offset_seconds": 2,
+      "technique": "T1021.002"
+    },
+    {
+      "kind": "auth",
+      "host": "host-02",
+      "user": "biz-a",
+      "src": "host-00",
+      "offset_seconds": 2,
+      "technique": "T1021.001"
+    },
+    {
+      "kind": "auth",
+      "host": "host-00",
+      "user": "biz-a",
+      "src": "host-02",
+      "offset_seconds": 3,
+      "technique": "T1021.002"
+    },
+    {
+      "kind": "auth",
+      "host": "host-02",
+      "user": "biz-a",
+      "src": "host-00",
+      "offset_seconds": 3,
+      "technique": "T1021.001"
+    },
+    {
+      "kind": "auth",
+      "host": "host-00",
+      "user": "biz-a",
+      "src": "host-02",
+      "offset_seconds": 4,
+      "technique": "T1021.002"
+    },
+    {
+      "kind": "auth",
+      "host": "host-02",
+      "user": "biz-a",
+      "src": "host-00",
+      "offset_seconds": 4,
+      "technique": "T1021.001"
+    },
+    {
+      "kind": "auth",
+      "host": "host-00",
+      "user": "biz-a",
+      "src": "host-02",
+      "offset_seconds": 5,
+      "technique": "T1021.002"
+    },
+    {
+      "kind": "auth",
+      "host": "host-02",
+      "user": "biz-a",
+      "src": "host-00",
+      "offset_seconds": 5,
+      "technique": "T1021.001"
+    },
+    {
+      "kind": "auth",
+      "host": "host-00",
+      "user": "biz-a",
+      "src": "host-02",
+      "offset_seconds": 6,
+      "technique": "T1021.002"
+    },
+    {
+      "kind": "auth",
+      "host": "host-02",
+      "user": "biz-b",
+      "src": "host-01",
+      "offset_seconds": 8,
+      "technique": "T1021.001"
+    },
+    {
+      "kind": "auth",
+      "host": "host-01",
+      "user": "biz-b",
+      "src": "host-02",
+      "offset_seconds": 9,
+      "technique": "T1021.002"
+    },
+    {
+      "kind": "auth",
+      "host": "host-02",
+      "user": "biz-b",
+      "src": "host-01",
+      "offset_seconds": 9,
+      "technique": "T1021.001"
+    },
+    {
+      "kind": "auth",
+      "host": "host-01",
+      "user": "biz-b",
+      "src": "host-02",
+      "offset_seconds": 10,
+      "technique": "T1021.002"
+    },
+    {
+      "kind": "auth",
+      "host": "host-02",
+      "user": "biz-b",
+      "src": "host-01",
+      "offset_seconds": 10,
+      "technique": "T1021.001"
+    },
+    {
+      "kind": "auth",
+      "host": "host-01",
+      "user": "biz-b",
+      "src": "host-02",
+      "offset_seconds": 11,
+      "technique": "T1021.002"
+    },
+    {
+      "kind": "auth",
+      "host": "host-02",
+      "user": "biz-b",
+      "src": "host-01",
+      "offset_seconds": 11,
+      "technique": "T1021.001"
+    },
+    {
+      "kind": "auth",
+      "host": "host-01",
+      "user": "biz-b",
+      "src": "host-02",
+      "offset_seconds": 12,
+      "technique": "T1021.002"
+    },
+    {
+      "kind": "auth",
+      "host": "host-02",
+      "user": "biz-b",
+      "src": "host-01",
+      "offset_seconds": 12,
+      "technique": "T1021.001"
+    },
+    {
+      "kind": "auth",
+      "host": "host-01",
+      "user": "biz-b",
+      "src": "host-02",
+      "offset_seconds": 13,
+      "technique": "T1021.002"
+    },
+    {
+      "kind": "auth",
+      "host": "host-02",
+      "user": "biz-b",
+      "src": "host-01",
+      "offset_seconds": 13,
+      "technique": "T1021.001"
+    },
+    {
+      "kind": "auth",
+      "host": "host-01",
+      "user": "biz-b",
+      "src": "host-02",
+      "offset_seconds": 14,
+      "technique": "T1021.002"
+    },
+    {
+      "kind": "auth",
+      "host": "host-02",
+      "user": "biz-d",
+      "src": "host-03",
+      "offset_seconds": 16,
+      "technique": "T1021.001"
+    },
+    {
+      "kind": "auth",
+      "host": "host-03",
+      "user": "biz-d",
+      "src": "host-02",
+      "offset_seconds": 17,
+      "technique": "T1021.002"
+    },
+    {
+      "kind": "auth",
+      "host": "host-02",
+      "user": "biz-d",
+      "src": "host-03",
+      "offset_seconds": 17,
+      "technique": "T1021.001"
+    },
+    {
+      "kind": "auth",
+      "host": "host-03",
+      "user": "biz-d",
+      "src": "host-02",
+      "offset_seconds": 18,
+      "technique": "T1021.002"
+    },
+    {
+      "kind": "auth",
+      "host": "host-02",
+      "user": "biz-d",
+      "src": "host-03",
+      "offset_seconds": 18,
+      "technique": "T1021.001"
+    },
+    {
+      "kind": "auth",
+      "host": "host-03",
+      "user": "biz-d",
+      "src": "host-02",
+      "offset_seconds": 19,
+      "technique": "T1021.002"
+    },
+    {
+      "kind": "auth",
+      "host": "host-02",
+      "user": "biz-d",
+      "src": "host-03",
+      "offset_seconds": 19,
+      "technique": "T1021.001"
+    },
+    {
+      "kind": "auth",
+      "host": "host-03",
+      "user": "biz-d",
+      "src": "host-02",
+      "offset_seconds": 20,
+      "technique": "T1021.002"
+    },
+    {
+      "kind": "auth",
+      "host": "host-02",
+      "user": "biz-d",
+      "src": "host-03",
+      "offset_seconds": 20,
+      "technique": "T1021.001"
+    },
+    {
+      "kind": "auth",
+      "host": "host-03",
+      "user": "biz-d",
+      "src": "host-02",
+      "offset_seconds": 21,
+      "technique": "T1021.002"
+    },
+    {
+      "kind": "auth",
+      "host": "host-02",
+      "user": "biz-d",
+      "src": "host-03",
+      "offset_seconds": 21,
+      "technique": "T1021.001"
+    },
+    {
+      "kind": "auth",
+      "host": "host-03",
+      "user": "biz-d",
+      "src": "host-02",
+      "offset_seconds": 22,
+      "technique": "T1021.002"
+    },
+    {
+      "kind": "auth",
+      "host": "host-02",
+      "user": "biz-e",
+      "src": "host-04",
+      "offset_seconds": 24,
+      "technique": "T1021.001"
+    },
+    {
+      "kind": "auth",
+      "host": "host-04",
+      "user": "biz-e",
+      "src": "host-02",
+      "offset_seconds": 25,
+      "technique": "T1021.002"
+    },
+    {
+      "kind": "auth",
+      "host": "host-02",
+      "user": "biz-e",
+      "src": "host-04",
+      "offset_seconds": 25,
+      "technique": "T1021.001"
+    },
+    {
+      "kind": "auth",
+      "host": "host-04",
+      "user": "biz-e",
+      "src": "host-02",
+      "offset_seconds": 26,
+      "technique": "T1021.002"
+    },
+    {
+      "kind": "auth",
+      "host": "host-02",
+      "user": "biz-e",
+      "src": "host-04",
+      "offset_seconds": 26,
+      "technique": "T1021.001"
+    },
+    {
+      "kind": "auth",
+      "host": "host-04",
+      "user": "biz-e",
+      "src": "host-02",
+      "offset_seconds": 27,
+      "technique": "T1021.002"
+    },
+    {
+      "kind": "auth",
+      "host": "host-02",
+      "user": "biz-e",
+      "src": "host-04",
+      "offset_seconds": 27,
+      "technique": "T1021.001"
+    },
+    {
+      "kind": "auth",
+      "host": "host-04",
+      "user": "biz-e",
+      "src": "host-02",
+      "offset_seconds": 28,
+      "technique": "T1021.002"
+    },
+    {
+      "kind": "auth",
+      "host": "host-02",
+      "user": "biz-e",
+      "src": "host-04",
+      "offset_seconds": 28,
+      "technique": "T1021.001"
+    },
+    {
+      "kind": "auth",
+      "host": "host-04",
+      "user": "biz-e",
+      "src": "host-02",
+      "offset_seconds": 29,
+      "technique": "T1021.002"
+    },
+    {
+      "kind": "auth",
+      "host": "host-02",
+      "user": "biz-e",
+      "src": "host-04",
+      "offset_seconds": 29,
+      "technique": "T1021.001"
+    },
+    {
+      "kind": "auth",
+      "host": "host-04",
+      "user": "biz-e",
+      "src": "host-02",
+      "offset_seconds": 30,
+      "technique": "T1021.002"
+    },
+    {
+      "kind": "auth",
+      "host": "host-00",
+      "user": "apt-pivot",
+      "src": "203.0.113.88",
+      "offset_seconds": 40,
+      "technique": "T1078"
+    },
+    {
+      "kind": "auth",
+      "host": "host-02",
+      "user": "apt-pivot",
+      "src": "host-00",
+      "offset_seconds": 48,
+      "technique": "T1078"
+    },
+    {
+      "kind": "auth",
+      "host": "host-04",
+      "user": "apt-pivot",
+      "src": "host-02",
+      "offset_seconds": 56,
+      "technique": "T1078"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-04",
+      "dst_ip": "198.51.100.220",
+      "bytes": 19000,
+      "offset_seconds": 70,
+      "technique": "T1041"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-02",
+      "dst_ip": "198.51.100.220",
+      "bytes": 15000,
+      "offset_seconds": 75,
+      "technique": "T1041"
+    },
+    {
+      "kind": "auth",
+      "host": "host-06",
+      "user": "decoy--pivot",
+      "src": "10.99.0.1",
+      "offset_seconds": 120,
+      "technique": "T1078"
+    },
+    {
+      "kind": "auth",
+      "host": "host-07",
+      "user": "decoy--pivot",
+      "src": "host-06",
+      "offset_seconds": 130,
+      "technique": "T1078"
+    }
+  ],
+  "scale": {
+    "tier": "T1",
+    "n_hosts": 15,
+    "source_campaign_id": "lim09d-benign-hub-pivot"
+  }
+}
