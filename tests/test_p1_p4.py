@@ -118,3 +118,49 @@ def test_byo_windows_wedge(tmp_path: Path, monkeypatch):
         {"campaigns": [c.to_dict() for c in camps], "ground_truth": None}
     )
     assert report["aggregate_status"] in ("complete", "partial")
+
+
+def test_score_non_author_skips_non_attack_manifests(tmp_path: Path):
+    """OS-wide sensor breaktest JSON lacks steps — must not crash score-non-author."""
+    import shutil
+    import subprocess
+    import sys
+
+    root = Path(__file__).resolve().parents[1]
+    man = tmp_path / "manifests"
+    man.mkdir()
+    shutil.copy(
+        root / "labs" / "breaktest" / "manifests" / "art_lateral_chain.json",
+        man / "art_lateral_chain.json",
+    )
+    (man / "break_os_wide_sensors.json").write_text(
+        json.dumps(
+            {
+                "campaign_id": "break-os-wide-sensors",
+                "hosts": ["host-a"],
+                "fixture": "x",
+            }
+        ),
+        encoding="utf-8",
+    )
+    report = tmp_path / "non_author.json"
+    proc = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "corvex",
+            "score-non-author",
+            "--manifests",
+            str(man),
+            "--report",
+            str(report),
+        ],
+        cwd=str(root),
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert proc.returncode in (0, 1), proc.stderr + proc.stdout
+    data = json.loads(report.read_text(encoding="utf-8"))
+    assert "art_lateral_chain.json" in data["packs"]
+    assert any(s["file"] == "break_os_wide_sensors.json" for s in data.get("skipped") or [])
