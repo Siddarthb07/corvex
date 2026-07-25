@@ -1,0 +1,110 @@
+{
+  "campaign_id": "lim07-dropped-mid-chain",
+  "family": "genuine_vuln_breaker",
+  "ood": true,
+  "hosts": [
+    "host-a",
+    "host-b",
+    "host-c",
+    "host-d",
+    "host-e"
+  ],
+  "truth_hosts": [
+    "host-a",
+    "host-b",
+    "host-c",
+    "host-d"
+  ],
+  "producers": {
+    "host-a": "prod-a",
+    "host-b": "prod-b",
+    "host-c": "prod-c",
+    "host-d": "prod-d",
+    "host-e": "prod-e"
+  },
+  "base_time_utc": "2026-07-25T14:00:00Z",
+  "fleet_origin": "original",
+  "fleet_suite": "limits",
+  "headline": false,
+  "source": {
+    "style": "Fleet-limits breaking-point sketches",
+    "repo": "https://github.com/Siddarthb07/corvex",
+    "techniques": [
+      "T1021.002",
+      "T1078",
+      "T1041"
+    ],
+    "note": "dropped mid-chain"
+  },
+  "narrative": [
+    "SMB hop a\u2192b\u2192c\u2192d but host-c agent is down \u2014 missing witness."
+  ],
+  "break_intent": {
+    "name": "dropped mid-chain",
+    "break_criterion": "PARTIAL/BROKE, or false confidence that a,d is complete",
+    "success_criteria_attacker": [
+      "host-c missed; incomplete chain treated as complete"
+    ]
+  },
+  "steps": [
+    {
+      "kind": "recon",
+      "host": "host-a",
+      "dst_ips": [
+        "10.50.0.11",
+        "10.50.0.12",
+        "10.50.0.13",
+        "10.50.0.14",
+        "10.50.0.15",
+        "10.50.0.16"
+      ],
+      "dst_port": 445,
+      "dst_step": 1,
+      "offset_seconds": 0,
+      "technique": "T1021.002"
+    },
+    {
+      "kind": "auth",
+      "host": "host-a",
+      "user": "svc-deploy",
+      "src": "10.50.0.9",
+      "offset_seconds": 10,
+      "technique": "T1078"
+    },
+    {
+      "kind": "auth",
+      "host": "host-b",
+      "user": "svc-deploy",
+      "src": "host-a",
+      "offset_seconds": 14,
+      "technique": "T1021.002"
+    },
+    {
+      "kind": "auth",
+      "host": "host-c",
+      "user": "svc-deploy",
+      "src": "host-b",
+      "offset_seconds": 18,
+      "technique": "T1021.002"
+    },
+    {
+      "kind": "auth",
+      "host": "host-d",
+      "user": "svc-deploy",
+      "src": "host-c",
+      "offset_seconds": 22,
+      "technique": "T1021.002"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-d",
+      "dst_ip": "198.51.100.40",
+      "bytes": 30000,
+      "offset_seconds": 35,
+      "technique": "T1041"
+    }
+  ],
+  "drop_hosts": [
+    "host-c"
+  ]
+}

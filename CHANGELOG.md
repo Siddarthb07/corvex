@@ -6,17 +6,21 @@
 - Stage B OS-wide Windows sensor: `corvex sensor-windows` (Security + Sysmon + Firewall + PowerShell), fixtures under `fixtures/os_wide/`, `docs/os-wide-sensor.md`, multi-host smoke script, `corvex habit-loop`.
 - `corvex stage-b-lab-unlock` (auditable lab override). Flat lab → envelope adapt on recompute. Dash `--token` required for LAN bind.
 - `corvex fuse-run` offline lab+PC merge; `sensor-windows --require-live`; wevtutil channel health + RecordId bookmarks.
+- `corvex sign-stranger-attestation`; claim gate `trust_integrity` functional probes; `lab_verified` vs `claim_allowed`.
 
 ### Changed
 - `recompute_run` verifies HMAC (rejects tampered envelopes) and adapts flat Docker-lab rows; campaigns from correlator only (`mode: offline_lab_replay`).
-- Claim stranger gate requires `attestation_kind=human`; agent operators rejected.
+- `Correlator.ingest` verifies HMAC when enrollment is provided.
+- `resign_events` verify-first; unverifiable packs tagged `_corvex_provenance=locally_stamped`.
+- Dash: token covers static + API; HTML boot is API-only (no embedded snapshot / no served `snapshot.json`).
+- Claim stranger gate requires signed `attestation_hmac`; unsigned human JSON is advisory.
 - `CORVEX_STAGE_B=1` env bypass removed.
 - Enrollment save applies owner-only ACL (best-effort).
-- **claim_allowed=true** after human stranger attestation (operator: Jack).
+- **claim_allowed=false** by default; **lab_verified** covers sealed/breaktest quality.
 
 ### Safety
-- Agent stranger dry-runs cannot unlock `claim_allowed`. Lab override does not flip claims.
-- Live OS quarantine still unimplemented / observe-only.
+- Agent stranger dry-runs and unsigned attestations cannot unlock `claim_allowed`.
+- Lab override does not flip claims. Live OS quarantine still unimplemented / observe-only.
 ## [1.1.0] — 2026-07-23
 
 ### Added

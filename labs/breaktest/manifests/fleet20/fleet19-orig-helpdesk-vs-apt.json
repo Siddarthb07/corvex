@@ -1,0 +1,103 @@
+{
+  "campaign_id": "fleet19-orig-helpdesk-vs-apt",
+  "family": "genuine_vuln_breaker",
+  "ood": true,
+  "hosts": [
+    "host-a",
+    "host-b",
+    "host-c",
+    "host-d",
+    "host-e"
+  ],
+  "truth_hosts": [
+    "host-a",
+    "host-b",
+    "host-c"
+  ],
+  "producers": {
+    "host-a": "prod-a",
+    "host-b": "prod-b",
+    "host-c": "prod-c",
+    "host-d": "prod-d",
+    "host-e": "prod-e"
+  },
+  "base_time_utc": "2026-07-25T14:00:00Z",
+  "fleet_origin": "original",
+  "source": {
+    "style": "Black-box fleet \u2014 ATT&CK/Atomic-style telemetry sketches",
+    "repo": "https://github.com/Siddarthb07/corvex",
+    "techniques": [
+      "T1078",
+      "T1041"
+    ],
+    "note": "Original: helpdesk on c\u2194d must not glue to APT a\u2194b\u2194c."
+  },
+  "narrative": [
+    "APT on a-b-c. Helpdesk also on c-d same minute."
+  ],
+  "break_intent": {
+    "name": "anti-jumpbox",
+    "success_criteria_defender": [
+      "empty over_merged_hosts",
+      "matched truth"
+    ]
+  },
+  "steps": [
+    {
+      "kind": "auth",
+      "host": "host-a",
+      "user": "apt-user",
+      "src": "203.0.113.21",
+      "offset_seconds": 0,
+      "technique": "T1078"
+    },
+    {
+      "kind": "auth",
+      "host": "host-b",
+      "user": "apt-user",
+      "src": "host-a",
+      "offset_seconds": 10,
+      "technique": "T1078"
+    },
+    {
+      "kind": "auth",
+      "host": "host-c",
+      "user": "apt-user",
+      "src": "host-b",
+      "offset_seconds": 20,
+      "technique": "T1078"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-c",
+      "dst_ip": "198.51.100.190",
+      "bytes": 16000,
+      "offset_seconds": 30,
+      "technique": "T1041"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-b",
+      "dst_ip": "198.51.100.190",
+      "bytes": 14000,
+      "offset_seconds": 35,
+      "technique": "T1041"
+    },
+    {
+      "kind": "auth",
+      "host": "host-c",
+      "user": "helpdesk",
+      "src": "10.30.0.9",
+      "offset_seconds": 25,
+      "technique": "T1078"
+    },
+    {
+      "kind": "auth",
+      "host": "host-d",
+      "user": "helpdesk",
+      "src": "host-c",
+      "offset_seconds": 32,
+      "technique": "T1078"
+    }
+  ]
+}

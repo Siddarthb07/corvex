@@ -78,20 +78,79 @@ def test_human_stranger_qualifies_gate(tmp_path: Path):
         json.dumps({"pass": True, "f1_lift": 0.5, "source": "x"}),
         encoding="utf-8",
     )
-    (reports / "stranger_dry_run.json").write_text(
+    from corvex.eval.attestation_crypto import (
+        generate_stranger_keypair,
+        load_stranger_private_key,
+        sign_attestation_ed25519,
+    )
+
+    key_path = reports / ".stranger_ed25519_private.pem"
+    generate_stranger_keypair(key_path)
+    priv = load_stranger_private_key(key_path)
+    att = sign_attestation_ed25519(
+        {
+            "pass": True,
+            "operator": "Alex External",
+            "attestation_kind": "human",
+            "note": "ran BYO path blind",
+        },
+        priv,
+    )
+    (reports / "stranger_dry_run.json").write_text(json.dumps(att), encoding="utf-8")
+    (reports / "live_second_host.json").write_text(
         json.dumps(
             {
                 "pass": True,
-                "operator": "Alex External",
-                "attestation_kind": "human",
-                "note": "ran BYO path blind",
+                "source": "wevtutil",
+                "host_id": "pc-lab-2",
+                "security_events_seen": True,
+                "note": "elevated Security channel on second PC",
             }
         ),
         encoding="utf-8",
     )
     result = evaluate_claim_gates(tmp_path)
     assert result["gates"]["stranger_success"]["pass"] is True
+    assert result["gates"]["trust_integrity"]["pass"] is True
+    assert result["gates"]["live_second_host"]["pass"] is True
     assert result["claim_allowed"] is True
+
+
+def test_unsigned_human_stranger_does_not_unlock(tmp_path: Path):
+    reports = tmp_path / "reports"
+    reports.mkdir()
+    (reports / "stageA_heldout.json").write_text(
+        json.dumps(
+            {
+                "metrics": {
+                    "correlator": {"false_campaign_rate": 0.0},
+                    "detector_only": {},
+                },
+                "packs": [{"family": "benign"}] * 5,
+            }
+        ),
+        encoding="utf-8",
+    )
+    (reports / "non_author_fusion.json").write_text(
+        json.dumps({"pass": True, "f1_lift": 0.5, "source": "x"}),
+        encoding="utf-8",
+    )
+    (reports / "stranger_dry_run.json").write_text(
+        json.dumps(
+            {
+                "pass": True,
+                "operator": "Jack",
+                "attestation_kind": "human",
+                "note": "unsigned advisory only",
+            }
+        ),
+        encoding="utf-8",
+    )
+    result = evaluate_claim_gates(tmp_path)
+    assert result["gates"]["stranger_success"]["pass"] is False
+    assert result.get("lab_verified") is True
+    assert result["claim_allowed"] is False
+    assert "lab_verified" in result["claim_language"]
 
 
 def test_env_stage_b_ignored(tmp_path: Path, monkeypatch):

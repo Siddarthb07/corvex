@@ -46,6 +46,8 @@ reports/AUDIT_BENCHMARK.json
 reports/oss_retention.json
 reports/stranger_dry_run.json
 reports/stranger_dry_run.md
+reports/.claim_attestation_key
+reports/.stranger_ed25519_private.pem
 reports/stageA.json
 reports/stageA.md
 reports/stageA_heldout.json

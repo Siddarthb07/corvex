@@ -13,10 +13,19 @@ This is purple-team event telemetry — **no Atomic scripts or malware are vendo
 | `art_cred_hop.json` | 5 | T1110, T1078, T1021, T1041 | Three distinct users chained by overlapping exfil |
 | `art_slow_drip.json` | 5 | T1078, T1021, T1041 | OOD slow timing, service accounts, alt ports |
 | `art_recon_pivot.json` | 4 | T1046, T1078, T1041 | Recon fan-out then auth/exfil pivot |
-| `art_recon_exfil_split.json` | 4 | T1046, T1078, T1048 | Recon + split-user lateral + two egress sinks |
+| `break_sql_continuous_art.json` | 5 | T1190, T1505.001, T1078, T1041, T1071.004… | Continuous SQLi method spray + stolen SQL cred lateral; shared `sql-svc` over-merge bait |
 
 Easy single-user burst lateral is **not** the break-test bar. These packs force
 cross-key fusion; detector-only should fragment.
+
+## Fleet (20)
+
+Black-box full-intensity benchmark (GitHub ART sketches + original breakers):
+
+```bash
+python scripts/run_attack_fleet10.py 2
+# -> reports/attack_fleet20.md + labs/breaktest/manifests/fleet20/
+```
 
 ## Score all manifests (no Docker)
 

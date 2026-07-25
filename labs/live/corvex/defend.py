@@ -234,7 +234,7 @@ def main() -> None:
     )
     store = CampaignStore(RUNS / "campaigns.jsonl")
     audit = AuditLog(RUNS / "audit.jsonl")
-    corr = Correlator(store, audit, CorrelatorConfig(min_hosts=2, window_seconds=600))
+    corr = Correlator(store, audit, CorrelatorConfig(min_hosts=2, window_seconds=600), allow_unverified=True)
 
     seen_lines = 0
     seq = 0

@@ -1,0 +1,98 @@
+{
+  "campaign_id": "lim05-technique-sub-kerberoast",
+  "family": "genuine_vuln_breaker",
+  "ood": true,
+  "hosts": [
+    "host-a",
+    "host-b",
+    "host-c",
+    "host-d",
+    "host-e"
+  ],
+  "truth_hosts": [
+    "host-a",
+    "host-b",
+    "host-c"
+  ],
+  "producers": {
+    "host-a": "prod-a",
+    "host-b": "prod-b",
+    "host-c": "prod-c",
+    "host-d": "prod-d",
+    "host-e": "prod-e"
+  },
+  "base_time_utc": "2026-07-25T14:00:00Z",
+  "fleet_origin": "original",
+  "fleet_suite": "limits",
+  "headline": false,
+  "source": {
+    "style": "Fleet-limits breaking-point sketches",
+    "repo": "https://github.com/Siddarthb07/corvex",
+    "techniques": [
+      "T1558",
+      "T1021.006",
+      "T1041"
+    ],
+    "note": "off-library technique substitution"
+  },
+  "narrative": [
+    "Off-library techniques: Kerberoast foothold, WinRM lateral, exfil."
+  ],
+  "break_intent": {
+    "name": "off-library technique substitution",
+    "break_criterion": "campaign not detected, or techniques logged but not correlated",
+    "success_criteria_attacker": [
+      "both_missed or fragmented"
+    ]
+  },
+  "steps": [
+    {
+      "kind": "auth",
+      "host": "host-a",
+      "user": "svc-sql",
+      "src": "203.0.113.40",
+      "offset_seconds": 0,
+      "technique": "T1558"
+    },
+    {
+      "kind": "auth",
+      "host": "host-a",
+      "user": "svc-sql",
+      "src": "203.0.113.40",
+      "offset_seconds": 5,
+      "technique": "T1558"
+    },
+    {
+      "kind": "auth",
+      "host": "host-b",
+      "user": "svc-sql",
+      "src": "host-a",
+      "offset_seconds": 15,
+      "technique": "T1021.006"
+    },
+    {
+      "kind": "auth",
+      "host": "host-c",
+      "user": "svc-sql",
+      "src": "host-b",
+      "offset_seconds": 25,
+      "technique": "T1021.006"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-c",
+      "dst_ip": "198.51.100.210",
+      "bytes": 20000,
+      "offset_seconds": 40,
+      "technique": "T1041"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-b",
+      "dst_ip": "198.51.100.210",
+      "bytes": 15000,
+      "offset_seconds": 45,
+      "technique": "T1041"
+    }
+  ]
+}

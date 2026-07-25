@@ -1,0 +1,122 @@
+{
+  "campaign_id": "fleet02-art-powershell-chain",
+  "family": "attack_repo",
+  "ood": true,
+  "hosts": [
+    "host-a",
+    "host-b",
+    "host-c",
+    "host-d",
+    "host-e"
+  ],
+  "truth_hosts": [
+    "host-a",
+    "host-b",
+    "host-d"
+  ],
+  "producers": {
+    "host-a": "prod-a",
+    "host-b": "prod-b",
+    "host-c": "prod-c",
+    "host-d": "prod-d",
+    "host-e": "prod-e"
+  },
+  "base_time_utc": "2026-07-25T14:00:00Z",
+  "fleet_origin": "github_art",
+  "source": {
+    "style": "Black-box fleet \u2014 ATT&CK/Atomic-style telemetry sketches",
+    "repo": "https://github.com/redcanaryco/atomic-red-team",
+    "techniques": [
+      "T1059.001",
+      "T1078",
+      "T1041"
+    ],
+    "note": "Atomic-style PowerShell execution \u2192 interactive user \u2192 egress."
+  },
+  "narrative": [
+    "Encoded PowerShell foothold, steal an interactive session, move, exfil."
+  ],
+  "break_intent": {
+    "name": "fleet02-art-powershell-chain",
+    "success_criteria_defender": [
+      "matched truth_hosts",
+      "empty over_merged_hosts"
+    ]
+  },
+  "steps": [
+    {
+      "kind": "recon",
+      "host": "host-a",
+      "dst_ips": [
+        "10.40.1.1",
+        "10.40.1.2",
+        "10.40.1.3",
+        "10.40.1.4",
+        "10.40.1.5",
+        "10.40.1.6",
+        "10.40.1.7",
+        "10.40.1.8"
+      ],
+      "dst_port": 5985,
+      "dst_step": 1,
+      "offset_seconds": 0,
+      "technique": "T1059.001"
+    },
+    {
+      "kind": "auth",
+      "host": "host-a",
+      "user": "ps-operator",
+      "src": "203.0.113.33",
+      "offset_seconds": 12,
+      "technique": "T1059.001"
+    },
+    {
+      "kind": "auth",
+      "host": "host-b",
+      "user": "ps-operator",
+      "src": "host-a",
+      "offset_seconds": 18,
+      "technique": "T1078"
+    },
+    {
+      "kind": "auth",
+      "host": "host-b",
+      "user": "ps-operator",
+      "src": "host-a",
+      "offset_seconds": 21,
+      "technique": "T1078"
+    },
+    {
+      "kind": "auth",
+      "host": "host-d",
+      "user": "ps-operator",
+      "src": "host-b",
+      "offset_seconds": 28,
+      "technique": "T1078"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-d",
+      "dst_ip": "198.51.100.30",
+      "bytes": 20000,
+      "offset_seconds": 40,
+      "technique": "T1041"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-b",
+      "dst_ip": "198.51.100.30",
+      "bytes": 14000,
+      "offset_seconds": 44,
+      "technique": "T1041"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-d",
+      "dst_ip": "198.51.100.30",
+      "bytes": 12000,
+      "offset_seconds": 48,
+      "technique": "T1041"
+    }
+  ]
+}

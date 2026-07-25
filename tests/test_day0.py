@@ -171,6 +171,6 @@ def test_correlator_dedup(tmp_path):
     )
     store = CampaignStore(tmp_path / "c.jsonl")
     audit = AuditLog(tmp_path / "a.jsonl")
-    corr = Correlator(store, audit)
+    corr = Correlator(store, audit, enrollment=enr)
     corr.ingest([env, env])
     assert "same-id" in corr._seen

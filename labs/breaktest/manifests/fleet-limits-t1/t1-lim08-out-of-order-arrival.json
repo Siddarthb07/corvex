@@ -1,0 +1,154 @@
+{
+  "campaign_id": "t1-lim08-out-of-order-arrival",
+  "family": "genuine_vuln_breaker",
+  "ood": true,
+  "hosts": [
+    "host-00",
+    "host-01",
+    "host-02",
+    "host-03",
+    "host-04",
+    "host-05",
+    "host-06",
+    "host-07",
+    "host-08",
+    "host-09",
+    "host-10",
+    "host-11",
+    "host-12",
+    "host-13",
+    "host-14"
+  ],
+  "truth_hosts": [
+    "host-00",
+    "host-01"
+  ],
+  "producers": {
+    "host-00": "prod-00",
+    "host-01": "prod-01",
+    "host-02": "prod-02",
+    "host-03": "prod-03",
+    "host-04": "prod-04",
+    "host-05": "prod-05",
+    "host-06": "prod-06",
+    "host-07": "prod-07",
+    "host-08": "prod-08",
+    "host-09": "prod-09",
+    "host-10": "prod-10",
+    "host-11": "prod-11",
+    "host-12": "prod-12",
+    "host-13": "prod-13",
+    "host-14": "prod-14"
+  },
+  "base_time_utc": "2026-07-25T14:00:00Z",
+  "fleet_origin": "original",
+  "fleet_suite": "limits-t1",
+  "headline": false,
+  "source": {
+    "style": "Fleet-limits breaking-point sketches",
+    "repo": "https://github.com/Siddarthb07/corvex",
+    "techniques": [
+      "T1041",
+      "T1105",
+      "T1078"
+    ],
+    "note": "out-of-order"
+  },
+  "narrative": [
+    "Chunked exfil on b arrives/timestamped before the lateral from a that caused it."
+  ],
+  "break_intent": {
+    "name": "out-of-order",
+    "break_criterion": "causal chain backwards, or split into two false fragments",
+    "success_criteria_attacker": [
+      "fragmented or inverted chain"
+    ]
+  },
+  "steps": [
+    {
+      "kind": "exfil",
+      "host": "host-02",
+      "dst_ip": "104.18.32.7",
+      "bytes": 8000,
+      "offset_seconds": 0,
+      "technique": "T1105"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-03",
+      "dst_ip": "104.18.32.7",
+      "bytes": 7900,
+      "offset_seconds": 5,
+      "technique": "T1105"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-01",
+      "dst_ip": "198.51.100.80",
+      "bytes": 9000,
+      "offset_seconds": 10,
+      "technique": "T1041"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-00",
+      "dst_ip": "198.51.100.80",
+      "bytes": 9000,
+      "offset_seconds": 12,
+      "technique": "T1041"
+    },
+    {
+      "kind": "auth",
+      "host": "host-00",
+      "user": "chunker",
+      "src": "203.0.113.8",
+      "offset_seconds": 40,
+      "technique": "T1078"
+    },
+    {
+      "kind": "auth",
+      "host": "host-01",
+      "user": "chunker",
+      "src": "host-00",
+      "offset_seconds": 45,
+      "technique": "T1078"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-01",
+      "dst_ip": "198.51.100.80",
+      "bytes": 9000,
+      "offset_seconds": 55,
+      "technique": "T1041"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-00",
+      "dst_ip": "198.51.100.80",
+      "bytes": 9000,
+      "offset_seconds": 58,
+      "technique": "T1041"
+    },
+    {
+      "kind": "auth",
+      "host": "host-06",
+      "user": "decoy-rrival",
+      "src": "10.99.0.1",
+      "offset_seconds": 120,
+      "technique": "T1078"
+    },
+    {
+      "kind": "auth",
+      "host": "host-07",
+      "user": "decoy-rrival",
+      "src": "host-06",
+      "offset_seconds": 130,
+      "technique": "T1078"
+    }
+  ],
+  "scale": {
+    "tier": "T1",
+    "n_hosts": 15,
+    "source_campaign_id": "lim08-out-of-order-arrival"
+  }
+}

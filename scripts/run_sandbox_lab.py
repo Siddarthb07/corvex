@@ -132,7 +132,7 @@ def scenario_core_detection() -> CaseResult:
         )
         store = CampaignStore()
         audit = AuditLog(SANDBOX / "runs" / "audit.jsonl")
-        corr = Correlator(store, audit, CorrelatorConfig())
+        corr = Correlator(store, audit, CorrelatorConfig(), allow_unverified=True)
         for env in events:
             corr.on_event(env)
         camps = list(store.all())

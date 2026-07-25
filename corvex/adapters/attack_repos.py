@@ -66,25 +66,57 @@ def adapt_attack_manifest(
     for h, p in (manifest.get("producers") or {}).items():
         host_producer[str(h)] = str(p)
 
+    # Optional per-host clock skew (seconds added to that host's event timestamps).
+    skew_map = {
+        str(h): float(s)
+        for h, s in (manifest.get("host_clock_skew_seconds") or {}).items()
+    }
+    # Simulate agent outage: drop all events for these hosts after expansion.
+    drop_hosts = {str(h) for h in (manifest.get("drop_hosts") or [])}
+    # Logical host aliases for scoring (e.g. DHCP re-lease → two host_ids, one identity).
+    host_aliases = {
+        str(k): str(v) for k, v in (manifest.get("host_aliases") or {}).items()
+    }
+
+    def _alias(hid: str) -> str:
+        return host_aliases.get(hid, hid)
+
     base = _base_time(manifest)
     events: List[Dict[str, Any]] = []
     seq = 0
     stage_names: Dict[str, List[str]] = {}
 
+    def _emit_host(step: Mapping[str, Any], logical: str) -> str:
+        # emit_host / host_id_override: report under a different hostname (split-brain).
+        return str(step.get("emit_host") or step.get("host_id_override") or logical)
+
+    def _producer_for(emit: str, logical: str) -> str:
+        if emit in host_producer:
+            return host_producer[emit]
+        if logical in host_producer:
+            return host_producer[logical]
+        raise KeyError(f"no producer for emit_host={emit!r} / host={logical!r}")
+
     for step in manifest["steps"]:
         kind = str(step.get("kind") or step.get("type") or "").lower()
         offset = float(step.get("offset_seconds", seq * 20))
         if kind == "auth":
-            host = str(step["host"])
+            logical = str(step["host"])
+            if logical in drop_hosts:
+                continue
+            host = _emit_host(step, logical)
+            if host in drop_hosts:
+                continue
             seq += 1
             eid = f"{manifest['campaign_id']}-auth-{seq:04d}"
+            ts_off = offset + skew_map.get(logical, 0.0) + float(step.get("clock_skew_seconds") or 0)
             events.append(
                 {
                     "schema_ver": "1",
                     "event_id": eid,
-                    "producer_id": host_producer[host],
+                    "producer_id": _producer_for(host, logical),
                     "host_id": host,
-                    "ts_utc": _ts(base, offset),
+                    "ts_utc": _ts(base, ts_off),
                     "nonce": eid,
                     "payload_type": "auth",
                     "payload": {
@@ -97,16 +129,22 @@ def adapt_attack_manifest(
             )
             stage_names.setdefault("lateral_auth", []).append(host)
         elif kind in ("egress", "exfil", "micro_exfil"):
-            host = str(step["host"])
+            logical = str(step["host"])
+            if logical in drop_hosts:
+                continue
+            host = _emit_host(step, logical)
+            if host in drop_hosts:
+                continue
             seq += 1
             eid = f"{manifest['campaign_id']}-exfil-{seq:04d}"
+            ts_off = offset + skew_map.get(logical, 0.0) + float(step.get("clock_skew_seconds") or 0)
             events.append(
                 {
                     "schema_ver": "1",
                     "event_id": eid,
-                    "producer_id": host_producer[host],
+                    "producer_id": _producer_for(host, logical),
                     "host_id": host,
-                    "ts_utc": _ts(base, offset),
+                    "ts_utc": _ts(base, ts_off),
                     "nonce": eid,
                     "payload_type": "net_conn",
                     "payload": {
@@ -120,18 +158,29 @@ def adapt_attack_manifest(
             )
             stage_names.setdefault("micro_exfil", []).append(host)
         elif kind in ("recon", "recon_fanout"):
-            host = str(step["host"])
+            logical = str(step["host"])
+            if logical in drop_hosts:
+                continue
+            host = _emit_host(step, logical)
+            if host in drop_hosts:
+                continue
             dsts = list(step.get("dst_ips") or [f"10.20.30.{j+1}" for j in range(8)])
             for j, dst in enumerate(dsts):
                 seq += 1
                 eid = f"{manifest['campaign_id']}-recon-{seq:04d}"
+                ts_off = (
+                    offset
+                    + j * float(step.get("dst_step", 5))
+                    + skew_map.get(logical, 0.0)
+                    + float(step.get("clock_skew_seconds") or 0)
+                )
                 events.append(
                     {
                         "schema_ver": "1",
                         "event_id": eid,
-                        "producer_id": host_producer[host],
+                        "producer_id": _producer_for(host, logical),
                         "host_id": host,
-                        "ts_utc": _ts(base, offset + j * float(step.get("dst_step", 5))),
+                        "ts_utc": _ts(base, ts_off),
                         "nonce": eid,
                         "payload_type": "net_conn",
                         "payload": {
@@ -145,17 +194,22 @@ def adapt_attack_manifest(
                 )
             stage_names.setdefault("recon_fanout", []).append(host)
         elif kind == "dns":
-            # Blind-channel noise — Corvex has no DNS multi-host detector today.
-            host = str(step["host"])
+            logical = str(step["host"])
+            if logical in drop_hosts:
+                continue
+            host = _emit_host(step, logical)
+            if host in drop_hosts:
+                continue
             seq += 1
             eid = f"{manifest['campaign_id']}-dns-{seq:04d}"
+            ts_off = offset + skew_map.get(logical, 0.0) + float(step.get("clock_skew_seconds") or 0)
             events.append(
                 {
                     "schema_ver": "1",
                     "event_id": eid,
-                    "producer_id": host_producer[host],
+                    "producer_id": _producer_for(host, logical),
                     "host_id": host,
-                    "ts_utc": _ts(base, offset),
+                    "ts_utc": _ts(base, ts_off),
                     "nonce": eid,
                     "payload_type": "dns",
                     "payload": {
@@ -168,12 +222,26 @@ def adapt_attack_manifest(
         else:
             raise ValueError(f"unknown step kind: {kind!r}")
 
+    # Normalize emit_host / DHCP aliases to persistent asset IDs before pack write
+    # so the correlator never sees split-brain labels (lim11).
+    if host_aliases:
+        for ev in events:
+            ev["host_id"] = _alias(str(ev["host_id"]))
+            payload = ev.get("payload")
+            if isinstance(payload, dict):
+                src = payload.get("src")
+                if src and str(src) in host_aliases:
+                    payload["src"] = _alias(str(src))
+
     events.sort(key=lambda e: e["ts_utc"])
     stages = [
         {"name": name, "hosts": sorted(set(hs))} for name, hs in stage_names.items()
     ]
-    # Optional truth_hosts: for over-merge / partial-intent break packs
-    truth_hosts = list(manifest.get("truth_hosts") or hosts)
+    # truth_hosts: distinguish missing (default all hosts) from explicit empty (FP stress).
+    if "truth_hosts" in manifest:
+        truth_hosts = list(manifest.get("truth_hosts") or [])
+    else:
+        truth_hosts = list(hosts)
     gt: Dict[str, Any] = {
         "campaign_id": str(manifest["campaign_id"]),
         "host_ids": truth_hosts,
@@ -183,6 +251,14 @@ def adapt_attack_manifest(
         "source": manifest.get("source") or {},
         "break_intent": manifest.get("break_intent"),
     }
+    if manifest.get("truth_campaigns"):
+        gt["truth_campaigns"] = list(manifest["truth_campaigns"])
+    if host_aliases:
+        gt["host_aliases"] = host_aliases
+    if drop_hosts:
+        gt["drop_hosts"] = sorted(drop_hosts)
+    if skew_map:
+        gt["host_clock_skew_seconds"] = skew_map
     return events, gt
 
 

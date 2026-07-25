@@ -1,0 +1,276 @@
+{
+  "campaign_id": "t1-lim12-near-dup-cdn-mimicry",
+  "family": "genuine_vuln_breaker",
+  "ood": true,
+  "hosts": [
+    "host-00",
+    "host-01",
+    "host-02",
+    "host-03",
+    "host-04",
+    "host-05",
+    "host-06",
+    "host-07",
+    "host-08",
+    "host-09",
+    "host-10",
+    "host-11",
+    "host-12",
+    "host-13",
+    "host-14"
+  ],
+  "truth_hosts": [
+    "host-00",
+    "host-01",
+    "host-02"
+  ],
+  "producers": {
+    "host-00": "prod-00",
+    "host-01": "prod-01",
+    "host-02": "prod-02",
+    "host-03": "prod-03",
+    "host-04": "prod-04",
+    "host-05": "prod-05",
+    "host-06": "prod-06",
+    "host-07": "prod-07",
+    "host-08": "prod-08",
+    "host-09": "prod-09",
+    "host-10": "prod-10",
+    "host-11": "prod-11",
+    "host-12": "prod-12",
+    "host-13": "prod-13",
+    "host-14": "prod-14"
+  },
+  "base_time_utc": "2026-07-25T14:00:00Z",
+  "fleet_origin": "original",
+  "fleet_suite": "limits-t1",
+  "headline": false,
+  "source": {
+    "style": "Fleet-limits breaking-point sketches",
+    "repo": "https://github.com/Siddarthb07/corvex",
+    "techniques": [
+      "T1105",
+      "T1078",
+      "T1041"
+    ],
+    "note": "CDN mimicry"
+  },
+  "narrative": [
+    "C2 traffic matches CDN bait timing/volume exactly; APT still moves underneath."
+  ],
+  "break_intent": {
+    "name": "CDN mimicry",
+    "break_criterion": "Jaccard regression vs #8/#20 passing results",
+    "success_criteria_attacker": [
+      "jaccard < reference or innocents false-Q"
+    ]
+  },
+  "steps": [
+    {
+      "kind": "exfil",
+      "host": "host-00",
+      "dst_ip": "104.18.32.7",
+      "bytes": 7500,
+      "offset_seconds": 0,
+      "technique": "T1105"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-01",
+      "dst_ip": "104.18.32.7",
+      "bytes": 7500,
+      "offset_seconds": 3,
+      "technique": "T1105"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-02",
+      "dst_ip": "104.18.32.7",
+      "bytes": 7500,
+      "offset_seconds": 6,
+      "technique": "T1105"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-03",
+      "dst_ip": "104.18.32.7",
+      "bytes": 7500,
+      "offset_seconds": 9,
+      "technique": "T1105"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-04",
+      "dst_ip": "104.18.32.7",
+      "bytes": 7500,
+      "offset_seconds": 12,
+      "technique": "T1105"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-05",
+      "dst_ip": "104.18.32.7",
+      "bytes": 7500,
+      "offset_seconds": 15,
+      "technique": "T1105"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-06",
+      "dst_ip": "104.18.32.7",
+      "bytes": 7500,
+      "offset_seconds": 18,
+      "technique": "T1105"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-07",
+      "dst_ip": "104.18.32.7",
+      "bytes": 7500,
+      "offset_seconds": 21,
+      "technique": "T1105"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-08",
+      "dst_ip": "104.18.32.7",
+      "bytes": 7500,
+      "offset_seconds": 24,
+      "technique": "T1105"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-09",
+      "dst_ip": "104.18.32.7",
+      "bytes": 7500,
+      "offset_seconds": 27,
+      "technique": "T1105"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-10",
+      "dst_ip": "104.18.32.7",
+      "bytes": 7500,
+      "offset_seconds": 30,
+      "technique": "T1105"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-11",
+      "dst_ip": "104.18.32.7",
+      "bytes": 7500,
+      "offset_seconds": 33,
+      "technique": "T1105"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-12",
+      "dst_ip": "104.18.32.7",
+      "bytes": 7500,
+      "offset_seconds": 36,
+      "technique": "T1105"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-13",
+      "dst_ip": "104.18.32.7",
+      "bytes": 7500,
+      "offset_seconds": 39,
+      "technique": "T1105"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-14",
+      "dst_ip": "104.18.32.7",
+      "bytes": 7500,
+      "offset_seconds": 42,
+      "technique": "T1105"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-00",
+      "dst_ip": "198.51.100.80",
+      "bytes": 7500,
+      "offset_seconds": 20,
+      "technique": "T1105"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-01",
+      "dst_ip": "198.51.100.80",
+      "bytes": 7500,
+      "offset_seconds": 23,
+      "technique": "T1105"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-02",
+      "dst_ip": "198.51.100.80",
+      "bytes": 7500,
+      "offset_seconds": 26,
+      "technique": "T1105"
+    },
+    {
+      "kind": "auth",
+      "host": "host-00",
+      "user": "under",
+      "src": "203.0.113.22",
+      "offset_seconds": 45,
+      "technique": "T1078"
+    },
+    {
+      "kind": "auth",
+      "host": "host-01",
+      "user": "under",
+      "src": "host-00",
+      "offset_seconds": 53,
+      "technique": "T1078"
+    },
+    {
+      "kind": "auth",
+      "host": "host-02",
+      "user": "under",
+      "src": "host-01",
+      "offset_seconds": 61,
+      "technique": "T1078"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-02",
+      "dst_ip": "198.51.100.200",
+      "bytes": 7500,
+      "offset_seconds": 75,
+      "technique": "T1041"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-01",
+      "dst_ip": "198.51.100.200",
+      "bytes": 7500,
+      "offset_seconds": 78,
+      "technique": "T1041"
+    },
+    {
+      "kind": "auth",
+      "host": "host-06",
+      "user": "decoy-imicry",
+      "src": "10.99.0.1",
+      "offset_seconds": 120,
+      "technique": "T1078"
+    },
+    {
+      "kind": "auth",
+      "host": "host-07",
+      "user": "decoy-imicry",
+      "src": "host-06",
+      "offset_seconds": 130,
+      "technique": "T1078"
+    }
+  ],
+  "reference_jaccard": 1.0,
+  "scale": {
+    "tier": "T1",
+    "n_hosts": 15,
+    "source_campaign_id": "lim12-near-dup-cdn-mimicry"
+  }
+}

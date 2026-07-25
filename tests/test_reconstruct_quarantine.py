@@ -40,10 +40,14 @@ def test_reconstruct_complete_multihost_with_attack_tags():
         Campaign(
             campaign_id="camp-lateral-alice",
             host_ids=["host-a", "host-b", "host-c"],
-            stages=[{"name": "lateral_auth", "user": "alice", "hosts": ["host-a", "host-b", "host-c"]}],
+            stages=[
+                {"name": "lateral_auth", "user": "alice", "hosts": ["host-a", "host-b", "host-c"]},
+                {"name": "micro_exfil", "hosts": ["host-c"]},
+            ],
             evidence=[
                 {"kind": "lateral_auth", "host_id": "host-a", "attrs": {"user": "alice"}},
                 {"kind": "lateral_auth", "host_id": "host-b", "attrs": {"user": "alice"}},
+                {"kind": "micro_exfil", "host_id": "host-c", "attrs": {}},
             ],
             score=0.9,
         ),
@@ -52,11 +56,55 @@ def test_reconstruct_complete_multihost_with_attack_tags():
     assert rec.status == "complete"
     assert "T1078" in rec.steps[0].attack_techniques
     assert rec.quarantine is not None
+    assert rec.quarantine.host_ids == ["host-a", "host-b", "host-c"]
     assert rec.quarantine.mode == "dry_run"
     assert "not armed" in rec.quarantine.honesty.lower() or "Dry-run" in rec.quarantine.honesty
     man = rec.to_manifest()
     assert man["purpose"] == "regression_only"
     assert man["honesty"]
+
+
+def test_lateral_only_refuses_isolate_host():
+    """Slice A: inert lateral-only → correlate OK, contain refused (lim10 shape)."""
+    from corvex.reconstruct import containment_evidence_ok
+
+    rec = reconstruct_campaign(
+        Campaign(
+            campaign_id="camp-lateral-audit",
+            host_ids=["host-a", "host-b", "host-c"],
+            stages=[
+                {"name": "lateral_auth", "user": "Administrator", "hosts": ["host-a", "host-b", "host-c"]}
+            ],
+            evidence=[
+                {"kind": "lateral_auth", "host_id": "host-a", "attrs": {}},
+                {"kind": "lateral_auth", "host_id": "host-b", "attrs": {}},
+            ],
+            score=1.0,
+        ),
+        quarantine_mode="dry_run",
+    )
+    assert not containment_evidence_ok(rec.steps)
+    assert rec.quarantine is not None
+    assert rec.quarantine.host_ids == []
+    assert "correlate-only" in rec.quarantine.honesty.lower() or "insufficient" in rec.quarantine.rationale.lower()
+
+
+def test_recon_plus_lateral_allows_isolate():
+    rec = reconstruct_campaign(
+        Campaign(
+            campaign_id="camp-recon-lat",
+            host_ids=["host-a", "host-b"],
+            stages=[
+                {"name": "recon_fanout", "hosts": ["host-a"]},
+                {"name": "lateral_auth", "hosts": ["host-a", "host-b"]},
+            ],
+            evidence=[],
+            score=0.8,
+        ),
+        quarantine_mode="dry_run",
+    )
+    assert rec.quarantine is not None
+    assert set(rec.quarantine.host_ids) == {"host-a", "host-b"}
 
 
 def test_reconstruct_truth_mismatch_is_partial():

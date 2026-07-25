@@ -1,0 +1,118 @@
+{
+  "campaign_id": "lim09c-positional-bias",
+  "family": "genuine_vuln_breaker",
+  "ood": true,
+  "hosts": [
+    "host-a",
+    "host-b",
+    "host-c",
+    "host-d",
+    "host-e"
+  ],
+  "truth_hosts": [
+    "host-e",
+    "host-a",
+    "host-b"
+  ],
+  "producers": {
+    "host-a": "prod-a",
+    "host-b": "prod-b",
+    "host-c": "prod-c",
+    "host-d": "prod-d",
+    "host-e": "prod-e"
+  },
+  "base_time_utc": "2026-07-25T14:00:00Z",
+  "fleet_origin": "original",
+  "fleet_suite": "limits",
+  "headline": true,
+  "source": {
+    "style": "Fleet-limits breaking-point sketches",
+    "repo": "https://github.com/Siddarthb07/corvex",
+    "techniques": [
+      "T1003.001",
+      "T1550.002",
+      "T1021",
+      "T1110.003",
+      "T1078",
+      "T1041"
+    ],
+    "note": "positional bias"
+  },
+  "narrative": [
+    "fleet01+fleet06 shapes with host labels rotated so e is patient zero."
+  ],
+  "break_intent": {
+    "name": "positional bias",
+    "break_criterion": "Jaccard or margin regression vs original #1/#6 from host relabeling alone",
+    "success_criteria_attacker": [
+      "jaccard < reference after rotation"
+    ]
+  },
+  "steps": [
+    {
+      "kind": "auth",
+      "host": "host-e",
+      "user": "Administrator",
+      "src": "203.0.113.10",
+      "offset_seconds": 0,
+      "technique": "T1003.001"
+    },
+    {
+      "kind": "auth",
+      "host": "host-a",
+      "user": "Administrator",
+      "src": "host-e",
+      "offset_seconds": 8,
+      "technique": "T1550.002"
+    },
+    {
+      "kind": "auth",
+      "host": "host-b",
+      "user": "Administrator",
+      "src": "host-a",
+      "offset_seconds": 16,
+      "technique": "T1021"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-b",
+      "dst_ip": "198.51.100.20",
+      "bytes": 24000,
+      "offset_seconds": 28,
+      "technique": "T1041"
+    },
+    {
+      "kind": "auth",
+      "host": "host-e",
+      "user": "jdoe",
+      "src": "203.0.113.99",
+      "offset_seconds": 50,
+      "technique": "T1078"
+    },
+    {
+      "kind": "auth",
+      "host": "host-a",
+      "user": "jdoe",
+      "src": "host-e",
+      "offset_seconds": 54,
+      "technique": "T1078"
+    },
+    {
+      "kind": "auth",
+      "host": "host-b",
+      "user": "jdoe",
+      "src": "host-a",
+      "offset_seconds": 58,
+      "technique": "T1078"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-b",
+      "dst_ip": "198.51.100.60",
+      "bytes": 21000,
+      "offset_seconds": 70,
+      "technique": "T1041"
+    }
+  ],
+  "reference_jaccard": 1.0
+}

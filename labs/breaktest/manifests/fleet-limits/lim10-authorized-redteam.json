@@ -1,0 +1,70 @@
+{
+  "campaign_id": "lim10-authorized-redteam",
+  "family": "genuine_vuln_breaker",
+  "ood": true,
+  "hosts": [
+    "host-a",
+    "host-b",
+    "host-c",
+    "host-d",
+    "host-e"
+  ],
+  "truth_hosts": [],
+  "producers": {
+    "host-a": "prod-a",
+    "host-b": "prod-b",
+    "host-c": "prod-c",
+    "host-d": "prod-d",
+    "host-e": "prod-e"
+  },
+  "base_time_utc": "2026-07-25T14:00:00Z",
+  "fleet_origin": "original",
+  "fleet_suite": "limits",
+  "headline": true,
+  "source": {
+    "style": "Fleet-limits breaking-point sketches",
+    "repo": "https://github.com/Siddarthb07/corvex",
+    "techniques": [
+      "T1003.001",
+      "T1021",
+      "T1078"
+    ],
+    "note": "authorized red team FP"
+  },
+  "narrative": [
+    "Authorized credential audit \u2014 same fingerprint as fleet01, no malicious campaign."
+  ],
+  "break_intent": {
+    "name": "authorized red team FP",
+    "break_criterion": "any host proposed for quarantine dry-run when truth is empty",
+    "success_criteria_attacker": [
+      "any quarantine proposal"
+    ]
+  },
+  "steps": [
+    {
+      "kind": "auth",
+      "host": "host-a",
+      "user": "Administrator",
+      "src": "203.0.113.10",
+      "offset_seconds": 0,
+      "technique": "T1003.001"
+    },
+    {
+      "kind": "auth",
+      "host": "host-b",
+      "user": "Administrator",
+      "src": "host-a",
+      "offset_seconds": 8,
+      "technique": "T1021"
+    },
+    {
+      "kind": "auth",
+      "host": "host-c",
+      "user": "Administrator",
+      "src": "host-b",
+      "offset_seconds": 16,
+      "technique": "T1021"
+    }
+  ]
+}

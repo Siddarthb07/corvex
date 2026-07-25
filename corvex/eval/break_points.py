@@ -62,6 +62,37 @@ def analyze_break_points(
         if _jaccard(_host_set(c), truth_hosts) < 0.5
     ]
 
+    best_corr_hosts: Set[str] = set()
+    ranked_corr: List[Dict[str, Any]] = []
+    if correlator:
+        ranked_corr = sorted(
+            [
+                {
+                    "campaign_id": c.get("campaign_id"),
+                    "hosts": sorted(_host_set(c)),
+                    "score": float(c.get("score") or 0.0),
+                    "jaccard_vs_truth": round(_jaccard(_host_set(c), truth_hosts), 4),
+                }
+                for c in correlator
+            ],
+            key=lambda row: (row["jaccard_vs_truth"], row["score"]),
+            reverse=True,
+        )
+        best_c = max(correlator, key=lambda c: _jaccard(_host_set(c), truth_hosts))
+        best_corr_hosts = _host_set(best_c)
+
+    # Margin: confidence(top) − confidence(2nd-best) by correlator score among campaigns.
+    by_score = sorted(
+        (float(c.get("score") or 0.0) for c in correlator),
+        reverse=True,
+    )
+    if len(by_score) >= 2:
+        confidence_margin = round(by_score[0] - by_score[1], 4)
+    elif len(by_score) == 1:
+        confidence_margin = round(by_score[0], 4)
+    else:
+        confidence_margin = None
+
     report: Dict[str, Any] = {
         "campaign_id": truth.get("campaign_id"),
         "family": truth.get("family"),
@@ -72,6 +103,9 @@ def analyze_break_points(
             "best_jaccard": round(best_corr, 4),
             "matched": corr_match,
             "hosts_union": sorted(corr_hosts),
+            "best_campaign_hosts": sorted(best_corr_hosts),
+            "campaigns_ranked": ranked_corr,
+            "confidence_margin": confidence_margin,
         },
         "detector_only": {
             "n_campaigns": len(detector_only),
@@ -82,7 +116,9 @@ def analyze_break_points(
         },
         "break_points": {
             "missed_hosts": sorted(truth_hosts - corr_hosts),
-            "over_merged_hosts": sorted(corr_hosts - truth_hosts),
+            # Over-merge vs the best-matching campaign (secondary campaigns are separate).
+            "over_merged_hosts": sorted(best_corr_hosts - truth_hosts),
+            "secondary_hosts_outside_truth": sorted((corr_hosts - best_corr_hosts) - truth_hosts),
             "hosts_never_in_detector": sorted(truth_hosts - det_hosts),
             "fusion_lift": bool(corr_match and not det_match),
             "both_missed": bool(not corr_match and not det_match),
@@ -90,12 +126,28 @@ def analyze_break_points(
         },
         "source": truth.get("source") or {},
     }
+    if truth.get("truth_campaigns"):
+        report["truth_campaigns"] = truth.get("truth_campaigns")
+    if truth.get("host_aliases"):
+        report["host_aliases"] = truth.get("host_aliases")
     if b1 is not None:
         best_b1 = max((_jaccard(_host_set(c), truth_hosts) for c in b1), default=0.0)
+        b1_hosts: Set[str] = set()
+        for c in b1:
+            b1_hosts |= _host_set(c)
         report["b1"] = {
             "n_campaigns": len(b1),
             "best_jaccard": round(best_b1, 4),
             "matched": best_b1 >= 0.5,
+            "hosts_union": sorted(b1_hosts),
+            "campaigns": [
+                {
+                    "campaign_id": c.get("campaign_id"),
+                    "hosts": sorted(_host_set(c)),
+                    "score": float(c.get("score") or 0.0),
+                }
+                for c in b1
+            ],
         }
     return report
 

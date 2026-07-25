@@ -309,17 +309,42 @@ def load_pack_events(path: Path) -> Tuple[List[EventEnvelope], Dict[str, Any]]:
 def resign_events(
     events: Sequence[EventEnvelope],
     enrollment: Enrollment,
+    *,
+    allow_local_stamp: bool = True,
 ) -> List[EventEnvelope]:
-    """Re-HMAC pack events with the caller's lab enrollment (demo / clean-clone path)."""
+    """Accept verified envelopes; optionally local-stamp unverifiable ones.
+
+    Verify-first: if the envelope HMAC already matches this enrollment, keep it
+    unchanged (host-bound provenance preserved).
+
+    Otherwise, if ``allow_local_stamp``, re-sign with
+    ``payload._corvex_provenance = locally_stamped`` so correlators and reports
+    never confuse lab re-HMAC with original sensor auth. If stamping is
+    disabled, drop the event.
+    """
+    from corvex.auth import AuthError
+    from corvex.envelope import verify_envelope
+
     out: List[EventEnvelope] = []
     for env in events:
+        try:
+            secret = enrollment.require(env.producer_id, env.host_id)
+        except AuthError:
+            secret = None
+        if secret is not None and verify_envelope(env, secret):
+            out.append(env)
+            continue
+        if not allow_local_stamp:
+            continue
         secret = enrollment.require(env.producer_id, env.host_id)
+        payload = dict(env.payload)
+        payload["_corvex_provenance"] = "locally_stamped"
         out.append(
             sign_envelope(
                 producer_id=env.producer_id,
                 host_id=env.host_id,
                 payload_type=env.payload_type,
-                payload=env.payload,
+                payload=payload,
                 secret=secret,
                 event_id=env.event_id,
                 ts_utc=env.ts_utc,

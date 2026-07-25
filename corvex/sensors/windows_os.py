@@ -284,7 +284,7 @@ def recompute_run(run_dir: Path, enrollment: Enrollment) -> Dict[str, Any]:
         store_path.write_text("", encoding="utf-8")
     store = CampaignStore(store_path)
     audit = AuditLog(run_dir / "audit.jsonl")
-    corr = Correlator(store, audit, config=CorrelatorConfig())
+    corr = Correlator(store, audit, config=CorrelatorConfig(), enrollment=enrollment)
     t0 = time.perf_counter()
     if envs:
         corr.ingest(envs)

@@ -1,0 +1,88 @@
+{
+  "campaign_id": "fleet14-art-rdp-hop",
+  "family": "attack_repo",
+  "ood": true,
+  "hosts": [
+    "host-a",
+    "host-b",
+    "host-c",
+    "host-d",
+    "host-e"
+  ],
+  "truth_hosts": [
+    "host-a",
+    "host-c",
+    "host-e"
+  ],
+  "producers": {
+    "host-a": "prod-a",
+    "host-b": "prod-b",
+    "host-c": "prod-c",
+    "host-d": "prod-d",
+    "host-e": "prod-e"
+  },
+  "base_time_utc": "2026-07-25T14:00:00Z",
+  "fleet_origin": "github_art",
+  "source": {
+    "style": "Black-box fleet \u2014 ATT&CK/Atomic-style telemetry sketches",
+    "repo": "https://github.com/redcanaryco/atomic-red-team",
+    "techniques": [
+      "T1021.001",
+      "T1078",
+      "T1041"
+    ],
+    "note": "Atomic RDP interactive hop."
+  },
+  "narrative": [
+    "RDP hop a\u2192c\u2192e then pull files."
+  ],
+  "break_intent": {
+    "name": "fleet14-art-rdp-hop",
+    "success_criteria_defender": [
+      "matched truth_hosts",
+      "empty over_merged_hosts"
+    ]
+  },
+  "steps": [
+    {
+      "kind": "auth",
+      "host": "host-a",
+      "user": "rdp-user",
+      "src": "203.0.113.15",
+      "offset_seconds": 0,
+      "technique": "T1021.001"
+    },
+    {
+      "kind": "auth",
+      "host": "host-c",
+      "user": "rdp-user",
+      "src": "host-a",
+      "offset_seconds": 15,
+      "technique": "T1021.001"
+    },
+    {
+      "kind": "auth",
+      "host": "host-e",
+      "user": "rdp-user",
+      "src": "host-c",
+      "offset_seconds": 30,
+      "technique": "T1021.001"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-e",
+      "dst_ip": "198.51.100.140",
+      "bytes": 23000,
+      "offset_seconds": 45,
+      "technique": "T1041"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-c",
+      "dst_ip": "198.51.100.140",
+      "bytes": 15000,
+      "offset_seconds": 50,
+      "technique": "T1041"
+    }
+  ]
+}

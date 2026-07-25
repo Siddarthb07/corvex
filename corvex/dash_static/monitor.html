@@ -184,7 +184,17 @@ body::before {
 (function() {
   const LEVEL_TEXT = { INFO:"#d3dbd6", WARNING:"#f0cd7a", ERROR:"#f5a3a3" };
   let tab = "campaigns";
-  let snap = JSON.parse(document.getElementById("boot").textContent);
+  const emptySnap = {
+    hero: { status: "NO_RUN", title: "Loading…", detail: "Fetching /api/snapshot" },
+    run: { loaded: false, campaigns: [] },
+    activity: [], audit: [], quarantine: {}, claim: {}, feed: {},
+    kpis: {}, sealed_eval: {}, product: {}
+  };
+  let snap = emptySnap;
+  try {
+    const raw = document.getElementById("boot").textContent.trim();
+    if (raw && raw !== "null") snap = JSON.parse(raw);
+  } catch (e) { snap = emptySnap; }
 
   function esc(s) {
     return String(s == null ? "" : s)
@@ -413,9 +423,17 @@ body::before {
   paint(snap);
   const tok = new URLSearchParams(location.search).get("token");
   const snapUrl = tok ? ("/api/snapshot?token=" + encodeURIComponent(tok)) : "/api/snapshot";
-  setInterval(() => {
-    fetch(snapUrl).then(r => r.json()).then(paint).catch(() => {});
-  }, 2000);
+  function pull() {
+    fetch(snapUrl)
+      .then(r => {
+        if (!r.ok) throw new Error("snapshot " + r.status);
+        return r.json();
+      })
+      .then(paint)
+      .catch(() => {});
+  }
+  pull();
+  setInterval(pull, 2000);
 })();
 </script>
 </body>

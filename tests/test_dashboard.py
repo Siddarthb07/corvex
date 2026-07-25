@@ -205,17 +205,57 @@ def test_dashboard_html_has_run_sections_not_toggles(
     _seed_reports(tmp_path)
     run = _seed_run(tmp_path)
     monkeypatch.setenv("CORVEX_RUN_DIR", str(run))
-    out = write_dashboard(tmp_path)
+    out = write_dashboard(tmp_path, embed_snapshot=False)
     html = out.read_text(encoding="utf-8")
     assert "run feed" in html
     assert "Activity" in html
-    assert "camp-test" in html
     assert "Sealed Day-0" in html
     assert "checkbox" not in html
     assert "file-tail" in html
-    assert '"kind": "AUTH"' in html or "AUTH" in html
-    assert "events.jsonl" in html
-    assert "file_tail" in html
+    # API-only boot — campaign payload must not be embedded (auth bypass fix)
+    assert "camp-test" not in html
+    assert ">null<" in html or "null" in html
+    assert not (out.parent / "snapshot.json").exists()
+
+
+def test_dashboard_token_covers_static_and_api(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    _seed_reports(tmp_path)
+    run = _seed_run(tmp_path)
+    monkeypatch.setenv("CORVEX_RUN_DIR", str(run))
+    token = "test-token-abc"
+    httpd = serve(tmp_path, port=0, access_token=token)
+    host, port = httpd.server_address
+    thread = threading.Thread(target=httpd.serve_forever, daemon=True)
+    thread.start()
+    try:
+        import urllib.error
+        import urllib.request
+
+        with pytest.raises(urllib.error.HTTPError) as exc:
+            urllib.request.urlopen(f"http://{host}:{port}/", timeout=5)
+        assert exc.value.code == 401
+
+        with pytest.raises(urllib.error.HTTPError) as exc2:
+            urllib.request.urlopen(f"http://{host}:{port}/api/snapshot", timeout=5)
+        assert exc2.value.code == 401
+
+        with urllib.request.urlopen(
+            f"http://{host}:{port}/api/snapshot?token={token}", timeout=5
+        ) as resp:
+            snap = json.loads(resp.read().decode("utf-8"))
+        assert snap["run"]["campaigns"][0]["campaign_id"] == "camp-test"
+
+        with urllib.request.urlopen(
+            f"http://{host}:{port}/?token={token}", timeout=5
+        ) as resp:
+            html = resp.read().decode("utf-8")
+        assert "camp-test" not in html
+        assert "null" in html
+    finally:
+        httpd.shutdown()
+        httpd.server_close()
 
 
 def test_api_snapshot_no_html_rewrite_and_no_post(
@@ -224,7 +264,7 @@ def test_api_snapshot_no_html_rewrite_and_no_post(
     _seed_reports(tmp_path)
     run = _seed_run(tmp_path)
     monkeypatch.setenv("CORVEX_RUN_DIR", str(run))
-    out = write_dashboard(tmp_path)
+    out = write_dashboard(tmp_path, embed_snapshot=False)
     httpd = serve(tmp_path, port=0)  # may rewrite once at bind
     mtime_before = out.stat().st_mtime
     host, port = httpd.server_address

@@ -4,7 +4,8 @@ Council rebuild rules:
 - GET /api/snapshot returns JSON only (does not rewrite HTML)
 - No POST mutation endpoints on this server
 - No prevention-log page
-- Non-localhost bind requires a bearer / query token
+- When access_token is set, EVERY route requires Bearer / ?token=
+- Served HTML never embeds the full snapshot (API-only boot)
 """
 
 from __future__ import annotations
@@ -57,10 +58,17 @@ def make_handler(
 
         def do_GET(self) -> None:  # noqa: N802
             path = urlparse(self.path).path
+            # Token covers static shell + API — no unauthenticated snapshot leak.
+            if token and not self._authorized():
+                if path.startswith("/api/"):
+                    self._json(
+                        401,
+                        {"ok": False, "error": "unauthorized — pass Bearer or ?token="},
+                    )
+                else:
+                    self.send_error(401, "unauthorized - pass ?token=")
+                return
             if path == "/api/snapshot":
-                if not self._authorized():
-                    self._json(401, {"ok": False, "error": "unauthorized — pass Bearer or ?token="})
-                    return
                 self._json(200, collect_snapshot(root))
                 return
             if path in ("/api/checklist", "/api/prevention"):
@@ -71,6 +79,10 @@ def make_handler(
                         "error": "removed — monitor is read-only; use CLI for checklist evidence",
                     },
                 )
+                return
+            # Never serve a raw snapshot.json from the static dir.
+            if path.rstrip("/").endswith("snapshot.json"):
+                self.send_error(404, "snapshot.json not served - use /api/snapshot")
                 return
             super().do_GET()
 
@@ -98,7 +110,8 @@ def serve(
             "non-localhost dash bind requires an access token "
             "(pass --token or let CLI generate one)"
         )
-    out = write_dashboard(repo_root)
+    # API-only boot — never embed full snap in index.html (LAN token bypass fix).
+    out = write_dashboard(repo_root, embed_snapshot=False)
     handler = make_handler(repo_root, out.parent, access_token=access_token)
     ThreadingHTTPServer.allow_reuse_address = True
     httpd = ThreadingHTTPServer((host, port), handler)

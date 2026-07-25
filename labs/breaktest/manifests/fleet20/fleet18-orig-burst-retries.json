@@ -1,0 +1,168 @@
+{
+  "campaign_id": "fleet18-orig-burst-retries",
+  "family": "attack_repo",
+  "ood": true,
+  "hosts": [
+    "host-a",
+    "host-b",
+    "host-c",
+    "host-d",
+    "host-e"
+  ],
+  "truth_hosts": [
+    "host-a",
+    "host-b",
+    "host-c"
+  ],
+  "producers": {
+    "host-a": "prod-a",
+    "host-b": "prod-b",
+    "host-c": "prod-c",
+    "host-d": "prod-d",
+    "host-e": "prod-e"
+  },
+  "base_time_utc": "2026-07-25T14:00:00Z",
+  "fleet_origin": "original",
+  "source": {
+    "style": "Black-box fleet \u2014 ATT&CK/Atomic-style telemetry sketches",
+    "repo": "https://github.com/Siddarthb07/corvex",
+    "techniques": [
+      "T1110",
+      "T1078",
+      "T1041"
+    ],
+    "note": "Original: high-intensity retry storm then pivot."
+  },
+  "narrative": [
+    "Hammer auth, then the working cred flies."
+  ],
+  "break_intent": {
+    "name": "fleet18-orig-burst-retries",
+    "success_criteria_defender": [
+      "matched truth_hosts",
+      "empty over_merged_hosts"
+    ]
+  },
+  "steps": [
+    {
+      "kind": "auth",
+      "host": "host-a",
+      "user": "burst",
+      "src": "203.0.113.20",
+      "offset_seconds": 0,
+      "technique": "T1110"
+    },
+    {
+      "kind": "auth",
+      "host": "host-a",
+      "user": "burst",
+      "src": "203.0.113.20",
+      "offset_seconds": 1,
+      "technique": "T1110"
+    },
+    {
+      "kind": "auth",
+      "host": "host-a",
+      "user": "burst",
+      "src": "203.0.113.20",
+      "offset_seconds": 2,
+      "technique": "T1110"
+    },
+    {
+      "kind": "auth",
+      "host": "host-a",
+      "user": "burst",
+      "src": "203.0.113.20",
+      "offset_seconds": 3,
+      "technique": "T1110"
+    },
+    {
+      "kind": "auth",
+      "host": "host-a",
+      "user": "burst",
+      "src": "203.0.113.20",
+      "offset_seconds": 4,
+      "technique": "T1110"
+    },
+    {
+      "kind": "auth",
+      "host": "host-a",
+      "user": "burst",
+      "src": "203.0.113.20",
+      "offset_seconds": 5,
+      "technique": "T1110"
+    },
+    {
+      "kind": "auth",
+      "host": "host-a",
+      "user": "burst",
+      "src": "203.0.113.20",
+      "offset_seconds": 6,
+      "technique": "T1110"
+    },
+    {
+      "kind": "auth",
+      "host": "host-a",
+      "user": "burst",
+      "src": "203.0.113.20",
+      "offset_seconds": 7,
+      "technique": "T1110"
+    },
+    {
+      "kind": "auth",
+      "host": "host-a",
+      "user": "burst",
+      "src": "203.0.113.20",
+      "offset_seconds": 8,
+      "technique": "T1110"
+    },
+    {
+      "kind": "auth",
+      "host": "host-a",
+      "user": "burst",
+      "src": "203.0.113.20",
+      "offset_seconds": 9,
+      "technique": "T1110"
+    },
+    {
+      "kind": "auth",
+      "host": "host-b",
+      "user": "burst",
+      "src": "host-a",
+      "offset_seconds": 12,
+      "technique": "T1078"
+    },
+    {
+      "kind": "auth",
+      "host": "host-b",
+      "user": "burst",
+      "src": "host-a",
+      "offset_seconds": 13,
+      "technique": "T1078"
+    },
+    {
+      "kind": "auth",
+      "host": "host-c",
+      "user": "burst",
+      "src": "host-b",
+      "offset_seconds": 16,
+      "technique": "T1078"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-c",
+      "dst_ip": "198.51.100.180",
+      "bytes": 20000,
+      "offset_seconds": 25,
+      "technique": "T1041"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-b",
+      "dst_ip": "198.51.100.180",
+      "bytes": 15000,
+      "offset_seconds": 28,
+      "technique": "T1041"
+    }
+  ]
+}
