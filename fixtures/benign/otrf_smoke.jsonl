@@ -1,0 +1,8 @@
+{"channel": "Microsoft-Windows-Sysmon/Operational", "EventID": 3, "Hostname": "WORKSTATION5.theshire.local", "@timestamp": "2020-09-20T16:16:40.000Z", "DestinationIp": "10.0.1.10", "DestinationPort": 445}
+{"Channel": "Security", "EventID": 4624, "Hostname": "WORKSTATION5.theshire.local", "@timestamp": "2020-09-20T16:16:41.000Z", "TargetUserName": "helpdesk", "IpAddress": "10.0.1.5"}
+{"Channel": "Security", "EventID": 4624, "Hostname": "WORKSTATION6.theshire.local", "@timestamp": "2020-09-20T16:16:50.000Z", "TargetUserName": "helpdesk", "IpAddress": "WORKSTATION5"}
+{"Channel": "Security", "EventID": 4624, "Hostname": "MORDORDC.theshire.local", "@timestamp": "2020-09-20T16:17:00.000Z", "TargetUserName": "helpdesk", "IpAddress": "WORKSTATION6"}
+{"Channel": "Security", "EventID": 5156, "Hostname": "WORKSTATION6.theshire.local", "@timestamp": "2020-09-20T16:17:10.000Z", "DestAddress": "198.51.100.40", "DestPort": 443}
+{"channel": "Microsoft-Windows-Sysmon/Operational", "EventID": 22, "Hostname": "WORKSTATION5.theshire.local", "@timestamp": "2020-09-20T16:17:20.000Z", "QueryName": "cdn.example.local", "QueryType": "A"}
+{"channel": "Microsoft-Windows-Sysmon/Operational", "EventID": 1, "Hostname": "WORKSTATION6.theshire.local", "@timestamp": "2020-09-20T16:17:30.000Z", "Image": "C:\\Windows\\System32\\notepad.exe", "CommandLine": "notepad.exe", "User": "helpdesk"}
+{"Channel": "Security", "EventID": 4688, "Hostname": "WORKSTATION5.theshire.local", "@timestamp": "2020-09-20T16:17:40.000Z", "TargetUserName": "noise"}

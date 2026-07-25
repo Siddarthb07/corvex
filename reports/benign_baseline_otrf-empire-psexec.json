@@ -1,0 +1,72 @@
+{
+  "gate": "INCOMPLETE",
+  "bars": {
+    "min_host_hours": 72.0,
+    "min_distinct_hosts": 3,
+    "max_fp_iso_per_host_hour": 0.001,
+    "max_fp_seal_per_host_hour": 0.01,
+    "locked": "2026-07-25"
+  },
+  "corpus_kind": "mixed",
+  "eligible_for_gate": false,
+  "host_hours": 0.108395,
+  "n_hosts": 3,
+  "fp_iso": 3,
+  "fp_seal": 1,
+  "fp_iso_per_host_hour": 27.67655335,
+  "fp_seal_per_host_hour": 9.22551778,
+  "hub_coverage": "GAP",
+  "hub": {
+    "hub_degree_bar": 2,
+    "degrees": {},
+    "hubs_at_or_above_bar": [],
+    "hub_coverage": "GAP",
+    "note": "No host meets hub-degree bar on this corpus; synthetic hub tests remain unvalidated by this run."
+  },
+  "reasons": [
+    "corpus_kind='mixed' is not pure_benign/home_lab_capture \u2014 dirty/mixed replay may be reported but cannot PASS the benign gate",
+    "corpus below minimum size (host_hours=0.108395, hosts=3; need \u226572.0 host-hours and \u22653 hosts)"
+  ],
+  "claim_sentence_still_applies": true,
+  "corpus_name": "otrf-empire-psexec",
+  "corpus_path": "labs\\benign\\otrf-empire-psexec",
+  "adapt_stats": {
+    "skipped": 3890,
+    "adapted": 458,
+    "by_channel": {
+      "firewall": 83,
+      "powershell": 351,
+      "security": 8,
+      "sysmon": 16
+    },
+    "files": 1,
+    "host_map_effective": {
+      "mordordc": "mordordc",
+      "workstation5": "workstation5",
+      "workstation6": "workstation6"
+    },
+    "source_files": [
+      "empire_psexec_dcerpc_tcp_svcctl_2020-09-20121608.json"
+    ]
+  },
+  "hosts": [
+    "mordordc",
+    "workstation5",
+    "workstation6"
+  ],
+  "host_hours_per_host": {
+    "mordordc": 0.036702,
+    "workstation5": 0.036116,
+    "workstation6": 0.035577
+  },
+  "isolate_hosts": [
+    "mordordc",
+    "workstation5",
+    "workstation6"
+  ],
+  "campaign_ids": [
+    "camp-exfil-168-63-129-16-1"
+  ],
+  "run_dir": "runs\\benign-baseline\\otrf-empire-psexec",
+  "generated_at": "2026-07-25T13:15:17Z"
+}

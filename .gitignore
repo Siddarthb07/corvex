@@ -60,5 +60,10 @@ reports/habit_loop.json
 
 labs/breaktest/shared/
 
+# benign corpus: large raw OTRF / Sysmon captures (keep manifests + fixtures tracked)
+labs/benign/**/raw/
+labs/benign/**/converted/
+!labs/benign/**/raw/.gitkeep
+
 
 .cursor/council-sessions/

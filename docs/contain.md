@@ -32,8 +32,10 @@ Live path opens only when:
 1. Every L1 key is evidenced true
 2. `hostile_bus_selftest` pass
 3. `CORVEX_CONTAIN!=0`
-4. Separate authz token presented (`CORVEX_CONTAIN_AUTHZ`)
+4. Separate authz token presented via **`CORVEX_CONTAIN_AUTHZ`** (required — **no hardcoded fallback**; forbidden defaults like `lab-dual-control-token` are rejected)
 
 OS quarantine executor remains unimplemented — honest `cannot_quarantine` without `--lab-dir`.
+
+Producer trust: default enrollment is **1 producer_id ↔ 1 host_id**. Aggregators need `CORVEX_ALLOW_MULTIHOST_PRODUCER=1` (accepts that one leaked secret forges every peer host).
 
 See [`corvex/contain/CHECKLIST.md`](../corvex/contain/CHECKLIST.md).
