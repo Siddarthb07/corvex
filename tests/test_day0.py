@@ -156,7 +156,7 @@ def test_b2_anti_sandbag_on_train():
 
 def test_correlator_dedup(tmp_path):
     enr = Enrollment(
-        {"prod-a": {"host-a", "host-b"}},
+        {"prod-a": {"host-a"}},
         {"prod-a": b"unit-test-secret-not-default-rr"},
     )
     env = sign_envelope(

@@ -1,8 +1,9 @@
 {
-  "schema_ver": "1",
-  "generated_at": "2026-07-25T07:07:32Z",
-  "claim_allowed": true,
-  "claim_language": "useful on real attacks",
+  "schema_ver": "3",
+  "generated_at": "2026-07-25T07:35:02Z",
+  "claim_allowed": false,
+  "lab_verified": true,
+  "claim_language": "lab_verified \u2014 sealed held-out + breaktest + trust probes; need Ed25519 stranger self-sign + live second host for claim_allowed",
   "gates": {
     "non_author_fusion_lift": {
       "id": "non_author_fusion_lift",
@@ -14,11 +15,14 @@
     },
     "stranger_success": {
       "id": "stranger_success",
-      "pass": true,
+      "pass": false,
       "path": "reports/stranger_dry_run.json",
       "operator": "Jack",
       "attestation_kind": "human",
-      "note": "Completed Windows export \u2192 byo-windows \u2192 timeline without author help."
+      "attestation_custody": "unsigned",
+      "attestation_signed": false,
+      "advisory": true,
+      "note": "FAIL: no verifying ed25519 stranger signature Human stranger attestation shape ok"
     },
     "benign_fcr_real_n": {
       "id": "benign_fcr_real_n",
@@ -28,7 +32,25 @@
       "false_campaign_rate": 0.0,
       "max_fcr": 0.1,
       "note": "Held-out benign N=5 (need >=5), FCR=0.000."
+    },
+    "trust_integrity": {
+      "id": "trust_integrity",
+      "pass": true,
+      "checks": {
+        "correlator_ingest_rejects_bad_hmac": true,
+        "correlator_rejects_without_enrollment": true,
+        "resign_keeps_verified": true,
+        "resign_tags_local_stamp": true,
+        "dash_boot_no_embed": true
+      },
+      "note": "Functional probes green."
+    },
+    "live_second_host": {
+      "id": "live_second_host",
+      "pass": false,
+      "path": "reports/live_second_host.json",
+      "note": "FAIL: missing reports/live_second_host.json \u2014 elevated wevtutil on a second physical Windows host (see docs/trust-hardening.md)."
     }
   },
-  "honesty": "Do not publish 'useful on real attacks' until claim_allowed=true. Soft probes, author packs, and agent stranger dry-runs never flip this alone."
+  "honesty": "Do not publish 'useful on real attacks' until claim_allowed=true. Author-held HMAC and unsigned stranger JSON are advisory. lab_verified means sealed/breaktest + trust probes only."
 }

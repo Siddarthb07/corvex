@@ -1,0 +1,226 @@
+{
+  "campaign_id": "t2-lim09b-sequential-reuse",
+  "family": "genuine_vuln_breaker",
+  "ood": true,
+  "hosts": [
+    "host-00",
+    "host-01",
+    "host-02",
+    "host-03",
+    "host-04",
+    "host-05",
+    "host-06",
+    "host-07",
+    "host-08",
+    "host-09",
+    "host-10",
+    "host-11",
+    "host-12",
+    "host-13",
+    "host-14",
+    "host-15",
+    "host-16",
+    "host-17",
+    "host-18",
+    "host-19",
+    "host-20",
+    "host-21",
+    "host-22",
+    "host-23",
+    "host-24",
+    "host-25",
+    "host-26",
+    "host-27",
+    "host-28",
+    "host-29",
+    "host-30",
+    "host-31",
+    "host-32",
+    "host-33",
+    "host-34",
+    "host-35",
+    "host-36",
+    "host-37",
+    "host-38",
+    "host-39",
+    "host-40",
+    "host-41",
+    "host-42",
+    "host-43",
+    "host-44",
+    "host-45",
+    "host-46",
+    "host-47",
+    "host-48",
+    "host-49"
+  ],
+  "truth_hosts": [
+    "host-00",
+    "host-01",
+    "host-02"
+  ],
+  "producers": {
+    "host-00": "prod-00",
+    "host-01": "prod-01",
+    "host-02": "prod-02",
+    "host-03": "prod-03",
+    "host-04": "prod-04",
+    "host-05": "prod-05",
+    "host-06": "prod-06",
+    "host-07": "prod-07",
+    "host-08": "prod-08",
+    "host-09": "prod-09",
+    "host-10": "prod-10",
+    "host-11": "prod-11",
+    "host-12": "prod-12",
+    "host-13": "prod-13",
+    "host-14": "prod-14",
+    "host-15": "prod-15",
+    "host-16": "prod-16",
+    "host-17": "prod-17",
+    "host-18": "prod-18",
+    "host-19": "prod-19",
+    "host-20": "prod-20",
+    "host-21": "prod-21",
+    "host-22": "prod-22",
+    "host-23": "prod-23",
+    "host-24": "prod-24",
+    "host-25": "prod-25",
+    "host-26": "prod-26",
+    "host-27": "prod-27",
+    "host-28": "prod-28",
+    "host-29": "prod-29",
+    "host-30": "prod-30",
+    "host-31": "prod-31",
+    "host-32": "prod-32",
+    "host-33": "prod-33",
+    "host-34": "prod-34",
+    "host-35": "prod-35",
+    "host-36": "prod-36",
+    "host-37": "prod-37",
+    "host-38": "prod-38",
+    "host-39": "prod-39",
+    "host-40": "prod-40",
+    "host-41": "prod-41",
+    "host-42": "prod-42",
+    "host-43": "prod-43",
+    "host-44": "prod-44",
+    "host-45": "prod-45",
+    "host-46": "prod-46",
+    "host-47": "prod-47",
+    "host-48": "prod-48",
+    "host-49": "prod-49"
+  },
+  "base_time_utc": "2026-07-25T14:00:00Z",
+  "fleet_origin": "original",
+  "fleet_suite": "limits-t2",
+  "headline": true,
+  "source": {
+    "style": "Fleet-limits breaking-point sketches",
+    "repo": "https://github.com/Siddarthb07/corvex",
+    "techniques": [
+      "T1071.004",
+      "T1053.005",
+      "T1078",
+      "T1041"
+    ],
+    "note": "sequential reuse"
+  },
+  "narrative": [
+    "DNS C2 shape then scheduled-task shape on same a/b/c after 10 min quiet."
+  ],
+  "break_intent": {
+    "name": "sequential reuse",
+    "break_criterion": "incident1 and incident2 reported as a single continuous campaign",
+    "success_criteria_attacker": [
+      "two incidents collapsed into one campaign"
+    ]
+  },
+  "steps": [
+    {
+      "kind": "dns",
+      "host": "host-00",
+      "query": "a1.c2.evil.test",
+      "offset_seconds": 0,
+      "technique": "T1071.004"
+    },
+    {
+      "kind": "dns",
+      "host": "host-01",
+      "query": "b1.c2.evil.test",
+      "offset_seconds": 10,
+      "technique": "T1071.004"
+    },
+    {
+      "kind": "dns",
+      "host": "host-02",
+      "query": "c1.c2.evil.test",
+      "offset_seconds": 20,
+      "technique": "T1071.004"
+    },
+    {
+      "kind": "auth",
+      "host": "host-00",
+      "user": "dns-only-a",
+      "src": "203.0.113.1",
+      "offset_seconds": 30,
+      "technique": "T1078"
+    },
+    {
+      "kind": "auth",
+      "host": "host-00",
+      "user": "tasksvc",
+      "src": "203.0.113.12",
+      "offset_seconds": 630,
+      "technique": "T1053.005"
+    },
+    {
+      "kind": "auth",
+      "host": "host-01",
+      "user": "tasksvc",
+      "src": "host-00",
+      "offset_seconds": 640,
+      "technique": "T1078"
+    },
+    {
+      "kind": "auth",
+      "host": "host-02",
+      "user": "tasksvc",
+      "src": "host-01",
+      "offset_seconds": 650,
+      "technique": "T1078"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-02",
+      "dst_ip": "198.51.100.110",
+      "bytes": 17000,
+      "offset_seconds": 665,
+      "technique": "T1041"
+    }
+  ],
+  "truth_campaigns": [
+    {
+      "id": "inc1-dns",
+      "hosts": [
+        "host-00",
+        "host-01",
+        "host-02"
+      ]
+    },
+    {
+      "id": "inc2-task",
+      "hosts": [
+        "host-00",
+        "host-01",
+        "host-02"
+      ]
+    }
+  ],
+  "scale": {
+    "tier": "T2",
+    "n_hosts": 50,
+    "source_campaign_id": "lim09b-sequential-reuse",
+    "decoys": false
+  }
+}

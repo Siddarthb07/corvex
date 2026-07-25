@@ -1,0 +1,148 @@
+{
+  "test": "Operation CDN Bridge (safe harness)",
+  "manifest": "labs/breaktest/manifests/break_cdn_bridge_compound.json",
+  "safety": {
+    "CORVEX_CONTAIN": "0",
+    "CORVEX_STAGE_B": "unset",
+    "lab_override_removed_for_run": false,
+    "hmac_verify": true,
+    "tamper_injection": true,
+    "default_correlator_config": true
+  },
+  "gates": {
+    "claim_gates": {
+      "exit": 1,
+      "pass": true,
+      "claim_allowed": false,
+      "lab_verified": true,
+      "payload": {
+        "schema_ver": "3",
+        "generated_at": "2026-07-25T07:35:02Z",
+        "claim_allowed": false,
+        "lab_verified": true,
+        "claim_language": "lab_verified \u2014 sealed held-out + breaktest + trust probes; need Ed25519 stranger self-sign + live second host for claim_allowed",
+        "gates": {
+          "non_author_fusion_lift": {
+            "id": "non_author_fusion_lift",
+            "pass": true,
+            "f1_lift": 0.44074074074074077,
+            "min_lift": 0.05,
+            "source": "labs/breaktest/manifests",
+            "note": "Public-TTP/breaktest manifest score. Still not stranger Windows telemetry \u2014 necessary but not sufficient for claim_allowed."
+          },
+          "stranger_success": {
+            "id": "stranger_success",
+            "pass": false,
+            "path": "reports/stranger_dry_run.json",
+            "operator": "Jack",
+            "attestation_kind": "human",
+            "attestation_custody": "unsigned",
+            "attestation_signed": false,
+            "advisory": true,
+            "note": "FAIL: no verifying ed25519 stranger signature Human stranger attestation shape ok"
+          },
+          "benign_fcr_real_n": {
+            "id": "benign_fcr_real_n",
+            "pass": true,
+            "n_benign": 5,
+            "min_n": 5,
+            "false_campaign_rate": 0.0,
+            "max_fcr": 0.1,
+            "note": "Held-out benign N=5 (need >=5), FCR=0.000."
+          },
+          "trust_integrity": {
+            "id": "trust_integrity",
+            "pass": true,
+            "checks": {
+              "correlator_ingest_rejects_bad_hmac": true,
+              "correlator_rejects_without_enrollment": true,
+              "resign_keeps_verified": true,
+              "resign_tags_local_stamp": true,
+              "dash_boot_no_embed": true
+            },
+            "note": "Functional probes green."
+          },
+          "live_second_host": {
+            "id": "live_second_host",
+            "pass": false,
+            "path": "reports/live_second_host.json",
+            "note": "FAIL: missing reports/live_second_host.json \u2014 elevated wevtutil on a second physical Windows host (see docs/trust-hardening.md)."
+          }
+        },
+        "honesty": "Do not publish 'useful on real attacks' until claim_allowed=true. Author-held HMAC and unsigned stranger JSON are advisory. lab_verified means sealed/breaktest + trust probes only."
+      }
+    },
+    "stage_b_check": {
+      "exit": 0,
+      "pass": true,
+      "payload": {
+        "allowed": true,
+        "pass": true,
+        "stranger_dry_run": true,
+        "stage_b_allowed_marker": true,
+        "lab_override": false,
+        "env_override_ignored": false,
+        "stranger_note": null
+      }
+    },
+    "hostile_bus": {
+      "exit": 0,
+      "pass": true,
+      "payload": {
+        "pass": true,
+        "cases": [
+          {
+            "case": "missing_authz",
+            "pass": true
+          },
+          {
+            "case": "free_form_verb",
+            "pass": true
+          },
+          {
+            "case": "replay",
+            "pass": true
+          },
+          {
+            "case": "expired",
+            "pass": true
+          }
+        ],
+        "honesty": "Hostile-bus selftest \u2260 live OS quarantine unlocked.",
+        "generated_at": "2026-07-25T07:35:03Z"
+      }
+    }
+  },
+  "break_points": {
+    "missed_hosts": [],
+    "over_merged_hosts": [
+      "host-d"
+    ],
+    "hosts_never_in_detector": [],
+    "fusion_lift": false,
+    "both_missed": false,
+    "detector_over_fragmented": false
+  },
+  "hmac": {
+    "ok": true,
+    "hmac_rejected": 1,
+    "events_accepted": 15,
+    "mode": "offline_lab_replay_verify"
+  },
+  "correlator": {
+    "n_campaigns": 2,
+    "best_jaccard": 1.0,
+    "matched": true,
+    "hosts_union": [
+      "host-a",
+      "host-b",
+      "host-c",
+      "host-d"
+    ]
+  },
+  "source_note": "Compound purple-team scenario. After Stage A honesty fix: window_seconds is enforced; fleet CDN dst is poisoned; APT {a,b,c} no longer fat-merges with innocents via jumpbox. Residual: separate helpdesk lateral can still flag host-d. DNS / >50KB blob remain invisible.",
+  "replay_exit": 0,
+  "pass": true,
+  "dash_run_dir": "runs/cdn-bridge-safe/replay",
+  "honesty": "Safety harness does not require claim_allowed. CDN Bridge residual host-d helpdesk stitch remains a published limit."
+}

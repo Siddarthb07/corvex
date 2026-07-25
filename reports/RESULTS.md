@@ -1,6 +1,6 @@
 # Evaluation results
 
-Sealed synthetic multi-host packs after `corvex seal-day0 --force` (fusion_chain + expanded benign N). **Care vs commercial tools: unproven.** Claim language: `claim_allowed=true` after human stranger **Jack** (see `reports/claim_gates.json`).
+Sealed synthetic multi-host packs after `corvex seal-day0 --force` (fusion_chain + expanded benign N). **Care vs commercial tools: unproven.** Claim language: **`lab_verified`** (sealed + breaktest); **`claim_allowed=false`** until signed stranger attestation + trust integrity hold (see `reports/claim_gates.json`).
 
 ## Held-out detection (sealed)
 
@@ -63,8 +63,9 @@ Observe-only Windows collector: `corvex sensor-windows` (Security + Sysmon + Fir
 | Fixture `--once` → campaigns | **pass** (unit + smoke) |
 | Multi-host exporter shape | **pass** (`scripts/smoke_os_wide_multihost.py`) |
 | Allowlist + rate cap | **shipped** |
-| Stranger / `claim_allowed` | **unlocked** — human operator **Jack** (`attestation_kind=human`) |
-| HMAC verify on recompute | **shipped** (tampered rows dropped) |
+| Stranger / `claim_allowed` | **locked** — unsigned human attestation is advisory; use `corvex sign-stranger-attestation` |
+| HMAC verify on recompute **and** `Correlator.ingest` | **shipped** |
+| Dash token covers static + API; no embedded snap | **shipped** |
 | wevtutil `--follow` / `--require-live` | shipped (elevated Security often needed) |
 | `corvex fuse-run` | shipped — offline lab+PC file merge |
 
@@ -91,14 +92,17 @@ Docs: [`docs/os-wide-sensor.md`](../docs/os-wide-sensor.md).
 |------|--------|
 | non_author_fusion_lift | pass (breaktest lift ~+0.44) |
 | benign_fcr_real_n | pass (N=5, FCR=0) |
-| stranger_success | **pass** (human operator Jack, `attestation_kind=human`) |
-| **claim_allowed** | **true** — language: useful on real attacks |
+| stranger_success | **fail until Ed25519 stranger self-sign** |
+| trust_integrity | pass (HMAC ingest, no-enrollment reject, resign, dash) |
+| live_second_host | **fail** until elevated wevtutil on a second physical PC |
+| **lab_verified** | **true** — sealed + breaktest + trust probes |
+| **claim_allowed** | **false** — not “useful on real attacks” yet |
 
 ## What this does / does not prove
 
-**Proves (narrow):** Sealed packs separate fusion from detector-only; window/anti-jumpbox honesty holds; benign FCR holds at N=5; reconstruction round-trips; breaktest fusion lift remains positive; human stranger completed BYO Windows → timeline path.
+**Proves (narrow):** Sealed packs separate fusion from detector-only; window/anti-jumpbox honesty holds; benign FCR holds at N=5; reconstruction round-trips; breaktest fusion lift remains positive; trust probes reject bad HMAC / dash snapshot bypass.
 
-**Does not prove:** Commercial parity, that live contain is safe to arm, or cross-host live Event Log on two physical machines.
+**Does not prove:** Independent live multi-host usefulness; signed stranger proof of outsider completion; OS quarantine; commercial parity; live contain safe to arm.
 
 ## Reproduce
 

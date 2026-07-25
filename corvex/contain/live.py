@@ -78,7 +78,21 @@ def execute_live(
     if int(os.environ.get("CORVEX_CONTAIN", CORVEX_CONTAIN) or 0) == 0:
         raise ContainGateError("CORVEX_CONTAIN=0 — live path locked")
 
-    expected = expected_authz or os.environ.get("CORVEX_CONTAIN_AUTHZ", "lab-dual-control-token")
+    expected = expected_authz if expected_authz is not None else os.environ.get("CORVEX_CONTAIN_AUTHZ")
+    if expected is None or not str(expected).strip():
+        raise ContainGateError(
+            "CORVEX_CONTAIN_AUTHZ unset — refuse live contain (no hardcoded dual-control fallback)"
+        )
+    expected = str(expected).strip()
+    if expected.lower() in (
+        "lab-dual-control-token",
+        "changeme",
+        "shared",
+        "default",
+    ):
+        raise ContainGateError(
+            "CORVEX_CONTAIN_AUTHZ is a forbidden default/shared token — set a unique secret"
+        )
     try:
         validate_action_envelope(
             envelope,

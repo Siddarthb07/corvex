@@ -2,7 +2,7 @@
 
 Multi-host **campaign correlator** — stitches weak signals across machines into one attack timeline.
 
-Observe and correlate first. Live containment stays locked behind safety controls.
+**Public claim (standing):** research correlator — holds up against synthetic ATT&CK-shaped fleets; **not yet validated against real telemetry or benign baselines.** Observe and correlate first. Live containment stays locked behind safety controls.
 
 ## Quick start
 
