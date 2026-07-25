@@ -56,15 +56,16 @@ Break-test / public-TTP manifests (`corvex score-non-author`): correlator F1 **~
 
 ## Stage B OS-wide sensor
 
-Observe-only Windows collector: `corvex sensor-windows` (Security + Sysmon + Firewall + PowerShell). Fixture CI path: `fixtures/os_wide/multi_channel.jsonl`. Lab unlock `CORVEX_STAGE_B=1`; honest unlock needs stranger PASS + `reports/stage-b-allowed`.
+Observe-only Windows collector: `corvex sensor-windows` (Security + Sysmon + Firewall + PowerShell). Fixture CI path: `fixtures/os_wide/multi_channel.jsonl`. Lab unlock: `corvex stage-b-lab-unlock` (`CORVEX_STAGE_B=1` removed). Honest unlock needs **human** stranger PASS + `reports/stage-b-allowed`.
 
 | Check | Status |
 |-------|--------|
 | Fixture `--once` → campaigns | **pass** (unit + smoke) |
 | Multi-host exporter shape | **pass** (`scripts/smoke_os_wide_multihost.py`) |
 | Allowlist + rate cap | **shipped** |
-| wevtutil `--follow` on live PC | best-effort (degrades if channel missing) |
-| Stranger / `claim_allowed` | **still locked** |
+| HMAC verify on recompute | **shipped** (tampered rows dropped) |
+| wevtutil `--follow` on live PC | best-effort (productize deferred) |
+| Stranger / `claim_allowed` | **still locked** (human only; agents rejected) |
 
 Docs: [`docs/os-wide-sensor.md`](../docs/os-wide-sensor.md).
 

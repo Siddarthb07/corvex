@@ -29,5 +29,5 @@
       "note": "Held-out benign N=5 (need >=5), FCR=0.000."
     }
   },
-  "honesty": "Do not publish 'useful on real attacks' until claim_allowed=true. Soft probes and author packs never flip this alone."
+  "honesty": "Do not publish 'useful on real attacks' until claim_allowed=true. Soft probes, author packs, and agent stranger dry-runs never flip this alone."
 }

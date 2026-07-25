@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import json
-import os
 from pathlib import Path
 
 import pytest
@@ -11,11 +10,20 @@ import pytest
 from corvex.adapters.os_wide import adapt_os_wide_export, load_allowlist
 from corvex.lab_enroll import ensure_lab_enrollment
 from corvex.sensors.windows_os import run_sensor_windows
-from corvex.stage_b import StageBGateError, require_stage_b, stage_b_status
+from corvex.stage_b import StageBGateError, require_stage_b, write_lab_override
 
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = ROOT / "fixtures" / "os_wide" / "multi_channel.jsonl"
 ALLOW = ROOT / "fixtures" / "os_wide" / "channels.json"
+
+
+def _lab_unlock(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.delenv("CORVEX_STAGE_B", raising=False)
+    monkeypatch.delenv("CFUSE_STAGE_B", raising=False)
+    monkeypatch.chdir(tmp_path)
+    reports = tmp_path / "reports"
+    reports.mkdir(exist_ok=True)
+    write_lab_override(reports, reason="pytest os-wide fixture unlock")
 
 
 def test_adapt_os_wide_skips_unknown_event_ids():
@@ -53,8 +61,7 @@ def test_sensor_requires_stage_b_gate(tmp_path: Path, monkeypatch):
 
 
 def test_sensor_windows_fixture_once(tmp_path: Path, monkeypatch):
-    monkeypatch.setenv("CORVEX_STAGE_B", "1")
-    monkeypatch.chdir(tmp_path)
+    _lab_unlock(tmp_path, monkeypatch)
     enr = ensure_lab_enrollment(tmp_path / "enrollment.json")
     run = tmp_path / "runs" / "os-wide"
     stats = run_sensor_windows(
@@ -89,7 +96,7 @@ def test_sensor_windows_fixture_once(tmp_path: Path, monkeypatch):
 
 
 def test_multihost_exporter_shape(tmp_path: Path, monkeypatch):
-    monkeypatch.setenv("CORVEX_STAGE_B", "1")
+    _lab_unlock(tmp_path, monkeypatch)
     enr = ensure_lab_enrollment(tmp_path / "enrollment.json")
     run = tmp_path / "runs" / "fleet"
     # host-a writes
@@ -124,7 +131,7 @@ def test_multihost_exporter_shape(tmp_path: Path, monkeypatch):
 
 
 def test_rate_limiter_drops(tmp_path: Path, monkeypatch):
-    monkeypatch.setenv("CORVEX_STAGE_B", "1")
+    _lab_unlock(tmp_path, monkeypatch)
     enr = ensure_lab_enrollment(tmp_path / "enrollment.json")
     run = tmp_path / "runs" / "rate"
     stats = run_sensor_windows(

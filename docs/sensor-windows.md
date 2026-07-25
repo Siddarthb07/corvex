@@ -18,12 +18,12 @@ This is the P3 stranger checklist path. It does **not** by itself unlock Stage B
 
 ## Stage B — OS-wide Windows sensor
 
-Gated by `require_stage_b` (Stage A PASS + stranger PASS + `reports/stage-b-allowed`, **or** lab `CORVEX_STAGE_B=1`).
+Gated by `require_stage_b` (Stage A PASS + **human** stranger PASS + `reports/stage-b-allowed`, **or** `corvex stage-b-lab-unlock`). `CORVEX_STAGE_B=1` is ignored.
 
 Full guide: [`docs/os-wide-sensor.md`](os-wide-sensor.md)
 
 ```bash
-set CORVEX_STAGE_B=1
+corvex stage-b-lab-unlock --reason "local fixture CI"
 corvex sensor-windows --fixture fixtures/os_wide/multi_channel.jsonl \
   --allowlist fixtures/os_wide/channels.json \
   --host-map fixtures/windows_host_map.json \
@@ -31,7 +31,7 @@ corvex sensor-windows --fixture fixtures/os_wide/multi_channel.jsonl \
 corvex dash --run-dir runs/os-wide
 ```
 
-Live follow (wevtutil, best-effort):
+Live follow (wevtutil, best-effort; productize deferred):
 
 ```bash
 corvex sensor-windows --run-dir runs/os-wide-live --follow
@@ -41,7 +41,7 @@ Channels: Security (4624/4625/4648), Sysmon (1/3/22 if installed), Firewall, Pow
 
 ## Multi-host enrollment map
 
-Corvex signs with local `~/.corvex/enrollment.json`. Map each Windows `Computer` name to an enrolled host id via `--host-map`.
+Corvex signs with local `~/.corvex/enrollment.json` (owner-only ACL on save). Map each Windows `Computer` name to an enrolled host id via `--host-map`.
 
 ## What this is / isn't
 
@@ -51,5 +51,6 @@ Corvex signs with local `~/.corvex/enrollment.json`. Map each Windows `Computer`
 | Stage B OS-wide collector (gated) | JetStream/mTLS bus (still stub) |
 | Fixture CI without admin rights | Proof of real-attack usefulness (`claim_allowed`) |
 | Multi-host exporter shape | Live OS quarantine |
+| HMAC verify on recompute | Trusted remote provenance from lab adapter signing |
 
-Claim language stays lab/BYO until `corvex claim-gates` → `claim_allowed=true`.
+Claim language stays lab/BYO until `corvex claim-gates` → `claim_allowed=true` (human stranger required).

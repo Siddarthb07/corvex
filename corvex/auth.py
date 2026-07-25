@@ -65,14 +65,44 @@ def generate_lab_enrollment(
     return Enrollment(by_producer, secrets_map)
 
 
+def _harden_secrets_file(path: Path) -> None:
+    """Best-effort: owner-only ACL. Not a substitute for OS keystore (DPAPI later)."""
+    try:
+        os.chmod(path, 0o600)
+    except OSError:
+        pass
+    if os.name == "nt":
+        try:
+            import subprocess
+
+            user = os.environ.get("USERNAME") or os.environ.get("USER") or ""
+            if user:
+                subprocess.run(
+                    [
+                        "icacls",
+                        str(path),
+                        "/inheritance:r",
+                        "/grant:r",
+                        f"{user}:(R,W)",
+                    ],
+                    check=False,
+                    capture_output=True,
+                    timeout=15,
+                )
+        except Exception:
+            pass
+
+
 def save_enrollment(path: Path, enrollment: Enrollment) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     # Secrets stored outside repo preference: if under ~/.corvex, OK.
+    # Plaintext JSON + owner-only ACL — rotate by deleting enrollment.json and re-enrolling.
     payload = {
         "hosts": enrollment.to_public_dict(),
         "secrets_hex": {k: v.hex() for k, v in enrollment._secrets.items()},
     }
     path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+    _harden_secrets_file(path)
 
 
 def load_enrollment(path: Path) -> Enrollment:

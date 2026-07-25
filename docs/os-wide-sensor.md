@@ -2,14 +2,17 @@
 
 Same `corvex sensor-windows` binary on each enrolled lab host; central run dir collects signed events.
 
+**Mode:** offline lab / observe-only. Not a live streaming product bus yet.
+
 ## Lab unlock
 
 ```bash
 # Local build without stranger (does NOT flip claim_allowed):
-set CORVEX_STAGE_B=1
+corvex stage-b-lab-unlock --reason "local fixture CI"
+# CORVEX_STAGE_B=1 is ignored (removed).
 
-# Honest unlock (after outsider stranger PASS):
-#   write reports/stranger_dry_run.json with pass:true
+# Honest unlock (after human outsider stranger PASS):
+#   write reports/stranger_dry_run.json with pass:true, attestation_kind=human
 #   create empty reports/stage-b-allowed
 corvex stage-b-check
 ```
@@ -17,7 +20,7 @@ corvex stage-b-check
 ## Fixture / CI (no admin Event Log)
 
 ```bash
-set CORVEX_STAGE_B=1
+corvex stage-b-lab-unlock --reason "local fixture CI"
 corvex sensor-windows --fixture fixtures/os_wide/multi_channel.jsonl \
   --allowlist fixtures/os_wide/channels.json \
   --host-map fixtures/windows_host_map.json \
@@ -25,10 +28,10 @@ corvex sensor-windows --fixture fixtures/os_wide/multi_channel.jsonl \
 corvex dash --run-dir runs/os-wide
 ```
 
-## Live local PC (wevtutil)
+## Live local PC (wevtutil) — deferred productization
 
 ```bash
-set CORVEX_STAGE_B=1
+corvex stage-b-lab-unlock --reason "elevated wevtutil probe"
 corvex sensor-windows --run-dir runs/os-wide-live --follow \
   --channels security,sysmon,firewall,powershell
 ```
@@ -51,6 +54,6 @@ corvex sensor-windows --host-id host-b --producer prod-b \
   --run-dir runs/fleet --once
 ```
 
-Central operator opens `corvex dash --run-dir runs/fleet`. Correlator recomputes from the shared `events.jsonl`.
+Central operator opens `corvex dash --run-dir runs/fleet`. Correlator recomputes from the shared `events.jsonl` **after HMAC verify** (tampered rows dropped).
 
-Enrollment: `corvex init` / `~/.corvex/enrollment.json` must include each host/producer pair.
+Enrollment: `corvex init` / `~/.corvex/enrollment.json` must include each host/producer pair (owner-only ACL on save).

@@ -23,32 +23,34 @@ corvex dash --run-dir runs/stranger-wedge --build
 {
   "pass": true,
   "operator": "NAME",
+  "attestation_kind": "human",
   "date": "YYYY-MM-DD",
   "note": "Completed Windows export → byo-windows → timeline without author help.",
   "run_dir": "runs/stranger-wedge"
 }
 ```
 
-Save as `reports/stranger_dry_run.json`.
+Save as `reports/stranger_dry_run.json`. Agent / Cursor dry-runs (`operator` containing `agent`, or `attestation_kind` other than `human`) **do not** unlock `claim_allowed`.
 
 ## After stranger PASS — Stage B marker
 
 ```bash
-# Author (or CI) only after stranger_dry_run.json has pass:true:
+# Author (or CI) only after stranger_dry_run.json has pass:true + attestation_kind=human:
 # Create an empty marker file — do not invent the attestation.
 #   reports/stage-b-allowed
 
-corvex stage-b-check   # allowed:true only if Stage A PASS + stranger pass + marker
+corvex stage-b-check   # allowed:true only if Stage A PASS + human stranger + marker
 corvex claim-gates     # claim_allowed still needs all P3 gates
 ```
 
-**Lab override (not for claims):** `CORVEX_STAGE_B=1` unlocks Stage B stubs locally without stranger attestation.
+**Lab override (not for claims):** `corvex stage-b-lab-unlock --reason "…"`. `CORVEX_STAGE_B=1` is ignored.
 
 After Stage B unlock, OS-wide collection: see [`docs/os-wide-sensor.md`](os-wide-sensor.md).
 
 ## Rules
 
 - Author may not write `pass: true` for themselves.
+- Agents / Cursor dry-runs do not qualify (`attestation_kind` must be `human`).
 - Shrugging / cannot finish → leave file absent or `"pass": false`.
 - File present with `"pass": false` does **not** count as stranger success.
 - This gate alone does not unlock live contain.
