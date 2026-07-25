@@ -5,16 +5,18 @@
 ### Added
 - Stage B OS-wide Windows sensor: `corvex sensor-windows` (Security + Sysmon + Firewall + PowerShell), fixtures under `fixtures/os_wide/`, `docs/os-wide-sensor.md`, multi-host smoke script, `corvex habit-loop`.
 - `corvex stage-b-lab-unlock` (auditable lab override). Flat lab → envelope adapt on recompute. Dash `--token` required for LAN bind.
+- `corvex fuse-run` offline lab+PC merge; `sensor-windows --require-live`; wevtutil channel health + RecordId bookmarks.
 
 ### Changed
 - `recompute_run` verifies HMAC (rejects tampered envelopes) and adapts flat Docker-lab rows; campaigns from correlator only (`mode: offline_lab_replay`).
 - Claim stranger gate requires `attestation_kind=human`; agent operators rejected.
 - `CORVEX_STAGE_B=1` env bypass removed.
 - Enrollment save applies owner-only ACL (best-effort).
+- **claim_allowed=true** after human stranger attestation (operator: Jack).
 
 ### Safety
 - Agent stranger dry-runs cannot unlock `claim_allowed`. Lab override does not flip claims.
-
+- Live OS quarantine still unimplemented / observe-only.
 ## [1.1.0] — 2026-07-23
 
 ### Added

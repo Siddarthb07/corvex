@@ -914,6 +914,11 @@ def sensor_windows_cmd(
     max_cycles: Optional[int] = typer.Option(
         None, help="Stop after N cycles (tests / bounded follow)"
     ),
+    require_live: bool = typer.Option(
+        False,
+        "--require-live",
+        help="Fail if no live wevtutil hits (CI should keep --fixture instead)",
+    ),
 ) -> None:
     """Stage B observe-only OS-wide Windows sensor → events.jsonl + timeline."""
     from corvex.sensors.windows_os import run_sensor_windows
@@ -949,6 +954,7 @@ def sensor_windows_cmd(
             max_per_sec=max_per_sec,
             poll_seconds=poll_seconds,
             max_cycles=max_cycles,
+            require_live=require_live,
         )
     except StageBGateError as exc:
         typer.echo(str(exc))
@@ -957,8 +963,100 @@ def sensor_windows_cmd(
             "(does not flip claim_allowed). CORVEX_STAGE_B=1 is ignored."
         )
         raise typer.Exit(2) from exc
+    except ValueError as exc:
+        typer.echo(str(exc))
+        raise typer.Exit(2) from exc
     typer.echo(json.dumps(stats, indent=2))
+    if stats.get("require_live_failed"):
+        raise typer.Exit(1)
     raise typer.Exit(0 if int(stats.get("published", 0)) > 0 or stats.get("timeline") else 1)
+
+
+@app.command("fuse-run")
+def fuse_run_cmd(
+    lab: Path = typer.Option(
+        Path("labs/breaktest/shared/events.jsonl"),
+        "--lab",
+        help="Lab shared events.jsonl (or dir containing it)",
+    ),
+    pc: Path = typer.Option(
+        Path("runs/pc-sensor"),
+        "--pc",
+        help="PC sensor run dir or events.jsonl",
+    ),
+    out_dir: Path = typer.Option(
+        Path("runs/pc-and-lab"),
+        "--out-dir",
+        help="Fusion output run directory",
+    ),
+    follow: bool = typer.Option(
+        False,
+        "--follow/--once",
+        help="Keep merging (file-tail). Default once. Not a concurrency-safe bus.",
+    ),
+    poll_seconds: float = typer.Option(2.0, help="Follow poll interval"),
+    max_cycles: Optional[int] = typer.Option(
+        None, help="Stop follow after N cycles (tests)"
+    ),
+    dash: bool = typer.Option(
+        False,
+        "--dash/--no-dash",
+        help="Also start corvex dash pointed at --out-dir",
+    ),
+    reset: bool = typer.Option(
+        False,
+        "--reset",
+        help="Delete out-dir events/timeline before fuse",
+    ),
+) -> None:
+    """Offline lab+PC fusion: merge JSONL sources, verify HMAC, recompute campaigns."""
+    from corvex.fusion import follow_fuse, fuse_sources
+
+    enrollment = ensure_lab_enrollment(
+        hosts={
+            "host-a": "prod-a",
+            "host-b": "prod-b",
+            "host-c": "prod-c",
+            "host-d": "prod-d",
+            "host-e": "prod-e",
+            "host-pc": "prod-pc",
+        }
+    )
+    out = Path(out_dir)
+    if reset and out.exists():
+        for name in ("events.jsonl", "timeline.json", "campaigns.jsonl", "fusion_status.json"):
+            p = out / name
+            if p.exists():
+                p.unlink()
+    sources = {"lab": Path(lab), "pc": Path(pc)}
+    typer.echo(
+        "fuse-run mode=offline_lab_replay — file merge + correlator; "
+        "not JetStream / not concurrent-safe product bus."
+    )
+    if follow:
+        stats = follow_fuse(
+            sources=sources,
+            out_dir=out,
+            enrollment=enrollment,
+            poll_seconds=poll_seconds,
+            max_cycles=max_cycles,
+        )
+    else:
+        stats = fuse_sources(sources=sources, out_dir=out, enrollment=enrollment)
+    typer.echo(json.dumps({k: v for k, v in stats.items() if k != "state"}, indent=2, default=str))
+    if dash:
+        os.environ["CORVEX_RUN_DIR"] = str(out.resolve())
+        dash_cmd(
+            build_only=False,
+            host="127.0.0.1",
+            port=8765,
+            token=None,
+            run_dir=out,
+            open_browser=True,
+            open_file=False,
+        )
+        return
+    raise typer.Exit(0)
 
 
 @app.command("habit-loop")
