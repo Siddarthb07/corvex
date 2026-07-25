@@ -403,8 +403,14 @@ def score_non_author_cmd(
     corr_scores = []
     det_scores = []
     pack_rows = []
+    skipped: List[Dict[str, str]] = []
     for path in sorted(man_dir.glob("*.json")):
-        man = load_manifest(path)
+        try:
+            man = load_manifest(path)
+        except ValueError as exc:
+            # Non-attack manifests live here too (e.g. OS-wide sensor breaktest).
+            skipped.append({"file": path.name, "reason": str(exc)})
+            continue
         raw_events, gt = adapt_attack_manifest(man)
         signed = []
         for rec in raw_events:
@@ -428,7 +434,7 @@ def score_non_author_cmd(
         det_scores.append(score_pack(pred_d, gt, ttu_seconds=ttu_d, benign=benign))
         pack_rows.append(path.name)
     if not corr_scores:
-        raise typer.Exit("no manifests scored")
+        raise typer.Exit("no attack manifests scored (need campaign_id/hosts/steps)")
     m_c = aggregate_scores(corr_scores)
     m_d = aggregate_scores(det_scores)
     lift = vs_baseline_lift(m_c, m_d)
@@ -438,6 +444,7 @@ def score_non_author_cmd(
     result = {
         "source": _repo_rel(man_dir, root),
         "packs": pack_rows,
+        "skipped": skipped,
         "correlator": m_c,
         "detector_only": m_d,
         "f1_lift": f1_lift,
