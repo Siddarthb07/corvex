@@ -198,37 +198,53 @@ def append_events(path: Path, envelopes: Sequence[EventEnvelope]) -> int:
 
 
 def recompute_run(run_dir: Path, enrollment: Enrollment) -> Dict[str, Any]:
-    """Load signed envelopes in run_dir/events.jsonl and rewrite timeline.json.
+    """Load events.jsonl, adapt flat lab rows, verify HMAC, rewrite timeline.json.
 
-    Skips flat Docker-lab bus rows (no schema_ver) — those still show on the dash
-    Activity feed via dashboard normalization.
+    Flat Docker-lab rows are adapted and re-signed with ``enrollment`` (offline lab
+    replay — not remote provenance). Bad or unverifiable HMACs are dropped.
+    Campaigns come only from the correlator — never copied from theatre state.
     """
-    from corvex.envelope import EventEnvelope
+    from corvex.adapters.lab_flat import try_adapt_row
+    from corvex.auth import AuthError
+    from corvex.envelope import EventEnvelope, verify_envelope
 
     run_dir = Path(run_dir)
     events_path = run_dir / "events.jsonl"
     if not events_path.exists():
         return {"campaigns": 0, "events": 0}
     envs: List[EventEnvelope] = []
-    flat = 0
+    adapted = 0
+    skipped = 0
+    rejected_hmac = 0
+    seq = 0
     for line in events_path.read_text(encoding="utf-8").splitlines():
         if not line.strip():
             continue
         try:
             rec = json.loads(line)
         except json.JSONDecodeError:
+            skipped += 1
             continue
-        if rec.get("type") == "event":
-            rec = {k: v for k, v in rec.items() if k != "type"}
-        if "schema_ver" not in rec or "payload_type" not in rec:
-            flat += 1
+        seq += 1
+        env, status = try_adapt_row(rec, enrollment, seq=seq)
+        if env is None:
+            skipped += 1
             continue
+        if status == "adapted":
+            adapted += 1
         try:
-            envs.append(EventEnvelope.from_dict(rec))
-        except (KeyError, TypeError, ValueError):
-            flat += 1
+            secret = enrollment.require(env.producer_id, env.host_id)
+        except AuthError:
+            rejected_hmac += 1
             continue
-    store = CampaignStore(run_dir / "campaigns.jsonl")
+        if not verify_envelope(env, secret):
+            rejected_hmac += 1
+            continue
+        envs.append(env)
+    store_path = run_dir / "campaigns.jsonl"
+    if store_path.exists():
+        store_path.write_text("", encoding="utf-8")
+    store = CampaignStore(store_path)
     audit = AuditLog(run_dir / "audit.jsonl")
     corr = Correlator(store, audit, config=CorrelatorConfig())
     t0 = time.perf_counter()
@@ -241,9 +257,12 @@ def recompute_run(run_dir: Path, enrollment: Enrollment) -> Dict[str, Any]:
         "ttu_seconds": ttu,
         "campaigns": camps,
         "sensor": "windows-os-wide+docker-lab",
+        "mode": "offline_lab_replay",
         "generated_at": _now(),
         "envelope_events": len(envs),
-        "flat_lab_events_skipped_for_correlate": flat,
+        "flat_lab_events_adapted": adapted,
+        "rows_skipped": skipped,
+        "hmac_rejected": rejected_hmac,
     }
     (run_dir / "timeline.json").write_text(
         json.dumps(timeline, indent=2) + "\n", encoding="utf-8"
@@ -257,7 +276,9 @@ def recompute_run(run_dir: Path, enrollment: Enrollment) -> Dict[str, Any]:
     return {
         "campaigns": len(camps),
         "events": len(envs),
-        "flat_lab_events": flat,
+        "flat_lab_adapted": adapted,
+        "rows_skipped": skipped,
+        "hmac_rejected": rejected_hmac,
         "ttu_seconds": ttu,
     }
 

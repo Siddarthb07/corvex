@@ -1,7 +1,9 @@
 """Stage B — gated: one OS sensor + NATS JetStream mTLS; habit-loop metric; no actuators.
 
-Unlock only after held-out Stage A PASS + stranger dry-run + reports/stage-b-allowed
-(or CORVEX_STAGE_B=1 for local lab).
+Honest unlock: held-out Stage A PASS + human stranger dry-run + reports/stage-b-allowed.
+
+Lab unlock (does NOT flip claim_allowed): ``corvex stage-b-lab-unlock`` writes
+``reports/stage-b-lab-override.json``. The old ``CORVEX_STAGE_B=1`` env bypass is gone.
 """
 
 from __future__ import annotations
@@ -9,16 +11,78 @@ from __future__ import annotations
 import json
 import os
 import ssl
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, Iterator, Optional
 
 from corvex.envelope import EventEnvelope
 
 ROOT = Path(__file__).resolve().parents[1]
+LAB_OVERRIDE_NAME = "stage-b-lab-override.json"
 
 
 class StageBGateError(RuntimeError):
     pass
+
+
+def _stranger_human_ok(sdata: Dict[str, Any]) -> bool:
+    """Agent / author self-attestation must not unlock Stage B or claims."""
+    if not bool(sdata.get("pass")):
+        return False
+    op = str(sdata.get("operator") or sdata.get("operator_id") or "").strip().lower()
+    if not op or op in {"replace", "author", "self", "n/a", "none"}:
+        return False
+    if "agent" in op or op.startswith("cursor-") or op.startswith("ci-"):
+        return False
+    kind = str(sdata.get("attestation_kind") or "").strip().lower()
+    if kind and kind != "human":
+        return False
+    # Prefer explicit human marker; allow legacy human files without the field
+    # only when operator does not look automated.
+    if kind == "human":
+        return True
+    return True
+
+
+def lab_override_path(report_dir: Optional[Path] = None) -> Path:
+    return Path(report_dir or Path("reports")) / LAB_OVERRIDE_NAME
+
+
+def write_lab_override(
+    report_dir: Optional[Path] = None,
+    *,
+    reason: str,
+) -> Path:
+    """Auditable local-lab unlock file. Does not flip claim_allowed."""
+    reason = (reason or "").strip()
+    if len(reason) < 8:
+        raise StageBGateError("lab unlock requires --reason (min 8 chars)")
+    rd = Path(report_dir or Path("reports"))
+    rd.mkdir(parents=True, exist_ok=True)
+    path = rd / LAB_OVERRIDE_NAME
+    payload = {
+        "schema_ver": "1",
+        "kind": "stage_b_lab_override",
+        "reason": reason,
+        "created_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "honesty": (
+            "Local lab unlock only. Does not flip claim_allowed. "
+            "Not a stranger attestation. Remove when done."
+        ),
+    }
+    path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+    return path
+
+
+def _lab_override_ok(rd: Path) -> bool:
+    path = rd / LAB_OVERRIDE_NAME
+    if not path.exists():
+        return False
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return False
+    return data.get("kind") == "stage_b_lab_override" and bool(data.get("reason"))
 
 
 def stage_b_status(report_dir: Optional[Path] = None) -> Dict[str, Any]:
@@ -37,34 +101,50 @@ def stage_b_status(report_dir: Optional[Path] = None) -> Dict[str, Any]:
         data = json.loads(stage_a.read_text(encoding="utf-8"))
         passed = bool(data.get("gate", {}).get("pass", data.get("pass")))
 
-    env_override = (
+    # Env bypass removed (council). Detect leftover env for honest messaging only.
+    env_present = (
         os.environ.get("CORVEX_STAGE_B") == "1" or os.environ.get("CFUSE_STAGE_B") == "1"
     )
+
     stranger_ok = False
+    stranger_note = None
     if stranger.exists():
         try:
             sdata = json.loads(stranger.read_text(encoding="utf-8"))
-            stranger_ok = bool(sdata.get("pass"))
+            stranger_ok = _stranger_human_ok(sdata)
+            if bool(sdata.get("pass")) and not stranger_ok:
+                stranger_note = (
+                    "stranger_dry_run pass ignored — operator looks like an agent "
+                    "or attestation_kind is not human"
+                )
         except (json.JSONDecodeError, OSError):
             stranger_ok = False
     marker_ok = allowed_marker.exists()
-    allowed = env_override or (passed and stranger_ok and marker_ok)
+    lab_override = _lab_override_ok(rd)
+    allowed = lab_override or (passed and stranger_ok and marker_ok)
     return {
         "allowed": allowed,
         "pass": passed,
         "stranger_dry_run": stranger_ok,
         "stage_b_allowed_marker": marker_ok,
-        "env_override": env_override,
+        "lab_override": lab_override,
+        "env_override_ignored": env_present,
+        "stranger_note": stranger_note,
     }
 
 
 def require_stage_b(report_path: Optional[Path] = None) -> None:
     status = stage_b_status(Path(report_path).parent if report_path else None)
     if not status["allowed"]:
-        raise StageBGateError(
-            "Stage B locked. Need held-out PASS + reports/stranger_dry_run.json + "
-            "reports/stage-b-allowed (or CORVEX_STAGE_B=1)."
+        msg = (
+            "Stage B locked. Need held-out PASS + human stranger_dry_run.json + "
+            "reports/stage-b-allowed, or: corvex stage-b-lab-unlock --reason '…'."
         )
+        if status.get("env_override_ignored"):
+            msg += " CORVEX_STAGE_B=1 is ignored (removed)."
+        if status.get("stranger_note"):
+            msg += f" ({status['stranger_note']})"
+        raise StageBGateError(msg)
 
 
 class SysmonJsonSensor:

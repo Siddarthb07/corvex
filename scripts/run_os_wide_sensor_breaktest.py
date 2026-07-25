@@ -15,7 +15,7 @@ sys.path.insert(0, str(ROOT))
 from corvex.lab_enroll import ensure_lab_enrollment
 from corvex.sensors.windows_os import poll_wevtutil_channel, run_sensor_windows
 from corvex.adapters.os_wide import DEFAULT_ALLOWLIST, load_allowlist
-from corvex.stage_b import stage_b_status
+from corvex.stage_b import stage_b_status, write_lab_override
 
 
 REQUIRED = ("security", "sysmon", "firewall", "powershell")
@@ -32,6 +32,7 @@ def main() -> int:
         shutil.rmtree(run_dir)
     run_dir.mkdir(parents=True)
 
+    write_lab_override(ROOT / "reports", reason="os-wide sensor breaktest fixture")
     gate = stage_b_status(ROOT / "reports")
     enr = ensure_lab_enrollment()
     hmap = {f"{h}.lab.local": h for h in ("host-a", "host-b", "host-c", "host-d", "host-e")}

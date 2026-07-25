@@ -124,7 +124,7 @@ Spins up 3 virtual hosts + attacker + Corvex on an isolated bridge network. Same
 | Replay / BYO JSONL ingest | Ready |
 | Fusion-gap packs (`fusion_chain`) + break-test lab | Ready (run locally — see [`labs/breaktest/README.md`](labs/breaktest/README.md)) |
 | Windows auth export → BYO (`adapt-windows` / `byo-windows`) | Ready (observe-only) |
-| OS-wide Windows sensor (`sensor-windows`) | Ready — Stage B gated / `CORVEX_STAGE_B=1` |
+| OS-wide Windows sensor (`sensor-windows`) | Ready — Stage B gated / `stage-b-lab-unlock` |
 | Sensors + JetStream/mTLS bus | JetStream still stub; OS-wide file path shipped |
 | Live host isolate | Dry-run only (`CORVEX_CONTAIN=0`) |
 

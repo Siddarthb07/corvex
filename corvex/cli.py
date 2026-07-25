@@ -852,12 +852,33 @@ def gate_cmd(
 
 @app.command("stage-b-check")
 def stage_b_check_cmd() -> None:
-    """Refuse sensor unlock unless held-out PASS + stranger dry-run + stage-b-allowed."""
+    """Refuse sensor unlock unless held-out PASS + human stranger + stage-b-allowed (or lab override)."""
     from corvex.stage_b import stage_b_status
 
     status = stage_b_status()
     typer.echo(json.dumps(status, indent=2))
     raise typer.Exit(0 if status["allowed"] else 1)
+
+
+@app.command("stage-b-lab-unlock")
+def stage_b_lab_unlock_cmd(
+    reason: str = typer.Option(
+        ...,
+        "--reason",
+        help="Why this machine needs a local lab unlock (audited; min 8 chars)",
+    ),
+    report_dir: Path = typer.Option(Path("reports"), "--reports"),
+) -> None:
+    """Write reports/stage-b-lab-override.json for local sensor work. Does NOT flip claim_allowed."""
+    from corvex.stage_b import StageBGateError, write_lab_override
+
+    try:
+        path = write_lab_override(Path(report_dir), reason=reason)
+    except StageBGateError as exc:
+        typer.echo(str(exc))
+        raise typer.Exit(2) from exc
+    typer.echo(f"wrote {path}")
+    typer.echo("Lab unlock only — claim_allowed stays locked. Delete the file when done.")
 
 
 @app.command("sensor-windows")
@@ -931,7 +952,10 @@ def sensor_windows_cmd(
         )
     except StageBGateError as exc:
         typer.echo(str(exc))
-        typer.echo("Lab unlock: set CORVEX_STAGE_B=1 (does not flip claim_allowed).")
+        typer.echo(
+            "Lab unlock: corvex stage-b-lab-unlock --reason 'local fixture' "
+            "(does not flip claim_allowed). CORVEX_STAGE_B=1 is ignored."
+        )
         raise typer.Exit(2) from exc
     typer.echo(json.dumps(stats, indent=2))
     raise typer.Exit(0 if int(stats.get("published", 0)) > 0 or stats.get("timeline") else 1)
@@ -974,9 +998,14 @@ def dash_cmd(
     host: str = typer.Option(
         "127.0.0.1",
         "--host",
-        help="Bind address (use 0.0.0.0 to share on a lab LAN)",
+        help="Bind address (default localhost). LAN bind requires --token.",
     ),
     port: int = typer.Option(8765, "--port", help="HTTP port"),
+    token: Optional[str] = typer.Option(
+        None,
+        "--token",
+        help="Bearer/?token= for /api/snapshot. Auto-generated when --host is 0.0.0.0.",
+    ),
     run_dir: Optional[Path] = typer.Option(
         None,
         "--run-dir",
@@ -991,7 +1020,7 @@ def dash_cmd(
 ) -> None:
     """Build read-only run monitor from reports/; serve unless --build/--open-file."""
     from corvex.dashboard import write_dashboard
-    from corvex.dash_server import serve
+    from corvex.dash_server import new_access_token, serve
     import webbrowser
 
     root = _repo_root()
@@ -1008,19 +1037,33 @@ def dash_cmd(
         typer.echo(f"opened {file_url}")
         return
 
+    access = token
+    if host in ("0.0.0.0", "::", "[::]") and not access:
+        access = new_access_token()
+        typer.echo(f"generated LAN access token (required): {access}")
+
     try:
-        httpd = serve(root, port=port, host=host)
+        httpd = serve(root, port=port, host=host, access_token=access)
+    except ValueError as exc:
+        typer.echo(str(exc))
+        raise typer.Exit(2) from exc
     except OSError as exc:
-        typer.echo(f"bind {host}:{port} failed ({exc}); opening file instead (server needed for live snapshot)")
+        typer.echo(
+            f"bind {host}:{port} failed ({exc}); opening file instead "
+            "(server needed for live snapshot)"
+        )
         webbrowser.open(file_url)
         raise typer.Exit(0)
 
     bound_host, bound_port = httpd.server_address[:2]
     display_host = "127.0.0.1" if bound_host in ("0.0.0.0", "::") else bound_host
     url = f"http://{display_host}:{bound_port}/"
+    if access:
+        url = f"{url}?token={access}"
+        typer.echo(f"snapshot auth: Authorization: Bearer {access}  (or ?token=)")
     typer.echo(f"Monitor (read-only): {url}")
     if host in ("0.0.0.0", "::"):
-        typer.echo(f"Bound on {host}:{bound_port} — reachable from other machines on your network")
+        typer.echo(f"bound on {host}:{bound_port} — token required for /api/snapshot")
     typer.echo("Ctrl+C to stop")
     if open_browser:
         try:

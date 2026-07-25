@@ -21,6 +21,7 @@ DEMO_HOSTS = {
     "host-c": "prod-c",
     "host-d": "prod-d",
     "host-e": "prod-e",
+    "host-pc": "prod-pc",
 }
 
 

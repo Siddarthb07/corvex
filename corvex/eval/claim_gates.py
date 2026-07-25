@@ -40,6 +40,32 @@ def _load(path: Path) -> Optional[Dict[str, Any]]:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def _stranger_qualifies(stranger: Dict[str, Any]) -> tuple[bool, str]:
+    """Human outsider only — agents / author self-attestation never unlock claims."""
+    if not bool(stranger.get("pass")):
+        return False, "Stranger attestation present but pass!=true"
+    op = str(stranger.get("operator") or stranger.get("operator_id") or "").strip()
+    op_l = op.lower()
+    if not op or op_l in {"replace", "author", "self", "n/a", "none"}:
+        return False, "FAIL: stranger operator missing or self/author placeholder"
+    if "agent" in op_l or op_l.startswith("cursor-") or op_l.startswith("ci-"):
+        return (
+            False,
+            f"FAIL: operator={op!r} looks like an agent/automation — "
+            "claim_allowed requires an independent human (attestation_kind=human).",
+        )
+    kind = str(stranger.get("attestation_kind") or "").strip().lower()
+    if kind and kind != "human":
+        return False, f"FAIL: attestation_kind={kind!r} is not human"
+    if kind != "human":
+        return (
+            False,
+            "FAIL: set attestation_kind=human on stranger_dry_run.json "
+            "(agent dry-runs do not qualify).",
+        )
+    return True, "Human stranger attestation pass=true"
+
+
 def evaluate_claim_gates(
     root: Path,
     *,
@@ -113,13 +139,14 @@ def evaluate_claim_gates(
     stranger_path = reports / "stranger_dry_run.json"
     stranger = _load(stranger_path)
     if stranger and "pass" in stranger:
+        ok, note = _stranger_qualifies(stranger)
         stranger_gate = {
             "id": "stranger_success",
-            "pass": bool(stranger.get("pass")),
+            "pass": ok,
             "path": _repo_rel(root, stranger_path),
-            "operator": stranger.get("operator"),
-            "note": stranger.get("note")
-            or ("Stranger attestation pass=true" if stranger.get("pass") else "Stranger attestation present but pass!=true"),
+            "operator": stranger.get("operator") or stranger.get("operator_id"),
+            "attestation_kind": stranger.get("attestation_kind"),
+            "note": note if not ok else (stranger.get("note") or note),
         }
     elif stranger:
         stranger_gate = {
@@ -157,7 +184,7 @@ def evaluate_claim_gates(
         "gates": {g["id"]: g for g in gates},
         "honesty": (
             "Do not publish 'useful on real attacks' until claim_allowed=true. "
-            "Soft probes and author packs never flip this alone."
+            "Soft probes, author packs, and agent stranger dry-runs never flip this alone."
         ),
     }
 

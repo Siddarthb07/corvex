@@ -4,23 +4,22 @@
 from __future__ import annotations
 
 import json
-import os
 import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-os.environ.setdefault("CORVEX_STAGE_B", "1")
-
 from corvex.lab_enroll import ensure_lab_enrollment
 from corvex.sensors.windows_os import run_sensor_windows
+from corvex.stage_b import write_lab_override
 
 FIXTURE = ROOT / "fixtures" / "os_wide" / "multi_channel.jsonl"
 ALLOW = ROOT / "fixtures" / "os_wide" / "channels.json"
 
 
 def main() -> int:
+    write_lab_override(ROOT / "reports", reason="smoke multihost fixture unlock")
     run = ROOT / "runs" / "fleet-smoke"
     if run.exists():
         for p in run.glob("*"):

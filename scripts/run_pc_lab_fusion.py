@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Docker breaktest lab + whole-PC OS-wide sensor → one dash run dir.
+"""Docker breaktest lab + whole-PC OS-wide sensor → one dash run dir (offline lab replay).
 
 Lab writes flat events into labs/breaktest/shared/events.jsonl.
 PC sensor writes signed envelopes into runs/pc-sensor/events.jsonl.
-This process merges both into runs/pc-and-lab/events.jsonl and refreshes timeline.
-Dash should be pointed at runs/pc-and-lab.
+This process merges both into runs/pc-and-lab/events.jsonl; recompute adapts flat
+lab rows, verifies HMAC, and derives campaigns from the correlator only.
 """
 
 from __future__ import annotations
@@ -104,12 +104,31 @@ def main() -> int:
             shutil.rmtree(d, ignore_errors=True)
         d.mkdir(parents=True)
 
+    # Auditable lab unlock (CORVEX_STAGE_B=1 no longer works)
+    subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "corvex",
+            "stage-b-lab-unlock",
+            "--reason",
+            "pc+lab offline fusion demo",
+            "--reports",
+            str(ROOT / "reports"),
+        ],
+        cwd=str(ROOT),
+        check=True,
+    )
+
     stop = threading.Event()
     merger = threading.Thread(target=merge_loop, args=(stop,), daemon=True)
     merger.start()
 
     env = os.environ.copy()
     env["ATTACK_MANIFEST"] = env.get("ATTACK_MANIFEST", "/manifests/art_lateral_chain.json")
+    # Drop legacy bypass if present — status will report env_override_ignored
+    env.pop("CORVEX_STAGE_B", None)
+    env.pop("CFUSE_STAGE_B", None)
 
     def dcmd(*args: str) -> None:
         print("+", " ".join(args), flush=True)
@@ -121,9 +140,7 @@ def main() -> int:
 
     # Whole-PC sensor (wevtutil follow) + seed fixture so dash shows host-pc even if EL empty
     seed = ROOT / "fixtures" / "os_wide" / "multi_channel.jsonl"
-    pc_env = os.environ.copy()
-    # Stage B already allowed via stranger marker; keep override as belt-and-suspenders
-    pc_env["CORVEX_STAGE_B"] = "1"
+    pc_env = env.copy()
 
     print("+ seeding PC sensor from fixture as host-pc", flush=True)
     subprocess.run(

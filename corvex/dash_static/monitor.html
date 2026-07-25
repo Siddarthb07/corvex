@@ -411,8 +411,10 @@ body::before {
 
   let lastEventCount = (snap.feed && snap.feed.events_count) || 0;
   paint(snap);
+  const tok = new URLSearchParams(location.search).get("token");
+  const snapUrl = tok ? ("/api/snapshot?token=" + encodeURIComponent(tok)) : "/api/snapshot";
   setInterval(() => {
-    fetch("/api/snapshot").then(r => r.json()).then(paint).catch(() => {});
+    fetch(snapUrl).then(r => r.json()).then(paint).catch(() => {});
   }, 2000);
 })();
 </script>
