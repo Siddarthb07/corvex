@@ -1,0 +1,26 @@
+{
+  "name": "otrf-empire-psexec",
+  "corpus_kind": "mixed",
+  "source": {
+    "project": "OTRF/Security-Datasets",
+    "url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/master/datasets/atomic/windows/lateral_movement/host/empire_psexec_dcerpc_tcp_svcctl.zip",
+    "note": "Attack simulation capture with ambient lab noise. Not a pure-benign corpus \u2014 gate stays INCOMPLETE."
+  },
+  "raw_glob": "raw/*.json",
+  "host_map": {},
+  "attack_windows": [],
+  "roles": {
+    "mordordc": "domain_controller_candidate",
+    "workstation5": "endpoint",
+    "workstation6": "endpoint"
+  },
+  "fetch": {
+    "source_url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/master/datasets/atomic/windows/lateral_movement/host/empire_psexec_dcerpc_tcp_svcctl.zip",
+    "zip_sha256": "8f40e7fc86bbbf31ebd50b3ba537cf0f4378392ae3e74de84bee00aeb0de1fa5",
+    "extracted": [
+      "empire_psexec_dcerpc_tcp_svcctl_2020-09-20121608.json"
+    ],
+    "license_note": "OTRF Security-Datasets \u2014 see upstream LICENSE (GPL-3.0)."
+  },
+  "bars_locked": "2026-07-25"
+}

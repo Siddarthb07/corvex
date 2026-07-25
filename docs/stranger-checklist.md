@@ -32,6 +32,18 @@ corvex dash --run-dir runs/stranger-wedge --build
 
 Save as `reports/stranger_dry_run.json`. Agent / Cursor dry-runs (`operator` containing `agent`, or `attestation_kind` other than `human`) **do not** unlock `claim_allowed`.
 
+**Unsigned JSON is advisory only.** Claim unlock requires Ed25519 self-sign with a key **Jack holds** (not an author HMAC):
+
+```bash
+corvex stranger-keygen
+corvex sign-stranger-attestation
+corvex claim-gates
+```
+
+Also need `reports/live_second_host.json` from elevated wevtutil on a **second physical** Windows PC (`python scripts/record_live_host_evidence.py --run-dir runs/live-host-2`).
+
+Private key: `reports/.stranger_ed25519_private.pem` (gitignored). Author-held `--hmac` does not unlock `claim_allowed`.
+
 ## After stranger PASS — Stage B marker
 
 ```bash

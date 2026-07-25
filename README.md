@@ -4,6 +4,8 @@ Multi-host **campaign correlator** — stitches weak signals across machines int
 
 **Public claim (standing):** research correlator — holds up against synthetic ATT&CK-shaped fleets; **not yet validated against real telemetry or benign baselines.** Observe and correlate first. Live containment stays locked behind safety controls.
 
+Real/realistic benign baseline (next gate): `labs/benign/` + `python scripts/run_benign_baseline.py` — pre-committed FP bars in `future-plans.md`; no hand-crafted “admin noise.”
+
 ## Quick start
 
 Requires Python 3.9+.

@@ -3,12 +3,16 @@
 from corvex.adapters.attack_repos import adapt_attack_manifest, load_manifest
 from corvex.adapters.lab_flat import adapt_flat_lab_event, try_adapt_row
 from corvex.adapters.os_wide import adapt_os_wide_export, adapt_os_wide_records
+from corvex.adapters.otrf import adapt_otrf_export, adapt_otrf_paths, normalize_otrf_record
 from corvex.adapters.windows_security import adapt_windows_security_export
 
 __all__ = [
     "adapt_windows_security_export",
     "adapt_os_wide_export",
     "adapt_os_wide_records",
+    "adapt_otrf_export",
+    "adapt_otrf_paths",
+    "normalize_otrf_record",
     "adapt_flat_lab_event",
     "try_adapt_row",
     "adapt_attack_manifest",
