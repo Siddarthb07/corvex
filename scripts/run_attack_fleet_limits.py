@@ -28,6 +28,10 @@ PRODUCERS5 = {h: f"prod-{h[-1]}" for h in HOSTS5}
 PRODUCERS6 = {**PRODUCERS5, "host-f": "prod-f"}
 
 FRAGILE_MARGIN = 0.2
+# Multi-campaign HELDs: only treat as fragile when an *unmatched* competitor
+# is within FRAGILE_MARGIN of the weakest clean match — not when two correct
+# campaigns simply share the same score (old top−2nd formula).
+MULTI_CLEAN_JACCARD = 0.9
 
 # Consequence order for write-ups (lead with FP / structural, not raw BROKE count).
 WRITEUP_PRIORITY = [
@@ -42,8 +46,84 @@ WRITEUP_PRIORITY = [
 ]
 
 
+HEADLINE_IDS = {
+    "lim09-max-density-overlap",
+    "lim09b-sequential-reuse",
+    "lim09c-positional-bias",
+    "lim09d-benign-hub-pivot",
+    "lim10-authorized-redteam",
+}
+
+SCORING_PREAMBLE = """
+## Scoring criteria (stated before the run)
+
+| Verdict | Criteria |
+|---------|----------|
+| **HELD** | Best-campaign Jaccard ≥ 0.9, no false-negative on any truth host, ambiguous legitimate activity correctly kept split (not merged into the malicious campaign). |
+| **PARTIAL** | Jaccard 0.5–0.89, OR a truth host missed but recovered on replay, OR a benign host wrongly merged into the malicious campaign (over-merge) without being falsely quarantined. |
+| **BROKE** | Jaccard < 0.5, OR a truth host never recovered, OR a benign host proposed for quarantine as part of the malicious campaign specifically because it got merged in. |
+
+Also: **margin** (fragile gate) = ambiguity margin — for multi-campaign truth,
+`min(matched scores) − max(unmatched competitor scores)` when every truth is
+cleanly attributed (min Jaccard ≥ 0.9, no collapse); if there is no unmatched
+competitor, margin = min(matched scores). Single-truth packs still use
+confidence(top) − confidence(2nd-best). Raw top−2nd is retained as
+`confidence_margin_raw` for diagnostics.
+**HELD, fragile** = HELD with ambiguity margin < 0.2 (near-miss wearing a pass —
+not equivalent to a clean HELD). Correctly separated equal-score campaigns are
+**not** fragile under this definition.
+""".strip()
+
+
+def _ambiguity_margin(
+    campaigns_ranked: Sequence[Mapping[str, Any]],
+    multi: Optional[Mapping[str, Any]],
+    *,
+    clean_jaccard: float = MULTI_CLEAN_JACCARD,
+) -> Optional[float]:
+    """Margin that measures host/campaign *ambiguity*, not multi-campaign existence.
+
+    Returns None when multi-campaign truth is absent or not cleanly resolved —
+    caller should fall back to raw top−2nd score gap.
+    """
+    if not multi:
+        return None
+    matches = list(multi.get("matches") or [])
+    if not matches:
+        return None
+    if multi.get("collapsed"):
+        return None
+    try:
+        min_j = float(multi.get("min_jaccard") or 0.0)
+    except (TypeError, ValueError):
+        return None
+    if min_j < clean_jaccard:
+        return None
+    matched_ids = {
+        str(m.get("pred_id"))
+        for m in matches
+        if m.get("pred_id") is not None and float(m.get("jaccard") or 0.0) >= clean_jaccard
+    }
+    if len(matched_ids) < len(matches):
+        return None
+    by_id: Dict[str, float] = {}
+    for c in campaigns_ranked:
+        cid = str(c.get("campaign_id") or "")
+        if not cid:
+            continue
+        by_id[cid] = float(c.get("score") or 0.0)
+    matched_scores = [by_id[i] for i in matched_ids if i in by_id]
+    if not matched_scores:
+        return None
+    unmatched_scores = [s for cid, s in by_id.items() if cid not in matched_ids]
+    floor = min(matched_scores)
+    if not unmatched_scores:
+        return round(floor, 4)
+    return round(floor - max(unmatched_scores), 4)
+
+
 def _is_fragile(verdict: str, margin: Any, false_q: Sequence[str]) -> bool:
-    """HELD with razor-thin margin (or collateral FQ + thin margin) is not a clean pass."""
+    """HELD with razor-thin *ambiguity* margin is not a clean pass."""
     if verdict != "HELD":
         return False
     if margin is None:
@@ -64,32 +144,16 @@ def _verdict_label(a: Mapping[str, Any]) -> str:
 
 def _priority_key(a: Mapping[str, Any]) -> Tuple[int, str]:
     cid = str(a.get("campaign_id") or "")
+    # Priority table uses T0 ids; strip scale prefixes.
+    base = cid
+    for prefix in ("t1-", "t2-", "t3-"):
+        if base.startswith(prefix):
+            base = base[len(prefix) :]
+            break
     try:
-        return (WRITEUP_PRIORITY.index(cid), cid)
+        return (WRITEUP_PRIORITY.index(base), cid)
     except ValueError:
         return (len(WRITEUP_PRIORITY), cid)
-
-
-HEADLINE_IDS = {
-    "lim09-max-density-overlap",
-    "lim09b-sequential-reuse",
-    "lim09c-positional-bias",
-    "lim09d-benign-hub-pivot",
-    "lim10-authorized-redteam",
-}
-
-SCORING_PREAMBLE = """
-## Scoring criteria (stated before the run)
-
-| Verdict | Criteria |
-|---------|----------|
-| **HELD** | Best-campaign Jaccard ≥ 0.9, no false-negative on any truth host, ambiguous legitimate activity correctly kept split (not merged into the malicious campaign). |
-| **PARTIAL** | Jaccard 0.5–0.89, OR a truth host missed but recovered on replay, OR a benign host wrongly merged into the malicious campaign (over-merge) without being falsely quarantined. |
-| **BROKE** | Jaccard < 0.5, OR a truth host never recovered, OR a benign host proposed for quarantine as part of the malicious campaign specifically because it got merged in. |
-
-Also: **margin** = confidence(top) − confidence(2nd-best). **baseline** = B1 single-host isolation (no cross-host correlation).
-**HELD, fragile** = HELD with margin < 0.2 (near-miss wearing a pass — not equivalent to a clean HELD).
-""".strip()
 
 
 def _annotate_fragile(row: Dict[str, Any]) -> Dict[str, Any]:
@@ -1023,11 +1087,24 @@ def score_one(
         recovered_on_replay=bool(recovered) and not still_missed,
     )
 
-    margin = last.get("confidence_margin")
+    margin_raw = last.get("confidence_margin")
+    margin_amb = _ambiguity_margin(
+        last.get("campaigns_ranked") or [],
+        last.get("multi_campaign"),
+    )
+    # Fragile gate uses ambiguity margin when multi-campaign is cleanly resolved;
+    # otherwise keep raw top−2nd (single-truth / unresolved multi).
+    margin = margin_amb if margin_amb is not None else margin_raw
+    cid = str(man["campaign_id"])
+    cid_base = cid
+    for prefix in ("t1-", "t2-", "t3-"):
+        if cid_base.startswith(prefix):
+            cid_base = cid_base[len(prefix) :]
+            break
     row_out = {
         "campaign_id": man["campaign_id"],
         "origin": man.get("fleet_origin"),
-        "headline": bool(man.get("headline")) or man["campaign_id"] in HEADLINE_IDS,
+        "headline": bool(man.get("headline")) or cid_base in HEADLINE_IDS,
         "techniques": (man.get("source") or {}).get("techniques"),
         "truth_hosts": sorted(truth),
         "truth_campaigns": man.get("truth_campaigns"),
@@ -1038,6 +1115,8 @@ def score_one(
         "wall_seconds": wall,
         "corr_jaccard": j,
         "confidence_margin": margin,
+        "confidence_margin_raw": margin_raw,
+        "confidence_margin_kind": "ambiguity" if margin_amb is not None else "top_minus_second",
         "missed_hosts": still_missed,
         "recovered_on_replay": recovered,
         "over_merged_hosts": over,

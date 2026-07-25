@@ -76,6 +76,7 @@ def test_claim_gates_locked_without_attestation(tmp_path: Path):
 
 def test_byo_windows_wedge(tmp_path: Path, monkeypatch):
     monkeypatch.chdir(tmp_path)
+    monkeypatch.setenv("CORVEX_ENROLLMENT", str(tmp_path / "enrollment.json"))
     # Minimal repo-like layout not required — call adapter + correlate via CLI helpers
     from corvex.adapters.windows_security import adapt_windows_security_export
     from corvex.audit import AuditLog
@@ -120,12 +121,14 @@ def test_byo_windows_wedge(tmp_path: Path, monkeypatch):
     assert report["aggregate_status"] in ("complete", "partial")
 
 
-def test_score_non_author_skips_non_attack_manifests(tmp_path: Path):
+def test_score_non_author_skips_non_attack_manifests(tmp_path: Path, monkeypatch):
     """OS-wide sensor breaktest JSON lacks steps — must not crash score-non-author."""
+    import os
     import shutil
     import subprocess
     import sys
 
+    monkeypatch.setenv("CORVEX_ENROLLMENT", str(tmp_path / "enrollment.json"))
     root = Path(__file__).resolve().parents[1]
     man = tmp_path / "manifests"
     man.mkdir()
@@ -144,6 +147,8 @@ def test_score_non_author_skips_non_attack_manifests(tmp_path: Path):
         encoding="utf-8",
     )
     report = tmp_path / "non_author.json"
+    env = os.environ.copy()
+    env["CORVEX_ENROLLMENT"] = str(tmp_path / "enrollment.json")
     proc = subprocess.run(
         [
             sys.executable,
@@ -158,9 +163,13 @@ def test_score_non_author_skips_non_attack_manifests(tmp_path: Path):
         cwd=str(root),
         capture_output=True,
         text=True,
+        encoding="utf-8",
+        errors="replace",
+        env=env,
         check=False,
     )
     assert proc.returncode in (0, 1), proc.stderr + proc.stdout
+    assert report.is_file(), proc.stderr + proc.stdout
     data = json.loads(report.read_text(encoding="utf-8"))
     assert "art_lateral_chain.json" in data["packs"]
     assert any(s["file"] == "break_os_wide_sensors.json" for s in data.get("skipped") or [])

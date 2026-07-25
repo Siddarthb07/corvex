@@ -1,0 +1,156 @@
+{
+  "campaign_id": "t1-lim09b-sequential-reuse",
+  "family": "genuine_vuln_breaker",
+  "ood": true,
+  "hosts": [
+    "host-00",
+    "host-01",
+    "host-02",
+    "host-03",
+    "host-04",
+    "host-05",
+    "host-06",
+    "host-07",
+    "host-08",
+    "host-09",
+    "host-10",
+    "host-11",
+    "host-12",
+    "host-13",
+    "host-14"
+  ],
+  "truth_hosts": [
+    "host-00",
+    "host-01",
+    "host-02"
+  ],
+  "producers": {
+    "host-00": "prod-00",
+    "host-01": "prod-01",
+    "host-02": "prod-02",
+    "host-03": "prod-03",
+    "host-04": "prod-04",
+    "host-05": "prod-05",
+    "host-06": "prod-06",
+    "host-07": "prod-07",
+    "host-08": "prod-08",
+    "host-09": "prod-09",
+    "host-10": "prod-10",
+    "host-11": "prod-11",
+    "host-12": "prod-12",
+    "host-13": "prod-13",
+    "host-14": "prod-14"
+  },
+  "base_time_utc": "2026-07-25T14:00:00Z",
+  "fleet_origin": "original",
+  "fleet_suite": "limits-t1",
+  "headline": true,
+  "source": {
+    "style": "Fleet-limits breaking-point sketches",
+    "repo": "https://github.com/Siddarthb07/corvex",
+    "techniques": [
+      "T1071.004",
+      "T1053.005",
+      "T1078",
+      "T1041"
+    ],
+    "note": "sequential reuse"
+  },
+  "narrative": [
+    "DNS C2 shape then scheduled-task shape on same a/b/c after 10 min quiet."
+  ],
+  "break_intent": {
+    "name": "sequential reuse",
+    "break_criterion": "incident1 and incident2 reported as a single continuous campaign",
+    "success_criteria_attacker": [
+      "two incidents collapsed into one campaign"
+    ]
+  },
+  "steps": [
+    {
+      "kind": "dns",
+      "host": "host-00",
+      "query": "a1.c2.evil.test",
+      "offset_seconds": 0,
+      "technique": "T1071.004"
+    },
+    {
+      "kind": "dns",
+      "host": "host-01",
+      "query": "b1.c2.evil.test",
+      "offset_seconds": 10,
+      "technique": "T1071.004"
+    },
+    {
+      "kind": "dns",
+      "host": "host-02",
+      "query": "c1.c2.evil.test",
+      "offset_seconds": 20,
+      "technique": "T1071.004"
+    },
+    {
+      "kind": "auth",
+      "host": "host-00",
+      "user": "dns-only-a",
+      "src": "203.0.113.1",
+      "offset_seconds": 30,
+      "technique": "T1078"
+    },
+    {
+      "kind": "auth",
+      "host": "host-00",
+      "user": "tasksvc",
+      "src": "203.0.113.12",
+      "offset_seconds": 630,
+      "technique": "T1053.005"
+    },
+    {
+      "kind": "auth",
+      "host": "host-01",
+      "user": "tasksvc",
+      "src": "host-00",
+      "offset_seconds": 640,
+      "technique": "T1078"
+    },
+    {
+      "kind": "auth",
+      "host": "host-02",
+      "user": "tasksvc",
+      "src": "host-01",
+      "offset_seconds": 650,
+      "technique": "T1078"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-02",
+      "dst_ip": "198.51.100.110",
+      "bytes": 17000,
+      "offset_seconds": 665,
+      "technique": "T1041"
+    }
+  ],
+  "truth_campaigns": [
+    {
+      "id": "inc1-dns",
+      "hosts": [
+        "host-00",
+        "host-01",
+        "host-02"
+      ]
+    },
+    {
+      "id": "inc2-task",
+      "hosts": [
+        "host-00",
+        "host-01",
+        "host-02"
+      ]
+    }
+  ],
+  "scale": {
+    "tier": "T1",
+    "n_hosts": 15,
+    "source_campaign_id": "lim09b-sequential-reuse",
+    "decoys": false
+  }
+}

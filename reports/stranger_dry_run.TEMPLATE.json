@@ -1,10 +1,11 @@
 {
-  "_instructions": "Independent HUMAN operator only. Copy to stranger_dry_run.json when done. Agent/Cursor dry-runs do NOT unlock claim_allowed. Then create empty reports/stage-b-allowed only if they did not shrug.",
+  "_instructions": "Independent HUMAN operator only. Copy to stranger_dry_run.json when done. Then: corvex sign-stranger-attestation. Agent/Cursor dry-runs do NOT unlock claim_allowed. Unsigned JSON is advisory only.",
   "operator": "REPLACE_WITH_HUMAN_NAME",
   "attestation_kind": "human",
   "pass": false,
   "packs_scored": [],
   "timeline_quality_ok": false,
   "notes": "",
-  "human_substitute_ttu_optional": null
+  "human_substitute_ttu_optional": null,
+  "attestation_hmac": "FILLED_BY_corvex_sign-stranger-attestation"
 }

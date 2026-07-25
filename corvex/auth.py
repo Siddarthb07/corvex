@@ -1,4 +1,12 @@
-"""Enrollment + per-producer secrets. CI must fail on shared/default secrets."""
+"""Enrollment + per-producer secrets. CI must fail on shared/default secrets.
+
+Default trust model is **1 producer_id ↔ 1 host_id**. A shared secret across
+many hosts under one producer lets a single compromised credential forge events
+as any enrolled peer — which defeats host-identity resolution (Slice C).
+
+Opt into aggregators only with `CORVEX_ALLOW_MULTIHOST_PRODUCER=1` or
+`allow_multihost_producer=True` (tests / explicit lab).
+"""
 
 from __future__ import annotations
 
@@ -6,7 +14,7 @@ import json
 import os
 import secrets
 from pathlib import Path
-from typing import Dict, Mapping, Set
+from typing import Dict, Mapping, Optional, Set
 
 # Explicit poison values — tests assert these never appear as committed secrets.
 FORBIDDEN_DEFAULT_SECRETS = {
@@ -15,6 +23,8 @@ FORBIDDEN_DEFAULT_SECRETS = {
     "default",
     "corvex-shared-secret",
     "test-shared-hmac",
+    # Contain dual-control must not reuse these either (see contain/live.py).
+    "lab-dual-control-token",
 }
 
 
@@ -22,12 +32,42 @@ class AuthError(ValueError):
     pass
 
 
-class Enrollment:
-    """producer_id -> allowed host_id set + per-producer HMAC secret."""
+def _multihost_producer_allowed(explicit: Optional[bool] = None) -> bool:
+    if explicit is not None:
+        return bool(explicit)
+    return os.environ.get("CORVEX_ALLOW_MULTIHOST_PRODUCER", "").strip() in (
+        "1",
+        "true",
+        "TRUE",
+        "yes",
+    )
 
-    def __init__(self, mapping: Mapping[str, Set[str]], secrets_map: Mapping[str, bytes]):
+
+class Enrollment:
+    """producer_id -> allowed host_id set + per-producer HMAC secret.
+
+    By default each producer may enroll **exactly one** host. Multi-host
+    producers require an explicit opt-in (see module docstring).
+    """
+
+    def __init__(
+        self,
+        mapping: Mapping[str, Set[str]],
+        secrets_map: Mapping[str, bytes],
+        *,
+        allow_multihost_producer: Optional[bool] = None,
+    ):
         self._hosts = {k: set(v) for k, v in mapping.items()}
         self._secrets = dict(secrets_map)
+        self._allow_multihost = _multihost_producer_allowed(allow_multihost_producer)
+        for pid, hosts in self._hosts.items():
+            if len(hosts) > 1 and not self._allow_multihost:
+                raise AuthError(
+                    f"producer {pid} enrolled for {len(hosts)} hosts; "
+                    "default trust model is 1:1 producer↔host. "
+                    "Set CORVEX_ALLOW_MULTIHOST_PRODUCER=1 only if you accept "
+                    "that one leaked secret forges events for every peer host."
+                )
         for pid, secret in self._secrets.items():
             text = secret.decode("utf-8", errors="replace")
             if text.lower() in FORBIDDEN_DEFAULT_SECRETS:
@@ -54,6 +94,8 @@ class Enrollment:
 
 def generate_lab_enrollment(
     hosts: Mapping[str, str],
+    *,
+    allow_multihost_producer: Optional[bool] = None,
 ) -> Enrollment:
     """hosts: host_id -> producer_id"""
     by_producer: Dict[str, Set[str]] = {}
@@ -62,7 +104,11 @@ def generate_lab_enrollment(
         by_producer.setdefault(producer_id, set()).add(host_id)
         if producer_id not in secrets_map:
             secrets_map[producer_id] = secrets.token_bytes(32)
-    return Enrollment(by_producer, secrets_map)
+    return Enrollment(
+        by_producer,
+        secrets_map,
+        allow_multihost_producer=allow_multihost_producer,
+    )
 
 
 def _harden_secrets_file(path: Path) -> None:
@@ -105,11 +151,45 @@ def save_enrollment(path: Path, enrollment: Enrollment) -> None:
     _harden_secrets_file(path)
 
 
-def load_enrollment(path: Path) -> Enrollment:
+def _split_multihost_producers(
+    hosts: Mapping[str, Set[str]],
+    secrets_map: Mapping[str, bytes],
+) -> tuple:
+    """Migrate aggregator producers → 1:1 (extra hosts get new producer ids + secrets)."""
+    new_hosts: Dict[str, Set[str]] = {}
+    new_secrets: Dict[str, bytes] = {}
+    for pid, hs in hosts.items():
+        ordered = sorted(hs)
+        if len(ordered) <= 1:
+            new_hosts[pid] = set(ordered)
+            if pid in secrets_map:
+                new_secrets[pid] = secrets_map[pid]
+            continue
+        # Preserve original producer+secret for the first host; split the rest.
+        new_hosts[pid] = {ordered[0]}
+        new_secrets[pid] = secrets_map[pid]
+        for host_id in ordered[1:]:
+            new_pid = f"{pid}__{host_id}"
+            while new_pid in new_hosts:
+                new_pid = f"{new_pid}_x"
+            new_hosts[new_pid] = {host_id}
+            new_secrets[new_pid] = secrets.token_bytes(32)
+    return new_hosts, new_secrets
+
+
+def load_enrollment(path: Path, *, migrate_multihost: bool = True) -> Enrollment:
     data = json.loads(path.read_text(encoding="utf-8"))
     hosts = {k: set(v) for k, v in data["hosts"].items()}
     secrets_map = {k: bytes.fromhex(v) for k, v in data["secrets_hex"].items()}
-    return Enrollment(hosts, secrets_map)
+    try:
+        return Enrollment(hosts, secrets_map)
+    except AuthError as exc:
+        if not migrate_multihost or "1:1" not in str(exc):
+            raise
+        hosts, secrets_map = _split_multihost_producers(hosts, secrets_map)
+        enrollment = Enrollment(hosts, secrets_map)
+        save_enrollment(path, enrollment)
+        return enrollment
 
 
 def default_secrets_path() -> Path:

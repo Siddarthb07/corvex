@@ -1,0 +1,3837 @@
+{
+  "test": "Attack fleet: Limits T2 \u2014 50-host scale (no-decoy control)",
+  "n": 15,
+  "n_hosts": 50,
+  "tier": "T2",
+  "decoys": false,
+  "intensity_rounds": 2,
+  "baseline_policy": "single-host-isolation",
+  "total_wall_seconds": 32.9576,
+  "peak_rss_mb": 33.85,
+  "t2_gate_pass": true,
+  "t0_fragile_rate_ref": 0.3571,
+  "fragile_gate_pass": true,
+  "counts": {
+    "HELD": 14,
+    "PARTIAL": 1,
+    "BROKE": 0
+  },
+  "baseline_wins_count": 0,
+  "fragile_count": 5,
+  "fragile_rate_held": 0.3571,
+  "scoring": {
+    "fragile": "HELD with ambiguity margin < 0.2 \u2192 HELD, fragile (multi-campaign uses unmatched-competitor gap, not top\u22122nd among equals)",
+    "writeup_priority": [
+      "lim10-authorized-redteam",
+      "lim09b-sequential-reuse",
+      "lim09-max-density-overlap",
+      "lim11-hostname-split-brain",
+      "lim02-triple-concurrent-shared",
+      "lim03-slow-low-day-gaps",
+      "lim09d-benign-hub-pivot",
+      "lim01-dual-ambiguous-lateral"
+    ],
+    "margin_def": "ambiguity: min(matched)\u2212max(unmatched) when multi clean; else top\u22122nd (confidence_margin_raw always retained)"
+  },
+  "attacks": [
+    {
+      "campaign_id": "t2-lim01-dual-ambiguous-lateral",
+      "origin": "original",
+      "headline": false,
+      "techniques": [
+        "T1021.001",
+        "T1078",
+        "T1041"
+      ],
+      "truth_hosts": [
+        "host-00",
+        "host-01",
+        "host-02"
+      ],
+      "truth_campaigns": null,
+      "break_criterion": "d or e appears in the malicious campaign's Q dry-run list",
+      "verdict": "HELD",
+      "verdict_reasons": [
+        "matched truth without merge-FQ",
+        "break_criterion not triggered: d or e appears in the malicious campaign's Q dry-run list"
+      ],
+      "intensity_rounds": 2,
+      "wall_seconds": 2.174,
+      "corr_jaccard": 1.0,
+      "confidence_margin": 0.0,
+      "confidence_margin_raw": 0.0,
+      "confidence_margin_kind": "top_minus_second",
+      "missed_hosts": [],
+      "recovered_on_replay": [],
+      "over_merged_hosts": [],
+      "quarantine_proposed": [
+        "host-00",
+        "host-01",
+        "host-02"
+      ],
+      "hosts_saved": [
+        "host-03",
+        "host-04",
+        "host-05",
+        "host-06",
+        "host-07",
+        "host-08",
+        "host-09",
+        "host-10",
+        "host-11",
+        "host-12",
+        "host-13",
+        "host-14",
+        "host-15",
+        "host-16",
+        "host-17",
+        "host-18",
+        "host-19",
+        "host-20",
+        "host-21",
+        "host-22",
+        "host-23",
+        "host-24",
+        "host-25",
+        "host-26",
+        "host-27",
+        "host-28",
+        "host-29",
+        "host-30",
+        "host-31",
+        "host-32",
+        "host-33",
+        "host-34",
+        "host-35",
+        "host-36",
+        "host-37",
+        "host-38",
+        "host-39",
+        "host-40",
+        "host-41",
+        "host-42",
+        "host-43",
+        "host-44",
+        "host-45",
+        "host-46",
+        "host-47",
+        "host-48",
+        "host-49"
+      ],
+      "false_quarantine": [],
+      "baseline": {
+        "policy": "single-host-isolation",
+        "hosts_flagged": [],
+        "false_quarantine": [],
+        "truth_coverage": [],
+        "corr_truth_coverage": [
+          "host-00",
+          "host-01",
+          "host-02"
+        ],
+        "baseline_wins": false
+      },
+      "multi_campaign": null,
+      "fusion_lift": false,
+      "rounds": [
+        {
+          "round": 1,
+          "build_ok": true,
+          "corr_matched": true,
+          "corr_jaccard": 1.0,
+          "det_jaccard": 1.0,
+          "missed_hosts": [],
+          "over_merged_hosts": [],
+          "fusion_lift": false,
+          "both_missed": false,
+          "corr_hosts": [
+            "host-00",
+            "host-01",
+            "host-02",
+            "host-03",
+            "host-04"
+          ],
+          "best_campaign_hosts": [
+            "host-00",
+            "host-01",
+            "host-02"
+          ],
+          "confidence_margin": 0.0,
+          "campaigns_ranked": [
+            {
+              "campaign_id": "camp-lateral-apt-rdp-1",
+              "hosts": [
+                "host-00",
+                "host-01",
+                "host-02"
+              ],
+              "score": 1.0,
+              "jaccard_vs_truth": 1.0
+            },
+            {
+              "campaign_id": "camp-lateral-helpdesk-2",
+              "hosts": [
+                "host-02",
+                "host-03",
+                "host-04"
+              ],
+              "score": 1.0,
+              "jaccard_vs_truth": 0.2
+            }
+          ],
+          "b1_hosts": [],
+          "b1_campaigns": [],
+          "quarantine_proposed": [
+            "host-00",
+            "host-01",
+            "host-02"
+          ],
+          "recon_hosts": [
+            "host-00",
+            "host-01",
+            "host-02",
+            "host-03",
+            "host-04"
+          ]
+        },
+        {
+          "round": 2,
+          "build_ok": true,
+          "corr_matched": true,
+          "corr_jaccard": 1.0,
+          "det_jaccard": 1.0,
+          "missed_hosts": [],
+          "over_merged_hosts": [],
+          "fusion_lift": false,
+          "both_missed": false,
+          "corr_hosts": [
+            "host-00",
+            "host-01",
+            "host-02",
+            "host-03",
+            "host-04"
+          ],
+          "best_campaign_hosts": [
+            "host-00",
+            "host-01",
+            "host-02"
+          ],
+          "confidence_margin": 0.0,
+          "campaigns_ranked": [
+            {
+              "campaign_id": "camp-lateral-apt-rdp-1",
+              "hosts": [
+                "host-00",
+                "host-01",
+                "host-02"
+              ],
+              "score": 1.0,
+              "jaccard_vs_truth": 1.0
+            },
+            {
+              "campaign_id": "camp-lateral-helpdesk-2",
+              "hosts": [
+                "host-02",
+                "host-03",
+                "host-04"
+              ],
+              "score": 1.0,
+              "jaccard_vs_truth": 0.2
+            }
+          ],
+          "b1_hosts": [],
+          "b1_campaigns": [],
+          "quarantine_proposed": [
+            "host-00",
+            "host-01",
+            "host-02"
+          ],
+          "recon_hosts": [
+            "host-00",
+            "host-01",
+            "host-02",
+            "host-03",
+            "host-04"
+          ]
+        }
+      ],
+      "narrative": "APT a\u2192b\u2192c with RDP. Helpdesk RDP also touches c and reaches d/e in the same \u00b190s window.",
+      "fragile": true,
+      "verdict_label": "HELD, fragile"
+    },
+    {
+      "campaign_id": "t2-lim02-triple-concurrent-shared",
+      "origin": "original",
+      "headline": false,
+      "techniques": [
+        "T1003.001",
+        "T1550.002",
+        "T1110.003",
+        "T1486",
+        "T1078",
+        "T1041"
+      ],
+      "truth_hosts": [
+        "host-00",
+        "host-01",
+        "host-02",
+        "host-03",
+        "host-04",
+        "host-05"
+      ],
+      "truth_campaigns": [
+        {
+          "id": "camp1-pth",
+          "hosts": [
+            "host-00",
+            "host-01",
+            "host-02"
+          ]
+        },
+        {
+          "id": "camp2-spray",
+          "hosts": [
+            "host-02",
+            "host-03"
+          ]
+        },
+        {
+          "id": "camp3-ransom",
+          "hosts": [
+            "host-03",
+            "host-04",
+            "host-05"
+          ]
+        }
+      ],
+      "break_criterion": "any two of the three campaigns collapse into a single reported campaign",
+      "verdict": "HELD",
+      "verdict_reasons": [
+        "multi-campaign held"
+      ],
+      "intensity_rounds": 2,
+      "wall_seconds": 2.6458,
+      "corr_jaccard": 1.0,
+      "confidence_margin": 0.9,
+      "confidence_margin_raw": 0.0,
+      "confidence_margin_kind": "ambiguity",
+      "missed_hosts": [],
+      "recovered_on_replay": [],
+      "over_merged_hosts": [],
+      "quarantine_proposed": [],
+      "hosts_saved": [
+        "host-06",
+        "host-07",
+        "host-08",
+        "host-09",
+        "host-10",
+        "host-11",
+        "host-12",
+        "host-13",
+        "host-14",
+        "host-15",
+        "host-16",
+        "host-17",
+        "host-18",
+        "host-19",
+        "host-20",
+        "host-21",
+        "host-22",
+        "host-23",
+        "host-24",
+        "host-25",
+        "host-26",
+        "host-27",
+        "host-28",
+        "host-29",
+        "host-30",
+        "host-31",
+        "host-32",
+        "host-33",
+        "host-34",
+        "host-35",
+        "host-36",
+        "host-37",
+        "host-38",
+        "host-39",
+        "host-40",
+        "host-41",
+        "host-42",
+        "host-43",
+        "host-44",
+        "host-45",
+        "host-46",
+        "host-47",
+        "host-48",
+        "host-49"
+      ],
+      "false_quarantine": [],
+      "baseline": {
+        "policy": "single-host-isolation",
+        "hosts_flagged": [],
+        "false_quarantine": [],
+        "truth_coverage": [],
+        "corr_truth_coverage": [
+          "host-00",
+          "host-01",
+          "host-02",
+          "host-03",
+          "host-04",
+          "host-05"
+        ],
+        "baseline_wins": false
+      },
+      "multi_campaign": {
+        "collapsed_pairs": [],
+        "collapsed": false,
+        "identical_host_truths": false,
+        "n_pred_campaigns": 3,
+        "matches": [
+          {
+            "truth_id": "camp1-pth",
+            "pred_id": "camp-lateral-Administrator-1",
+            "jaccard": 1.0,
+            "pred_hosts": [
+              "host-00",
+              "host-01",
+              "host-02"
+            ],
+            "truth_hosts": [
+              "host-00",
+              "host-01",
+              "host-02"
+            ]
+          },
+          {
+            "truth_id": "camp2-spray",
+            "pred_id": "camp-lateral-spray-hit-2",
+            "jaccard": 1.0,
+            "pred_hosts": [
+              "host-02",
+              "host-03"
+            ],
+            "truth_hosts": [
+              "host-02",
+              "host-03"
+            ]
+          },
+          {
+            "truth_id": "camp3-ransom",
+            "pred_id": "camp-lateral-ransom-op-3",
+            "jaccard": 1.0,
+            "pred_hosts": [
+              "host-03",
+              "host-04",
+              "host-05"
+            ],
+            "truth_hosts": [
+              "host-03",
+              "host-04",
+              "host-05"
+            ]
+          }
+        ],
+        "mean_jaccard": 1.0,
+        "min_jaccard": 1.0
+      },
+      "fusion_lift": false,
+      "rounds": [
+        {
+          "round": 1,
+          "build_ok": true,
+          "corr_matched": true,
+          "corr_jaccard": 0.5,
+          "det_jaccard": 0.5,
+          "missed_hosts": [],
+          "over_merged_hosts": [],
+          "fusion_lift": false,
+          "both_missed": false,
+          "corr_hosts": [
+            "host-00",
+            "host-01",
+            "host-02",
+            "host-03",
+            "host-04",
+            "host-05"
+          ],
+          "best_campaign_hosts": [
+            "host-00",
+            "host-01",
+            "host-02"
+          ],
+          "confidence_margin": 0.0,
+          "campaigns_ranked": [
+            {
+              "campaign_id": "camp-lateral-Administrator-1",
+              "hosts": [
+                "host-00",
+                "host-01",
+                "host-02"
+              ],
+              "score": 1.0,
+              "jaccard_vs_truth": 0.5
+            },
+            {
+              "campaign_id": "camp-lateral-ransom-op-3",
+              "hosts": [
+                "host-03",
+                "host-04",
+                "host-05"
+              ],
+              "score": 1.0,
+              "jaccard_vs_truth": 0.5
+            },
+            {
+              "campaign_id": "camp-lateral-spray-hit-2",
+              "hosts": [
+                "host-02",
+                "host-03"
+              ],
+              "score": 0.9,
+              "jaccard_vs_truth": 0.3333
+            }
+          ],
+          "b1_hosts": [],
+          "b1_campaigns": [],
+          "multi_campaign": {
+            "collapsed_pairs": [],
+            "collapsed": false,
+            "identical_host_truths": false,
+            "n_pred_campaigns": 3,
+            "matches": [
+              {
+                "truth_id": "camp1-pth",
+                "pred_id": "camp-lateral-Administrator-1",
+                "jaccard": 1.0,
+                "pred_hosts": [
+                  "host-00",
+                  "host-01",
+                  "host-02"
+                ],
+                "truth_hosts": [
+                  "host-00",
+                  "host-01",
+                  "host-02"
+                ]
+              },
+              {
+                "truth_id": "camp2-spray",
+                "pred_id": "camp-lateral-spray-hit-2",
+                "jaccard": 1.0,
+                "pred_hosts": [
+                  "host-02",
+                  "host-03"
+                ],
+                "truth_hosts": [
+                  "host-02",
+                  "host-03"
+                ]
+              },
+              {
+                "truth_id": "camp3-ransom",
+                "pred_id": "camp-lateral-ransom-op-3",
+                "jaccard": 1.0,
+                "pred_hosts": [
+                  "host-03",
+                  "host-04",
+                  "host-05"
+                ],
+                "truth_hosts": [
+                  "host-03",
+                  "host-04",
+                  "host-05"
+                ]
+              }
+            ],
+            "mean_jaccard": 1.0,
+            "min_jaccard": 1.0
+          },
+          "quarantine_proposed": [],
+          "recon_hosts": [
+            "host-00",
+            "host-01",
+            "host-02",
+            "host-03",
+            "host-04",
+            "host-05"
+          ]
+        },
+        {
+          "round": 2,
+          "build_ok": true,
+          "corr_matched": true,
+          "corr_jaccard": 0.5,
+          "det_jaccard": 0.5,
+          "missed_hosts": [],
+          "over_merged_hosts": [],
+          "fusion_lift": false,
+          "both_missed": false,
+          "corr_hosts": [
+            "host-00",
+            "host-01",
+            "host-02",
+            "host-03",
+            "host-04",
+            "host-05"
+          ],
+          "best_campaign_hosts": [
+            "host-00",
+            "host-01",
+            "host-02"
+          ],
+          "confidence_margin": 0.0,
+          "campaigns_ranked": [
+            {
+              "campaign_id": "camp-lateral-Administrator-1",
+              "hosts": [
+                "host-00",
+                "host-01",
+                "host-02"
+              ],
+              "score": 1.0,
+              "jaccard_vs_truth": 0.5
+            },
+            {
+              "campaign_id": "camp-lateral-ransom-op-3",
+              "hosts": [
+                "host-03",
+                "host-04",
+                "host-05"
+              ],
+              "score": 1.0,
+              "jaccard_vs_truth": 0.5
+            },
+            {
+              "campaign_id": "camp-lateral-spray-hit-2",
+              "hosts": [
+                "host-02",
+                "host-03"
+              ],
+              "score": 0.9,
+              "jaccard_vs_truth": 0.3333
+            }
+          ],
+          "b1_hosts": [],
+          "b1_campaigns": [],
+          "multi_campaign": {
+            "collapsed_pairs": [],
+            "collapsed": false,
+            "identical_host_truths": false,
+            "n_pred_campaigns": 3,
+            "matches": [
+              {
+                "truth_id": "camp1-pth",
+                "pred_id": "camp-lateral-Administrator-1",
+                "jaccard": 1.0,
+                "pred_hosts": [
+                  "host-00",
+                  "host-01",
+                  "host-02"
+                ],
+                "truth_hosts": [
+                  "host-00",
+                  "host-01",
+                  "host-02"
+                ]
+              },
+              {
+                "truth_id": "camp2-spray",
+                "pred_id": "camp-lateral-spray-hit-2",
+                "jaccard": 1.0,
+                "pred_hosts": [
+                  "host-02",
+                  "host-03"
+                ],
+                "truth_hosts": [
+                  "host-02",
+                  "host-03"
+                ]
+              },
+              {
+                "truth_id": "camp3-ransom",
+                "pred_id": "camp-lateral-ransom-op-3",
+                "jaccard": 1.0,
+                "pred_hosts": [
+                  "host-03",
+                  "host-04",
+                  "host-05"
+                ],
+                "truth_hosts": [
+                  "host-03",
+                  "host-04",
+                  "host-05"
+                ]
+              }
+            ],
+            "mean_jaccard": 1.0,
+            "min_jaccard": 1.0
+          },
+          "quarantine_proposed": [],
+          "recon_hosts": [
+            "host-00",
+            "host-01",
+            "host-02",
+            "host-03",
+            "host-04",
+            "host-05"
+          ]
+        }
+      ],
+      "narrative": "Three concurrent incidents: PtH a-b-c, spray c-d, ransom d-e-f. Shared nodes must not collapse into one blob.",
+      "fragile": false,
+      "verdict_label": "HELD"
+    },
+    {
+      "campaign_id": "t2-lim03-slow-low-day-gaps",
+      "origin": "original",
+      "headline": false,
+      "techniques": [
+        "T1078",
+        "T1041"
+      ],
+      "truth_hosts": [
+        "host-00",
+        "host-01",
+        "host-02"
+      ],
+      "truth_campaigns": null,
+      "break_criterion": "any truth-host event outside the window silently dropped from campaign reconstruction",
+      "verdict": "PARTIAL",
+      "verdict_reasons": [
+        "jaccard 0.6667 in PARTIAL band"
+      ],
+      "intensity_rounds": 2,
+      "wall_seconds": 1.9525,
+      "corr_jaccard": 0.6667,
+      "confidence_margin": 0.0,
+      "confidence_margin_raw": 0.0,
+      "confidence_margin_kind": "top_minus_second",
+      "missed_hosts": [],
+      "recovered_on_replay": [],
+      "over_merged_hosts": [],
+      "quarantine_proposed": [],
+      "hosts_saved": [
+        "host-03",
+        "host-04",
+        "host-05",
+        "host-06",
+        "host-07",
+        "host-08",
+        "host-09",
+        "host-10",
+        "host-11",
+        "host-12",
+        "host-13",
+        "host-14",
+        "host-15",
+        "host-16",
+        "host-17",
+        "host-18",
+        "host-19",
+        "host-20",
+        "host-21",
+        "host-22",
+        "host-23",
+        "host-24",
+        "host-25",
+        "host-26",
+        "host-27",
+        "host-28",
+        "host-29",
+        "host-30",
+        "host-31",
+        "host-32",
+        "host-33",
+        "host-34",
+        "host-35",
+        "host-36",
+        "host-37",
+        "host-38",
+        "host-39",
+        "host-40",
+        "host-41",
+        "host-42",
+        "host-43",
+        "host-44",
+        "host-45",
+        "host-46",
+        "host-47",
+        "host-48",
+        "host-49"
+      ],
+      "false_quarantine": [],
+      "baseline": {
+        "policy": "single-host-isolation",
+        "hosts_flagged": [],
+        "false_quarantine": [],
+        "truth_coverage": [],
+        "corr_truth_coverage": [
+          "host-00",
+          "host-01",
+          "host-02"
+        ],
+        "baseline_wins": false
+      },
+      "multi_campaign": null,
+      "fusion_lift": false,
+      "rounds": [
+        {
+          "round": 1,
+          "build_ok": true,
+          "corr_matched": true,
+          "corr_jaccard": 0.6667,
+          "det_jaccard": 1.0,
+          "missed_hosts": [],
+          "over_merged_hosts": [],
+          "fusion_lift": false,
+          "both_missed": false,
+          "corr_hosts": [
+            "host-00",
+            "host-01",
+            "host-02"
+          ],
+          "best_campaign_hosts": [
+            "host-00",
+            "host-01"
+          ],
+          "confidence_margin": 0.0,
+          "campaigns_ranked": [
+            {
+              "campaign_id": "camp-lateral-sleeper-1",
+              "hosts": [
+                "host-00",
+                "host-01"
+              ],
+              "score": 0.9,
+              "jaccard_vs_truth": 0.6667
+            },
+            {
+              "campaign_id": "camp-lateral-sleeper-2",
+              "hosts": [
+                "host-01",
+                "host-02"
+              ],
+              "score": 0.9,
+              "jaccard_vs_truth": 0.6667
+            }
+          ],
+          "b1_hosts": [],
+          "b1_campaigns": [],
+          "quarantine_proposed": [],
+          "recon_hosts": [
+            "host-00",
+            "host-01",
+            "host-02"
+          ]
+        },
+        {
+          "round": 2,
+          "build_ok": true,
+          "corr_matched": true,
+          "corr_jaccard": 0.6667,
+          "det_jaccard": 1.0,
+          "missed_hosts": [],
+          "over_merged_hosts": [],
+          "fusion_lift": false,
+          "both_missed": false,
+          "corr_hosts": [
+            "host-00",
+            "host-01",
+            "host-02"
+          ],
+          "best_campaign_hosts": [
+            "host-00",
+            "host-01"
+          ],
+          "confidence_margin": 0.0,
+          "campaigns_ranked": [
+            {
+              "campaign_id": "camp-lateral-sleeper-1",
+              "hosts": [
+                "host-00",
+                "host-01"
+              ],
+              "score": 0.9,
+              "jaccard_vs_truth": 0.6667
+            },
+            {
+              "campaign_id": "camp-lateral-sleeper-2",
+              "hosts": [
+                "host-01",
+                "host-02"
+              ],
+              "score": 0.9,
+              "jaccard_vs_truth": 0.6667
+            }
+          ],
+          "b1_hosts": [],
+          "b1_campaigns": [],
+          "quarantine_proposed": [],
+          "recon_hosts": [
+            "host-00",
+            "host-01",
+            "host-02"
+          ]
+        }
+      ],
+      "narrative": "Same sleeper identity across 14d / 21d / 9d quiet gaps \u2014 finds lookback cliffs.",
+      "fragile": false,
+      "verdict_label": "PARTIAL"
+    },
+    {
+      "campaign_id": "t2-lim04-timing-jitter",
+      "origin": "original",
+      "headline": false,
+      "techniques": [
+        "T1071.004",
+        "T1078",
+        "T1041"
+      ],
+      "truth_hosts": [
+        "host-00",
+        "host-01",
+        "host-02"
+      ],
+      "truth_campaigns": null,
+      "break_criterion": "Jaccard drop vs #5/#17 baseline at matched technique set",
+      "verdict": "HELD",
+      "verdict_reasons": [
+        "matched truth without merge-FQ",
+        "break_criterion not triggered: Jaccard drop vs #5/#17 baseline at matched technique set"
+      ],
+      "intensity_rounds": 2,
+      "wall_seconds": 1.9296,
+      "corr_jaccard": 1.0,
+      "confidence_margin": 1.0,
+      "confidence_margin_raw": 1.0,
+      "confidence_margin_kind": "top_minus_second",
+      "missed_hosts": [],
+      "recovered_on_replay": [],
+      "over_merged_hosts": [],
+      "quarantine_proposed": [
+        "host-00",
+        "host-01",
+        "host-02"
+      ],
+      "hosts_saved": [
+        "host-03",
+        "host-04",
+        "host-05",
+        "host-06",
+        "host-07",
+        "host-08",
+        "host-09",
+        "host-10",
+        "host-11",
+        "host-12",
+        "host-13",
+        "host-14",
+        "host-15",
+        "host-16",
+        "host-17",
+        "host-18",
+        "host-19",
+        "host-20",
+        "host-21",
+        "host-22",
+        "host-23",
+        "host-24",
+        "host-25",
+        "host-26",
+        "host-27",
+        "host-28",
+        "host-29",
+        "host-30",
+        "host-31",
+        "host-32",
+        "host-33",
+        "host-34",
+        "host-35",
+        "host-36",
+        "host-37",
+        "host-38",
+        "host-39",
+        "host-40",
+        "host-41",
+        "host-42",
+        "host-43",
+        "host-44",
+        "host-45",
+        "host-46",
+        "host-47",
+        "host-48",
+        "host-49"
+      ],
+      "false_quarantine": [],
+      "baseline": {
+        "policy": "single-host-isolation",
+        "hosts_flagged": [],
+        "false_quarantine": [],
+        "truth_coverage": [],
+        "corr_truth_coverage": [
+          "host-00",
+          "host-01",
+          "host-02"
+        ],
+        "baseline_wins": false
+      },
+      "multi_campaign": null,
+      "fusion_lift": false,
+      "rounds": [
+        {
+          "round": 1,
+          "build_ok": true,
+          "corr_matched": true,
+          "corr_jaccard": 1.0,
+          "det_jaccard": 1.0,
+          "missed_hosts": [],
+          "over_merged_hosts": [],
+          "fusion_lift": false,
+          "both_missed": false,
+          "corr_hosts": [
+            "host-00",
+            "host-01",
+            "host-02"
+          ],
+          "best_campaign_hosts": [
+            "host-00",
+            "host-01",
+            "host-02"
+          ],
+          "confidence_margin": 1.0,
+          "campaigns_ranked": [
+            {
+              "campaign_id": "camp-lateral-hybrid-1",
+              "hosts": [
+                "host-00",
+                "host-01",
+                "host-02"
+              ],
+              "score": 1.0,
+              "jaccard_vs_truth": 1.0
+            }
+          ],
+          "b1_hosts": [],
+          "b1_campaigns": [],
+          "quarantine_proposed": [
+            "host-00",
+            "host-01",
+            "host-02"
+          ],
+          "recon_hosts": [
+            "host-00",
+            "host-01",
+            "host-02"
+          ]
+        },
+        {
+          "round": 2,
+          "build_ok": true,
+          "corr_matched": true,
+          "corr_jaccard": 1.0,
+          "det_jaccard": 1.0,
+          "missed_hosts": [],
+          "over_merged_hosts": [],
+          "fusion_lift": false,
+          "both_missed": false,
+          "corr_hosts": [
+            "host-00",
+            "host-01",
+            "host-02"
+          ],
+          "best_campaign_hosts": [
+            "host-00",
+            "host-01",
+            "host-02"
+          ],
+          "confidence_margin": 1.0,
+          "campaigns_ranked": [
+            {
+              "campaign_id": "camp-lateral-hybrid-1",
+              "hosts": [
+                "host-00",
+                "host-01",
+                "host-02"
+              ],
+              "score": 1.0,
+              "jaccard_vs_truth": 1.0
+            }
+          ],
+          "b1_hosts": [],
+          "b1_campaigns": [],
+          "quarantine_proposed": [
+            "host-00",
+            "host-01",
+            "host-02"
+          ],
+          "recon_hosts": [
+            "host-00",
+            "host-01",
+            "host-02"
+          ]
+        }
+      ],
+      "narrative": "Same shape as fleet05/17 with per-stage uniform 0\u20136\u00d7 interval jitter.",
+      "fragile": false,
+      "verdict_label": "HELD"
+    },
+    {
+      "campaign_id": "t2-lim05-technique-sub-kerberoast",
+      "origin": "original",
+      "headline": false,
+      "techniques": [
+        "T1558",
+        "T1021.006",
+        "T1041"
+      ],
+      "truth_hosts": [
+        "host-00",
+        "host-01",
+        "host-02"
+      ],
+      "truth_campaigns": null,
+      "break_criterion": "campaign not detected, or techniques logged but not correlated",
+      "verdict": "HELD",
+      "verdict_reasons": [
+        "matched truth without merge-FQ",
+        "break_criterion not triggered: campaign not detected, or techniques logged but not correlated"
+      ],
+      "intensity_rounds": 2,
+      "wall_seconds": 2.2105,
+      "corr_jaccard": 1.0,
+      "confidence_margin": 1.0,
+      "confidence_margin_raw": 1.0,
+      "confidence_margin_kind": "top_minus_second",
+      "missed_hosts": [],
+      "recovered_on_replay": [],
+      "over_merged_hosts": [],
+      "quarantine_proposed": [
+        "host-00",
+        "host-01",
+        "host-02"
+      ],
+      "hosts_saved": [
+        "host-03",
+        "host-04",
+        "host-05",
+        "host-06",
+        "host-07",
+        "host-08",
+        "host-09",
+        "host-10",
+        "host-11",
+        "host-12",
+        "host-13",
+        "host-14",
+        "host-15",
+        "host-16",
+        "host-17",
+        "host-18",
+        "host-19",
+        "host-20",
+        "host-21",
+        "host-22",
+        "host-23",
+        "host-24",
+        "host-25",
+        "host-26",
+        "host-27",
+        "host-28",
+        "host-29",
+        "host-30",
+        "host-31",
+        "host-32",
+        "host-33",
+        "host-34",
+        "host-35",
+        "host-36",
+        "host-37",
+        "host-38",
+        "host-39",
+        "host-40",
+        "host-41",
+        "host-42",
+        "host-43",
+        "host-44",
+        "host-45",
+        "host-46",
+        "host-47",
+        "host-48",
+        "host-49"
+      ],
+      "false_quarantine": [],
+      "baseline": {
+        "policy": "single-host-isolation",
+        "hosts_flagged": [],
+        "false_quarantine": [],
+        "truth_coverage": [],
+        "corr_truth_coverage": [
+          "host-00",
+          "host-01",
+          "host-02"
+        ],
+        "baseline_wins": false
+      },
+      "multi_campaign": null,
+      "fusion_lift": false,
+      "rounds": [
+        {
+          "round": 1,
+          "build_ok": true,
+          "corr_matched": true,
+          "corr_jaccard": 1.0,
+          "det_jaccard": 1.0,
+          "missed_hosts": [],
+          "over_merged_hosts": [],
+          "fusion_lift": false,
+          "both_missed": false,
+          "corr_hosts": [
+            "host-00",
+            "host-01",
+            "host-02"
+          ],
+          "best_campaign_hosts": [
+            "host-00",
+            "host-01",
+            "host-02"
+          ],
+          "confidence_margin": 1.0,
+          "campaigns_ranked": [
+            {
+              "campaign_id": "camp-lateral-svc-sql-1",
+              "hosts": [
+                "host-00",
+                "host-01",
+                "host-02"
+              ],
+              "score": 1.0,
+              "jaccard_vs_truth": 1.0
+            }
+          ],
+          "b1_hosts": [],
+          "b1_campaigns": [],
+          "quarantine_proposed": [
+            "host-00",
+            "host-01",
+            "host-02"
+          ],
+          "recon_hosts": [
+            "host-00",
+            "host-01",
+            "host-02"
+          ]
+        },
+        {
+          "round": 2,
+          "build_ok": true,
+          "corr_matched": true,
+          "corr_jaccard": 1.0,
+          "det_jaccard": 1.0,
+          "missed_hosts": [],
+          "over_merged_hosts": [],
+          "fusion_lift": false,
+          "both_missed": false,
+          "corr_hosts": [
+            "host-00",
+            "host-01",
+            "host-02"
+          ],
+          "best_campaign_hosts": [
+            "host-00",
+            "host-01",
+            "host-02"
+          ],
+          "confidence_margin": 1.0,
+          "campaigns_ranked": [
+            {
+              "campaign_id": "camp-lateral-svc-sql-1",
+              "hosts": [
+                "host-00",
+                "host-01",
+                "host-02"
+              ],
+              "score": 1.0,
+              "jaccard_vs_truth": 1.0
+            }
+          ],
+          "b1_hosts": [],
+          "b1_campaigns": [],
+          "quarantine_proposed": [
+            "host-00",
+            "host-01",
+            "host-02"
+          ],
+          "recon_hosts": [
+            "host-00",
+            "host-01",
+            "host-02"
+          ]
+        }
+      ],
+      "narrative": "Off-library techniques: Kerberoast foothold, WinRM lateral, exfil.",
+      "fragile": false,
+      "verdict_label": "HELD"
+    },
+    {
+      "campaign_id": "t2-lim06-clock-skew-47s",
+      "origin": "original",
+      "headline": false,
+      "techniques": [
+        "T1003.001",
+        "T1550.002",
+        "T1021",
+        "T1041"
+      ],
+      "truth_hosts": [
+        "host-00",
+        "host-01",
+        "host-02"
+      ],
+      "truth_campaigns": null,
+      "break_criterion": "causal ordering a\u2192b\u2192c wrong, or b dropped due to apparent gap",
+      "verdict": "HELD",
+      "verdict_reasons": [
+        "matched truth without merge-FQ",
+        "break_criterion not triggered: causal ordering a\u2192b\u2192c wrong, or b dropped due to apparent gap"
+      ],
+      "intensity_rounds": 2,
+      "wall_seconds": 2.5992,
+      "corr_jaccard": 1.0,
+      "confidence_margin": 1.0,
+      "confidence_margin_raw": 1.0,
+      "confidence_margin_kind": "top_minus_second",
+      "missed_hosts": [],
+      "recovered_on_replay": [],
+      "over_merged_hosts": [],
+      "quarantine_proposed": [
+        "host-00",
+        "host-01",
+        "host-02"
+      ],
+      "hosts_saved": [
+        "host-03",
+        "host-04",
+        "host-05",
+        "host-06",
+        "host-07",
+        "host-08",
+        "host-09",
+        "host-10",
+        "host-11",
+        "host-12",
+        "host-13",
+        "host-14",
+        "host-15",
+        "host-16",
+        "host-17",
+        "host-18",
+        "host-19",
+        "host-20",
+        "host-21",
+        "host-22",
+        "host-23",
+        "host-24",
+        "host-25",
+        "host-26",
+        "host-27",
+        "host-28",
+        "host-29",
+        "host-30",
+        "host-31",
+        "host-32",
+        "host-33",
+        "host-34",
+        "host-35",
+        "host-36",
+        "host-37",
+        "host-38",
+        "host-39",
+        "host-40",
+        "host-41",
+        "host-42",
+        "host-43",
+        "host-44",
+        "host-45",
+        "host-46",
+        "host-47",
+        "host-48",
+        "host-49"
+      ],
+      "false_quarantine": [],
+      "baseline": {
+        "policy": "single-host-isolation",
+        "hosts_flagged": [],
+        "false_quarantine": [],
+        "truth_coverage": [],
+        "corr_truth_coverage": [
+          "host-00",
+          "host-01",
+          "host-02"
+        ],
+        "baseline_wins": false
+      },
+      "multi_campaign": null,
+      "fusion_lift": false,
+      "rounds": [
+        {
+          "round": 1,
+          "build_ok": true,
+          "corr_matched": true,
+          "corr_jaccard": 1.0,
+          "det_jaccard": 1.0,
+          "missed_hosts": [],
+          "over_merged_hosts": [],
+          "fusion_lift": false,
+          "both_missed": false,
+          "corr_hosts": [
+            "host-00",
+            "host-01",
+            "host-02"
+          ],
+          "best_campaign_hosts": [
+            "host-00",
+            "host-01",
+            "host-02"
+          ],
+          "confidence_margin": 1.0,
+          "campaigns_ranked": [
+            {
+              "campaign_id": "camp-lateral-Administrator-1",
+              "hosts": [
+                "host-00",
+                "host-01",
+                "host-02"
+              ],
+              "score": 1.0,
+              "jaccard_vs_truth": 1.0
+            }
+          ],
+          "b1_hosts": [],
+          "b1_campaigns": [],
+          "quarantine_proposed": [
+            "host-00",
+            "host-01",
+            "host-02"
+          ],
+          "recon_hosts": [
+            "host-00",
+            "host-01",
+            "host-02"
+          ]
+        },
+        {
+          "round": 2,
+          "build_ok": true,
+          "corr_matched": true,
+          "corr_jaccard": 1.0,
+          "det_jaccard": 1.0,
+          "missed_hosts": [],
+          "over_merged_hosts": [],
+          "fusion_lift": false,
+          "both_missed": false,
+          "corr_hosts": [
+            "host-00",
+            "host-01",
+            "host-02"
+          ],
+          "best_campaign_hosts": [
+            "host-00",
+            "host-01",
+            "host-02"
+          ],
+          "confidence_margin": 1.0,
+          "campaigns_ranked": [
+            {
+              "campaign_id": "camp-lateral-Administrator-1",
+              "hosts": [
+                "host-00",
+                "host-01",
+                "host-02"
+              ],
+              "score": 1.0,
+              "jaccard_vs_truth": 1.0
+            }
+          ],
+          "b1_hosts": [],
+          "b1_campaigns": [],
+          "quarantine_proposed": [
+            "host-00",
+            "host-01",
+            "host-02"
+          ],
+          "recon_hosts": [
+            "host-00",
+            "host-01",
+            "host-02"
+          ]
+        }
+      ],
+      "narrative": "Cred dump\u2192PtH with host-b clock +47s (unannounced NTP drift).",
+      "fragile": false,
+      "verdict_label": "HELD"
+    },
+    {
+      "campaign_id": "t2-lim07-dropped-mid-chain",
+      "origin": "original",
+      "headline": false,
+      "techniques": [
+        "T1021.002",
+        "T1078",
+        "T1041"
+      ],
+      "truth_hosts": [
+        "host-00",
+        "host-01",
+        "host-02",
+        "host-03"
+      ],
+      "truth_campaigns": null,
+      "break_criterion": "PARTIAL/BROKE, or false confidence that a,d is complete",
+      "verdict": "HELD",
+      "verdict_reasons": [
+        "matched truth without merge-FQ",
+        "break_criterion not triggered: PARTIAL/BROKE, or false confidence that a,d is complete"
+      ],
+      "intensity_rounds": 2,
+      "wall_seconds": 2.2317,
+      "corr_jaccard": 1.0,
+      "confidence_margin": 1.0,
+      "confidence_margin_raw": 1.0,
+      "confidence_margin_kind": "top_minus_second",
+      "missed_hosts": [],
+      "recovered_on_replay": [],
+      "over_merged_hosts": [],
+      "quarantine_proposed": [
+        "host-00",
+        "host-01",
+        "host-02",
+        "host-03"
+      ],
+      "hosts_saved": [
+        "host-04",
+        "host-05",
+        "host-06",
+        "host-07",
+        "host-08",
+        "host-09",
+        "host-10",
+        "host-11",
+        "host-12",
+        "host-13",
+        "host-14",
+        "host-15",
+        "host-16",
+        "host-17",
+        "host-18",
+        "host-19",
+        "host-20",
+        "host-21",
+        "host-22",
+        "host-23",
+        "host-24",
+        "host-25",
+        "host-26",
+        "host-27",
+        "host-28",
+        "host-29",
+        "host-30",
+        "host-31",
+        "host-32",
+        "host-33",
+        "host-34",
+        "host-35",
+        "host-36",
+        "host-37",
+        "host-38",
+        "host-39",
+        "host-40",
+        "host-41",
+        "host-42",
+        "host-43",
+        "host-44",
+        "host-45",
+        "host-46",
+        "host-47",
+        "host-48",
+        "host-49"
+      ],
+      "false_quarantine": [],
+      "baseline": {
+        "policy": "single-host-isolation",
+        "hosts_flagged": [],
+        "false_quarantine": [],
+        "truth_coverage": [],
+        "corr_truth_coverage": [
+          "host-00",
+          "host-01",
+          "host-02",
+          "host-03"
+        ],
+        "baseline_wins": false
+      },
+      "multi_campaign": null,
+      "fusion_lift": false,
+      "rounds": [
+        {
+          "round": 1,
+          "build_ok": true,
+          "corr_matched": true,
+          "corr_jaccard": 1.0,
+          "det_jaccard": 0.75,
+          "missed_hosts": [],
+          "over_merged_hosts": [],
+          "fusion_lift": false,
+          "both_missed": false,
+          "corr_hosts": [
+            "host-00",
+            "host-01",
+            "host-02",
+            "host-03"
+          ],
+          "best_campaign_hosts": [
+            "host-00",
+            "host-01",
+            "host-02",
+            "host-03"
+          ],
+          "confidence_margin": 1.0,
+          "campaigns_ranked": [
+            {
+              "campaign_id": "camp-lateral-svc-deploy-1",
+              "hosts": [
+                "host-00",
+                "host-01",
+                "host-02",
+                "host-03"
+              ],
+              "score": 1.0,
+              "jaccard_vs_truth": 1.0
+            }
+          ],
+          "b1_hosts": [],
+          "b1_campaigns": [],
+          "quarantine_proposed": [
+            "host-00",
+            "host-01",
+            "host-02",
+            "host-03"
+          ],
+          "recon_hosts": [
+            "host-00",
+            "host-01",
+            "host-02",
+            "host-03"
+          ]
+        },
+        {
+          "round": 2,
+          "build_ok": true,
+          "corr_matched": true,
+          "corr_jaccard": 1.0,
+          "det_jaccard": 0.75,
+          "missed_hosts": [],
+          "over_merged_hosts": [],
+          "fusion_lift": false,
+          "both_missed": false,
+          "corr_hosts": [
+            "host-00",
+            "host-01",
+            "host-02",
+            "host-03"
+          ],
+          "best_campaign_hosts": [
+            "host-00",
+            "host-01",
+            "host-02",
+            "host-03"
+          ],
+          "confidence_margin": 1.0,
+          "campaigns_ranked": [
+            {
+              "campaign_id": "camp-lateral-svc-deploy-1",
+              "hosts": [
+                "host-00",
+                "host-01",
+                "host-02",
+                "host-03"
+              ],
+              "score": 1.0,
+              "jaccard_vs_truth": 1.0
+            }
+          ],
+          "b1_hosts": [],
+          "b1_campaigns": [],
+          "quarantine_proposed": [
+            "host-00",
+            "host-01",
+            "host-02",
+            "host-03"
+          ],
+          "recon_hosts": [
+            "host-00",
+            "host-01",
+            "host-02",
+            "host-03"
+          ]
+        }
+      ],
+      "narrative": "SMB hop a\u2192b\u2192c\u2192d but host-c agent is down \u2014 missing witness.",
+      "fragile": false,
+      "verdict_label": "HELD"
+    },
+    {
+      "campaign_id": "t2-lim08-out-of-order-arrival",
+      "origin": "original",
+      "headline": false,
+      "techniques": [
+        "T1041",
+        "T1105",
+        "T1078"
+      ],
+      "truth_hosts": [
+        "host-00",
+        "host-01"
+      ],
+      "truth_campaigns": null,
+      "break_criterion": "causal chain backwards, or split into two false fragments",
+      "verdict": "HELD",
+      "verdict_reasons": [
+        "matched truth without merge-FQ",
+        "break_criterion not triggered: causal chain backwards, or split into two false fragments"
+      ],
+      "intensity_rounds": 2,
+      "wall_seconds": 1.8998,
+      "corr_jaccard": 1.0,
+      "confidence_margin": 0.1,
+      "confidence_margin_raw": 0.1,
+      "confidence_margin_kind": "top_minus_second",
+      "missed_hosts": [],
+      "recovered_on_replay": [],
+      "over_merged_hosts": [],
+      "quarantine_proposed": [
+        "host-00",
+        "host-01",
+        "host-02",
+        "host-03"
+      ],
+      "hosts_saved": [
+        "host-04",
+        "host-05",
+        "host-06",
+        "host-07",
+        "host-08",
+        "host-09",
+        "host-10",
+        "host-11",
+        "host-12",
+        "host-13",
+        "host-14",
+        "host-15",
+        "host-16",
+        "host-17",
+        "host-18",
+        "host-19",
+        "host-20",
+        "host-21",
+        "host-22",
+        "host-23",
+        "host-24",
+        "host-25",
+        "host-26",
+        "host-27",
+        "host-28",
+        "host-29",
+        "host-30",
+        "host-31",
+        "host-32",
+        "host-33",
+        "host-34",
+        "host-35",
+        "host-36",
+        "host-37",
+        "host-38",
+        "host-39",
+        "host-40",
+        "host-41",
+        "host-42",
+        "host-43",
+        "host-44",
+        "host-45",
+        "host-46",
+        "host-47",
+        "host-48",
+        "host-49"
+      ],
+      "false_quarantine": [
+        "host-02",
+        "host-03"
+      ],
+      "baseline": {
+        "policy": "single-host-isolation",
+        "hosts_flagged": [],
+        "false_quarantine": [],
+        "truth_coverage": [],
+        "corr_truth_coverage": [
+          "host-00",
+          "host-01"
+        ],
+        "baseline_wins": false
+      },
+      "multi_campaign": null,
+      "fusion_lift": false,
+      "rounds": [
+        {
+          "round": 1,
+          "build_ok": true,
+          "corr_matched": true,
+          "corr_jaccard": 1.0,
+          "det_jaccard": 1.0,
+          "missed_hosts": [],
+          "over_merged_hosts": [],
+          "fusion_lift": false,
+          "both_missed": false,
+          "corr_hosts": [
+            "host-00",
+            "host-01",
+            "host-02",
+            "host-03"
+          ],
+          "best_campaign_hosts": [
+            "host-00",
+            "host-01"
+          ],
+          "confidence_margin": 0.1,
+          "campaigns_ranked": [
+            {
+              "campaign_id": "camp-lateral-chunker-1",
+              "hosts": [
+                "host-00",
+                "host-01"
+              ],
+              "score": 1.0,
+              "jaccard_vs_truth": 1.0
+            },
+            {
+              "campaign_id": "camp-exfil-104-18-32-7-2",
+              "hosts": [
+                "host-02",
+                "host-03"
+              ],
+              "score": 0.9,
+              "jaccard_vs_truth": 0.0
+            }
+          ],
+          "b1_hosts": [],
+          "b1_campaigns": [],
+          "quarantine_proposed": [
+            "host-00",
+            "host-01",
+            "host-02",
+            "host-03"
+          ],
+          "recon_hosts": [
+            "host-00",
+            "host-01",
+            "host-02",
+            "host-03"
+          ]
+        },
+        {
+          "round": 2,
+          "build_ok": true,
+          "corr_matched": true,
+          "corr_jaccard": 1.0,
+          "det_jaccard": 1.0,
+          "missed_hosts": [],
+          "over_merged_hosts": [],
+          "fusion_lift": false,
+          "both_missed": false,
+          "corr_hosts": [
+            "host-00",
+            "host-01",
+            "host-02",
+            "host-03"
+          ],
+          "best_campaign_hosts": [
+            "host-00",
+            "host-01"
+          ],
+          "confidence_margin": 0.1,
+          "campaigns_ranked": [
+            {
+              "campaign_id": "camp-lateral-chunker-1",
+              "hosts": [
+                "host-00",
+                "host-01"
+              ],
+              "score": 1.0,
+              "jaccard_vs_truth": 1.0
+            },
+            {
+              "campaign_id": "camp-exfil-104-18-32-7-2",
+              "hosts": [
+                "host-02",
+                "host-03"
+              ],
+              "score": 0.9,
+              "jaccard_vs_truth": 0.0
+            }
+          ],
+          "b1_hosts": [],
+          "b1_campaigns": [],
+          "quarantine_proposed": [
+            "host-00",
+            "host-01",
+            "host-02",
+            "host-03"
+          ],
+          "recon_hosts": [
+            "host-00",
+            "host-01",
+            "host-02",
+            "host-03"
+          ]
+        }
+      ],
+      "narrative": "Chunked exfil on b arrives/timestamped before the lateral from a that caused it.",
+      "fragile": true,
+      "verdict_label": "HELD, fragile"
+    },
+    {
+      "campaign_id": "t2-lim09-max-density-overlap",
+      "origin": "original",
+      "headline": true,
+      "techniques": [
+        "T1003.001",
+        "T1550.002",
+        "T1110.003",
+        "T1486",
+        "T1078",
+        "T1041"
+      ],
+      "truth_hosts": [
+        "host-00",
+        "host-01",
+        "host-02",
+        "host-03",
+        "host-04"
+      ],
+      "truth_campaigns": [
+        {
+          "id": "c1-pth",
+          "hosts": [
+            "host-00",
+            "host-01",
+            "host-02"
+          ]
+        },
+        {
+          "id": "c2-spray",
+          "hosts": [
+            "host-01",
+            "host-02",
+            "host-03"
+          ]
+        },
+        {
+          "id": "c3-ransom",
+          "hosts": [
+            "host-02",
+            "host-03",
+            "host-04"
+          ]
+        }
+      ],
+      "break_criterion": "any two campaigns collapse, or host-c attribution near-random",
+      "verdict": "HELD",
+      "verdict_reasons": [
+        "multi-campaign held"
+      ],
+      "intensity_rounds": 2,
+      "wall_seconds": 2.2023,
+      "corr_jaccard": 1.0,
+      "confidence_margin": 1.0,
+      "confidence_margin_raw": 0.0,
+      "confidence_margin_kind": "ambiguity",
+      "missed_hosts": [],
+      "recovered_on_replay": [],
+      "over_merged_hosts": [],
+      "quarantine_proposed": [],
+      "hosts_saved": [
+        "host-05",
+        "host-06",
+        "host-07",
+        "host-08",
+        "host-09",
+        "host-10",
+        "host-11",
+        "host-12",
+        "host-13",
+        "host-14",
+        "host-15",
+        "host-16",
+        "host-17",
+        "host-18",
+        "host-19",
+        "host-20",
+        "host-21",
+        "host-22",
+        "host-23",
+        "host-24",
+        "host-25",
+        "host-26",
+        "host-27",
+        "host-28",
+        "host-29",
+        "host-30",
+        "host-31",
+        "host-32",
+        "host-33",
+        "host-34",
+        "host-35",
+        "host-36",
+        "host-37",
+        "host-38",
+        "host-39",
+        "host-40",
+        "host-41",
+        "host-42",
+        "host-43",
+        "host-44",
+        "host-45",
+        "host-46",
+        "host-47",
+        "host-48",
+        "host-49"
+      ],
+      "false_quarantine": [],
+      "baseline": {
+        "policy": "single-host-isolation",
+        "hosts_flagged": [
+          "host-02"
+        ],
+        "false_quarantine": [],
+        "truth_coverage": [
+          "host-02"
+        ],
+        "corr_truth_coverage": [
+          "host-00",
+          "host-01",
+          "host-02",
+          "host-03",
+          "host-04"
+        ],
+        "baseline_wins": false
+      },
+      "multi_campaign": {
+        "collapsed_pairs": [],
+        "collapsed": false,
+        "identical_host_truths": false,
+        "n_pred_campaigns": 3,
+        "matches": [
+          {
+            "truth_id": "c1-pth",
+            "pred_id": "camp-lateral-Administrator-1",
+            "jaccard": 1.0,
+            "pred_hosts": [
+              "host-00",
+              "host-01",
+              "host-02"
+            ],
+            "truth_hosts": [
+              "host-00",
+              "host-01",
+              "host-02"
+            ]
+          },
+          {
+            "truth_id": "c2-spray",
+            "pred_id": "camp-lateral-spray-hit-2",
+            "jaccard": 1.0,
+            "pred_hosts": [
+              "host-01",
+              "host-02",
+              "host-03"
+            ],
+            "truth_hosts": [
+              "host-01",
+              "host-02",
+              "host-03"
+            ]
+          },
+          {
+            "truth_id": "c3-ransom",
+            "pred_id": "camp-lateral-ransom-op-3",
+            "jaccard": 1.0,
+            "pred_hosts": [
+              "host-02",
+              "host-03",
+              "host-04"
+            ],
+            "truth_hosts": [
+              "host-02",
+              "host-03",
+              "host-04"
+            ]
+          }
+        ],
+        "mean_jaccard": 1.0,
+        "min_jaccard": 1.0
+      },
+      "fusion_lift": false,
+      "rounds": [
+        {
+          "round": 1,
+          "build_ok": true,
+          "corr_matched": true,
+          "corr_jaccard": 0.6,
+          "det_jaccard": 0.6,
+          "missed_hosts": [],
+          "over_merged_hosts": [],
+          "fusion_lift": false,
+          "both_missed": false,
+          "corr_hosts": [
+            "host-00",
+            "host-01",
+            "host-02",
+            "host-03",
+            "host-04"
+          ],
+          "best_campaign_hosts": [
+            "host-00",
+            "host-01",
+            "host-02"
+          ],
+          "confidence_margin": 0.0,
+          "campaigns_ranked": [
+            {
+              "campaign_id": "camp-lateral-Administrator-1",
+              "hosts": [
+                "host-00",
+                "host-01",
+                "host-02"
+              ],
+              "score": 1.0,
+              "jaccard_vs_truth": 0.6
+            },
+            {
+              "campaign_id": "camp-lateral-spray-hit-2",
+              "hosts": [
+                "host-01",
+                "host-02",
+                "host-03"
+              ],
+              "score": 1.0,
+              "jaccard_vs_truth": 0.6
+            },
+            {
+              "campaign_id": "camp-lateral-ransom-op-3",
+              "hosts": [
+                "host-02",
+                "host-03",
+                "host-04"
+              ],
+              "score": 1.0,
+              "jaccard_vs_truth": 0.6
+            }
+          ],
+          "b1_hosts": [
+            "host-02"
+          ],
+          "b1_campaigns": [
+            {
+              "campaign_id": "b1-auth-host-02",
+              "hosts": [
+                "host-02"
+              ],
+              "score": 0.4
+            }
+          ],
+          "multi_campaign": {
+            "collapsed_pairs": [],
+            "collapsed": false,
+            "identical_host_truths": false,
+            "n_pred_campaigns": 3,
+            "matches": [
+              {
+                "truth_id": "c1-pth",
+                "pred_id": "camp-lateral-Administrator-1",
+                "jaccard": 1.0,
+                "pred_hosts": [
+                  "host-00",
+                  "host-01",
+                  "host-02"
+                ],
+                "truth_hosts": [
+                  "host-00",
+                  "host-01",
+                  "host-02"
+                ]
+              },
+              {
+                "truth_id": "c2-spray",
+                "pred_id": "camp-lateral-spray-hit-2",
+                "jaccard": 1.0,
+                "pred_hosts": [
+                  "host-01",
+                  "host-02",
+                  "host-03"
+                ],
+                "truth_hosts": [
+                  "host-01",
+                  "host-02",
+                  "host-03"
+                ]
+              },
+              {
+                "truth_id": "c3-ransom",
+                "pred_id": "camp-lateral-ransom-op-3",
+                "jaccard": 1.0,
+                "pred_hosts": [
+                  "host-02",
+                  "host-03",
+                  "host-04"
+                ],
+                "truth_hosts": [
+                  "host-02",
+                  "host-03",
+                  "host-04"
+                ]
+              }
+            ],
+            "mean_jaccard": 1.0,
+            "min_jaccard": 1.0
+          },
+          "quarantine_proposed": [],
+          "recon_hosts": [
+            "host-00",
+            "host-01",
+            "host-02",
+            "host-03",
+            "host-04"
+          ]
+        },
+        {
+          "round": 2,
+          "build_ok": true,
+          "corr_matched": true,
+          "corr_jaccard": 0.6,
+          "det_jaccard": 0.6,
+          "missed_hosts": [],
+          "over_merged_hosts": [],
+          "fusion_lift": false,
+          "both_missed": false,
+          "corr_hosts": [
+            "host-00",
+            "host-01",
+            "host-02",
+            "host-03",
+            "host-04"
+          ],
+          "best_campaign_hosts": [
+            "host-00",
+            "host-01",
+            "host-02"
+          ],
+          "confidence_margin": 0.0,
+          "campaigns_ranked": [
+            {
+              "campaign_id": "camp-lateral-Administrator-1",
+              "hosts": [
+                "host-00",
+                "host-01",
+                "host-02"
+              ],
+              "score": 1.0,
+              "jaccard_vs_truth": 0.6
+            },
+            {
+              "campaign_id": "camp-lateral-spray-hit-2",
+              "hosts": [
+                "host-01",
+                "host-02",
+                "host-03"
+              ],
+              "score": 1.0,
+              "jaccard_vs_truth": 0.6
+            },
+            {
+              "campaign_id": "camp-lateral-ransom-op-3",
+              "hosts": [
+                "host-02",
+                "host-03",
+                "host-04"
+              ],
+              "score": 1.0,
+              "jaccard_vs_truth": 0.6
+            }
+          ],
+          "b1_hosts": [
+            "host-02"
+          ],
+          "b1_campaigns": [
+            {
+              "campaign_id": "b1-auth-host-02",
+              "hosts": [
+                "host-02"
+              ],
+              "score": 0.4
+            }
+          ],
+          "multi_campaign": {
+            "collapsed_pairs": [],
+            "collapsed": false,
+            "identical_host_truths": false,
+            "n_pred_campaigns": 3,
+            "matches": [
+              {
+                "truth_id": "c1-pth",
+                "pred_id": "camp-lateral-Administrator-1",
+                "jaccard": 1.0,
+                "pred_hosts": [
+                  "host-00",
+                  "host-01",
+                  "host-02"
+                ],
+                "truth_hosts": [
+                  "host-00",
+                  "host-01",
+                  "host-02"
+                ]
+              },
+              {
+                "truth_id": "c2-spray",
+                "pred_id": "camp-lateral-spray-hit-2",
+                "jaccard": 1.0,
+                "pred_hosts": [
+                  "host-01",
+                  "host-02",
+                  "host-03"
+                ],
+                "truth_hosts": [
+                  "host-01",
+                  "host-02",
+                  "host-03"
+                ]
+              },
+              {
+                "truth_id": "c3-ransom",
+                "pred_id": "camp-lateral-ransom-op-3",
+                "jaccard": 1.0,
+                "pred_hosts": [
+                  "host-02",
+                  "host-03",
+                  "host-04"
+                ],
+                "truth_hosts": [
+                  "host-02",
+                  "host-03",
+                  "host-04"
+                ]
+              }
+            ],
+            "mean_jaccard": 1.0,
+            "min_jaccard": 1.0
+          },
+          "quarantine_proposed": [],
+          "recon_hosts": [
+            "host-00",
+            "host-01",
+            "host-02",
+            "host-03",
+            "host-04"
+          ]
+        }
+      ],
+      "narrative": "Three overlapping campaigns; host-c in all three \u2014 combinatorial density stress.",
+      "fragile": false,
+      "verdict_label": "HELD"
+    },
+    {
+      "campaign_id": "t2-lim09b-sequential-reuse",
+      "origin": "original",
+      "headline": true,
+      "techniques": [
+        "T1071.004",
+        "T1053.005",
+        "T1078",
+        "T1041"
+      ],
+      "truth_hosts": [
+        "host-00",
+        "host-01",
+        "host-02"
+      ],
+      "truth_campaigns": [
+        {
+          "id": "inc1-dns",
+          "hosts": [
+            "host-00",
+            "host-01",
+            "host-02"
+          ]
+        },
+        {
+          "id": "inc2-task",
+          "hosts": [
+            "host-00",
+            "host-01",
+            "host-02"
+          ]
+        }
+      ],
+      "break_criterion": "incident1 and incident2 reported as a single continuous campaign",
+      "verdict": "HELD",
+      "verdict_reasons": [
+        "sequential incidents split across 2 campaigns"
+      ],
+      "intensity_rounds": 2,
+      "wall_seconds": 2.2109,
+      "corr_jaccard": 1.0,
+      "confidence_margin": 0.0,
+      "confidence_margin_raw": 0.0,
+      "confidence_margin_kind": "top_minus_second",
+      "missed_hosts": [],
+      "recovered_on_replay": [],
+      "over_merged_hosts": [],
+      "quarantine_proposed": [
+        "host-00",
+        "host-01",
+        "host-02"
+      ],
+      "hosts_saved": [
+        "host-03",
+        "host-04",
+        "host-05",
+        "host-06",
+        "host-07",
+        "host-08",
+        "host-09",
+        "host-10",
+        "host-11",
+        "host-12",
+        "host-13",
+        "host-14",
+        "host-15",
+        "host-16",
+        "host-17",
+        "host-18",
+        "host-19",
+        "host-20",
+        "host-21",
+        "host-22",
+        "host-23",
+        "host-24",
+        "host-25",
+        "host-26",
+        "host-27",
+        "host-28",
+        "host-29",
+        "host-30",
+        "host-31",
+        "host-32",
+        "host-33",
+        "host-34",
+        "host-35",
+        "host-36",
+        "host-37",
+        "host-38",
+        "host-39",
+        "host-40",
+        "host-41",
+        "host-42",
+        "host-43",
+        "host-44",
+        "host-45",
+        "host-46",
+        "host-47",
+        "host-48",
+        "host-49"
+      ],
+      "false_quarantine": [],
+      "baseline": {
+        "policy": "single-host-isolation",
+        "hosts_flagged": [],
+        "false_quarantine": [],
+        "truth_coverage": [],
+        "corr_truth_coverage": [
+          "host-00",
+          "host-01",
+          "host-02"
+        ],
+        "baseline_wins": false
+      },
+      "multi_campaign": {
+        "collapsed_pairs": [],
+        "collapsed": false,
+        "identical_host_truths": true,
+        "n_pred_campaigns": 2,
+        "matches": [
+          {
+            "truth_id": "inc1-dns",
+            "pred_id": "camp-lateral-tasksvc-1",
+            "jaccard": 1.0,
+            "pred_hosts": [
+              "host-00",
+              "host-01",
+              "host-02"
+            ],
+            "truth_hosts": [
+              "host-00",
+              "host-01",
+              "host-02"
+            ]
+          },
+          {
+            "truth_id": "inc2-task",
+            "pred_id": "camp-lateral-tasksvc-1",
+            "jaccard": 1.0,
+            "pred_hosts": [
+              "host-00",
+              "host-01",
+              "host-02"
+            ],
+            "truth_hosts": [
+              "host-00",
+              "host-01",
+              "host-02"
+            ]
+          }
+        ],
+        "mean_jaccard": 1.0,
+        "min_jaccard": 1.0
+      },
+      "fusion_lift": false,
+      "rounds": [
+        {
+          "round": 1,
+          "build_ok": true,
+          "corr_matched": true,
+          "corr_jaccard": 1.0,
+          "det_jaccard": 1.0,
+          "missed_hosts": [],
+          "over_merged_hosts": [],
+          "fusion_lift": false,
+          "both_missed": false,
+          "corr_hosts": [
+            "host-00",
+            "host-01",
+            "host-02"
+          ],
+          "best_campaign_hosts": [
+            "host-00",
+            "host-01",
+            "host-02"
+          ],
+          "confidence_margin": 0.0,
+          "campaigns_ranked": [
+            {
+              "campaign_id": "camp-lateral-tasksvc-1",
+              "hosts": [
+                "host-00",
+                "host-01",
+                "host-02"
+              ],
+              "score": 1.0,
+              "jaccard_vs_truth": 1.0
+            },
+            {
+              "campaign_id": "camp-dns-c2-evil-test-2",
+              "hosts": [
+                "host-00",
+                "host-01",
+                "host-02"
+              ],
+              "score": 1.0,
+              "jaccard_vs_truth": 1.0
+            }
+          ],
+          "b1_hosts": [],
+          "b1_campaigns": [],
+          "multi_campaign": {
+            "collapsed_pairs": [],
+            "collapsed": false,
+            "identical_host_truths": true,
+            "n_pred_campaigns": 2,
+            "matches": [
+              {
+                "truth_id": "inc1-dns",
+                "pred_id": "camp-lateral-tasksvc-1",
+                "jaccard": 1.0,
+                "pred_hosts": [
+                  "host-00",
+                  "host-01",
+                  "host-02"
+                ],
+                "truth_hosts": [
+                  "host-00",
+                  "host-01",
+                  "host-02"
+                ]
+              },
+              {
+                "truth_id": "inc2-task",
+                "pred_id": "camp-lateral-tasksvc-1",
+                "jaccard": 1.0,
+                "pred_hosts": [
+                  "host-00",
+                  "host-01",
+                  "host-02"
+                ],
+                "truth_hosts": [
+                  "host-00",
+                  "host-01",
+                  "host-02"
+                ]
+              }
+            ],
+            "mean_jaccard": 1.0,
+            "min_jaccard": 1.0
+          },
+          "quarantine_proposed": [
+            "host-00",
+            "host-01",
+            "host-02"
+          ],
+          "recon_hosts": [
+            "host-00",
+            "host-01",
+            "host-02"
+          ]
+        },
+        {
+          "round": 2,
+          "build_ok": true,
+          "corr_matched": true,
+          "corr_jaccard": 1.0,
+          "det_jaccard": 1.0,
+          "missed_hosts": [],
+          "over_merged_hosts": [],
+          "fusion_lift": false,
+          "both_missed": false,
+          "corr_hosts": [
+            "host-00",
+            "host-01",
+            "host-02"
+          ],
+          "best_campaign_hosts": [
+            "host-00",
+            "host-01",
+            "host-02"
+          ],
+          "confidence_margin": 0.0,
+          "campaigns_ranked": [
+            {
+              "campaign_id": "camp-lateral-tasksvc-1",
+              "hosts": [
+                "host-00",
+                "host-01",
+                "host-02"
+              ],
+              "score": 1.0,
+              "jaccard_vs_truth": 1.0
+            },
+            {
+              "campaign_id": "camp-dns-c2-evil-test-2",
+              "hosts": [
+                "host-00",
+                "host-01",
+                "host-02"
+              ],
+              "score": 1.0,
+              "jaccard_vs_truth": 1.0
+            }
+          ],
+          "b1_hosts": [],
+          "b1_campaigns": [],
+          "multi_campaign": {
+            "collapsed_pairs": [],
+            "collapsed": false,
+            "identical_host_truths": true,
+            "n_pred_campaigns": 2,
+            "matches": [
+              {
+                "truth_id": "inc1-dns",
+                "pred_id": "camp-lateral-tasksvc-1",
+                "jaccard": 1.0,
+                "pred_hosts": [
+                  "host-00",
+                  "host-01",
+                  "host-02"
+                ],
+                "truth_hosts": [
+                  "host-00",
+                  "host-01",
+                  "host-02"
+                ]
+              },
+              {
+                "truth_id": "inc2-task",
+                "pred_id": "camp-lateral-tasksvc-1",
+                "jaccard": 1.0,
+                "pred_hosts": [
+                  "host-00",
+                  "host-01",
+                  "host-02"
+                ],
+                "truth_hosts": [
+                  "host-00",
+                  "host-01",
+                  "host-02"
+                ]
+              }
+            ],
+            "mean_jaccard": 1.0,
+            "min_jaccard": 1.0
+          },
+          "quarantine_proposed": [
+            "host-00",
+            "host-01",
+            "host-02"
+          ],
+          "recon_hosts": [
+            "host-00",
+            "host-01",
+            "host-02"
+          ]
+        }
+      ],
+      "narrative": "DNS C2 shape then scheduled-task shape on same a/b/c after 10 min quiet.",
+      "fragile": true,
+      "verdict_label": "HELD, fragile"
+    },
+    {
+      "campaign_id": "t2-lim09c-positional-bias",
+      "origin": "original",
+      "headline": true,
+      "techniques": [
+        "T1003.001",
+        "T1550.002",
+        "T1021",
+        "T1110.003",
+        "T1078",
+        "T1041"
+      ],
+      "truth_hosts": [
+        "host-00",
+        "host-01",
+        "host-04"
+      ],
+      "truth_campaigns": null,
+      "break_criterion": "Jaccard or margin regression vs original #1/#6 from host relabeling alone",
+      "verdict": "HELD",
+      "verdict_reasons": [
+        "matched truth without merge-FQ",
+        "break_criterion not triggered: Jaccard or margin regression vs original #1/#6 from host relabeling alone"
+      ],
+      "intensity_rounds": 2,
+      "wall_seconds": 2.3257,
+      "corr_jaccard": 1.0,
+      "confidence_margin": 0.0,
+      "confidence_margin_raw": 0.0,
+      "confidence_margin_kind": "top_minus_second",
+      "missed_hosts": [],
+      "recovered_on_replay": [],
+      "over_merged_hosts": [],
+      "quarantine_proposed": [],
+      "hosts_saved": [
+        "host-02",
+        "host-03",
+        "host-05",
+        "host-06",
+        "host-07",
+        "host-08",
+        "host-09",
+        "host-10",
+        "host-11",
+        "host-12",
+        "host-13",
+        "host-14",
+        "host-15",
+        "host-16",
+        "host-17",
+        "host-18",
+        "host-19",
+        "host-20",
+        "host-21",
+        "host-22",
+        "host-23",
+        "host-24",
+        "host-25",
+        "host-26",
+        "host-27",
+        "host-28",
+        "host-29",
+        "host-30",
+        "host-31",
+        "host-32",
+        "host-33",
+        "host-34",
+        "host-35",
+        "host-36",
+        "host-37",
+        "host-38",
+        "host-39",
+        "host-40",
+        "host-41",
+        "host-42",
+        "host-43",
+        "host-44",
+        "host-45",
+        "host-46",
+        "host-47",
+        "host-48",
+        "host-49"
+      ],
+      "false_quarantine": [],
+      "baseline": {
+        "policy": "single-host-isolation",
+        "hosts_flagged": [],
+        "false_quarantine": [],
+        "truth_coverage": [],
+        "corr_truth_coverage": [
+          "host-00",
+          "host-01",
+          "host-04"
+        ],
+        "baseline_wins": false
+      },
+      "multi_campaign": null,
+      "fusion_lift": false,
+      "rounds": [
+        {
+          "round": 1,
+          "build_ok": true,
+          "corr_matched": true,
+          "corr_jaccard": 1.0,
+          "det_jaccard": 1.0,
+          "missed_hosts": [],
+          "over_merged_hosts": [],
+          "fusion_lift": false,
+          "both_missed": false,
+          "corr_hosts": [
+            "host-00",
+            "host-01",
+            "host-04"
+          ],
+          "best_campaign_hosts": [
+            "host-00",
+            "host-01",
+            "host-04"
+          ],
+          "confidence_margin": 0.0,
+          "campaigns_ranked": [
+            {
+              "campaign_id": "camp-lateral-Administrator-1",
+              "hosts": [
+                "host-00",
+                "host-01",
+                "host-04"
+              ],
+              "score": 1.0,
+              "jaccard_vs_truth": 1.0
+            },
+            {
+              "campaign_id": "camp-lateral-jdoe-2",
+              "hosts": [
+                "host-00",
+                "host-01",
+                "host-04"
+              ],
+              "score": 1.0,
+              "jaccard_vs_truth": 1.0
+            }
+          ],
+          "b1_hosts": [],
+          "b1_campaigns": [],
+          "quarantine_proposed": [],
+          "recon_hosts": [
+            "host-00",
+            "host-01",
+            "host-04"
+          ]
+        },
+        {
+          "round": 2,
+          "build_ok": true,
+          "corr_matched": true,
+          "corr_jaccard": 1.0,
+          "det_jaccard": 1.0,
+          "missed_hosts": [],
+          "over_merged_hosts": [],
+          "fusion_lift": false,
+          "both_missed": false,
+          "corr_hosts": [
+            "host-00",
+            "host-01",
+            "host-04"
+          ],
+          "best_campaign_hosts": [
+            "host-00",
+            "host-01",
+            "host-04"
+          ],
+          "confidence_margin": 0.0,
+          "campaigns_ranked": [
+            {
+              "campaign_id": "camp-lateral-Administrator-1",
+              "hosts": [
+                "host-00",
+                "host-01",
+                "host-04"
+              ],
+              "score": 1.0,
+              "jaccard_vs_truth": 1.0
+            },
+            {
+              "campaign_id": "camp-lateral-jdoe-2",
+              "hosts": [
+                "host-00",
+                "host-01",
+                "host-04"
+              ],
+              "score": 1.0,
+              "jaccard_vs_truth": 1.0
+            }
+          ],
+          "b1_hosts": [],
+          "b1_campaigns": [],
+          "quarantine_proposed": [],
+          "recon_hosts": [
+            "host-00",
+            "host-01",
+            "host-04"
+          ]
+        }
+      ],
+      "narrative": "fleet01+fleet06 shapes with host labels rotated so e is patient zero.",
+      "fragile": true,
+      "verdict_label": "HELD, fragile"
+    },
+    {
+      "campaign_id": "t2-lim09d-benign-hub-pivot",
+      "origin": "original",
+      "headline": true,
+      "techniques": [
+        "T1021.001",
+        "T1021.002",
+        "T1078",
+        "T1041"
+      ],
+      "truth_hosts": [
+        "host-00",
+        "host-02",
+        "host-04"
+      ],
+      "truth_campaigns": null,
+      "break_criterion": "attack missed (BROKE) or b/d False Q via association",
+      "verdict": "HELD",
+      "verdict_reasons": [
+        "matched truth without merge-FQ",
+        "break_criterion not triggered: attack missed (BROKE) or b/d False Q via association"
+      ],
+      "intensity_rounds": 2,
+      "wall_seconds": 1.9455,
+      "corr_jaccard": 1.0,
+      "confidence_margin": 0.1,
+      "confidence_margin_raw": 0.1,
+      "confidence_margin_kind": "top_minus_second",
+      "missed_hosts": [],
+      "recovered_on_replay": [],
+      "over_merged_hosts": [],
+      "quarantine_proposed": [
+        "host-00",
+        "host-02",
+        "host-04"
+      ],
+      "hosts_saved": [
+        "host-01",
+        "host-03",
+        "host-05",
+        "host-06",
+        "host-07",
+        "host-08",
+        "host-09",
+        "host-10",
+        "host-11",
+        "host-12",
+        "host-13",
+        "host-14",
+        "host-15",
+        "host-16",
+        "host-17",
+        "host-18",
+        "host-19",
+        "host-20",
+        "host-21",
+        "host-22",
+        "host-23",
+        "host-24",
+        "host-25",
+        "host-26",
+        "host-27",
+        "host-28",
+        "host-29",
+        "host-30",
+        "host-31",
+        "host-32",
+        "host-33",
+        "host-34",
+        "host-35",
+        "host-36",
+        "host-37",
+        "host-38",
+        "host-39",
+        "host-40",
+        "host-41",
+        "host-42",
+        "host-43",
+        "host-44",
+        "host-45",
+        "host-46",
+        "host-47",
+        "host-48",
+        "host-49"
+      ],
+      "false_quarantine": [],
+      "baseline": {
+        "policy": "single-host-isolation",
+        "hosts_flagged": [
+          "host-00",
+          "host-01",
+          "host-02",
+          "host-03",
+          "host-04"
+        ],
+        "false_quarantine": [
+          "host-01",
+          "host-03"
+        ],
+        "truth_coverage": [
+          "host-00",
+          "host-02",
+          "host-04"
+        ],
+        "corr_truth_coverage": [
+          "host-00",
+          "host-02",
+          "host-04"
+        ],
+        "baseline_wins": false
+      },
+      "multi_campaign": null,
+      "fusion_lift": false,
+      "rounds": [
+        {
+          "round": 1,
+          "build_ok": true,
+          "corr_matched": true,
+          "corr_jaccard": 1.0,
+          "det_jaccard": 1.0,
+          "missed_hosts": [],
+          "over_merged_hosts": [],
+          "fusion_lift": false,
+          "both_missed": false,
+          "corr_hosts": [
+            "host-00",
+            "host-01",
+            "host-02",
+            "host-03",
+            "host-04"
+          ],
+          "best_campaign_hosts": [
+            "host-00",
+            "host-02",
+            "host-04"
+          ],
+          "confidence_margin": 0.1,
+          "campaigns_ranked": [
+            {
+              "campaign_id": "camp-lateral-biz-a-1",
+              "hosts": [
+                "host-00",
+                "host-02",
+                "host-04"
+              ],
+              "score": 1.0,
+              "jaccard_vs_truth": 1.0
+            },
+            {
+              "campaign_id": "camp-lateral-biz-b-2",
+              "hosts": [
+                "host-01",
+                "host-02"
+              ],
+              "score": 0.9,
+              "jaccard_vs_truth": 0.25
+            },
+            {
+              "campaign_id": "camp-lateral-biz-d-3",
+              "hosts": [
+                "host-02",
+                "host-03"
+              ],
+              "score": 0.9,
+              "jaccard_vs_truth": 0.25
+            }
+          ],
+          "b1_hosts": [
+            "host-00",
+            "host-01",
+            "host-02",
+            "host-03",
+            "host-04"
+          ],
+          "b1_campaigns": [
+            {
+              "campaign_id": "b1-auth-host-02",
+              "hosts": [
+                "host-02"
+              ],
+              "score": 0.4
+            },
+            {
+              "campaign_id": "b1-auth-host-00",
+              "hosts": [
+                "host-00"
+              ],
+              "score": 0.4
+            },
+            {
+              "campaign_id": "b1-auth-host-01",
+              "hosts": [
+                "host-01"
+              ],
+              "score": 0.4
+            },
+            {
+              "campaign_id": "b1-auth-host-03",
+              "hosts": [
+                "host-03"
+              ],
+              "score": 0.4
+            },
+            {
+              "campaign_id": "b1-auth-host-04",
+              "hosts": [
+                "host-04"
+              ],
+              "score": 0.4
+            }
+          ],
+          "quarantine_proposed": [
+            "host-00",
+            "host-02",
+            "host-04"
+          ],
+          "recon_hosts": [
+            "host-00",
+            "host-01",
+            "host-02",
+            "host-03",
+            "host-04"
+          ]
+        },
+        {
+          "round": 2,
+          "build_ok": true,
+          "corr_matched": true,
+          "corr_jaccard": 1.0,
+          "det_jaccard": 1.0,
+          "missed_hosts": [],
+          "over_merged_hosts": [],
+          "fusion_lift": false,
+          "both_missed": false,
+          "corr_hosts": [
+            "host-00",
+            "host-01",
+            "host-02",
+            "host-03",
+            "host-04"
+          ],
+          "best_campaign_hosts": [
+            "host-00",
+            "host-02",
+            "host-04"
+          ],
+          "confidence_margin": 0.1,
+          "campaigns_ranked": [
+            {
+              "campaign_id": "camp-lateral-biz-a-1",
+              "hosts": [
+                "host-00",
+                "host-02",
+                "host-04"
+              ],
+              "score": 1.0,
+              "jaccard_vs_truth": 1.0
+            },
+            {
+              "campaign_id": "camp-lateral-biz-b-2",
+              "hosts": [
+                "host-01",
+                "host-02"
+              ],
+              "score": 0.9,
+              "jaccard_vs_truth": 0.25
+            },
+            {
+              "campaign_id": "camp-lateral-biz-d-3",
+              "hosts": [
+                "host-02",
+                "host-03"
+              ],
+              "score": 0.9,
+              "jaccard_vs_truth": 0.25
+            }
+          ],
+          "b1_hosts": [
+            "host-00",
+            "host-01",
+            "host-02",
+            "host-03",
+            "host-04"
+          ],
+          "b1_campaigns": [
+            {
+              "campaign_id": "b1-auth-host-02",
+              "hosts": [
+                "host-02"
+              ],
+              "score": 0.4
+            },
+            {
+              "campaign_id": "b1-auth-host-00",
+              "hosts": [
+                "host-00"
+              ],
+              "score": 0.4
+            },
+            {
+              "campaign_id": "b1-auth-host-01",
+              "hosts": [
+                "host-01"
+              ],
+              "score": 0.4
+            },
+            {
+              "campaign_id": "b1-auth-host-03",
+              "hosts": [
+                "host-03"
+              ],
+              "score": 0.4
+            },
+            {
+              "campaign_id": "b1-auth-host-04",
+              "hosts": [
+                "host-04"
+              ],
+              "score": 0.4
+            }
+          ],
+          "quarantine_proposed": [
+            "host-00",
+            "host-02",
+            "host-04"
+          ],
+          "recon_hosts": [
+            "host-00",
+            "host-01",
+            "host-02",
+            "host-03",
+            "host-04"
+          ]
+        }
+      ],
+      "narrative": "host-c is a busy legitimate jump box AND the real APT pivot; b/d are normal peers.",
+      "fragile": true,
+      "verdict_label": "HELD, fragile"
+    },
+    {
+      "campaign_id": "t2-lim10-authorized-redteam",
+      "origin": "original",
+      "headline": true,
+      "techniques": [
+        "T1003.001",
+        "T1021",
+        "T1078"
+      ],
+      "truth_hosts": [],
+      "truth_campaigns": null,
+      "break_criterion": "any host proposed for quarantine dry-run when truth is empty",
+      "verdict": "HELD",
+      "verdict_reasons": [
+        "no quarantine with empty truth"
+      ],
+      "intensity_rounds": 2,
+      "wall_seconds": 1.8322,
+      "corr_jaccard": 1.0,
+      "confidence_margin": 1.0,
+      "confidence_margin_raw": 1.0,
+      "confidence_margin_kind": "top_minus_second",
+      "missed_hosts": [],
+      "recovered_on_replay": [],
+      "over_merged_hosts": [
+        "host-00",
+        "host-01",
+        "host-02"
+      ],
+      "quarantine_proposed": [],
+      "hosts_saved": [
+        "host-00",
+        "host-01",
+        "host-02",
+        "host-03",
+        "host-04",
+        "host-05",
+        "host-06",
+        "host-07",
+        "host-08",
+        "host-09",
+        "host-10",
+        "host-11",
+        "host-12",
+        "host-13",
+        "host-14",
+        "host-15",
+        "host-16",
+        "host-17",
+        "host-18",
+        "host-19",
+        "host-20",
+        "host-21",
+        "host-22",
+        "host-23",
+        "host-24",
+        "host-25",
+        "host-26",
+        "host-27",
+        "host-28",
+        "host-29",
+        "host-30",
+        "host-31",
+        "host-32",
+        "host-33",
+        "host-34",
+        "host-35",
+        "host-36",
+        "host-37",
+        "host-38",
+        "host-39",
+        "host-40",
+        "host-41",
+        "host-42",
+        "host-43",
+        "host-44",
+        "host-45",
+        "host-46",
+        "host-47",
+        "host-48",
+        "host-49"
+      ],
+      "false_quarantine": [],
+      "baseline": {
+        "policy": "single-host-isolation",
+        "hosts_flagged": [],
+        "false_quarantine": [],
+        "truth_coverage": [],
+        "corr_truth_coverage": [],
+        "baseline_wins": false
+      },
+      "multi_campaign": null,
+      "fusion_lift": false,
+      "rounds": [
+        {
+          "round": 1,
+          "build_ok": true,
+          "corr_matched": false,
+          "corr_jaccard": 0.0,
+          "det_jaccard": 0.0,
+          "missed_hosts": [],
+          "over_merged_hosts": [
+            "host-00",
+            "host-01",
+            "host-02"
+          ],
+          "fusion_lift": false,
+          "both_missed": true,
+          "corr_hosts": [
+            "host-00",
+            "host-01",
+            "host-02"
+          ],
+          "best_campaign_hosts": [
+            "host-00",
+            "host-01",
+            "host-02"
+          ],
+          "confidence_margin": 1.0,
+          "campaigns_ranked": [
+            {
+              "campaign_id": "camp-lateral-Administrator-1",
+              "hosts": [
+                "host-00",
+                "host-01",
+                "host-02"
+              ],
+              "score": 1.0,
+              "jaccard_vs_truth": 0.0
+            }
+          ],
+          "b1_hosts": [],
+          "b1_campaigns": [],
+          "quarantine_proposed": [],
+          "recon_hosts": [
+            "host-00",
+            "host-01",
+            "host-02"
+          ]
+        },
+        {
+          "round": 2,
+          "build_ok": true,
+          "corr_matched": false,
+          "corr_jaccard": 0.0,
+          "det_jaccard": 0.0,
+          "missed_hosts": [],
+          "over_merged_hosts": [
+            "host-00",
+            "host-01",
+            "host-02"
+          ],
+          "fusion_lift": false,
+          "both_missed": true,
+          "corr_hosts": [
+            "host-00",
+            "host-01",
+            "host-02"
+          ],
+          "best_campaign_hosts": [
+            "host-00",
+            "host-01",
+            "host-02"
+          ],
+          "confidence_margin": 1.0,
+          "campaigns_ranked": [
+            {
+              "campaign_id": "camp-lateral-Administrator-1",
+              "hosts": [
+                "host-00",
+                "host-01",
+                "host-02"
+              ],
+              "score": 1.0,
+              "jaccard_vs_truth": 0.0
+            }
+          ],
+          "b1_hosts": [],
+          "b1_campaigns": [],
+          "quarantine_proposed": [],
+          "recon_hosts": [
+            "host-00",
+            "host-01",
+            "host-02"
+          ]
+        }
+      ],
+      "narrative": "Authorized credential audit \u2014 same fingerprint as fleet01, no malicious campaign.",
+      "fragile": false,
+      "verdict_label": "HELD"
+    },
+    {
+      "campaign_id": "t2-lim11-hostname-split-brain",
+      "origin": "original",
+      "headline": false,
+      "techniques": [
+        "T1021",
+        "T1078",
+        "T1041"
+      ],
+      "truth_hosts": [
+        "host-00",
+        "host-01",
+        "host-02"
+      ],
+      "truth_campaigns": null,
+      "break_criterion": "b's two identities treated as separate hosts, splitting coverage",
+      "verdict": "HELD",
+      "verdict_reasons": [
+        "matched truth without merge-FQ",
+        "break_criterion not triggered: b's two identities treated as separate hosts, splitting coverage"
+      ],
+      "intensity_rounds": 2,
+      "wall_seconds": 2.1317,
+      "corr_jaccard": 1.0,
+      "confidence_margin": 1.0,
+      "confidence_margin_raw": 1.0,
+      "confidence_margin_kind": "top_minus_second",
+      "missed_hosts": [],
+      "recovered_on_replay": [],
+      "over_merged_hosts": [],
+      "quarantine_proposed": [
+        "host-00",
+        "host-01",
+        "host-02"
+      ],
+      "hosts_saved": [
+        "host-03",
+        "host-04",
+        "host-05",
+        "host-06",
+        "host-07",
+        "host-08",
+        "host-09",
+        "host-10",
+        "host-11",
+        "host-12",
+        "host-13",
+        "host-14",
+        "host-15",
+        "host-16",
+        "host-17",
+        "host-18",
+        "host-19",
+        "host-20",
+        "host-21",
+        "host-22",
+        "host-23",
+        "host-24",
+        "host-25",
+        "host-26",
+        "host-27",
+        "host-28",
+        "host-29",
+        "host-30",
+        "host-31",
+        "host-32",
+        "host-33",
+        "host-34",
+        "host-35",
+        "host-36",
+        "host-37",
+        "host-38",
+        "host-39",
+        "host-40",
+        "host-41",
+        "host-42",
+        "host-43",
+        "host-44",
+        "host-45",
+        "host-46",
+        "host-47",
+        "host-48",
+        "host-49"
+      ],
+      "false_quarantine": [],
+      "baseline": {
+        "policy": "single-host-isolation",
+        "hosts_flagged": [],
+        "false_quarantine": [],
+        "truth_coverage": [],
+        "corr_truth_coverage": [
+          "host-00",
+          "host-01",
+          "host-02"
+        ],
+        "baseline_wins": false
+      },
+      "multi_campaign": null,
+      "fusion_lift": false,
+      "rounds": [
+        {
+          "round": 1,
+          "build_ok": true,
+          "corr_matched": true,
+          "corr_jaccard": 1.0,
+          "det_jaccard": 1.0,
+          "missed_hosts": [],
+          "over_merged_hosts": [],
+          "fusion_lift": false,
+          "both_missed": false,
+          "corr_hosts": [
+            "host-00",
+            "host-01",
+            "host-02"
+          ],
+          "best_campaign_hosts": [
+            "host-00",
+            "host-01",
+            "host-02"
+          ],
+          "confidence_margin": 1.0,
+          "campaigns_ranked": [
+            {
+              "campaign_id": "camp-lateral-ops-1",
+              "hosts": [
+                "host-00",
+                "host-01",
+                "host-02"
+              ],
+              "score": 1.0,
+              "jaccard_vs_truth": 1.0
+            }
+          ],
+          "b1_hosts": [],
+          "b1_campaigns": [],
+          "quarantine_proposed": [
+            "host-00",
+            "host-01",
+            "host-02"
+          ],
+          "recon_hosts": [
+            "host-00",
+            "host-01",
+            "host-02"
+          ]
+        },
+        {
+          "round": 2,
+          "build_ok": true,
+          "corr_matched": true,
+          "corr_jaccard": 1.0,
+          "det_jaccard": 1.0,
+          "missed_hosts": [],
+          "over_merged_hosts": [],
+          "fusion_lift": false,
+          "both_missed": false,
+          "corr_hosts": [
+            "host-00",
+            "host-01",
+            "host-02"
+          ],
+          "best_campaign_hosts": [
+            "host-00",
+            "host-01",
+            "host-02"
+          ],
+          "confidence_margin": 1.0,
+          "campaigns_ranked": [
+            {
+              "campaign_id": "camp-lateral-ops-1",
+              "hosts": [
+                "host-00",
+                "host-01",
+                "host-02"
+              ],
+              "score": 1.0,
+              "jaccard_vs_truth": 1.0
+            }
+          ],
+          "b1_hosts": [],
+          "b1_campaigns": [],
+          "quarantine_proposed": [
+            "host-00",
+            "host-01",
+            "host-02"
+          ],
+          "recon_hosts": [
+            "host-00",
+            "host-01",
+            "host-02"
+          ]
+        }
+      ],
+      "narrative": "host-b DHCP re-lease mid-attack: later events arrive as host-b-dhcp.",
+      "fragile": false,
+      "verdict_label": "HELD"
+    },
+    {
+      "campaign_id": "t2-lim12-near-dup-cdn-mimicry",
+      "origin": "original",
+      "headline": false,
+      "techniques": [
+        "T1105",
+        "T1078",
+        "T1041"
+      ],
+      "truth_hosts": [
+        "host-00",
+        "host-01",
+        "host-02"
+      ],
+      "truth_campaigns": null,
+      "break_criterion": "Jaccard regression vs #8/#20 passing results",
+      "verdict": "HELD",
+      "verdict_reasons": [
+        "matched truth without merge-FQ",
+        "break_criterion not triggered: Jaccard regression vs #8/#20 passing results"
+      ],
+      "intensity_rounds": 2,
+      "wall_seconds": 2.3244,
+      "corr_jaccard": 1.0,
+      "confidence_margin": 1.0,
+      "confidence_margin_raw": 1.0,
+      "confidence_margin_kind": "top_minus_second",
+      "missed_hosts": [],
+      "recovered_on_replay": [],
+      "over_merged_hosts": [],
+      "quarantine_proposed": [
+        "host-00",
+        "host-01",
+        "host-02"
+      ],
+      "hosts_saved": [
+        "host-03",
+        "host-04",
+        "host-05",
+        "host-06",
+        "host-07",
+        "host-08",
+        "host-09",
+        "host-10",
+        "host-11",
+        "host-12",
+        "host-13",
+        "host-14",
+        "host-15",
+        "host-16",
+        "host-17",
+        "host-18",
+        "host-19",
+        "host-20",
+        "host-21",
+        "host-22",
+        "host-23",
+        "host-24",
+        "host-25",
+        "host-26",
+        "host-27",
+        "host-28",
+        "host-29",
+        "host-30",
+        "host-31",
+        "host-32",
+        "host-33",
+        "host-34",
+        "host-35",
+        "host-36",
+        "host-37",
+        "host-38",
+        "host-39",
+        "host-40",
+        "host-41",
+        "host-42",
+        "host-43",
+        "host-44",
+        "host-45",
+        "host-46",
+        "host-47",
+        "host-48",
+        "host-49"
+      ],
+      "false_quarantine": [],
+      "baseline": {
+        "policy": "single-host-isolation",
+        "hosts_flagged": [],
+        "false_quarantine": [],
+        "truth_coverage": [],
+        "corr_truth_coverage": [
+          "host-00",
+          "host-01",
+          "host-02"
+        ],
+        "baseline_wins": false
+      },
+      "multi_campaign": null,
+      "fusion_lift": false,
+      "rounds": [
+        {
+          "round": 1,
+          "build_ok": true,
+          "corr_matched": true,
+          "corr_jaccard": 1.0,
+          "det_jaccard": 1.0,
+          "missed_hosts": [],
+          "over_merged_hosts": [],
+          "fusion_lift": false,
+          "both_missed": false,
+          "corr_hosts": [
+            "host-00",
+            "host-01",
+            "host-02"
+          ],
+          "best_campaign_hosts": [
+            "host-00",
+            "host-01",
+            "host-02"
+          ],
+          "confidence_margin": 1.0,
+          "campaigns_ranked": [
+            {
+              "campaign_id": "camp-lateral-under-1",
+              "hosts": [
+                "host-00",
+                "host-01",
+                "host-02"
+              ],
+              "score": 1.0,
+              "jaccard_vs_truth": 1.0
+            }
+          ],
+          "b1_hosts": [],
+          "b1_campaigns": [],
+          "quarantine_proposed": [
+            "host-00",
+            "host-01",
+            "host-02"
+          ],
+          "recon_hosts": [
+            "host-00",
+            "host-01",
+            "host-02"
+          ]
+        },
+        {
+          "round": 2,
+          "build_ok": true,
+          "corr_matched": true,
+          "corr_jaccard": 1.0,
+          "det_jaccard": 1.0,
+          "missed_hosts": [],
+          "over_merged_hosts": [],
+          "fusion_lift": false,
+          "both_missed": false,
+          "corr_hosts": [
+            "host-00",
+            "host-01",
+            "host-02"
+          ],
+          "best_campaign_hosts": [
+            "host-00",
+            "host-01",
+            "host-02"
+          ],
+          "confidence_margin": 1.0,
+          "campaigns_ranked": [
+            {
+              "campaign_id": "camp-lateral-under-1",
+              "hosts": [
+                "host-00",
+                "host-01",
+                "host-02"
+              ],
+              "score": 1.0,
+              "jaccard_vs_truth": 1.0
+            }
+          ],
+          "b1_hosts": [],
+          "b1_campaigns": [],
+          "quarantine_proposed": [
+            "host-00",
+            "host-01",
+            "host-02"
+          ],
+          "recon_hosts": [
+            "host-00",
+            "host-01",
+            "host-02"
+          ]
+        }
+      ],
+      "narrative": "C2 traffic matches CDN bait timing/volume exactly; APT still moves underneath.",
+      "fragile": false,
+      "verdict_label": "HELD"
+    }
+  ],
+  "honesty": "T0 fleet-limits shapes remapped to 50 hosts NO decoys \u2014 unused hosts truly quiet (margin control). Event sketches only."
+}

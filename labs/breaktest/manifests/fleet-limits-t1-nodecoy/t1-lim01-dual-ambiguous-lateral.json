@@ -1,0 +1,140 @@
+{
+  "campaign_id": "t1-lim01-dual-ambiguous-lateral",
+  "family": "genuine_vuln_breaker",
+  "ood": true,
+  "hosts": [
+    "host-00",
+    "host-01",
+    "host-02",
+    "host-03",
+    "host-04",
+    "host-05",
+    "host-06",
+    "host-07",
+    "host-08",
+    "host-09",
+    "host-10",
+    "host-11",
+    "host-12",
+    "host-13",
+    "host-14"
+  ],
+  "truth_hosts": [
+    "host-00",
+    "host-01",
+    "host-02"
+  ],
+  "producers": {
+    "host-00": "prod-00",
+    "host-01": "prod-01",
+    "host-02": "prod-02",
+    "host-03": "prod-03",
+    "host-04": "prod-04",
+    "host-05": "prod-05",
+    "host-06": "prod-06",
+    "host-07": "prod-07",
+    "host-08": "prod-08",
+    "host-09": "prod-09",
+    "host-10": "prod-10",
+    "host-11": "prod-11",
+    "host-12": "prod-12",
+    "host-13": "prod-13",
+    "host-14": "prod-14"
+  },
+  "base_time_utc": "2026-07-25T14:00:00Z",
+  "fleet_origin": "original",
+  "fleet_suite": "limits-t1",
+  "headline": false,
+  "source": {
+    "style": "Fleet-limits breaking-point sketches",
+    "repo": "https://github.com/Siddarthb07/corvex",
+    "techniques": [
+      "T1021.001",
+      "T1078",
+      "T1041"
+    ],
+    "note": "shared-node helpdesk overlap"
+  },
+  "narrative": [
+    "APT a\u2192b\u2192c with RDP. Helpdesk RDP also touches c and reaches d/e in the same \u00b190s window."
+  ],
+  "break_intent": {
+    "name": "shared-node helpdesk overlap",
+    "break_criterion": "d or e appears in the malicious campaign's Q dry-run list",
+    "success_criteria_attacker": [
+      "host-d or host-e in best-campaign quarantine"
+    ]
+  },
+  "steps": [
+    {
+      "kind": "auth",
+      "host": "host-00",
+      "user": "apt-rdp",
+      "src": "203.0.113.21",
+      "offset_seconds": 0,
+      "technique": "T1021.001"
+    },
+    {
+      "kind": "auth",
+      "host": "host-01",
+      "user": "apt-rdp",
+      "src": "host-00",
+      "offset_seconds": 20,
+      "technique": "T1021.001"
+    },
+    {
+      "kind": "auth",
+      "host": "host-02",
+      "user": "apt-rdp",
+      "src": "host-01",
+      "offset_seconds": 40,
+      "technique": "T1021.001"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-02",
+      "dst_ip": "198.51.100.190",
+      "bytes": 16000,
+      "offset_seconds": 55,
+      "technique": "T1041"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-01",
+      "dst_ip": "198.51.100.190",
+      "bytes": 14000,
+      "offset_seconds": 60,
+      "technique": "T1041"
+    },
+    {
+      "kind": "auth",
+      "host": "host-02",
+      "user": "helpdesk",
+      "src": "10.30.0.9",
+      "offset_seconds": 35,
+      "technique": "T1021.001"
+    },
+    {
+      "kind": "auth",
+      "host": "host-03",
+      "user": "helpdesk",
+      "src": "host-02",
+      "offset_seconds": 50,
+      "technique": "T1021.001"
+    },
+    {
+      "kind": "auth",
+      "host": "host-04",
+      "user": "helpdesk",
+      "src": "host-03",
+      "offset_seconds": 70,
+      "technique": "T1021.001"
+    }
+  ],
+  "scale": {
+    "tier": "T1",
+    "n_hosts": 15,
+    "source_campaign_id": "lim01-dual-ambiguous-lateral",
+    "decoys": false
+  }
+}
