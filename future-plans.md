@@ -49,6 +49,8 @@ Do not jump to 200-host packs to “prove” correlator. Never summarize HELD wi
 
 Ordered by what to act on next (synthetic T3 **paused** until #1 has a corpus):
 
+**Next operator action:** run [`docs/real-world-test-sequences.md`](docs/real-world-test-sequences.md) (S0→S6). Highest leverage is S5 home-lab capture; S1 stranger + S2 second physical host block `claim_allowed`.
+
 1. **Real / realistic benign baseline** (highest) — see **Benign corpus plan** below. Not hand-crafted SCCM/RDP noise.
 2. **Trust P0s (code)** — 1:1 producer↔host by default; fail-closed `CORVEX_CONTAIN_AUTHZ` (no hardcoded dual-control token). Landed.
 3. **Evasion-doc publication** — keep `docs/attack-fleet-limits*.md` **public** for early-stage falsifiability; revisit before networked bus/live contain.
