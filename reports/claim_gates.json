@@ -1,6 +1,6 @@
 {
   "schema_ver": "3",
-  "generated_at": "2026-07-25T07:35:02Z",
+  "generated_at": "2026-07-29T10:01:08Z",
   "claim_allowed": false,
   "lab_verified": true,
   "claim_language": "lab_verified \u2014 sealed held-out + breaktest + trust probes; need Ed25519 stranger self-sign + live second host for claim_allowed",
@@ -15,14 +15,13 @@
     },
     "stranger_success": {
       "id": "stranger_success",
-      "pass": false,
+      "pass": true,
       "path": "reports/stranger_dry_run.json",
       "operator": "Jack",
       "attestation_kind": "human",
-      "attestation_custody": "unsigned",
-      "attestation_signed": false,
-      "advisory": true,
-      "note": "FAIL: no verifying ed25519 stranger signature Human stranger attestation shape ok"
+      "attestation_custody": "stranger_private_key",
+      "attestation_signed": true,
+      "note": "Completed Windows export \u2192 byo-windows \u2192 timeline without author help."
     },
     "benign_fcr_real_n": {
       "id": "benign_fcr_real_n",

@@ -4,7 +4,7 @@ Multi-host **campaign correlator** — stitches weak signals across machines int
 
 **Public claim (standing):** research correlator — holds up against synthetic ATT&CK-shaped fleets; **not yet validated against real telemetry or benign baselines.** Observe and correlate first. Live containment stays locked behind safety controls.
 
-Real/realistic benign baseline (next gate): `labs/benign/` + `python scripts/run_benign_baseline.py` — pre-committed FP bars in `future-plans.md`; no hand-crafted “admin noise.”
+Real/realistic benign baseline (next gate): `labs/benign/` + `python scripts/run_benign_baseline.py` — pre-committed FP bars in `future-plans.md`; no hand-crafted “admin noise.” Operator sequence: [`docs/real-world-test-sequences.md`](docs/real-world-test-sequences.md).
 
 ## Quick start
 
@@ -181,7 +181,7 @@ Reconstruction writes `reconstruction.json` with status `complete` / `partial` /
 ## Docs
 
 - [`CHANGELOG.md`](CHANGELOG.md) · [`SECURITY.md`](SECURITY.md) · [`THREAT_MODEL.md`](THREAT_MODEL.md) · [`LICENSE`](LICENSE)
-- [`docs/how-corvex-works.md`](docs/how-corvex-works.md) · [`docs/contain.md`](docs/contain.md) · [`docs/sensor-windows.md`](docs/sensor-windows.md) · [`docs/stranger-checklist.md`](docs/stranger-checklist.md) · [`reports/RESULTS.md`](reports/RESULTS.md)
+- [`docs/how-corvex-works.md`](docs/how-corvex-works.md) · [`docs/contain.md`](docs/contain.md) · [`docs/sensor-windows.md`](docs/sensor-windows.md) · [`docs/stranger-checklist.md`](docs/stranger-checklist.md) · [`docs/real-world-test-sequences.md`](docs/real-world-test-sequences.md) · [`reports/RESULTS.md`](reports/RESULTS.md)
 - [`labs/breaktest/README.md`](labs/breaktest/README.md) · [`future-plans.md`](future-plans.md)
 
 ## License

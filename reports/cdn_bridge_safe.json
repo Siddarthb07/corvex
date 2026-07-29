@@ -17,7 +17,7 @@
       "lab_verified": true,
       "payload": {
         "schema_ver": "3",
-        "generated_at": "2026-07-25T07:35:02Z",
+        "generated_at": "2026-07-29T09:35:44Z",
         "claim_allowed": false,
         "lab_verified": true,
         "claim_language": "lab_verified \u2014 sealed held-out + breaktest + trust probes; need Ed25519 stranger self-sign + live second host for claim_allowed",
@@ -109,13 +109,14 @@
           }
         ],
         "honesty": "Hostile-bus selftest \u2260 live OS quarantine unlocked.",
-        "generated_at": "2026-07-25T07:35:03Z"
+        "generated_at": "2026-07-29T09:35:45Z"
       }
     }
   },
   "break_points": {
     "missed_hosts": [],
-    "over_merged_hosts": [
+    "over_merged_hosts": [],
+    "secondary_hosts_outside_truth": [
       "host-d"
     ],
     "hosts_never_in_detector": [],
@@ -138,7 +139,34 @@
       "host-b",
       "host-c",
       "host-d"
-    ]
+    ],
+    "best_campaign_hosts": [
+      "host-a",
+      "host-b",
+      "host-c"
+    ],
+    "campaigns_ranked": [
+      {
+        "campaign_id": "camp-lateral-svc-backup-1",
+        "hosts": [
+          "host-a",
+          "host-b",
+          "host-c"
+        ],
+        "score": 1.0,
+        "jaccard_vs_truth": 1.0
+      },
+      {
+        "campaign_id": "camp-lateral-helpdesk-2",
+        "hosts": [
+          "host-c",
+          "host-d"
+        ],
+        "score": 0.9,
+        "jaccard_vs_truth": 0.25
+      }
+    ],
+    "confidence_margin": 0.1
   },
   "source_note": "Compound purple-team scenario. After Stage A honesty fix: window_seconds is enforced; fleet CDN dst is poisoned; APT {a,b,c} no longer fat-merges with innocents via jumpbox. Residual: separate helpdesk lateral can still flag host-d. DNS / >50KB blob remain invisible.",
   "replay_exit": 0,

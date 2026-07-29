@@ -44,7 +44,7 @@ reports/stage_d_dry_run.jsonl
 reports/prevention_log.jsonl
 reports/AUDIT_BENCHMARK.json
 reports/oss_retention.json
-reports/stranger_dry_run.json
+# Signed stranger attestation is tracked (pubkey+sig only). Private key stays local.
 reports/stranger_dry_run.md
 reports/.claim_attestation_key
 reports/.stranger_ed25519_private.pem
