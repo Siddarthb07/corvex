@@ -134,6 +134,7 @@
   "scale": {
     "tier": "T1",
     "n_hosts": 15,
-    "source_campaign_id": "lim05-technique-sub-kerberoast"
+    "source_campaign_id": "lim05-technique-sub-kerberoast",
+    "decoys": true
   }
 }

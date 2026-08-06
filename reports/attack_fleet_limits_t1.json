@@ -3,20 +3,24 @@
   "n": 15,
   "n_hosts": 15,
   "tier": "T1",
+  "decoys": true,
   "intensity_rounds": 2,
   "baseline_policy": "single-host-isolation",
-  "total_wall_seconds": 34.3176,
-  "peak_rss_mb": 33.55,
+  "total_wall_seconds": 116.8722,
+  "peak_rss_mb": 15.09,
   "t2_gate_pass": true,
+  "t0_fragile_rate_ref": 0.3846,
+  "fragile_gate_pass": null,
   "counts": {
-    "HELD": 14,
+    "HELD": 13,
     "PARTIAL": 1,
-    "BROKE": 0
+    "BROKE": 1
   },
   "baseline_wins_count": 0,
-  "fragile_count": 14,
+  "fragile_count": 13,
+  "fragile_rate_held": 1.0,
   "scoring": {
-    "fragile": "HELD with margin < 0.2 \u2192 HELD, fragile",
+    "fragile": "HELD with ambiguity margin < 0.2 \u2192 HELD, fragile (multi-campaign uses unmatched-competitor gap, not top\u22122nd among equals)",
     "writeup_priority": [
       "lim10-authorized-redteam",
       "lim09b-sequential-reuse",
@@ -26,7 +30,8 @@
       "lim03-slow-low-day-gaps",
       "lim09d-benign-hub-pivot",
       "lim01-dual-ambiguous-lateral"
-    ]
+    ],
+    "margin_def": "ambiguity: min(matched)\u2212max(unmatched) when multi clean; else top\u22122nd (confidence_margin_raw always retained)"
   },
   "attacks": [
     {
@@ -51,9 +56,11 @@
         "break_criterion not triggered: d or e appears in the malicious campaign's Q dry-run list"
       ],
       "intensity_rounds": 2,
-      "wall_seconds": 3.1971,
+      "wall_seconds": 9.0673,
       "corr_jaccard": 1.0,
       "confidence_margin": 0.0,
+      "confidence_margin_raw": 0.0,
+      "confidence_margin_kind": "top_minus_second",
       "missed_hosts": [],
       "recovered_on_replay": [],
       "over_merged_hosts": [],
@@ -294,9 +301,11 @@
         "multi-campaign held"
       ],
       "intensity_rounds": 2,
-      "wall_seconds": 3.0377,
+      "wall_seconds": 7.7584,
       "corr_jaccard": 1.0,
       "confidence_margin": 0.0,
+      "confidence_margin_raw": 0.0,
+      "confidence_margin_kind": "ambiguity",
       "missed_hosts": [],
       "recovered_on_replay": [],
       "over_merged_hosts": [],
@@ -674,9 +683,11 @@
         "jaccard 0.6667 in PARTIAL band"
       ],
       "intensity_rounds": 2,
-      "wall_seconds": 3.5731,
+      "wall_seconds": 8.2724,
       "corr_jaccard": 0.6667,
       "confidence_margin": 0.0,
+      "confidence_margin_raw": 0.0,
+      "confidence_margin_kind": "top_minus_second",
       "missed_hosts": [],
       "recovered_on_replay": [],
       "over_merged_hosts": [],
@@ -862,9 +873,11 @@
         "break_criterion not triggered: Jaccard drop vs #5/#17 baseline at matched technique set"
       ],
       "intensity_rounds": 2,
-      "wall_seconds": 1.9808,
+      "wall_seconds": 7.7345,
       "corr_jaccard": 1.0,
       "confidence_margin": 0.1,
+      "confidence_margin_raw": 0.1,
+      "confidence_margin_kind": "top_minus_second",
       "missed_hosts": [],
       "recovered_on_replay": [],
       "over_merged_hosts": [],
@@ -1048,9 +1061,11 @@
         "break_criterion not triggered: campaign not detected, or techniques logged but not correlated"
       ],
       "intensity_rounds": 2,
-      "wall_seconds": 1.7474,
+      "wall_seconds": 9.6142,
       "corr_jaccard": 1.0,
       "confidence_margin": 0.1,
+      "confidence_margin_raw": 0.1,
+      "confidence_margin_kind": "top_minus_second",
       "missed_hosts": [],
       "recovered_on_replay": [],
       "over_merged_hosts": [],
@@ -1235,9 +1250,11 @@
         "break_criterion not triggered: causal ordering a\u2192b\u2192c wrong, or b dropped due to apparent gap"
       ],
       "intensity_rounds": 2,
-      "wall_seconds": 2.0093,
+      "wall_seconds": 8.5016,
       "corr_jaccard": 1.0,
       "confidence_margin": 0.1,
+      "confidence_margin_raw": 0.1,
+      "confidence_margin_kind": "top_minus_second",
       "missed_hosts": [],
       "recovered_on_replay": [],
       "over_merged_hosts": [],
@@ -1422,9 +1439,11 @@
         "break_criterion not triggered: PARTIAL/BROKE, or false confidence that a,d is complete"
       ],
       "intensity_rounds": 2,
-      "wall_seconds": 2.2744,
+      "wall_seconds": 7.1772,
       "corr_jaccard": 1.0,
       "confidence_margin": 0.1,
+      "confidence_margin_raw": 0.1,
+      "confidence_margin_kind": "top_minus_second",
       "missed_hosts": [],
       "recovered_on_replay": [],
       "over_merged_hosts": [],
@@ -1618,9 +1637,11 @@
         "break_criterion not triggered: causal chain backwards, or split into two false fragments"
       ],
       "intensity_rounds": 2,
-      "wall_seconds": 1.9002,
+      "wall_seconds": 7.0682,
       "corr_jaccard": 1.0,
       "confidence_margin": 0.1,
+      "confidence_margin_raw": 0.1,
+      "confidence_margin_kind": "top_minus_second",
       "missed_hosts": [],
       "recovered_on_replay": [],
       "over_merged_hosts": [],
@@ -1855,9 +1876,11 @@
         "multi-campaign held"
       ],
       "intensity_rounds": 2,
-      "wall_seconds": 1.8536,
+      "wall_seconds": 7.036,
       "corr_jaccard": 1.0,
-      "confidence_margin": 0.0,
+      "confidence_margin": 0.1,
+      "confidence_margin_raw": 0.0,
+      "confidence_margin_kind": "ambiguity",
       "missed_hosts": [],
       "recovered_on_replay": [],
       "over_merged_hosts": [],
@@ -2282,9 +2305,11 @@
         "sequential incidents split across 3 campaigns"
       ],
       "intensity_rounds": 2,
-      "wall_seconds": 2.1699,
+      "wall_seconds": 7.5293,
       "corr_jaccard": 1.0,
       "confidence_margin": 0.0,
+      "confidence_margin_raw": 0.0,
+      "confidence_margin_kind": "top_minus_second",
       "missed_hosts": [],
       "recovered_on_replay": [],
       "over_merged_hosts": [],
@@ -2610,9 +2635,11 @@
         "break_criterion not triggered: Jaccard or margin regression vs original #1/#6 from host relabeling alone"
       ],
       "intensity_rounds": 2,
-      "wall_seconds": 1.7726,
+      "wall_seconds": 5.2316,
       "corr_jaccard": 1.0,
       "confidence_margin": 0.0,
+      "confidence_margin_raw": 0.0,
+      "confidence_margin_kind": "top_minus_second",
       "missed_hosts": [],
       "recovered_on_replay": [],
       "over_merged_hosts": [],
@@ -2805,9 +2832,11 @@
         "break_criterion not triggered: attack missed (BROKE) or b/d False Q via association"
       ],
       "intensity_rounds": 2,
-      "wall_seconds": 2.3127,
+      "wall_seconds": 8.621,
       "corr_jaccard": 1.0,
       "confidence_margin": 0.1,
+      "confidence_margin_raw": 0.1,
+      "confidence_margin_kind": "top_minus_second",
       "missed_hosts": [],
       "recovered_on_replay": [],
       "over_merged_hosts": [],
@@ -3127,9 +3156,11 @@
         "no quarantine with empty truth"
       ],
       "intensity_rounds": 2,
-      "wall_seconds": 2.3569,
+      "wall_seconds": 6.7715,
       "corr_jaccard": 1.0,
       "confidence_margin": 0.1,
+      "confidence_margin_raw": 0.1,
+      "confidence_margin_kind": "top_minus_second",
       "missed_hosts": [],
       "recovered_on_replay": [],
       "over_merged_hosts": [
@@ -3306,23 +3337,25 @@
       ],
       "truth_campaigns": null,
       "break_criterion": "b's two identities treated as separate hosts, splitting coverage",
-      "verdict": "HELD",
+      "verdict": "BROKE",
       "verdict_reasons": [
-        "matched truth without merge-FQ",
-        "break_criterion not triggered: b's two identities treated as separate hosts, splitting coverage"
+        "alias coverage miss: ['host-00', 'host-01', 'host-02']",
+        "truth never recovered: ['host-00', 'host-01', 'host-02']"
       ],
       "intensity_rounds": 2,
-      "wall_seconds": 1.8592,
-      "corr_jaccard": 1.0,
-      "confidence_margin": 0.1,
-      "missed_hosts": [],
-      "recovered_on_replay": [],
-      "over_merged_hosts": [],
-      "quarantine_proposed": [
+      "wall_seconds": 7.6637,
+      "corr_jaccard": 0.0,
+      "confidence_margin": null,
+      "confidence_margin_raw": null,
+      "confidence_margin_kind": "top_minus_second",
+      "missed_hosts": [
         "host-00",
         "host-01",
         "host-02"
       ],
+      "recovered_on_replay": [],
+      "over_merged_hosts": [],
+      "quarantine_proposed": [],
       "hosts_saved": [
         "host-03",
         "host-04",
@@ -3343,138 +3376,26 @@
         "hosts_flagged": [],
         "false_quarantine": [],
         "truth_coverage": [],
-        "corr_truth_coverage": [
-          "host-00",
-          "host-01",
-          "host-02"
-        ],
+        "corr_truth_coverage": [],
         "baseline_wins": false
       },
       "multi_campaign": null,
-      "fusion_lift": false,
+      "fusion_lift": null,
       "rounds": [
         {
           "round": 1,
-          "build_ok": true,
-          "corr_matched": true,
-          "corr_jaccard": 1.0,
-          "det_jaccard": 1.0,
-          "missed_hosts": [],
-          "over_merged_hosts": [],
-          "fusion_lift": false,
-          "both_missed": false,
-          "corr_hosts": [
-            "host-00",
-            "host-01",
-            "host-02",
-            "host-06",
-            "host-07"
-          ],
-          "best_campaign_hosts": [
-            "host-00",
-            "host-01",
-            "host-02"
-          ],
-          "confidence_margin": 0.1,
-          "campaigns_ranked": [
-            {
-              "campaign_id": "camp-lateral-ops-1",
-              "hosts": [
-                "host-00",
-                "host-01",
-                "host-02"
-              ],
-              "score": 1.0,
-              "jaccard_vs_truth": 1.0
-            },
-            {
-              "campaign_id": "camp-lateral-decoy--brain-2",
-              "hosts": [
-                "host-06",
-                "host-07"
-              ],
-              "score": 0.9,
-              "jaccard_vs_truth": 0.0
-            }
-          ],
-          "b1_hosts": [],
-          "b1_campaigns": [],
-          "quarantine_proposed": [
-            "host-00",
-            "host-01",
-            "host-02"
-          ],
-          "recon_hosts": [
-            "host-00",
-            "host-01",
-            "host-02",
-            "host-06",
-            "host-07"
-          ]
+          "build_ok": false,
+          "error": "cer_allowed(allow_mult \u2502\n\u2502    63 \u2502   \u2502   for pid, hosts in self._hosts.items():                         \u2502\n\u2502    64 \u2502   \u2502   \u2502   if len(hosts) > 1 and not self._allow_multihost:           \u2502\n\u2502 \u2771  65 \u2502   \u2502   \u2502   \u2502   raise AuthError(                                       \u2502\n\u2502    66 \u2502   \u2502   \u2502   \u2502   \u2502   f\"producer {pid} enrolled for {len(hosts)} hosts;  \u2502\n\u2502    67 \u2502   \u2502   \u2502   \u2502   \u2502   \"default trust model is 1:1 producer\u2194host. \"       \u2502\n\u2502    68 \u2502   \u2502   \u2502   \u2502   \u2502   \"Set CORVEX_ALLOW_MULTIHOST_PRODUCER=1 only if you \u2502\n\u2570\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u256f\nAuthError: producer prod-01 enrolled for 2 hosts; default trust model is 1:1 \nproducer\u2194host. Set CORVEX_ALLOW_MULTIHOST_PRODUCER=1 only if you accept that one\nleaked secret forges events for every peer host.\n"
         },
         {
           "round": 2,
-          "build_ok": true,
-          "corr_matched": true,
-          "corr_jaccard": 1.0,
-          "det_jaccard": 1.0,
-          "missed_hosts": [],
-          "over_merged_hosts": [],
-          "fusion_lift": false,
-          "both_missed": false,
-          "corr_hosts": [
-            "host-00",
-            "host-01",
-            "host-02",
-            "host-06",
-            "host-07"
-          ],
-          "best_campaign_hosts": [
-            "host-00",
-            "host-01",
-            "host-02"
-          ],
-          "confidence_margin": 0.1,
-          "campaigns_ranked": [
-            {
-              "campaign_id": "camp-lateral-ops-1",
-              "hosts": [
-                "host-00",
-                "host-01",
-                "host-02"
-              ],
-              "score": 1.0,
-              "jaccard_vs_truth": 1.0
-            },
-            {
-              "campaign_id": "camp-lateral-decoy--brain-2",
-              "hosts": [
-                "host-06",
-                "host-07"
-              ],
-              "score": 0.9,
-              "jaccard_vs_truth": 0.0
-            }
-          ],
-          "b1_hosts": [],
-          "b1_campaigns": [],
-          "quarantine_proposed": [
-            "host-00",
-            "host-01",
-            "host-02"
-          ],
-          "recon_hosts": [
-            "host-00",
-            "host-01",
-            "host-02",
-            "host-06",
-            "host-07"
-          ]
+          "build_ok": false,
+          "error": "cer_allowed(allow_mult \u2502\n\u2502    63 \u2502   \u2502   for pid, hosts in self._hosts.items():                         \u2502\n\u2502    64 \u2502   \u2502   \u2502   if len(hosts) > 1 and not self._allow_multihost:           \u2502\n\u2502 \u2771  65 \u2502   \u2502   \u2502   \u2502   raise AuthError(                                       \u2502\n\u2502    66 \u2502   \u2502   \u2502   \u2502   \u2502   f\"producer {pid} enrolled for {len(hosts)} hosts;  \u2502\n\u2502    67 \u2502   \u2502   \u2502   \u2502   \u2502   \"default trust model is 1:1 producer\u2194host. \"       \u2502\n\u2502    68 \u2502   \u2502   \u2502   \u2502   \u2502   \"Set CORVEX_ALLOW_MULTIHOST_PRODUCER=1 only if you \u2502\n\u2570\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u256f\nAuthError: producer prod-01 enrolled for 2 hosts; default trust model is 1:1 \nproducer\u2194host. Set CORVEX_ALLOW_MULTIHOST_PRODUCER=1 only if you accept that one\nleaked secret forges events for every peer host.\n"
         }
       ],
       "narrative": "host-b DHCP re-lease mid-attack: later events arrive as host-b-dhcp.",
-      "fragile": true,
-      "verdict_label": "HELD, fragile"
+      "fragile": false,
+      "verdict_label": "BROKE"
     },
     {
       "campaign_id": "t1-lim12-near-dup-cdn-mimicry",
@@ -3498,9 +3419,11 @@
         "break_criterion not triggered: Jaccard regression vs #8/#20 passing results"
       ],
       "intensity_rounds": 2,
-      "wall_seconds": 1.9189,
+      "wall_seconds": 8.7887,
       "corr_jaccard": 1.0,
       "confidence_margin": 0.1,
+      "confidence_margin_raw": 0.1,
+      "confidence_margin_kind": "top_minus_second",
       "missed_hosts": [],
       "recovered_on_replay": [],
       "over_merged_hosts": [],

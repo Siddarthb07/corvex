@@ -213,6 +213,7 @@
   "scale": {
     "tier": "T1",
     "n_hosts": 15,
-    "source_campaign_id": "lim09-max-density-overlap"
+    "source_campaign_id": "lim09-max-density-overlap",
+    "decoys": true
   }
 }

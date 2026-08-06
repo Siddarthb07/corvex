@@ -2,6 +2,7 @@
 
 from corvex.sensors.file_tail import tail_jsonl
 from corvex.sensors.jetstream_mtls import JetStreamMTLSConfig, connect_jetstream
+from corvex.sensors.macos_os import run_sensor_macos
 from corvex.sensors.windows_os import run_sensor_windows
 
 __all__ = [
@@ -9,4 +10,5 @@ __all__ = [
     "JetStreamMTLSConfig",
     "connect_jetstream",
     "run_sensor_windows",
+    "run_sensor_macos",
 ]

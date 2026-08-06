@@ -1,0 +1,13 @@
+{"channel": "auth", "EventID": "ssh_accept", "Computer": "host-mac-a.local", "TimeCreated": "2026-08-06T12:00:00Z", "user": "ops", "src": "10.0.0.8", "result": "success"}
+{"channel": "auth", "EventID": "ssh_accept", "Computer": "host-mac-b.local", "TimeCreated": "2026-08-06T12:00:20Z", "user": "ops", "src": "10.0.0.8", "result": "success"}
+{"channel": "auth", "EventID": "ssh_fail", "Computer": "host-mac-c.local", "TimeCreated": "2026-08-06T12:00:40Z", "user": "ops", "src": "203.0.113.50", "result": "failure"}
+{"channel": "net", "EventID": "tcp_established", "Computer": "host-mac-a.local", "TimeCreated": "2026-08-06T12:01:00Z", "dst_ip": "198.51.100.40", "dst_port": 443, "bytes": 4200, "egress": true, "image": "curl", "pid": 4242}
+{"channel": "net", "EventID": "tcp_established", "Computer": "host-mac-b.local", "TimeCreated": "2026-08-06T12:01:15Z", "dst_ip": "198.51.100.40", "dst_port": 443, "bytes": 3900, "egress": true, "image": "curl", "pid": 4243}
+{"channel": "net", "EventID": "tcp_established", "Computer": "host-mac-c.local", "TimeCreated": "2026-08-06T12:01:30Z", "dst_ip": "198.51.100.40", "dst_port": 443, "bytes": 5100, "egress": true, "image": "curl", "pid": 4244}
+{"channel": "dns", "EventID": "query", "Computer": "host-mac-b.local", "TimeCreated": "2026-08-06T12:01:45Z", "query": "cdn-sync-updates.example", "qtype": "A"}
+{"channel": "dns", "EventID": "query", "Computer": "host-mac-c.local", "TimeCreated": "2026-08-06T12:01:50Z", "query": "cdn-sync-updates.example", "qtype": "TXT"}
+{"channel": "process", "EventID": "exec", "Computer": "host-mac-a.local", "TimeCreated": "2026-08-06T12:02:00Z", "image": "/usr/bin/curl", "command_line": "curl -s https://cdn-sync-updates.example/", "user": "ops"}
+{"channel": "pf", "EventID": "block", "Computer": "host-mac-d.local", "TimeCreated": "2026-08-06T12:02:10Z", "dst_ip": "203.0.113.9", "dst_port": 445, "bytes": 60, "action": "block"}
+{"channel": "net", "EventID": "udp_noise", "Computer": "host-mac-a.local", "TimeCreated": "2026-08-06T12:03:00Z", "dst_ip": "8.8.8.8", "dst_port": 53, "bytes": 64}
+{"channel": "auth", "EventID": "ssh_accept", "Computer": "host-mac-a.local", "TimeCreated": "2026-08-06T12:03:20Z", "user": "ops", "src": "10.0.0.8"}
+{"channel": "auth", "EventID": "ssh_accept", "Computer": "host-mac-b.local", "TimeCreated": "2026-08-06T12:03:40Z", "user": "ops", "src": "10.0.0.8"}

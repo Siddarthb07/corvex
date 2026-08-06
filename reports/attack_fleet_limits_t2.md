@@ -1,6 +1,6 @@
 # Attack fleet: Limits T2 — 50-host scale
 
-**Scale tier:** T2 | **Hosts:** 50 | **Decoys:** True | **Wall:** 34.6544s | **Peak RSS:** 33.78 MB | **fragile_rate=1.0**
+**Scale tier:** T2 | **Hosts:** 50 | **Decoys:** True | **Wall:** 72.7798s | **Peak RSS:** 15.1 MB | **fragile_rate=1.0**
 **Gates:** wall/RSS → PASS
 
 
@@ -26,8 +26,8 @@ not equivalent to a clean HELD). Correctly separated equal-score campaigns are
 
 - Attacks: **15** | Intensity rounds/attack: **2**
 - Baseline: **single-host-isolation**
-- Wall: **34.6544s**
-- HELD: **14** (of which **fragile**: 14) | PARTIAL: **1** | BROKE: **0**
+- Wall: **72.7798s**
+- HELD: **13** (of which **fragile**: 13) | PARTIAL: **1** | BROKE: **1**
 - Baseline wins: **0**
 
 ## Lead with #10 — false positives beat missed detections
@@ -41,7 +41,7 @@ Ordered by operational severity, not by suite index.
 - **t2-lim10-authorized-redteam** — **HELD, fragile** (J=1.0, margin=0.1, FQ=-). 
 - **t2-lim09b-sequential-reuse** — **HELD, fragile** (J=1.0, margin=0.0, FQ=-). 
 - **t2-lim09-max-density-overlap** — **HELD, fragile** (J=1.0, margin=0.1, FQ=-). 
-- **t2-lim11-hostname-split-brain** — **HELD, fragile** (J=1.0, margin=0.1, FQ=-). 
+- **t2-lim11-hostname-split-brain** — **BROKE** (J=0.0, margin=None, FQ=-). 
 - **t2-lim02-triple-concurrent-shared** — **HELD, fragile** (J=1.0, margin=0.0, FQ=-). 
 - **t2-lim03-slow-low-day-gaps** — **PARTIAL** (J=0.6667, margin=0.0, FQ=-). 
 - **t2-lim09d-benign-hub-pivot** — **HELD, fragile** (J=1.0, margin=0.1, FQ=-). 
@@ -85,7 +85,7 @@ Ordered by operational severity, not by suite index.
 | 11 | t2-lim09c-positional-bias ★ | **HELD, fragile** | 1.0 | 0.0 | - | - | host-02, host-03, host-05, host-06, host-07, host-08, host-09, host-10, host-11, host-12, host-13, host-14, host-15, host-16, host-17, host-18, host-19, host-20, host-21, host-22, host-23, host-24, host-25, host-26, host-27, host-28, host-29, host-30, host-31, host-32, host-33, host-34, host-35, host-36, host-37, host-38, host-39, host-40, host-41, host-42, host-43, host-44, host-45, host-46, host-47, host-48, host-49 | - | - | False |
 | 12 | t2-lim09d-benign-hub-pivot ★ | **HELD, fragile** | 1.0 | 0.1 | - | - | host-01, host-03, host-05, host-06, host-07, host-08, host-09, host-10, host-11, host-12, host-13, host-14, host-15, host-16, host-17, host-18, host-19, host-20, host-21, host-22, host-23, host-24, host-25, host-26, host-27, host-28, host-29, host-30, host-31, host-32, host-33, host-34, host-35, host-36, host-37, host-38, host-39, host-40, host-41, host-42, host-43, host-44, host-45, host-46, host-47, host-48, host-49 | - | host-01, host-03 | False |
 | 13 | t2-lim10-authorized-redteam ★ | **HELD, fragile** | 1.0 | 0.1 | - | host-00, host-01, host-02 | host-00, host-01, host-02, host-03, host-04, host-05, host-06, host-07, host-08, host-09, host-10, host-11, host-12, host-13, host-14, host-15, host-16, host-17, host-18, host-19, host-20, host-21, host-22, host-23, host-24, host-25, host-26, host-27, host-28, host-29, host-30, host-31, host-32, host-33, host-34, host-35, host-36, host-37, host-38, host-39, host-40, host-41, host-42, host-43, host-44, host-45, host-46, host-47, host-48, host-49 | - | - | False |
-| 14 | t2-lim11-hostname-split-brain | **HELD, fragile** | 1.0 | 0.1 | - | - | host-03, host-04, host-05, host-06, host-07, host-08, host-09, host-10, host-11, host-12, host-13, host-14, host-15, host-16, host-17, host-18, host-19, host-20, host-21, host-22, host-23, host-24, host-25, host-26, host-27, host-28, host-29, host-30, host-31, host-32, host-33, host-34, host-35, host-36, host-37, host-38, host-39, host-40, host-41, host-42, host-43, host-44, host-45, host-46, host-47, host-48, host-49 | - | - | False |
+| 14 | t2-lim11-hostname-split-brain | **BROKE** | 0.0 | None | host-00, host-01, host-02 | - | host-03, host-04, host-05, host-06, host-07, host-08, host-09, host-10, host-11, host-12, host-13, host-14, host-15, host-16, host-17, host-18, host-19, host-20, host-21, host-22, host-23, host-24, host-25, host-26, host-27, host-28, host-29, host-30, host-31, host-32, host-33, host-34, host-35, host-36, host-37, host-38, host-39, host-40, host-41, host-42, host-43, host-44, host-45, host-46, host-47, host-48, host-49 | - | - | False |
 | 15 | t2-lim12-near-dup-cdn-mimicry | **HELD, fragile** | 1.0 | 0.1 | - | - | host-03, host-04, host-05, host-06, host-07, host-08, host-09, host-10, host-11, host-12, host-13, host-14, host-15, host-16, host-17, host-18, host-19, host-20, host-21, host-22, host-23, host-24, host-25, host-26, host-27, host-28, host-29, host-30, host-31, host-32, host-33, host-34, host-35, host-36, host-37, host-38, host-39, host-40, host-41, host-42, host-43, host-44, host-45, host-46, host-47, host-48, host-49 | - | - | False |
 
 ## Where it broke / partial / fragile (priority order)
@@ -93,7 +93,7 @@ Ordered by operational severity, not by suite index.
 - **t2-lim10-authorized-redteam** (HELD, fragile): no quarantine with empty truth — any host proposed for quarantine dry-run when truth is empty
 - **t2-lim09b-sequential-reuse** (HELD, fragile): sequential incidents split across 3 campaigns — incident1 and incident2 reported as a single continuous campaign
 - **t2-lim09-max-density-overlap** (HELD, fragile): multi-campaign held — any two campaigns collapse, or host-c attribution near-random
-- **t2-lim11-hostname-split-brain** (HELD, fragile): matched truth without merge-FQ; break_criterion not triggered: b's two identities treated as separate hosts, splitting coverage — b's two identities treated as separate hosts, splitting coverage
+- **t2-lim11-hostname-split-brain** (BROKE): alias coverage miss: ['host-00', 'host-01', 'host-02']; truth never recovered: ['host-00', 'host-01', 'host-02'] — b's two identities treated as separate hosts, splitting coverage
 - **t2-lim02-triple-concurrent-shared** (HELD, fragile): multi-campaign held — any two of the three campaigns collapse into a single reported campaign
 - **t2-lim03-slow-low-day-gaps** (PARTIAL): jaccard 0.6667 in PARTIAL band — any truth-host event outside the window silently dropped from campaign reconstruction
 - **t2-lim09d-benign-hub-pivot** (HELD, fragile): matched truth without merge-FQ; break_criterion not triggered: attack missed (BROKE) or b/d False Q via association — attack missed (BROKE) or b/d False Q via association
@@ -246,13 +246,13 @@ None.
 - Saved: host-00, host-01, host-02, host-03, host-04, host-05, host-06, host-07, host-08, host-09, host-10, host-11, host-12, host-13, host-14, host-15, host-16, host-17, host-18, host-19, host-20, host-21, host-22, host-23, host-24, host-25, host-26, host-27, host-28, host-29, host-30, host-31, host-32, host-33, host-34, host-35, host-36, host-37, host-38, host-39, host-40, host-41, host-42, host-43, host-44, host-45, host-46, host-47, host-48, host-49 | False Q: -
 - Baseline FQ: - | baseline_wins=False
 
-### t2-lim11-hostname-split-brain | **fragile**
+### t2-lim11-hostname-split-brain
 
 - Break criterion: b's two identities treated as separate hosts, splitting coverage
 - Truth: host-00, host-01, host-02
-- Verdict: **HELD, fragile** | Jaccard=1.0 | margin=0.1
-- Reasons: matched truth without merge-FQ; break_criterion not triggered: b's two identities treated as separate hosts, splitting coverage
-- Quarantine dry-run: host-00, host-01, host-02
+- Verdict: **BROKE** | Jaccard=0.0 | margin=None
+- Reasons: alias coverage miss: ['host-00', 'host-01', 'host-02']; truth never recovered: ['host-00', 'host-01', 'host-02']
+- Quarantine dry-run: -
 - Saved: host-03, host-04, host-05, host-06, host-07, host-08, host-09, host-10, host-11, host-12, host-13, host-14, host-15, host-16, host-17, host-18, host-19, host-20, host-21, host-22, host-23, host-24, host-25, host-26, host-27, host-28, host-29, host-30, host-31, host-32, host-33, host-34, host-35, host-36, host-37, host-38, host-39, host-40, host-41, host-42, host-43, host-44, host-45, host-46, host-47, host-48, host-49 | False Q: -
 - Baseline FQ: - | baseline_wins=False
 

@@ -161,6 +161,7 @@
   "scale": {
     "tier": "T1",
     "n_hosts": 15,
-    "source_campaign_id": "lim04-timing-jitter"
+    "source_campaign_id": "lim04-timing-jitter",
+    "decoys": true
   }
 }

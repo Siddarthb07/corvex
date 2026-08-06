@@ -154,6 +154,7 @@
   "scale": {
     "tier": "T1",
     "n_hosts": 15,
-    "source_campaign_id": "lim06-clock-skew-47s"
+    "source_campaign_id": "lim06-clock-skew-47s",
+    "decoys": true
   }
 }

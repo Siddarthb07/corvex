@@ -166,6 +166,7 @@
   "scale": {
     "tier": "T1",
     "n_hosts": 15,
-    "source_campaign_id": "lim09b-sequential-reuse"
+    "source_campaign_id": "lim09b-sequential-reuse",
+    "decoys": true
   }
 }

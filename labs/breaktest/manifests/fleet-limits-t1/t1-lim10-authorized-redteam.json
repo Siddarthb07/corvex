@@ -106,6 +106,7 @@
   "scale": {
     "tier": "T1",
     "n_hosts": 15,
-    "source_campaign_id": "lim10-authorized-redteam"
+    "source_campaign_id": "lim10-authorized-redteam",
+    "decoys": true
   }
 }

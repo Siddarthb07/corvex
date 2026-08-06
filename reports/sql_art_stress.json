@@ -1,8 +1,8 @@
 {
   "test": "Continuous SQL ART stress",
   "manifest": "labs/breaktest/manifests/break_sql_continuous_art.json",
-  "retries": 3,
-  "total_wall_seconds": 3.8219,
+  "retries": 8,
+  "total_wall_seconds": 29.3787,
   "first_compromise": {
     "host": "host-a",
     "offset_seconds": 42.0,
@@ -141,9 +141,9 @@
     {
       "attempt": 1,
       "ok": true,
-      "build_seconds": 0.4897,
-      "replay_seconds": 0.57,
-      "wall_seconds": 1.0597,
+      "build_seconds": 2.0717,
+      "replay_seconds": 2.0656,
+      "wall_seconds": 4.1373,
       "correlator_jaccard": 1.0,
       "correlator_matched": true,
       "correlator_hosts": [
@@ -171,9 +171,9 @@
     {
       "attempt": 2,
       "ok": true,
-      "build_seconds": 0.5383,
-      "replay_seconds": 0.5507,
-      "wall_seconds": 1.089,
+      "build_seconds": 2.0893,
+      "replay_seconds": 2.4439,
+      "wall_seconds": 4.5333,
       "correlator_jaccard": 1.0,
       "correlator_matched": true,
       "correlator_hosts": [
@@ -201,9 +201,159 @@
     {
       "attempt": 3,
       "ok": true,
-      "build_seconds": 0.5959,
-      "replay_seconds": 0.9891,
-      "wall_seconds": 1.585,
+      "build_seconds": 1.8178,
+      "replay_seconds": 1.9773,
+      "wall_seconds": 3.7951,
+      "correlator_jaccard": 1.0,
+      "correlator_matched": true,
+      "correlator_hosts": [
+        "host-a",
+        "host-b",
+        "host-c"
+      ],
+      "detector_jaccard": 0.6667,
+      "detector_hosts": [
+        "host-a",
+        "host-b",
+        "host-c",
+        "host-d",
+        "host-e"
+      ],
+      "over_merged_hosts": [],
+      "missed_hosts": [],
+      "quarantine_proposed": [
+        "host-a",
+        "host-b",
+        "host-c"
+      ],
+      "n_campaigns": 1
+    },
+    {
+      "attempt": 4,
+      "ok": true,
+      "build_seconds": 1.6241,
+      "replay_seconds": 0.8874,
+      "wall_seconds": 2.5115,
+      "correlator_jaccard": 1.0,
+      "correlator_matched": true,
+      "correlator_hosts": [
+        "host-a",
+        "host-b",
+        "host-c"
+      ],
+      "detector_jaccard": 0.6667,
+      "detector_hosts": [
+        "host-a",
+        "host-b",
+        "host-c",
+        "host-d",
+        "host-e"
+      ],
+      "over_merged_hosts": [],
+      "missed_hosts": [],
+      "quarantine_proposed": [
+        "host-a",
+        "host-b",
+        "host-c"
+      ],
+      "n_campaigns": 1
+    },
+    {
+      "attempt": 5,
+      "ok": true,
+      "build_seconds": 0.8349,
+      "replay_seconds": 2.1787,
+      "wall_seconds": 3.0136,
+      "correlator_jaccard": 1.0,
+      "correlator_matched": true,
+      "correlator_hosts": [
+        "host-a",
+        "host-b",
+        "host-c"
+      ],
+      "detector_jaccard": 0.6667,
+      "detector_hosts": [
+        "host-a",
+        "host-b",
+        "host-c",
+        "host-d",
+        "host-e"
+      ],
+      "over_merged_hosts": [],
+      "missed_hosts": [],
+      "quarantine_proposed": [
+        "host-a",
+        "host-b",
+        "host-c"
+      ],
+      "n_campaigns": 1
+    },
+    {
+      "attempt": 6,
+      "ok": true,
+      "build_seconds": 1.9736,
+      "replay_seconds": 2.2404,
+      "wall_seconds": 4.2141,
+      "correlator_jaccard": 1.0,
+      "correlator_matched": true,
+      "correlator_hosts": [
+        "host-a",
+        "host-b",
+        "host-c"
+      ],
+      "detector_jaccard": 0.6667,
+      "detector_hosts": [
+        "host-a",
+        "host-b",
+        "host-c",
+        "host-d",
+        "host-e"
+      ],
+      "over_merged_hosts": [],
+      "missed_hosts": [],
+      "quarantine_proposed": [
+        "host-a",
+        "host-b",
+        "host-c"
+      ],
+      "n_campaigns": 1
+    },
+    {
+      "attempt": 7,
+      "ok": true,
+      "build_seconds": 2.0531,
+      "replay_seconds": 1.6718,
+      "wall_seconds": 3.7248,
+      "correlator_jaccard": 1.0,
+      "correlator_matched": true,
+      "correlator_hosts": [
+        "host-a",
+        "host-b",
+        "host-c"
+      ],
+      "detector_jaccard": 0.6667,
+      "detector_hosts": [
+        "host-a",
+        "host-b",
+        "host-c",
+        "host-d",
+        "host-e"
+      ],
+      "over_merged_hosts": [],
+      "missed_hosts": [],
+      "quarantine_proposed": [
+        "host-a",
+        "host-b",
+        "host-c"
+      ],
+      "n_campaigns": 1
+    },
+    {
+      "attempt": 8,
+      "ok": true,
+      "build_seconds": 1.4591,
+      "replay_seconds": 1.8942,
+      "wall_seconds": 3.3533,
       "correlator_jaccard": 1.0,
       "correlator_matched": true,
       "correlator_hosts": [

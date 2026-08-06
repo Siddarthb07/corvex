@@ -511,6 +511,7 @@
   "scale": {
     "tier": "T1",
     "n_hosts": 15,
-    "source_campaign_id": "lim09d-benign-hub-pivot"
+    "source_campaign_id": "lim09d-benign-hub-pivot",
+    "decoys": true
   }
 }

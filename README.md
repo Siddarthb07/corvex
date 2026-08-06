@@ -127,6 +127,7 @@ Spins up 3 virtual hosts + attacker + Corvex on an isolated bridge network. Same
 | Fusion-gap packs (`fusion_chain`) + break-test lab | Ready (run locally — see [`labs/breaktest/README.md`](labs/breaktest/README.md)) |
 | Windows auth export → BYO (`adapt-windows` / `byo-windows`) | Ready (observe-only) |
 | OS-wide Windows sensor (`sensor-windows`) | Ready — Stage B gated / `stage-b-lab-unlock` |
+| OS-wide macOS network sensor (`sensor-macos`) | Ready — Stage B gated; live net via `lsof` |
 | Sensors + JetStream/mTLS bus | JetStream still stub; OS-wide file path shipped |
 | Live host isolate | Dry-run only (`CORVEX_CONTAIN=0`) |
 
@@ -181,7 +182,7 @@ Reconstruction writes `reconstruction.json` with status `complete` / `partial` /
 ## Docs
 
 - [`CHANGELOG.md`](CHANGELOG.md) · [`SECURITY.md`](SECURITY.md) · [`THREAT_MODEL.md`](THREAT_MODEL.md) · [`LICENSE`](LICENSE)
-- [`docs/how-corvex-works.md`](docs/how-corvex-works.md) · [`docs/contain.md`](docs/contain.md) · [`docs/sensor-windows.md`](docs/sensor-windows.md) · [`docs/stranger-checklist.md`](docs/stranger-checklist.md) · [`docs/real-world-test-sequences.md`](docs/real-world-test-sequences.md) · [`reports/RESULTS.md`](reports/RESULTS.md)
+- [`docs/how-corvex-works.md`](docs/how-corvex-works.md) · [`docs/contain.md`](docs/contain.md) · [`docs/sensor-windows.md`](docs/sensor-windows.md) · [`docs/sensor-macos.md`](docs/sensor-macos.md) · [`docs/stranger-checklist.md`](docs/stranger-checklist.md) · [`docs/real-world-test-sequences.md`](docs/real-world-test-sequences.md) · [`reports/RESULTS.md`](reports/RESULTS.md) · [`reports/local_stress_break_results.md`](reports/local_stress_break_results.md)
 - [`labs/breaktest/README.md`](labs/breaktest/README.md) · [`future-plans.md`](future-plans.md)
 
 ## License

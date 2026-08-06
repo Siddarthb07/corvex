@@ -150,6 +150,7 @@
   "scale": {
     "tier": "T1",
     "n_hosts": 15,
-    "source_campaign_id": "lim01-dual-ambiguous-lateral"
+    "source_campaign_id": "lim01-dual-ambiguous-lateral",
+    "decoys": true
   }
 }
