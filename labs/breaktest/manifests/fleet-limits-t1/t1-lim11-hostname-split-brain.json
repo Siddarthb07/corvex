@@ -140,6 +140,7 @@
   "scale": {
     "tier": "T1",
     "n_hosts": 15,
-    "source_campaign_id": "lim11-hostname-split-brain"
+    "source_campaign_id": "lim11-hostname-split-brain",
+    "decoys": true
   }
 }

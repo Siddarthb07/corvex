@@ -1079,6 +1079,109 @@ def sensor_windows_cmd(
     raise typer.Exit(0 if int(stats.get("published", 0)) > 0 or stats.get("timeline") else 1)
 
 
+@app.command("sensor-macos")
+def sensor_macos_cmd(
+    run_dir: Path = typer.Option(Path("runs/os-wide-macos"), help="Run directory for events/timeline"),
+    channels: str = typer.Option(
+        "net,auth,dns,process",
+        help="Comma-separated channels: net,auth,dns,process,pf",
+    ),
+    fixture: Optional[Path] = typer.Option(
+        None,
+        "--fixture",
+        help="JSON/JSONL Mac multi-channel export (CI / no-admin). Omit to poll live.",
+    ),
+    allowlist: Optional[Path] = typer.Option(
+        None,
+        "--allowlist",
+        help="Channel event-kind allowlist JSON (default: fixtures/os_wide_macos/channels.json)",
+    ),
+    host_id: Optional[str] = typer.Option(
+        None, "--host-id", help="Force enrolled host id (multi-host exporter shape)"
+    ),
+    producer: Optional[str] = typer.Option(
+        None, "--producer", help="Force producer id (default from DEMO_HOSTS[host-id])"
+    ),
+    host_map: Optional[Path] = typer.Option(
+        None, "--host-map", help="hostname→host_id JSON map"
+    ),
+    follow: bool = typer.Option(False, "--follow", help="Continuous poll"),
+    once: bool = typer.Option(True, "--once/--no-once", help="Single drain cycle (default)"),
+    max_per_sec: float = typer.Option(50.0, help="Soft rate cap (envelopes/sec)"),
+    poll_seconds: float = typer.Option(2.0, help="Follow poll interval"),
+    max_cycles: Optional[int] = typer.Option(
+        None, help="Stop after N cycles (tests / bounded follow)"
+    ),
+    require_live: bool = typer.Option(
+        False,
+        "--require-live",
+        help="Fail if no live macOS hits (CI should keep --fixture instead)",
+    ),
+) -> None:
+    """Stage B observe-only macOS network-wide sensor → events.jsonl + timeline."""
+    from corvex.sensors.macos_os import run_sensor_macos
+    from corvex.stage_b import StageBGateError
+
+    wanted = dict(DEMO_HOSTS)
+    wanted["host-mac"] = "prod-mac"
+    hid = host_id or None
+    prod = producer or (wanted.get(hid) if hid else None) or "prod-mac"
+    if hid:
+        wanted[hid] = prod
+    enrollment = ensure_lab_enrollment(hosts=wanted)
+    root = _repo_root()
+    allow = (
+        Path(allowlist)
+        if allowlist
+        else root / "fixtures" / "os_wide_macos" / "channels.json"
+    )
+    if not allow.exists():
+        allow = None
+    hmap: Dict[str, str] = {h: h for h in wanted}
+    hmap.setdefault("localhost", hid or "host-mac")
+    hmap.setdefault("host-mac.local", "host-mac")
+    if host_map and Path(host_map).exists():
+        loaded = json.loads(Path(host_map).read_text(encoding="utf-8"))
+        if isinstance(loaded, dict):
+            hmap.update({str(k).lower(): str(v) for k, v in loaded.items()})
+            hmap.update({str(k): str(v) for k, v in loaded.items()})
+    for h in list(wanted):
+        hmap.setdefault(f"{h}.local", h)
+        hmap.setdefault(f"{h}.lab.local", h)
+    chans = [c.strip() for c in channels.split(",") if c.strip()]
+    try:
+        stats = run_sensor_macos(
+            run_dir=Path(run_dir),
+            enrollment=enrollment,
+            channels=chans,
+            allowlist_path=allow,
+            fixture=Path(fixture) if fixture else None,
+            host_id=hid or "host-mac",
+            producer_id=prod,
+            host_map=hmap,
+            follow=follow,
+            once=once and not follow,
+            max_per_sec=max_per_sec,
+            poll_seconds=poll_seconds,
+            max_cycles=max_cycles,
+            require_live=require_live,
+        )
+    except StageBGateError as exc:
+        typer.echo(str(exc))
+        typer.echo(
+            "Lab unlock: corvex stage-b-lab-unlock --reason 'local macos fixture' "
+            "(does not flip claim_allowed). CORVEX_STAGE_B=1 is ignored."
+        )
+        raise typer.Exit(2) from exc
+    except ValueError as exc:
+        typer.echo(str(exc))
+        raise typer.Exit(2) from exc
+    typer.echo(json.dumps(stats, indent=2))
+    if stats.get("require_live_failed"):
+        raise typer.Exit(1)
+    raise typer.Exit(0 if int(stats.get("published", 0)) > 0 or stats.get("timeline") else 1)
+
+
 @app.command("fuse-run")
 def fuse_run_cmd(
     lab: Path = typer.Option(

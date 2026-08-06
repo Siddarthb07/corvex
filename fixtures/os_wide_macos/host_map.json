@@ -1,0 +1,11 @@
+{
+  "host-mac-a.local": "host-a",
+  "host-mac-b.local": "host-b",
+  "host-mac-c.local": "host-c",
+  "host-mac-d.local": "host-d",
+  "host-mac-a": "host-a",
+  "host-mac-b": "host-b",
+  "host-mac-c": "host-c",
+  "host-mac-d": "host-d",
+  "localhost": "host-a"
+}

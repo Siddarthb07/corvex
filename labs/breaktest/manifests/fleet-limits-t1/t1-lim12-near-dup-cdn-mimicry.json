@@ -271,6 +271,7 @@
   "scale": {
     "tier": "T1",
     "n_hosts": 15,
-    "source_campaign_id": "lim12-near-dup-cdn-mimicry"
+    "source_campaign_id": "lim12-near-dup-cdn-mimicry",
+    "decoys": true
   }
 }

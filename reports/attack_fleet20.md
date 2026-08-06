@@ -3,7 +3,7 @@
 Purple-team **event sketches** only. Sources cite [Atomic Red Team](https://github.com/redcanaryco/atomic-red-team) technique IDs where marked `github_art`. No malware executed. Quarantine = dry-run proposals.
 
 - Attacks: **20** | Intensity rounds/attack: **2**
-- Wall: **41.6308s**
+- Wall: **47.1071s**
 - HELD: **20** | PARTIAL: **0** | BROKE: **0**
 
 ## Fleet scoreboard

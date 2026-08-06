@@ -3,6 +3,8 @@
 ## [Unreleased]
 
 ### Added
+- Stage B **macOS network-wide sensor**: `corvex sensor-macos` (net/auth/dns/process/pf), fixtures under `fixtures/os_wide_macos/`, `docs/sensor-macos.md`. Live net via `lsof` TCP established; unified-log auth/dns degrade honestly.
+- Local stress break write-up: `reports/local_stress_break_results.md`.
 - Stage B OS-wide Windows sensor: `corvex sensor-windows` (Security + Sysmon + Firewall + PowerShell), fixtures under `fixtures/os_wide/`, `docs/os-wide-sensor.md`, multi-host smoke script, `corvex habit-loop`.
 - `corvex stage-b-lab-unlock` (auditable lab override). Flat lab → envelope adapt on recompute. Dash `--token` required for LAN bind.
 - `corvex fuse-run` offline lab+PC merge; `sensor-windows --require-live`; wevtutil channel health + RecordId bookmarks.

@@ -1,0 +1,11 @@
+{
+  "allowlist": {
+    "auth": ["ssh_accept", "ssh_fail", "login_success", "login_fail", "sudo"],
+    "net": ["tcp_established", "udp_flow", "tcp_listen"],
+    "dns": ["query"],
+    "process": ["exec", "sample"],
+    "pf": ["pass", "block"]
+  },
+  "max_per_sec": 50,
+  "honesty": "Default macOS noise allowlist. Expand carefully — broad kinds increase correlator blast radius."
+}

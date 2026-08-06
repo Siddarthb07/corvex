@@ -165,6 +165,7 @@
   "scale": {
     "tier": "T1",
     "n_hosts": 15,
-    "source_campaign_id": "lim03-slow-low-day-gaps"
+    "source_campaign_id": "lim03-slow-low-day-gaps",
+    "decoys": true
   }
 }

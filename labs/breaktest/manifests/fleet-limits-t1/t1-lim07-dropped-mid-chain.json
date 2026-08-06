@@ -146,6 +146,7 @@
   "scale": {
     "tier": "T1",
     "n_hosts": 15,
-    "source_campaign_id": "lim07-dropped-mid-chain"
+    "source_campaign_id": "lim07-dropped-mid-chain",
+    "decoys": true
   }
 }

@@ -20,7 +20,8 @@ This is the P3 stranger checklist path. It does **not** by itself unlock Stage B
 
 Gated by `require_stage_b` (Stage A PASS + **human** stranger PASS + `reports/stage-b-allowed`, **or** `corvex stage-b-lab-unlock`). `CORVEX_STAGE_B=1` is ignored.
 
-Full guide: [`docs/os-wide-sensor.md`](os-wide-sensor.md)
+Full guide: [`docs/os-wide-sensor.md`](os-wide-sensor.md)  
+macOS counterpart: [`docs/sensor-macos.md`](sensor-macos.md) (`corvex sensor-macos`)
 
 ```bash
 corvex stage-b-lab-unlock --reason "local fixture CI"
