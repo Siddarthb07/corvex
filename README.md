@@ -6,6 +6,8 @@ Multi-host **campaign correlator** — stitches weak signals across machines int
 
 Real/realistic benign baseline (next gate): `labs/benign/` + `python scripts/run_benign_baseline.py` — pre-committed FP bars in `future-plans.md`; no hand-crafted “admin noise.” Operator sequence: [`docs/real-world-test-sequences.md`](docs/real-world-test-sequences.md).
 
+Local stress / break write-up (no Docker): [`reports/local_stress_break_results.md`](reports/local_stress_break_results.md).
+
 ## Quick start
 
 Requires Python 3.9+.
@@ -35,6 +37,67 @@ corvex dash --host 0.0.0.0 --port 8765 --run-dir runs/demo
 ```
 
 CLI: `corvex` (legacy alias `cfuse`). Optional: `corvex init` to create enrollment without replaying.
+
+## Host sensors (observe-only)
+
+Stage B gated collectors write HMAC-signed envelopes into a shared run directory.
+Unlock locally with `corvex stage-b-lab-unlock --reason "…"` (does **not** flip
+`claim_allowed`), or via the honest stranger path.
+
+| Platform | CLI | Live source (primary) | Guide |
+|----------|-----|----------------------|--------|
+| Windows | `corvex sensor-windows` | wevtutil (Security / Sysmon / Firewall / PowerShell) | [`docs/sensor-windows.md`](docs/sensor-windows.md) · [`docs/os-wide-sensor.md`](docs/os-wide-sensor.md) |
+| macOS | `corvex sensor-macos` | `lsof` TCP established (+ optional unified-log auth/dns, `ps`, pf) | [`docs/sensor-macos.md`](docs/sensor-macos.md) |
+
+### macOS (no Docker)
+
+```bash
+corvex stage-b-lab-unlock --reason "local macos fixture CI"
+
+# Fixture / CI
+corvex sensor-macos \
+  --fixture fixtures/os_wide_macos/multi_channel.jsonl \
+  --allowlist fixtures/os_wide_macos/channels.json \
+  --host-map fixtures/os_wide_macos/host_map.json \
+  --run-dir runs/os-wide-macos --once
+
+# Live net on this Mac
+corvex sensor-macos --run-dir runs/os-wide-macos-live --once \
+  --channels net,process \
+  --host-id host-mac --producer prod-mac
+
+corvex dash --run-dir runs/os-wide-macos-live
+```
+
+Channels: `net` (primary), `auth`, `dns`, `process`, `pf`. Missing channels
+**degrade honestly** (`sensor_status.json` → `channel_health`). Not
+EndpointSecurity — process is a `ps` sample; net is per-user `lsof` visibility.
+
+### Windows
+
+```bash
+corvex stage-b-lab-unlock --reason "local fixture CI"
+corvex sensor-windows --fixture fixtures/os_wide/multi_channel.jsonl \
+  --allowlist fixtures/os_wide/channels.json \
+  --host-map fixtures/windows_host_map.json \
+  --run-dir runs/os-wide --once
+```
+
+Stranger / BYO auth wedge (ungated converter): `corvex byo-windows` — see
+[`docs/stranger-checklist.md`](docs/stranger-checklist.md).
+
+### Multi-host + fuse
+
+Run the same binary on each enrolled host into one `run_dir`, or merge offline:
+
+```bash
+corvex fuse-run \
+  --lab labs/breaktest/shared/events.jsonl \
+  --pc runs/os-wide-macos-live \
+  --out-dir runs/pc-and-lab --once
+```
+
+Mode is **offline_lab_replay** (file merge + HMAC verify) — not JetStream.
 
 ## Results (sealed held-out)
 
@@ -95,7 +158,8 @@ Train is **context**, not the sealed claim.
 **Proves (narrow):** Sealed packs; fusion beats detector-only; benign FCR at N=5; dry-run isolates clean.  
 **Does not prove:** Real malware defense, stranger Windows success, commercial parity, or live contain safety.
 
-Full write-up: [`reports/RESULTS.md`](reports/RESULTS.md).
+Full write-up: [`reports/RESULTS.md`](reports/RESULTS.md).  
+Where it breaks under stress (alias split-brain, day-gap lookback, shared svc glue, …): [`reports/local_stress_break_results.md`](reports/local_stress_break_results.md).
 
 ## Bring your own events
 
@@ -108,7 +172,22 @@ Enrollment / HMAC secrets live **outside** the repo (`~/.corvex/` by default). D
 
 Public train packs are re-signed with your local enrollment on replay so a clean clone works without sealed held-out material.
 
-## Docker attack lab
+## Labs (synthetic)
+
+### No Docker — score breaktest manifests
+
+```bash
+corvex build-breaktest labs/breaktest/manifests/art_lateral_chain.json \
+  --out runs/breaktest/art_lateral_chain.jsonl \
+  --report runs/breaktest/art_lateral_chain.breaks.json
+
+python scripts/run_attack_fleet_limits.py --intensity 2
+python scripts/run_breaker_attacks.py
+```
+
+See [`labs/breaktest/README.md`](labs/breaktest/README.md).
+
+### Docker attack lab
 
 Needs Docker. Sources live in `labs/live/`:
 
@@ -124,15 +203,20 @@ Spins up 3 virtual hosts + attacker + Corvex on an isolated bridge network. Same
 |------------|--------|
 | Correlator + monitor + prevention log | Ready |
 | Replay / BYO JSONL ingest | Ready |
-| Fusion-gap packs (`fusion_chain`) + break-test lab | Ready (run locally — see [`labs/breaktest/README.md`](labs/breaktest/README.md)) |
+| Fusion-gap packs (`fusion_chain`) + break-test lab | Ready (local score **or** Docker live — [`labs/breaktest/README.md`](labs/breaktest/README.md)) |
 | Windows auth export → BYO (`adapt-windows` / `byo-windows`) | Ready (observe-only) |
 | OS-wide Windows sensor (`sensor-windows`) | Ready — Stage B gated / `stage-b-lab-unlock` |
 | OS-wide macOS network sensor (`sensor-macos`) | Ready — Stage B gated; live net via `lsof` |
+| Fleet-limits / stress break reports | Ready — [`reports/local_stress_break_results.md`](reports/local_stress_break_results.md) |
 | Sensors + JetStream/mTLS bus | JetStream still stub; OS-wide file path shipped |
 | Live host isolate | Dry-run only (`CORVEX_CONTAIN=0`) |
 
 ```text
-[Host sensors] --mTLS--> [Event bus] --> [Corvex correlator]
+[Host sensors: Windows wevtutil | macOS lsof/log/ps]
+        --(signed JSONL / later mTLS)--> [Event bus]
+                                              |
+                                              v
+                                    Corvex correlator
                                               |
                                               v
                                     Prevention log + Monitor
@@ -160,7 +244,7 @@ Details: [`corvex/contain/CHECKLIST.md`](corvex/contain/CHECKLIST.md) · [`docs/
 ## Architecture
 
 ```text
-Sensors / Feeder / BYO-JSONL
+Sensors (Windows / macOS) / Feeder / BYO-JSONL
         → EventBus (JSONL now; JetStream+mTLS later)
         → detectors (pure functions)
         → correlator
@@ -182,7 +266,9 @@ Reconstruction writes `reconstruction.json` with status `complete` / `partial` /
 ## Docs
 
 - [`CHANGELOG.md`](CHANGELOG.md) · [`SECURITY.md`](SECURITY.md) · [`THREAT_MODEL.md`](THREAT_MODEL.md) · [`LICENSE`](LICENSE)
-- [`docs/how-corvex-works.md`](docs/how-corvex-works.md) · [`docs/contain.md`](docs/contain.md) · [`docs/sensor-windows.md`](docs/sensor-windows.md) · [`docs/sensor-macos.md`](docs/sensor-macos.md) · [`docs/stranger-checklist.md`](docs/stranger-checklist.md) · [`docs/real-world-test-sequences.md`](docs/real-world-test-sequences.md) · [`reports/RESULTS.md`](reports/RESULTS.md) · [`reports/local_stress_break_results.md`](reports/local_stress_break_results.md)
+- Sensors: [`docs/sensor-macos.md`](docs/sensor-macos.md) · [`docs/sensor-windows.md`](docs/sensor-windows.md) · [`docs/os-wide-sensor.md`](docs/os-wide-sensor.md)
+- [`docs/how-corvex-works.md`](docs/how-corvex-works.md) · [`docs/contain.md`](docs/contain.md) · [`docs/stranger-checklist.md`](docs/stranger-checklist.md) · [`docs/real-world-test-sequences.md`](docs/real-world-test-sequences.md)
+- Results: [`reports/RESULTS.md`](reports/RESULTS.md) · [`reports/local_stress_break_results.md`](reports/local_stress_break_results.md)
 - [`labs/breaktest/README.md`](labs/breaktest/README.md) · [`future-plans.md`](future-plans.md)
 
 ## License
