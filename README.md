@@ -1,6 +1,8 @@
 # Corvex
 
-Multi-host **campaign correlator** — stitches weak signals across machines into one attack timeline.
+**Keywords:** threat hunting · MITRE ATT&CK · multi-host campaign correlation · lateral movement · SIEM-style fusion · cybersecurity research · observe-only sensors
+
+Multi-host **campaign correlator** for threat hunting — fuses weak per-host detectors (lateral auth, micro-exfil, recon fanout) into ATT&CK-shaped attack timelines. SIEM-style correlation without an LLM or cloud API.
 
 **Public claim (standing):** research correlator — holds up against synthetic ATT&CK-shaped fleets; **not yet validated against real telemetry or benign baselines.** Observe and correlate first. Live containment stays locked behind safety controls.
 
