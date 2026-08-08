@@ -1031,19 +1031,22 @@ def sensor_windows_cmd(
     from corvex.sensors.windows_os import run_sensor_windows
     from corvex.stage_b import StageBGateError
 
-    enrollment = ensure_lab_enrollment()
+    hosts = dict(DEMO_HOSTS)
+    if host_id:
+        hosts[str(host_id)] = str(producer or f"prod-{host_id}")
+    enrollment = ensure_lab_enrollment(hosts=hosts)
     root = _repo_root()
     allow = Path(allowlist) if allowlist else root / "fixtures" / "os_wide" / "channels.json"
     if not allow.exists():
         allow = None
-    hmap: Dict[str, str] = {h: h for h in DEMO_HOSTS}
+    hmap: Dict[str, str] = {h: h for h in hosts}
     if host_map and Path(host_map).exists():
         loaded = json.loads(Path(host_map).read_text(encoding="utf-8"))
         if isinstance(loaded, dict):
             hmap.update({str(k).lower(): str(v) for k, v in loaded.items()})
             hmap.update({str(k): str(v) for k, v in loaded.items()})
     # Always map *.lab.local style from fixture computers
-    for h in list(DEMO_HOSTS):
+    for h in list(hosts):
         hmap.setdefault(f"{h}.lab.local", h)
     chans = [c.strip() for c in channels.split(",") if c.strip()]
     try:
@@ -1054,7 +1057,7 @@ def sensor_windows_cmd(
             allowlist_path=allow,
             fixture=Path(fixture) if fixture else None,
             host_id=host_id,
-            producer_id=producer,
+            producer_id=producer or (hosts.get(str(host_id)) if host_id else None),
             host_map=hmap,
             follow=follow,
             once=once and not follow,
@@ -1230,6 +1233,7 @@ def fuse_run_cmd(
             "host-d": "prod-d",
             "host-e": "prod-e",
             "host-pc": "prod-pc",
+            "host-win": "prod-win",
         }
     )
     out = Path(out_dir)

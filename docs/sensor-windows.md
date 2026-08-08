@@ -35,8 +35,11 @@ corvex dash --run-dir runs/os-wide
 Live follow (wevtutil, best-effort; productize deferred):
 
 ```bash
-corvex sensor-windows --run-dir runs/os-wide-live --follow
+corvex sensor-windows --run-dir runs/os-wide-live --follow --require-live
 ```
+
+Stock Windows `wevtutil` supports **XML|Text|RenderedXml** only (not `/f:json`).
+The live sensor polls with `/f:xml /e:Events` and flattens records for the os_wide adapter.
 
 Channels: Security (4624/4625/4648), Sysmon (1/3/22 if installed), Firewall, PowerShell (hashed script blocks). Allowlists + rate caps control noise. **No actuators.**
 

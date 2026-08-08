@@ -278,12 +278,15 @@ def adapt_os_wide_records(
             continue
         raw_host = _host_id(rec, default_host)
         host_id = hmap.get(raw_host, hmap.get(raw_host.lower(), raw_host))
-        ts = _parse_ts(
+        ts_raw = (
             rec.get("TimeCreated")
             or rec.get("ts_utc")
             or rec.get("@timestamp")
             or (rec.get("System") or {}).get("TimeCreated")
         )
+        if isinstance(ts_raw, Mapping):
+            ts_raw = ts_raw.get("SystemTime") or ts_raw.get("#text") or ts_raw.get("Value")
+        ts = _parse_ts(ts_raw)
         mapped = mapper(rec, eid, host_id, ts)
         if mapped is None:
             stats["skipped"] += 1

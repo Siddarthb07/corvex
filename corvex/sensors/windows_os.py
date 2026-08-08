@@ -15,6 +15,7 @@ import os
 import shutil
 import subprocess
 import time
+import xml.etree.ElementTree as ET
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Mapping, Optional, Sequence, Set
@@ -86,6 +87,90 @@ def _wevtutil_available() -> bool:
     return shutil.which("wevtutil") is not None
 
 
+def _xml_local(tag: str) -> str:
+    if "}" in tag:
+        return tag.rsplit("}", 1)[-1]
+    return tag
+
+
+def parse_wevtutil_xml(raw: str, *, channel: str) -> List[Dict[str, Any]]:
+    """Flatten wevtutil ``/f:xml /e:Events`` output into fixture-shaped records.
+
+    Stock Windows ``wevtutil`` only supports XML|Text|RenderedXml — not JSON.
+    """
+    text = (raw or "").strip()
+    if not text:
+        return []
+    # Strip UTF-16 BOM / nulls that some PowerShell redirects inject
+    if "\x00" in text:
+        text = text.replace("\x00", "")
+    if not text.lstrip().startswith("<"):
+        return []
+    try:
+        root = ET.fromstring(text)
+    except ET.ParseError:
+        # Concatenated <Event>…</Event> without wrapper
+        try:
+            root = ET.fromstring(f"<Events>{text}</Events>")
+        except ET.ParseError:
+            return []
+
+    events = []
+    if _xml_local(root.tag) == "Event":
+        events = [root]
+    else:
+        events = [el for el in root.iter() if _xml_local(el.tag) == "Event"]
+
+    records: List[Dict[str, Any]] = []
+    for ev in events:
+        system = None
+        event_data_el = None
+        for child in list(ev):
+            loc = _xml_local(child.tag)
+            if loc == "System":
+                system = child
+            elif loc == "EventData":
+                event_data_el = child
+        if system is None:
+            continue
+        fields: Dict[str, Any] = {"channel": channel}
+        for child in list(system):
+            loc = _xml_local(child.tag)
+            if loc == "EventID":
+                fields["EventID"] = (child.text or "").strip()
+            elif loc == "EventRecordID":
+                try:
+                    fields["RecordId"] = int((child.text or "").strip())
+                    fields["EventRecordID"] = fields["RecordId"]
+                except ValueError:
+                    pass
+            elif loc == "Computer":
+                fields["Computer"] = (child.text or "").strip()
+            elif loc == "TimeCreated":
+                st = child.attrib.get("SystemTime") or (child.text or "").strip()
+                if st:
+                    fields["TimeCreated"] = st
+            elif loc == "Channel":
+                # Prefer logical channel key; keep raw for aliasing
+                fields["Channel"] = (child.text or "").strip()
+        ed: Dict[str, Any] = {}
+        if event_data_el is not None:
+            for data in list(event_data_el):
+                if _xml_local(data.tag) != "Data":
+                    continue
+                name = data.attrib.get("Name")
+                if not name:
+                    continue
+                ed[name] = data.text if data.text is not None else ""
+                # Promote common security fields to top-level (fixture shape)
+                if name in {"TargetUserName", "IpAddress", "SubjectUserName"}:
+                    fields[name] = ed[name]
+        if ed:
+            fields["EventData"] = ed
+        records.append(fields)
+    return records
+
+
 def poll_wevtutil_channel(
     channel: str,
     *,
@@ -93,7 +178,7 @@ def poll_wevtutil_channel(
     max_events: int = 40,
     min_record_id: Optional[int] = None,
 ) -> Dict[str, Any]:
-    """Best-effort wevtutil JSON query with explicit degrade reasons.
+    """Best-effort wevtutil XML query with explicit degrade reasons.
 
     Returns ``{"records": [...], "ok": bool, "reason": str|None, "max_record_id": int|None}``.
     """
@@ -111,12 +196,14 @@ def poll_wevtutil_channel(
         query = (
             f"*[System[({id_clause}) and EventRecordID > {int(min_record_id)}]]"
         )
+    # /f:json is NOT supported by stock wevtutil (XML|Text|RenderedXml only).
     cmd = [
         "wevtutil",
         "qe",
         log_name,
         f"/q:{query}",
-        "/f:json",
+        "/f:xml",
+        "/e:Events",
         f"/c:{max_events}",
         "/rd:true",
     ]
@@ -127,6 +214,8 @@ def poll_wevtutil_channel(
             text=True,
             timeout=20,
             check=False,
+            encoding="utf-8",
+            errors="replace",
         )
     except (OSError, subprocess.TimeoutExpired) as exc:
         return {
@@ -146,34 +235,7 @@ def poll_wevtutil_channel(
     if not proc.stdout.strip():
         return {"records": [], "ok": True, "reason": "zero_hits", "max_record_id": min_record_id}
 
-    raw = proc.stdout.strip()
-    records: List[Dict[str, Any]] = []
-
-    def _ingest(rec: Dict[str, Any]) -> None:
-        rec = dict(rec)
-        rec["channel"] = channel
-        records.append(rec)
-
-    try:
-        data = json.loads(raw)
-        if isinstance(data, list):
-            for rec in data:
-                if isinstance(rec, dict):
-                    _ingest(rec)
-        elif isinstance(data, dict):
-            _ingest(data)
-    except json.JSONDecodeError:
-        chunk = ""
-        for line in raw.splitlines():
-            chunk += line
-            if line.strip().endswith("}"):
-                try:
-                    rec = json.loads(chunk)
-                    if isinstance(rec, dict):
-                        _ingest(rec)
-                except json.JSONDecodeError:
-                    pass
-                chunk = ""
+    records = parse_wevtutil_xml(proc.stdout, channel=channel)
 
     max_rid: Optional[int] = min_record_id
     for rec in records:

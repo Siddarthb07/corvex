@@ -151,3 +151,19 @@ def test_rate_limiter_drops(tmp_path: Path, monkeypatch):
         max_per_sec=2,
     )
     assert stats["rate_limited"] >= 1 or stats["published"] <= 2
+
+
+def test_parse_wevtutil_xml_sysmon_and_security():
+    from corvex.sensors.windows_os import parse_wevtutil_xml
+
+    sample = """<Events>
+<Event xmlns='http://schemas.microsoft.com/win/2004/08/events/event'><System><Provider Name='Microsoft-Windows-Sysmon'/><EventID>1</EventID><TimeCreated SystemTime='2026-08-13T14:11:50.2596407Z'/><EventRecordID>42</EventRecordID><Channel>Microsoft-Windows-Sysmon/Operational</Channel><Computer>cyborg_1</Computer></System><EventData><Data Name='Image'>C:\\Windows\\System32\\cmd.exe</Data><Data Name='CommandLine'>cmd /c echo</Data><Data Name='User'>lab\\user</Data></EventData></Event>
+<Event xmlns='http://schemas.microsoft.com/win/2004/08/events/event'><System><Provider Name='Microsoft-Windows-Security-Auditing'/><EventID>4624</EventID><TimeCreated SystemTime='2026-08-13T14:06:17.0586787Z'/><EventRecordID>99</EventRecordID><Channel>Security</Channel><Computer>cyborg_1</Computer></System><EventData><Data Name='TargetUserName'>alice</Data><Data Name='IpAddress'>10.0.0.8</Data></EventData></Event>
+</Events>"""
+    sysmon = parse_wevtutil_xml(sample, channel="sysmon")
+    assert len(sysmon) == 2
+    assert sysmon[0]["EventID"] == "1"
+    assert sysmon[0]["RecordId"] == 42
+    assert sysmon[0]["EventData"]["Image"].endswith("cmd.exe")
+    assert sysmon[1]["TargetUserName"] == "alice"
+    assert sysmon[1]["IpAddress"] == "10.0.0.8"
