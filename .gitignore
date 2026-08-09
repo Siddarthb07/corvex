@@ -65,5 +65,15 @@ labs/benign/**/raw/
 labs/benign/**/converted/
 !labs/benign/**/raw/.gitkeep
 
+# local Sysmon installer (downloaded for Phase 0 home-lab)
+tools/sysmon/
+
+# Phase 0 operator temp bootstrap scripts
+scripts/_phase0_*.ps1
+reports/phase0_elevated_sensor.log
+reports/phase0_wevtutil_*.log
+reports/phase0_home_lab_start.log
+reports/phase0_capture_follow.log
+
 
 .cursor/council-sessions/
