@@ -1,0 +1,25 @@
+{
+  "name": "home-lab-2026-08-13",
+  "corpus_kind": "home_lab_capture",
+  "source": {
+    "project": "local-home-lab",
+    "capture_start_utc": "2026-08-13T14:17:23Z",
+    "capture_end_utc": null,
+    "note": "Phase 0 single-host Windows capture started. Window OPEN \u2014 do not peek/curate. Not PASS-eligible until >=3 hosts and >=72 host-hours."
+  },
+  "raw_glob": "raw/*.jsonl",
+  "host_map": {
+    "cyborg_1": "host-win"
+  },
+  "attack_windows": [],
+  "roles": {
+    "host-win": "endpoint"
+  },
+  "bars_locked": "2026-07-25",
+  "phase0": {
+    "hosts_enrolled": [
+      "host-win"
+    ],
+    "status": "capture_open_single_host"
+  }
+}
