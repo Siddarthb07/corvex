@@ -1,5 +1,7 @@
 # Home-lab capture protocol
 
+*Updated: 2026-09-09*
+
 Passive Sysmon (and optional Security / Firewall) capture for the **pure-benign**
 gate. This is the preferred path to a PASS-eligible corpus.
 

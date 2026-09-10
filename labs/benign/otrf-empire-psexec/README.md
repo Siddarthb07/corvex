@@ -1,5 +1,7 @@
 # otrf-empire-psexec
 
+*Updated: 2026-09-07*
+
 Public OTRF/Security-Datasets slice (captured telemetry — not hand-authored).
 
 - **corpus_kind:** `mixed` (attack + ambient). Cannot PASS the pure-benign gate.

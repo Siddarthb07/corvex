@@ -1,6 +1,6 @@
 # Home-lab capture — Phase 0 (single Windows host)
 
-**Status:** capture window **OPEN** (single host). Cannot PASS the benign gate until ≥3 hosts and ≥72 host-hours.
+**Status:** capture window **OPEN** (single host). Follow last wrote `runs/home-lab-capture` on **2026-08-13**; docs hygiene pass **2026-09-09** (restart helpers linked; gate still needs ≥3 hosts). Cannot PASS the benign gate until ≥3 hosts and ≥72 host-hours. Do not peek or curate.
 
 | Field | Value |
 |-------|--------|
@@ -29,11 +29,31 @@ python -m corvex sensor-windows --follow --require-live `
   --poll-seconds 30
 ```
 
-Periodically refresh Event Log–shaped raw for the scorer:
+Helper (same thing): `scripts\restart_home_lab_follow.ps1` (must be elevated).
+
+Periodically refresh Event Log–shaped raw for the scorer (writes a **dated**
+file; does not overwrite `raw/host-win.jsonl`):
 
 ```powershell
 python scripts/dump_home_lab_raw_once.py
 ```
+
+## Phase 1 — add hosts (same window)
+
+Do **not** close this corpus and start a new folder. Do **not** peek or curate
+events. Join extra sensors into `runs/home-lab-capture` until ≥3 hosts and ≥72
+host-hours. Prefer a jump/management host so hub is not GAP by construction.
+
+| Join | Where | Command |
+|------|--------|---------|
+| Second physical Windows | PC-2 (also S2) | `scripts\run_s2_second_host.ps1` then keep `--follow` into this run-dir, or `scripts\join_home_lab_host.ps1 -HostId host-pc-2 -Producer prod-pc-2` |
+| macOS | Mac on the same LAN | `corvex sensor-macos --follow --run-dir runs/home-lab-capture --host-id host-mac --producer prod-mac` (see `docs/sensor-macos.md`) |
+| Windows VM | only if it is a distinct OS install | `scripts\join_home_lab_host.ps1 -HostId host-win-vm -Producer prod-win-vm` |
+
+After a new hostname appears, add it to `manifest.json` `host_map` / `roles` and
+`fixtures/os_wide/host_map_phase0.json`. Do not drop quiet hosts.
+
+Score stays **INCOMPLETE** until size bars pass. Do not retune bars.
 
 ## Score (dry-run while open / single-host)
 

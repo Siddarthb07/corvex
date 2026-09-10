@@ -13,9 +13,9 @@ Where Corvex is today: **Stage A honesty closed**; **Stage B sensor shipped**; t
 
 ## Blocks 4.5/5 (human + second PC)
 
-1. Elevated wevtutil on a **second physical** Windows host → `reports/live_second_host.json`
-2. Jack runs `corvex stranger-keygen` + `sign-stranger-attestation` (Jack holds private key)
-3. `corvex claim-gates` → both gates green
+1. Elevated wevtutil on a **second physical** Windows host → `reports/live_second_host.json` (`docs/s2-second-host.md`)
+2. Jack stranger Ed25519 -- **done** (do not overwrite `stranger_dry_run.json`; later operators use `operator_replication.json`)
+3. `corvex claim-gates` → `claim_allowed` still blocked on (1)
 
 ## Still later
 
@@ -49,7 +49,7 @@ Do not jump to 200-host packs to “prove” correlator. Never summarize HELD wi
 
 Ordered by what to act on next (synthetic T3 **paused** until #1 has a corpus):
 
-**Next operator action:** run [`docs/real-world-test-sequences.md`](docs/real-world-test-sequences.md) (S0→S6). Highest leverage is S5 home-lab capture; S1 stranger + S2 second physical host block `claim_allowed`.
+**Next operator action:** run [`docs/real-world-test-sequences.md`](docs/real-world-test-sequences.md) (S0→S6). S2 is [`docs/s2-second-host.md`](docs/s2-second-host.md) (`scripts/run_s2_second_host.ps1` on PC-2, not `cyborg_1`). Independent operators: [`docs/external-operator-packet.md`](docs/external-operator-packet.md). Highest leverage after S2 is S5 home-lab capture (Phase 1: add hosts, do not peek).
 
 1. **Real / realistic benign baseline** (highest) — see **Benign corpus plan** below. Not hand-crafted SCCM/RDP noise.
 2. **Trust P0s (code)** — 1:1 producer↔host by default; fail-closed `CORVEX_CONTAIN_AUTHZ` (no hardcoded dual-control token). Landed.

@@ -1,4 +1,4 @@
 """Corvex — multi-host campaign correlator (L0 observe-only)."""
 
-__version__ = "1.1.0"
+__version__ = "1.2.0"
 CORVEX_CONTAIN = 0  # hard-locked off until contain checklist + executor

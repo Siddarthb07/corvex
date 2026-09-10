@@ -2,13 +2,14 @@
 from __future__ import annotations
 
 import json
+from datetime import datetime, timezone
 from pathlib import Path
 
 from corvex.adapters.os_wide import DEFAULT_ALLOWLIST
 from corvex.sensors.windows_os import poll_wevtutil_channel
 
 ROOT = Path(__file__).resolve().parents[1]
-OUT = ROOT / "labs" / "benign" / "home-lab-2026-08-13" / "raw" / "host-win.jsonl"
+RAW = ROOT / "labs" / "benign" / "home-lab-2026-08-13" / "raw"
 
 
 def main() -> None:
@@ -16,11 +17,13 @@ def main() -> None:
     for ch, ids in DEFAULT_ALLOWLIST.items():
         poll = poll_wevtutil_channel(ch, allow_ids=set(ids), max_events=80)
         records.extend(poll.get("records") or [])
-    OUT.parent.mkdir(parents=True, exist_ok=True)
-    with OUT.open("w", encoding="utf-8") as fh:
+    RAW.mkdir(parents=True, exist_ok=True)
+    stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    out = RAW / f"host-win-{stamp}.jsonl"
+    with out.open("a", encoding="utf-8") as fh:
         for rec in records:
             fh.write(json.dumps(rec, separators=(",", ":")) + "\n")
-    print(json.dumps({"wrote": str(OUT), "records": len(records)}))
+    print(json.dumps({"wrote": str(out), "records": len(records), "note": "dated file; does not overwrite host-win.jsonl"}))
 
 
 if __name__ == "__main__":

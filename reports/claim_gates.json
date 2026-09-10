@@ -1,6 +1,6 @@
 {
   "schema_ver": "3",
-  "generated_at": "2026-08-13T14:19:37Z",
+  "generated_at": "2026-08-15T13:48:37Z",
   "claim_allowed": false,
   "lab_verified": true,
   "claim_language": "lab_verified \u2014 sealed held-out + breaktest + trust probes; need Ed25519 stranger self-sign + live second host for claim_allowed",

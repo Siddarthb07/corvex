@@ -64,7 +64,29 @@ Attacker (`labs/breaktest/attacker/art_attack.py`) executes steps **in order**:
 3. Corvex correlates mid-chain and writes isolate flags  
 4. Later hops / wave2 retries return `403`
 
+## Sketch vs Atomic modes
+
+| Mode | Artifact | What runs |
+|------|----------|-----------|
+| **Sketch** (default) | `*.json` manifests | Offline `build-breaktest` packs **or** Docker `art_attack.py` (HTTP/net_conn sketches) |
+| **Atomic** (lab Windows) | `*.atomic.json` playbooks | Operator-installed `Invoke-AtomicTest` on a real host role — see [`docs/atomic-replay.md`](../../docs/atomic-replay.md) |
+
+```bash
+# Bind curated ART test numbers (does not vendor Atomic scripts)
+corvex atomic-bind labs/breaktest/manifests/art_lateral_chain.json \
+  --out labs/breaktest/manifests/art_lateral_chain.atomic.json
+
+# Gated real-host replay (CORVEX_ATOMIC=1 + --i-authorize-lab-ttp + Stage B unlock)
+corvex atomic-run labs/breaktest/manifests/art_lateral_chain.atomic.json \
+  --role host-a --run-dir runs/atomic/lateral-a --i-authorize-lab-ttp
+```
+
+Seeded playbook: `manifests/art_lateral_chain.atomic.json`. Reconstruction stays narrative; **playbooks** are the reusable attack. Atomic runs do **not** flip `claim_allowed`.
+
+*Updated: 2026-09-08 — sketch vs Atomic modes.*
+
 ## Adding a harder sequential attack
+
 
 1. Copy a manifest under `manifests/`.
 2. Use ≥4 hosts and **multiple detector keys** (different users and/or egress destinations).

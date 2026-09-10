@@ -2,6 +2,10 @@
 
 Someone **other than the author** must complete this and write `reports/stranger_dry_run.json`.
 
+For a 45-minute frozen path with three difficulty rungs, use
+[`docs/external-operator-packet.md`](external-operator-packet.md). This checklist
+is still the attestation format for the stranger gate.
+
 ## Steps
 
 1. Clone the repo; install (`pip install -e .`).
@@ -40,7 +44,9 @@ corvex sign-stranger-attestation
 corvex claim-gates
 ```
 
-Also need `reports/live_second_host.json` from elevated wevtutil on a **second physical** Windows PC (`python scripts/record_live_host_evidence.py --run-dir runs/live-host-2`).
+Also need `reports/live_second_host.json` from elevated wevtutil on a **second physical** Windows PC (`docs/s2-second-host.md`, `python scripts/record_live_host_evidence.py --run-dir runs/live-host-2`).
+
+A later independent operator should use [`docs/external-operator-packet.md`](external-operator-packet.md) and write `reports/operator_replication.json` (do not overwrite this stranger file).
 
 Private key: `reports/.stranger_ed25519_private.pem` (gitignored). Author-held `--hmac` does not unlock `claim_allowed`.
 

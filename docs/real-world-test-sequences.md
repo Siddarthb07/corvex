@@ -113,7 +113,15 @@ JSON as claim unlock.
 ## S2 — Second physical Windows host
 
 **Goal:** Elevated live wevtutil on a **second physical** PC.  
-**Owner:** Author on that machine (not Docker, not fixture).
+**Owner:** Author on that machine (not Docker, not fixture).  
+**Runbook:** [`s2-second-host.md`](s2-second-host.md) (`scripts/run_s2_second_host.ps1`).
+
+```bash
+# On PC-2 only (refuses hostname cyborg_1):
+powershell -ExecutionPolicy Bypass -File scripts/run_s2_second_host.ps1
+```
+
+Manual equivalent:
 
 ```bash
 corvex sensor-windows --follow --require-live --run-dir runs/live-host-2 \

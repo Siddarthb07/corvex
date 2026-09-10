@@ -23,6 +23,12 @@
 ### Safety
 - Agent stranger dry-runs and unsigned attestations cannot unlock `claim_allowed`.
 - Lab override does not flip claims. Live OS quarantine still unimplemented / observe-only.
+
+## [1.2.0] — 2026-09-08
+
+### Added
+- Atomic Red Team playbook replay (lab Windows): `corvex atomic-bind` / `atomic-run` / `atomic-lab`, curated technique→test bindings, `docs/atomic-replay.md`, `scripts/run_atomic_playbook.ps1`, seeded `art_lateral_chain.atomic.json`. ART not vendored; gated (`CORVEX_ATOMIC` + `--i-authorize-lab-ttp` + Stage B unlock); does not flip `claim_allowed`.
+
 ## [1.1.0] — 2026-07-23
 
 ### Added

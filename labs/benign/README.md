@@ -1,5 +1,8 @@
 # Benign corpora (dirty-replay / FP baseline)
 
+*Updated: 2026-09-07 — layout/commands unchanged; Atomic/ART replay is a separate
+lab path (`docs/atomic-replay.md`) and must **not** enter a pure-benign corpus.*
+
 Highest-leverage validation after synthetic fleets. **Do not hand-craft**
 SCCM/RDP-shaped synthetic noise for this gate — that recreates the
 “designed the test you already know how to pass” trap.

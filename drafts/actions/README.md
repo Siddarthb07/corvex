@@ -1,5 +1,7 @@
 # Draft action schemas (NOT installed)
 
+*Updated: 2026-09-07*
+
 Destructive verbs are documented here for contain design review only.
 
 **Do not import from the installable `corvex` package.**

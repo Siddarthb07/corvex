@@ -6,6 +6,8 @@ Multi-host **campaign correlator** for threat hunting — fuses weak per-host de
 
 **Public claim (standing):** research correlator — holds up against synthetic ATT&CK-shaped fleets; **not yet validated against real telemetry or benign baselines.** Observe and correlate first. Live containment stays locked behind safety controls.
 
+*Docs pass: 2026-09-07 — Atomic playbook replay path linked under Labs; claim language unchanged.*
+
 Real/realistic benign baseline (next gate): `labs/benign/` + `python scripts/run_benign_baseline.py` — pre-committed FP bars in `future-plans.md`; no hand-crafted “admin noise.” Operator sequence: [`docs/real-world-test-sequences.md`](docs/real-world-test-sequences.md).
 
 Local stress / break write-up (no Docker): [`reports/local_stress_break_results.md`](reports/local_stress_break_results.md).
@@ -189,6 +191,19 @@ python scripts/run_breaker_attacks.py
 
 See [`labs/breaktest/README.md`](labs/breaktest/README.md).
 
+### Atomic Red Team replay (lab Windows)
+
+Reusable playbooks that invoke operator-installed ART (not vendored). Gated; does not flip `claim_allowed`.
+
+```bash
+corvex atomic-bind labs/breaktest/manifests/art_lateral_chain.json \
+  --out labs/breaktest/manifests/art_lateral_chain.atomic.json
+# then: CORVEX_ATOMIC=1 + stage-b-lab-unlock + --i-authorize-lab-ttp
+# corvex atomic-run … --role host-a
+```
+
+See [`docs/atomic-replay.md`](docs/atomic-replay.md).
+
 ### Docker attack lab
 
 Needs Docker. Sources live in `labs/live/`:
@@ -206,6 +221,7 @@ Spins up 3 virtual hosts + attacker + Corvex on an isolated bridge network. Same
 | Correlator + monitor + prevention log | Ready |
 | Replay / BYO JSONL ingest | Ready |
 | Fusion-gap packs (`fusion_chain`) + break-test lab | Ready (local score **or** Docker live — [`labs/breaktest/README.md`](labs/breaktest/README.md)) |
+| Atomic Red Team playbook replay (`atomic-bind` / `atomic-run`) | Ready — gated lab Windows; ART not vendored — [`docs/atomic-replay.md`](docs/atomic-replay.md) |
 | Windows auth export → BYO (`adapt-windows` / `byo-windows`) | Ready (observe-only) |
 | OS-wide Windows sensor (`sensor-windows`) | Ready — Stage B gated / `stage-b-lab-unlock` |
 | OS-wide macOS network sensor (`sensor-macos`) | Ready — Stage B gated; live net via `lsof` |
@@ -269,9 +285,9 @@ Reconstruction writes `reconstruction.json` with status `complete` / `partial` /
 
 - [`CHANGELOG.md`](CHANGELOG.md) · [`SECURITY.md`](SECURITY.md) · [`THREAT_MODEL.md`](THREAT_MODEL.md) · [`LICENSE`](LICENSE)
 - Sensors: [`docs/sensor-macos.md`](docs/sensor-macos.md) · [`docs/sensor-windows.md`](docs/sensor-windows.md) · [`docs/os-wide-sensor.md`](docs/os-wide-sensor.md)
-- [`docs/how-corvex-works.md`](docs/how-corvex-works.md) · [`docs/contain.md`](docs/contain.md) · [`docs/stranger-checklist.md`](docs/stranger-checklist.md) · [`docs/real-world-test-sequences.md`](docs/real-world-test-sequences.md)
+- [`docs/how-corvex-works.md`](docs/how-corvex-works.md) · [`docs/contain.md`](docs/contain.md) · [`docs/stranger-checklist.md`](docs/stranger-checklist.md) · [`docs/external-operator-packet.md`](docs/external-operator-packet.md) · [`docs/real-world-test-sequences.md`](docs/real-world-test-sequences.md) · [`docs/s2-second-host.md`](docs/s2-second-host.md)
 - Results: [`reports/RESULTS.md`](reports/RESULTS.md) · [`reports/local_stress_break_results.md`](reports/local_stress_break_results.md)
-- [`labs/breaktest/README.md`](labs/breaktest/README.md) · [`future-plans.md`](future-plans.md)
+- [`labs/breaktest/README.md`](labs/breaktest/README.md) · [`docs/atomic-replay.md`](docs/atomic-replay.md) · [`future-plans.md`](future-plans.md)
 
 ## License
 

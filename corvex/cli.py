@@ -1,4 +1,4 @@
-"""CLI: corvex replay | eval | sensor-windows | byo-windows | dash | seal-day0 | …"""
+"""CLI: corvex replay | eval | sensor-windows | atomic-run | byo-windows | dash | …"""
 
 from __future__ import annotations
 
@@ -1542,6 +1542,241 @@ def build_breaktest_cmd(
         payload["fusion_lift"] = br["break_points"]["fusion_lift"]
         payload["break_points"] = br["break_points"]
     typer.echo(json.dumps(payload, indent=2))
+
+
+@app.command("atomic-bind")
+def atomic_bind_cmd(
+    manifest: Path = typer.Argument(..., help="Break-test manifest JSON"),
+    out: Path = typer.Option(
+        ...,
+        "--out",
+        help="Write atomic playbook JSON (*.atomic.json)",
+    ),
+    allow_unlisted: bool = typer.Option(
+        False,
+        "--allow-unlisted",
+        help="Bind unknown techniques only if they already pin test_number",
+    ),
+) -> None:
+    """Fill curated Atomic Red Team bindings into a breaktest manifest → playbook.
+
+    Does not vendor Atomic scripts. Output is for lab purple-team replay only.
+    """
+    from corvex.adapters.attack_repos import load_manifest
+    from corvex.atomic.playbook import bind_manifest, write_playbook
+
+    man = load_manifest(manifest)
+    playbook = bind_manifest(man, allow_unlisted=allow_unlisted)
+    path = write_playbook(Path(out), playbook)
+    typer.echo(
+        json.dumps(
+            {
+                "out": str(path),
+                "campaign_id": playbook.get("campaign_id"),
+                "atomic_bound_count": playbook.get("atomic_bound_count"),
+                "atomic_gaps": playbook.get("atomic_gaps"),
+                "honesty": playbook.get("honesty"),
+            },
+            indent=2,
+        )
+    )
+
+
+@app.command("atomic-run")
+def atomic_run_cmd(
+    playbook_path: Path = typer.Argument(..., help="Atomic playbook JSON"),
+    role: str = typer.Option(..., "--role", help="Host role to execute (e.g. host-a)"),
+    run_dir: Path = typer.Option(
+        Path("runs/atomic"),
+        "--run-dir",
+        help="Journal + summary output directory",
+    ),
+    i_authorize_lab_ttp: bool = typer.Option(
+        False,
+        "--i-authorize-lab-ttp",
+        help="Required: confirm authorized lab host",
+    ),
+    allow_unlisted: bool = typer.Option(
+        False,
+        "--allow-unlisted",
+        help="Allow techniques outside the curated allowlist (must pin test_number)",
+    ),
+    dry_run: bool = typer.Option(
+        False,
+        "--dry-run",
+        help="Journal planned Invoke-AtomicTest calls without executing",
+    ),
+    report_dir: Path = typer.Option(Path("reports"), "--reports"),
+    write_report: bool = typer.Option(
+        True,
+        "--write-report/--no-write-report",
+        help="Write reports/atomic_run_<id>.json",
+    ),
+) -> None:
+    """Execute bound Atomic tests for one host role via Invoke-AtomicRedTeam.
+
+    Requires CORVEX_ATOMIC=1, --i-authorize-lab-ttp, and Stage B lab unlock.
+    Does not flip claim_allowed. See docs/atomic-replay.md.
+    """
+    from corvex.atomic.playbook import load_playbook
+    from corvex.atomic.report import write_atomic_run_report
+    from corvex.atomic.runner import AtomicGateError, run_playbook
+
+    try:
+        playbook = load_playbook(playbook_path)
+        summary = run_playbook(
+            playbook,
+            role=role,
+            run_dir=Path(run_dir),
+            authorize=i_authorize_lab_ttp,
+            allow_unlisted=allow_unlisted,
+            report_dir=Path(report_dir),
+            dry_run=dry_run,
+            check_invoke=not dry_run,
+        )
+    except AtomicGateError as exc:
+        typer.echo(str(exc), err=True)
+        raise typer.Exit(2) from exc
+    except Exception as exc:
+        typer.echo(f"atomic-run failed: {exc}", err=True)
+        raise typer.Exit(1) from exc
+
+    report_path = None
+    if write_report:
+        report_path = write_atomic_run_report(
+            report_dir=Path(report_dir),
+            playbook=playbook,
+            summary=summary,
+            run_dir=Path(run_dir),
+        )
+        summary = {**summary, "report": str(report_path)}
+    typer.echo(json.dumps(summary, indent=2))
+
+
+@app.command("atomic-lab")
+def atomic_lab_cmd(
+    playbook_path: Path = typer.Argument(..., help="Atomic playbook JSON"),
+    role: str = typer.Option(..., "--role", help="Host role to execute"),
+    run_dir: Path = typer.Option(Path("runs/atomic/lab"), "--run-dir"),
+    i_authorize_lab_ttp: bool = typer.Option(
+        False,
+        "--i-authorize-lab-ttp",
+        help="Required: confirm authorized lab host",
+    ),
+    host_map: Optional[Path] = typer.Option(
+        None,
+        "--host-map",
+        help="Windows host map JSON for sensor-windows",
+    ),
+    fixture: Optional[Path] = typer.Option(
+        None,
+        "--fixture",
+        help="If set, sensor uses fixture once (CI) instead of live follow",
+    ),
+    report_dir: Path = typer.Option(Path("reports"), "--reports"),
+    dry_run: bool = typer.Option(False, "--dry-run"),
+) -> None:
+    """Capture (sensor-windows) then atomic-run + reconstruct for one role.
+
+    Observe-only. Prefer scripts/run_atomic_playbook.ps1 for live follow + stop.
+    Does not flip claim_allowed.
+    """
+    from corvex.atomic.playbook import load_playbook
+    from corvex.atomic.report import write_atomic_run_report
+    from corvex.atomic.runner import AtomicGateError, run_playbook
+    from corvex.reconstruct import write_reconstruction
+
+    run_dir = Path(run_dir)
+    run_dir.mkdir(parents=True, exist_ok=True)
+
+    sensor_note = None
+    if fixture is not None:
+        try:
+            from corvex.sensors.windows_os import run_sensor_windows
+            from corvex.stage_b import StageBGateError
+
+            hosts = dict(DEMO_HOSTS)
+            enrollment = ensure_lab_enrollment(hosts=hosts)
+            root = _repo_root()
+            allow = root / "fixtures" / "os_wide" / "channels.json"
+            hmap: Dict[str, str] = {h: h for h in hosts}
+            hm_path = host_map or (root / "fixtures" / "windows_host_map.json")
+            if Path(hm_path).exists():
+                loaded = json.loads(Path(hm_path).read_text(encoding="utf-8"))
+                if isinstance(loaded, dict):
+                    hmap.update({str(k).lower(): str(v) for k, v in loaded.items()})
+                    hmap.update({str(k): str(v) for k, v in loaded.items()})
+            run_sensor_windows(
+                run_dir=run_dir,
+                enrollment=enrollment,
+                channels=["security", "sysmon", "firewall", "powershell"],
+                allowlist_path=allow if allow.exists() else None,
+                fixture=Path(fixture),
+                host_map=hmap,
+                follow=False,
+                once=True,
+            )
+            sensor_note = "sensor-windows fixture once completed"
+        except StageBGateError as exc:
+            sensor_note = f"sensor gated: {exc}"
+        except Exception as exc:
+            sensor_note = f"sensor skipped/failed: {exc}"
+    elif host_map is not None:
+        sensor_note = (
+            "host-map set without --fixture; use scripts/run_atomic_playbook.ps1 "
+            "for live sensor-windows --follow around atomic-run"
+        )
+
+    try:
+        playbook = load_playbook(playbook_path)
+        summary = run_playbook(
+            playbook,
+            role=role,
+            run_dir=run_dir,
+            authorize=i_authorize_lab_ttp,
+            report_dir=Path(report_dir),
+            dry_run=dry_run,
+            check_invoke=not dry_run,
+        )
+    except AtomicGateError as exc:
+        typer.echo(str(exc), err=True)
+        raise typer.Exit(2) from exc
+
+    recon_status = None
+    campaign_ids: List[str] = []
+    timeline = run_dir / "timeline.json"
+    if timeline.exists():
+        try:
+            write_reconstruction(run_dir, quarantine_mode="dry_run")
+            recon = json.loads((run_dir / "reconstruction.json").read_text(encoding="utf-8"))
+            recon_status = recon.get("aggregate_status") or recon.get("status")
+            for item in recon.get("campaign_reconstructions") or []:
+                cid = item.get("campaign_id")
+                if cid:
+                    campaign_ids.append(str(cid))
+        except Exception:
+            recon_status = "unavailable"
+
+    report_path = write_atomic_run_report(
+        report_dir=Path(report_dir),
+        playbook=playbook,
+        summary=summary,
+        run_dir=run_dir,
+        campaign_ids=campaign_ids,
+        reconstruction_status=recon_status,
+    )
+    typer.echo(
+        json.dumps(
+            {
+                **summary,
+                "sensor": sensor_note,
+                "reconstruction_status": recon_status,
+                "campaign_ids_found": campaign_ids,
+                "report": str(report_path),
+            },
+            indent=2,
+        )
+    )
 
 
 @app.command("freeze-check")

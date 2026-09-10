@@ -1,0 +1,12 @@
+{
+  "schema_ver": "1",
+  "generated_at": "2026-08-15T13:50:00Z",
+  "live_second_host_written": false,
+  "claim_allowed": false,
+  "blocked_on": "second_physical_windows_host",
+  "this_hostname": "cyborg_1",
+  "this_host_role": "phase0_host-win (host-1)",
+  "script_check": "scripts/run_s2_second_host.ps1 refuses cyborg_1 (verified 2026-08-15)",
+  "honesty": "Agent on host-1 must not write reports/live_second_host.json. Run scripts/run_s2_second_host.ps1 elevated on PC-2. See docs/s2-second-host.md.",
+  "next": "powershell -ExecutionPolicy Bypass -File scripts/run_s2_second_host.ps1"
+}
