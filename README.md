@@ -285,7 +285,7 @@ Reconstruction writes `reconstruction.json` with status `complete` / `partial` /
 
 - [`CHANGELOG.md`](CHANGELOG.md) · [`SECURITY.md`](SECURITY.md) · [`THREAT_MODEL.md`](THREAT_MODEL.md) · [`LICENSE`](LICENSE)
 - Sensors: [`docs/sensor-macos.md`](docs/sensor-macos.md) · [`docs/sensor-windows.md`](docs/sensor-windows.md) · [`docs/os-wide-sensor.md`](docs/os-wide-sensor.md)
-- [`docs/how-corvex-works.md`](docs/how-corvex-works.md) · [`docs/contain.md`](docs/contain.md) · [`docs/stranger-checklist.md`](docs/stranger-checklist.md) · [`docs/external-operator-packet.md`](docs/external-operator-packet.md) · [`docs/real-world-test-sequences.md`](docs/real-world-test-sequences.md) · [`docs/s2-second-host.md`](docs/s2-second-host.md)
+- [`docs/how-corvex-works.md`](docs/how-corvex-works.md) · [`docs/DEEP_DIVE.md`](docs/DEEP_DIVE.md) · [`docs/contain.md`](docs/contain.md) · [`docs/stranger-checklist.md`](docs/stranger-checklist.md) · [`docs/external-operator-packet.md`](docs/external-operator-packet.md) · [`docs/real-world-test-sequences.md`](docs/real-world-test-sequences.md) · [`docs/s2-second-host.md`](docs/s2-second-host.md)
 - Results: [`reports/RESULTS.md`](reports/RESULTS.md) · [`reports/local_stress_break_results.md`](reports/local_stress_break_results.md)
 - [`labs/breaktest/README.md`](labs/breaktest/README.md) · [`docs/atomic-replay.md`](docs/atomic-replay.md) · [`future-plans.md`](future-plans.md)
 

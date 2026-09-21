@@ -12,6 +12,7 @@ runs/
 # secrets & local key material — never publish
 .secrets/
 *.key
+*.pem
 **/enrollment.json
 **/.corvex/
 **/.campaignfuse/
