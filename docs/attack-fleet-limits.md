@@ -82,7 +82,7 @@ Not another N/N HELD. A useful outcome is mixed HELD/PARTIAL/BROKE that shows th
 
 ### Publication decision (evasion cookbook tradeoff)
 
-**Decision (2026-07-25): keep these docs public** for early-stage authenticity — the suite exists to falsify Corvex, and hiding break criteria undercuts that. Audience today is the author plus reviewers/admissions readers, not a production SOC defending a networked deployment.
+**Decision (2026-07-25): keep these docs public** for early-stage authenticity — the suite exists to falsify Corvex, and hiding break criteria undercuts that. Audience today is the author and outside reviewers, not a production SOC defending a networked deployment.
 
 Accepted tradeoff: thresholds and bypass shapes (day-gap, hub-degree, sequential-reuse, contain gate) are visible. Revisit (private mirror or redact knobs) **before** any networked bus / live contain deployment. Until then, prefer fix+regress over secrecy.
 - Live OS quarantine remains unimplemented.

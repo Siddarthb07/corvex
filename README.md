@@ -103,7 +103,7 @@ corvex fuse-run \
 
 Mode is **offline_lab_replay** (file merge + HMAC verify) — not JetStream.
 
-## Results (sealed held-out)
+## Results (sealed held-out, synthetic)
 
 Synthetic multi-host packs (incl. `fusion_chain` + benign **N=5**). **Care vs commercial tools: unproven.** Sealed/breaktest quality is `lab_verified`; publish “useful on real attacks” only when `claim_allowed=true` (signed stranger + trust integrity).
 
