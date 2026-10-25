@@ -43,6 +43,19 @@ The live sensor polls with `/f:xml /e:Events` and flattens records for the os_wi
 
 Channels: Security (4624/4625/4648), Sysmon (1/3/22 if installed), Firewall, PowerShell (hashed script blocks). Allowlists + rate caps control noise. **No actuators.**
 
+### DNS / DNS-only C2 (honest degrade)
+
+There is **no** standalone wevtutil `dns` log. DNS queries reach Corvex only as **Sysmon EID 22** → `payload_type: dns`. After each sensor run, `sensor_status.json` includes `channel_health.dns`:
+
+| `channel_health.dns.reason` | Meaning |
+|-----------------------------|---------|
+| `sysmon_eid22` | DNS events adapted — correlator `dns_beacon` path can fire |
+| `sysmon_channel_not_requested` | `--channels` omitted sysmon — DNS C2 is a blind spot |
+| `sysmon_unavailable` / channel missing | Sysmon not installed or denied — **do not claim DNS coverage** |
+| `no_sysmon_eid22_hits` | Sysmon polled but no EID 22 this window — coverage unproven (GAP) |
+
+When `dns` appears in `degraded`, treat DNS-only C2 as an explicit blind spot (`dns_only_c2_blind`), not silent pass. Enable Sysmon with EID 22 if you need that channel; macOS uses unified-log `dns` with the same honesty pattern (`docs/sensor-macos.md`).
+
 ## Multi-host enrollment map
 
 Corvex signs with local `~/.corvex/enrollment.json` (owner-only ACL on save). Map each Windows `Computer` name to an enrolled host id via `--host-map`.

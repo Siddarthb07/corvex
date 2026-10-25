@@ -193,6 +193,7 @@ def aggregate_scores(scores: Sequence[ScoreResult]) -> Dict[str, float]:
     if not scores:
         return {
             "campaign_f1": 0.0,
+            "macro_campaign_f1": 0.0,
             "precision": 0.0,
             "recall": 0.0,
             "precision_at_1": 0.0,
@@ -201,20 +202,26 @@ def aggregate_scores(scores: Sequence[ScoreResult]) -> Dict[str, float]:
             "tp": 0,
             "fp": 0,
             "fn": 0,
+            "f1_aggregation": "micro_from_tp_fp_fn",
         }
     benign = [s for s in scores if s.details.get("benign")]
     non = [s for s in scores if not s.details.get("benign")]
     fcr = sum(s.false_campaign_rate for s in benign) / len(benign) if benign else 0.0
     if non:
-        f1 = sum(s.campaign_f1 for s in non) / len(non)
         p1 = sum(s.precision_at_1 for s in non) / len(non)
         tp = sum(s.tp for s in non)
         fp = sum(s.fp for s in non)
         fn = sum(s.fn for s in non)
+        # Micro-averaged P/R/F1 from pooled TP/FP/FN. Do NOT average per-pack F1
+        # while reporting micro P/R — that mismatch (e.g. P=0.33, R=0.67, F1=0.67)
+        # is arithmetically impossible for a harmonic mean and was a paper defect.
         prec, rec = precision_recall(tp, fp, fn)
+        f1 = campaign_f1(tp, fp, fn)
+        macro_f1 = sum(s.campaign_f1 for s in non) / len(non)
     else:
         # Benign-only bucket: campaign F1 is not meaningful — surface clean FCR instead.
         f1 = 1.0 - fcr
+        macro_f1 = f1
         p1 = 1.0 - fcr
         tp = fp = fn = 0
         prec = 1.0 - fcr
@@ -222,6 +229,7 @@ def aggregate_scores(scores: Sequence[ScoreResult]) -> Dict[str, float]:
     ttu = max(s.ttu_seconds for s in scores)
     return {
         "campaign_f1": f1,
+        "macro_campaign_f1": macro_f1,
         "precision": prec,
         "recall": rec,
         "precision_at_1": p1,
@@ -230,6 +238,7 @@ def aggregate_scores(scores: Sequence[ScoreResult]) -> Dict[str, float]:
         "tp": float(tp),
         "fp": float(fp),
         "fn": float(fn),
+        "f1_aggregation": "micro_from_tp_fp_fn",
     }
 
 

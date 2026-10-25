@@ -1,6 +1,6 @@
 # Attack fleet: Limits T1 — 15-host scale
 
-**Scale tier:** T1 | **Hosts:** 15 | **Decoys:** False | **Wall:** 35.6346s | **Peak RSS:** 33.69 MB | **fragile_rate=0.3571**
+**Scale tier:** T1 | **Hosts:** 15 | **Decoys:** False | **Wall:** 12.2978s | **Peak RSS:** 33.78 MB | **fragile_rate=0.3571**
 **Gates:** wall/RSS → PASS; fragile-rate → PASS
 
 
@@ -24,9 +24,9 @@ confidence(top) − confidence(2nd-best). Raw top−2nd is retained as
 not equivalent to a clean HELD). Correctly separated equal-score campaigns are
 **not** fragile under this definition.
 
-- Attacks: **15** | Intensity rounds/attack: **2**
+- Attacks: **15** | Intensity rounds/attack: **1**
 - Baseline: **single-host-isolation**
-- Wall: **35.6346s**
+- Wall: **12.2978s**
 - HELD: **14** (of which **fragile**: 5) | PARTIAL: **1** | BROKE: **0**
 - Baseline wins: **0**
 
@@ -39,9 +39,9 @@ For a security tool, quarantining authorized activity *worse than doing nothing*
 Ordered by operational severity, not by suite index.
 
 - **t1-lim09b-sequential-reuse** — **HELD, fragile** (J=1.0, margin=0.0, FQ=-). 
-- **t1-lim03-slow-low-day-gaps** — **PARTIAL** (J=0.6667, margin=0.0, FQ=-). 
 - **t1-lim09d-benign-hub-pivot** — **HELD, fragile** (J=1.0, margin=0.1, FQ=-). 
 - **t1-lim01-dual-ambiguous-lateral** — **HELD, fragile** (J=1.0, margin=0.0, FQ=-). 
+- **t1-lim07-dropped-mid-chain** — **PARTIAL** (J=0.5, margin=0.1, FQ=-). 
 - **t1-lim08-out-of-order-arrival** — **HELD, fragile** (J=1.0, margin=0.1, FQ=host-02, host-03). 
 - **t1-lim09c-positional-bias** — **HELD, fragile** (J=1.0, margin=0.0, FQ=-). 
 
@@ -65,11 +65,11 @@ Ordered by operational severity, not by suite index.
 |---|----------|---------|---------|--------|--------|-------------|-------|---------|-------------|---------------|
 | 1 | t1-lim01-dual-ambiguous-lateral | **HELD, fragile** | 1.0 | 0.0 | - | - | host-03, host-04, host-05, host-06, host-07, host-08, host-09, host-10, host-11, host-12, host-13, host-14 | - | - | False |
 | 2 | t1-lim02-triple-concurrent-shared | **HELD** | 1.0 | 0.9 | - | - | host-06, host-07, host-08, host-09, host-10, host-11, host-12, host-13, host-14 | - | - | False |
-| 3 | t1-lim03-slow-low-day-gaps | **PARTIAL** | 0.6667 | 0.0 | - | - | host-03, host-04, host-05, host-06, host-07, host-08, host-09, host-10, host-11, host-12, host-13, host-14 | - | - | False |
+| 3 | t1-lim03-slow-low-day-gaps | **HELD** | 1.0 | 1.0 | - | - | host-03, host-04, host-05, host-06, host-07, host-08, host-09, host-10, host-11, host-12, host-13, host-14 | - | - | False |
 | 4 | t1-lim04-timing-jitter | **HELD** | 1.0 | 1.0 | - | - | host-03, host-04, host-05, host-06, host-07, host-08, host-09, host-10, host-11, host-12, host-13, host-14 | - | - | False |
 | 5 | t1-lim05-technique-sub-kerberoast | **HELD** | 1.0 | 1.0 | - | - | host-03, host-04, host-05, host-06, host-07, host-08, host-09, host-10, host-11, host-12, host-13, host-14 | - | - | False |
 | 6 | t1-lim06-clock-skew-47s | **HELD** | 1.0 | 1.0 | - | - | host-03, host-04, host-05, host-06, host-07, host-08, host-09, host-10, host-11, host-12, host-13, host-14 | - | - | False |
-| 7 | t1-lim07-dropped-mid-chain | **HELD** | 1.0 | 1.0 | - | - | host-04, host-05, host-06, host-07, host-08, host-09, host-10, host-11, host-12, host-13, host-14 | - | - | False |
+| 7 | t1-lim07-dropped-mid-chain | **PARTIAL** | 0.5 | 0.1 | - | - | host-04, host-05, host-06, host-07, host-08, host-09, host-10, host-11, host-12, host-13, host-14 | - | - | False |
 | 8 | t1-lim08-out-of-order-arrival | **HELD, fragile** | 1.0 | 0.1 | - | - | host-04, host-05, host-06, host-07, host-08, host-09, host-10, host-11, host-12, host-13, host-14 | host-02, host-03 | - | False |
 | 9 | t1-lim09-max-density-overlap ★ | **HELD** | 1.0 | 1.0 | - | - | host-05, host-06, host-07, host-08, host-09, host-10, host-11, host-12, host-13, host-14 | - | - | False |
 | 10 | t1-lim09b-sequential-reuse ★ | **HELD, fragile** | 1.0 | 0.0 | - | - | host-03, host-04, host-05, host-06, host-07, host-08, host-09, host-10, host-11, host-12, host-13, host-14 | - | - | False |
@@ -82,9 +82,9 @@ Ordered by operational severity, not by suite index.
 ## Where it broke / partial / fragile (priority order)
 
 - **t1-lim09b-sequential-reuse** (HELD, fragile): sequential incidents split across 2 campaigns — incident1 and incident2 reported as a single continuous campaign
-- **t1-lim03-slow-low-day-gaps** (PARTIAL): jaccard 0.6667 in PARTIAL band — any truth-host event outside the window silently dropped from campaign reconstruction
 - **t1-lim09d-benign-hub-pivot** (HELD, fragile): matched truth without merge-FQ; break_criterion not triggered: attack missed (BROKE) or b/d False Q via association — attack missed (BROKE) or b/d False Q via association
 - **t1-lim01-dual-ambiguous-lateral** (HELD, fragile): matched truth without merge-FQ; break_criterion not triggered: d or e appears in the malicious campaign's Q dry-run list — d or e appears in the malicious campaign's Q dry-run list
+- **t1-lim07-dropped-mid-chain** (PARTIAL): jaccard 0.5 in PARTIAL band — PARTIAL/BROKE, or false confidence that a,d is complete
 - **t1-lim08-out-of-order-arrival** (HELD, fragile): matched truth without merge-FQ; break_criterion not triggered: causal chain backwards, or split into two false fragments — causal chain backwards, or split into two false fragments
 - **t1-lim09c-positional-bias** (HELD, fragile): matched truth without merge-FQ; break_criterion not triggered: Jaccard or margin regression vs original #1/#6 from host relabeling alone — Jaccard or margin regression vs original #1/#6 from host relabeling alone
 
@@ -94,7 +94,7 @@ None — correlator never lost to single-host isolation on FQ/coverage.
 
 ## Clean HELD (9) — not fragile
 
-`t1-lim02-triple-concurrent-shared`, `t1-lim04-timing-jitter`, `t1-lim05-technique-sub-kerberoast`, `t1-lim06-clock-skew-47s`, `t1-lim07-dropped-mid-chain`, `t1-lim09-max-density-overlap`, `t1-lim10-authorized-redteam`, `t1-lim11-hostname-split-brain`, `t1-lim12-near-dup-cdn-mimicry` — confident passes (margin ≥ 0.2, no fragile flag).
+`t1-lim02-triple-concurrent-shared`, `t1-lim03-slow-low-day-gaps`, `t1-lim04-timing-jitter`, `t1-lim05-technique-sub-kerberoast`, `t1-lim06-clock-skew-47s`, `t1-lim09-max-density-overlap`, `t1-lim10-authorized-redteam`, `t1-lim11-hostname-split-brain`, `t1-lim12-near-dup-cdn-mimicry` — confident passes (margin ≥ 0.2, no fragile flag).
 
 ## Per-attack detail
 
@@ -122,8 +122,8 @@ None — correlator never lost to single-host isolation on FQ/coverage.
 
 - Break criterion: any truth-host event outside the window silently dropped from campaign reconstruction
 - Truth: host-00, host-01, host-02
-- Verdict: **PARTIAL** | Jaccard=0.6667 | margin=0.0
-- Reasons: jaccard 0.6667 in PARTIAL band
+- Verdict: **HELD** | Jaccard=1.0 | margin=1.0
+- Reasons: matched truth without merge-FQ; break_criterion not triggered: any truth-host event outside the window silently dropped from campaign reconstruction
 - Quarantine dry-run: -
 - Saved: host-03, host-04, host-05, host-06, host-07, host-08, host-09, host-10, host-11, host-12, host-13, host-14 | False Q: -
 - Baseline FQ: - | baseline_wins=False
@@ -162,9 +162,9 @@ None — correlator never lost to single-host isolation on FQ/coverage.
 
 - Break criterion: PARTIAL/BROKE, or false confidence that a,d is complete
 - Truth: host-00, host-01, host-02, host-03
-- Verdict: **HELD** | Jaccard=1.0 | margin=1.0
-- Reasons: matched truth without merge-FQ; break_criterion not triggered: PARTIAL/BROKE, or false confidence that a,d is complete
-- Quarantine dry-run: host-00, host-01, host-02, host-03
+- Verdict: **PARTIAL** | Jaccard=0.5 | margin=0.1
+- Reasons: jaccard 0.5 in PARTIAL band
+- Quarantine dry-run: host-00, host-01
 - Saved: host-04, host-05, host-06, host-07, host-08, host-09, host-10, host-11, host-12, host-13, host-14 | False Q: -
 - Baseline FQ: - | baseline_wins=False
 

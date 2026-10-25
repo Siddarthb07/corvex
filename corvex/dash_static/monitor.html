@@ -308,15 +308,30 @@ body::before {
     const by = k.by_kind || {};
     const kinds = Object.keys(by).sort((a,b)=>by[b]-by[a]);
     const hosts = (s.run && s.run.hosts) || [];
+    const sensor = s.sensor || {};
+    const health = sensor.channel_health || {};
+    const chNames = Object.keys(health).sort();
     const kindBars = kinds.length
       ? kinds.map(x => `<div class="bar"><span>${esc(x)}</span><b>${by[x]}</b></div>`).join("")
       : '<div class="bar"><span>no events</span><b>0</b></div>';
     const hostBars = hosts.length
       ? hosts.map(h => `<div class="bar"><span>${esc(h)}</span><b>·</b></div>`).join("")
       : '<div class="bar"><span>—</span><b>0</b></div>';
+    const healthBars = chNames.length
+      ? chNames.map(ch => {
+          const h = health[ch] || {};
+          const ok = !!h.ok;
+          const reason = h.reason || (ok ? "ok" : "gap");
+          return `<div class="bar"><span>${esc(ch)}</span><b style="color:${ok?"var(--ok,#8fd19e)":"var(--warn,#f0cd7a)"}">${esc(reason)}</b></div>`;
+        }).join("")
+      : '<div class="bar"><span>no sensor_status</span><b>—</b></div>';
+    const dnsNote = sensor.note
+      ? `<div class="bar" style="margin-top:6px;color:var(--warn,#f0cd7a);font-size:.65rem;letter-spacing:0">${esc(sensor.note)}</div>`
+      : "";
     return `
       <h3>Signal mix</h3>${kindBars}
       <h3 style="margin-top:18px">Hosts in run</h3>${hostBars}
+      <h3 style="margin-top:18px">Sensor channels</h3>${healthBars}${dnsNote}
       <h3 style="margin-top:18px">Honesty</h3>
       <div class="bar"><span>quarantine</span><b>${esc((s.quarantine||{}).mode||"—")}</b></div>
       <div class="bar"><span>live executor</span><b>false</b></div>

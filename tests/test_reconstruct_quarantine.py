@@ -56,7 +56,8 @@ def test_reconstruct_complete_multihost_with_attack_tags():
     assert rec.status == "complete"
     assert "T1078" in rec.steps[0].attack_techniques
     assert rec.quarantine is not None
-    assert rec.quarantine.host_ids == ["host-a", "host-b", "host-c"]
+    # ≥3-host camp → mid-chain cut only (not fleet-wide spray)
+    assert rec.quarantine.host_ids == ["host-b"]  # cut = second host of first multi stage
     assert rec.quarantine.mode == "dry_run"
     assert "not armed" in rec.quarantine.honesty.lower() or "Dry-run" in rec.quarantine.honesty
     man = rec.to_manifest()
@@ -104,7 +105,28 @@ def test_recon_plus_lateral_allows_isolate():
         quarantine_mode="dry_run",
     )
     assert rec.quarantine is not None
-    assert set(rec.quarantine.host_ids) == {"host-a", "host-b"}
+    # 2-host camp → mid-chain cut only (host-b)
+    assert set(rec.quarantine.host_ids) == {"host-b"}
+
+
+def test_quarantine_refuses_fleet_wide_spray_on_egress_camp():
+    """≥3-host camp with egress on one host must not Q every member."""
+    rec = reconstruct_campaign(
+        Campaign(
+            campaign_id="camp-big",
+            host_ids=["host-a", "host-b", "host-c", "host-d"],
+            stages=[
+                {"name": "lateral_auth", "hosts": ["host-a", "host-b", "host-c", "host-d"]},
+                {"name": "micro_exfil", "hosts": ["host-d"]},
+            ],
+            evidence=[],
+            score=0.9,
+        ),
+        quarantine_mode="dry_run",
+    )
+    assert rec.quarantine is not None
+    assert len(rec.quarantine.host_ids) == 1
+    assert set(rec.quarantine.host_ids) != {"host-a", "host-b", "host-c", "host-d"}
 
 
 def test_reconstruct_truth_mismatch_is_partial():

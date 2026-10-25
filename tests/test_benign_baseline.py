@@ -35,6 +35,28 @@ def test_normalize_remaps_security_firewall_and_hostname():
     assert rec["EventData"]["DestAddress"] == "198.51.100.40"
 
 
+def test_normalize_winlogbeat_ecs_flattens():
+    rec = normalize_otrf_record(
+        {
+            "@timestamp": "2019-10-20T20:11:06.937Z",
+            "host": {"hostname": "HFDC01"},
+            "winlog": {
+                "channel": "Microsoft-Windows-Sysmon/Operational",
+                "event_id": 3,
+                "computer_name": "HFDC01.shire.local",
+                "event_data": {
+                    "DestinationIp": "10.0.0.5",
+                    "DestinationPort": "443",
+                    "Image": "C:\\\\Windows\\\\System32\\\\curl.exe",
+                },
+            },
+        }
+    )
+    assert rec["Computer"] == "HFDC01.shire.local"
+    assert "Sysmon" in str(rec.get("Channel") or "")
+    assert rec["EventData"]["DestinationIp"] == "10.0.0.5"
+
+
 def test_adapt_otrf_smoke_skips_noise_and_maps_types():
     envs, stats = adapt_otrf_export(FIXTURE)
     assert stats["adapted"] >= 5

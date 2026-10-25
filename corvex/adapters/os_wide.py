@@ -17,13 +17,15 @@ from corvex.adapters.windows_security import (
     _event_id,
     _host_id,
     _parse_ts,
-    _src_ip,
+    _src_peer,
     _user,
 )
+from corvex.net_noise import is_ambient_dst, looks_like_ip
 
 # Default allowlists (noise control). Override via channels config JSON.
+# 4768/4769/4776 = Kerberos/NTLM auth bridges; 5140/5145 = share lateral.
 DEFAULT_ALLOWLIST: Dict[str, Set[str]] = {
-    "security": {"4624", "4625", "4648"},
+    "security": {"4624", "4625", "4648", "4768", "4769", "4776", "5140", "5145"},
     "sysmon": {"1", "3", "22"},
     "firewall": {"2004", "2005", "2006", "5156", "5157"},
     "powershell": {"4103", "4104"},
@@ -126,13 +128,18 @@ def iter_os_wide_records(path: Path) -> Iterator[Mapping[str, Any]]:
 
 
 def _map_security(rec: Mapping[str, Any], eid: str, host_id: str, ts: str) -> Optional[Dict[str, Any]]:
-    result = "success" if eid in {"4624", "4648"} else "failure" if eid == "4625" else "success"
+    if eid == "4625":
+        result = "failure"
+    elif eid in {"4624", "4648", "4768", "4769", "4776", "5140", "5145"}:
+        result = "success"
+    else:
+        result = "success"
     return {
         "payload_type": "auth",
         "payload": {
             "user": _user(rec),
             "result": result,
-            "src": _src_ip(rec),
+            "src": _src_peer(rec),
             "windows_event_id": eid,
             "channel": "security",
         },
@@ -155,17 +162,20 @@ def _map_sysmon(rec: Mapping[str, Any], eid: str, host_id: str, ts: str) -> Opti
     if eid == "3":
         dst = str(ed.get("DestinationIp") or rec.get("DestinationIp") or "0.0.0.0")
         port = int(ed.get("DestinationPort") or rec.get("DestinationPort") or 0)
-        return {
-            "payload_type": "net_conn",
-            "payload": {
-                "dst_ip": dst,
-                "dst_port": port,
-                "bytes": int(ed.get("bytes") or rec.get("bytes") or 1200),
-                "egress": True,
-                "windows_event_id": eid,
-                "channel": "sysmon",
-            },
+        src_ip = str(ed.get("SourceIp") or rec.get("SourceIp") or "")
+        # Ambient / metadata endpoints are not useful egress for fusion.
+        egress = not is_ambient_dst(dst)
+        payload: Dict[str, Any] = {
+            "dst_ip": dst,
+            "dst_port": port,
+            "bytes": int(ed.get("bytes") or rec.get("bytes") or 1200),
+            "egress": egress,
+            "windows_event_id": eid,
+            "channel": "sysmon",
         }
+        if src_ip and src_ip not in {"-", "::1", "127.0.0.1"}:
+            payload["src_ip"] = src_ip
+        return {"payload_type": "net_conn", "payload": payload}
     if eid == "22":
         query = str(ed.get("QueryName") or rec.get("QueryName") or "unknown")
         return {
@@ -199,7 +209,7 @@ def _map_firewall(rec: Mapping[str, Any], eid: str, host_id: str, ts: str) -> Op
             "dst_ip": dst,
             "dst_port": port,
             "bytes": int(ed.get("bytes") or 800),
-            "egress": True,
+            "egress": not is_ambient_dst(dst),
             "blocked": blocked,
             "windows_event_id": eid,
             "channel": "firewall",
@@ -309,6 +319,27 @@ def adapt_os_wide_records(
         by = stats["by_channel"]
         assert isinstance(by, dict)
         by[ch] = int(by.get(ch, 0)) + 1
+
+    # Resolve auth src IPs → peer host_ids using Sysmon SourceIp inventory.
+    ip_inv: Dict[str, str] = {}
+    for env in out:
+        if env.get("payload_type") != "net_conn":
+            continue
+        sip = str((env.get("payload") or {}).get("src_ip") or "")
+        hid = str(env.get("host_id") or "")
+        if sip and hid and looks_like_ip(sip):
+            ip_inv.setdefault(sip, hid)
+    for env in out:
+        if env.get("payload_type") != "auth":
+            continue
+        payload = env.get("payload") or {}
+        src = str(payload.get("src") or "")
+        hid = str(env.get("host_id") or "")
+        if looks_like_ip(src) and src in ip_inv and ip_inv[src] != hid:
+            payload = dict(payload)
+            payload["src"] = ip_inv[src]
+            env["payload"] = payload
+
     return out, stats
 
 

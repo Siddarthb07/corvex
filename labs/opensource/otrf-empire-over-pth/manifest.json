@@ -1,0 +1,31 @@
+{
+  "name": "otrf-empire-over-pth",
+  "corpus_kind": "opensource_attack_capture",
+  "source": {
+    "project": "OTRF/Security-Datasets",
+    "url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/master/datasets/atomic/windows/credential_access/host/empire_over_pth_patch_lsass.zip",
+    "family": "credential_access",
+    "tool": "Empire",
+    "attack": "Over-PTH / LSASS patch",
+    "techniques": [
+      "T1550.002",
+      "T1003.001"
+    ],
+    "note": "Over-PTH / LSASS patch",
+    "authorship": "external"
+  },
+  "raw_glob": "raw/*.sanitized.jsonl",
+  "host_map": {},
+  "fetch": {
+    "source_url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/master/datasets/atomic/windows/credential_access/host/empire_over_pth_patch_lsass.zip",
+    "archive_sha256": "daee42bbd9f7c6265e5614ce468ec868a399ee03877456dd01ec34e3e06479e7",
+    "format": "zip",
+    "extracted": [
+      "empire_over_pth_patch_lsass_2020-09-21221336.sanitized.jsonl"
+    ],
+    "family": "credential_access",
+    "note": null,
+    "license_note": "OTRF Security-Datasets \u2014 see upstream LICENSE (GPL-3.0).",
+    "authorship": "external \u2014 OTRF / MITRE ATT&CK Evals capture, not Corvex authors"
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "name": "otrf-ntdsutil-ntds-dit",
+  "corpus_kind": "opensource_attack_capture",
+  "source": {
+    "project": "OTRF/Security-Datasets",
+    "url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/master/datasets/atomic/windows/credential_access/host/cmd_dumping_ntds_dit_file_ntdsutil.zip",
+    "family": "credential_access",
+    "tool": "native",
+    "attack": "ntdsutil NTDS.dit dump",
+    "techniques": [
+      "T1003.003"
+    ],
+    "note": "ntdsutil NTDS.dit dump",
+    "authorship": "external"
+  },
+  "raw_glob": "raw/*.sanitized.jsonl",
+  "host_map": {},
+  "fetch": {
+    "source_url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/master/datasets/atomic/windows/credential_access/host/cmd_dumping_ntds_dit_file_ntdsutil.zip",
+    "archive_sha256": "4633882ab1e9eadd156b29a89a5a6e24b680ead1b11ee259fdbe0d19ddbf77cf",
+    "format": "zip",
+    "extracted": [
+      "cmd_dumping_ntds_dit_file_ntdsutil.sanitized.jsonl"
+    ],
+    "family": "credential_access",
+    "note": null,
+    "license_note": "OTRF Security-Datasets \u2014 see upstream LICENSE (GPL-3.0).",
+    "authorship": "external \u2014 OTRF / MITRE ATT&CK Evals capture, not Corvex authors"
+  }
+}

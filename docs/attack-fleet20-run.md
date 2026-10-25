@@ -8,13 +8,13 @@ Purple-team **event sketches** only. Sources cite [Atomic Red Team](https://gith
 |--|--|
 | Suite | Attack fleet **20** (black-box) |
 | Command | `python scripts/run_attack_fleet10.py 2` |
-| Intensity | **2** rounds per attack (`build-breaktest` + `replay` each) |
-| Wall time | **~47s** (last recorded run) |
-| Result | **20 HELD / 0 PARTIAL / 0 BROKE** |
+| Intensity | **1** round per attack in latest refresh (`build-breaktest` + `replay`); use `python scripts/run_attack_fleet10.py 2` for 2-round intensity |
+| Wall time | **~19s** (intensity=1 refresh 2026-10-23) |
+| Result | **20 HELD** (clean **19**, fragile **1**, fragile_rate=**0.05**) / 0 PARTIAL / 0 BROKE |
 | Reports | `reports/attack_fleet20.md`, `reports/attack_fleet20.json` |
 | Manifests | `labs/breaktest/manifests/fleet20/` |
 
-Also: unit suite `pytest tests/` — **66** passed on the same wave.
+Never hero bare **20/20** without the fragile count. Fragile = HELD with confidence_margin &lt; 0.2 (fleet19 helpdesk-vs-apt in the latest run).
 
 ## Column meanings
 
@@ -24,7 +24,8 @@ Also: unit suite `pytest tests/` — **66** passed on the same wave.
 | **Saved** | Innocent hosts not falsely proposed for dry-run quarantine |
 | **False Q** | Innocents that *were* proposed (dry-run only) |
 | **Missed / Over-merged** | Relative to the **best-matching** campaign (not the union of all campaigns) |
-| **Verdict** | `HELD` = matched truth, no best-campaign over-merge; `PARTIAL` / `BROKE` otherwise |
+| **Verdict** | `HELD` = matched truth, no best-campaign over-merge; `HELD, fragile` = HELD with margin &lt; 0.2; `PARTIAL` / `BROKE` otherwise |
+| **Margin** | confidence(top) − confidence(2nd) (or ambiguity margin when multi-campaign) |
 
 ## Scoreboard
 

@@ -22,8 +22,8 @@ not equivalent to a clean HELD). Correctly separated equal-score campaigns are
 
 - Attacks: **15** | Intensity rounds/attack: **2**
 - Baseline: **single-host-isolation**
-- Wall: **41.34s**
-- HELD: **13** (of which **fragile**: 5) | PARTIAL: **1** | BROKE: **1**
+- Wall: **23.4339s**
+- HELD: **14** (of which **fragile**: 5) | PARTIAL: **1** | BROKE: **0**
 - Baseline wins: **0**
 
 ## Lead with #10 — false positives beat missed detections
@@ -40,10 +40,9 @@ Ordered by operational severity, not by suite index.
 
 - **lim10-authorized-redteam** — **HELD** (J=1.0, margin=1.0, FQ=-). Narrow contain gate: inert lateral-only no longer proposes IsolateHost. Does NOT solve general FP — exfil-shaped authorized pentests still clear the gate.
 - **lim09b-sequential-reuse** — **HELD, fragile** (J=1.0, margin=0.0, FQ=-). Structural, not an edge case. Small fixed host pools will reuse infrastructure across unrelated incidents. Fix likely needs hard split on temporal gap + technique-shape discontinuity even at 100% host overlap.
-- **lim11-hostname-split-brain** — **BROKE** (J=0.0, margin=None, FQ=-). Split-brain: one host, two labels. Pair with #9 — persistent asset ID + degree-weighted hub evidence may fix both.
-- **lim03-slow-low-day-gaps** — **PARTIAL** (J=0.6667, margin=0.0, FQ=-). Good failure: states an operational boundary (reliable inside lookback, degrades past day-scale gaps) instead of an unfalsifiable claim.
 - **lim09d-benign-hub-pivot** — **HELD, fragile** (J=1.0, margin=0.1, FQ=-). Do not read as a clean HELD if fragile — margin < 0.2 with collateral FQ on hub peers.
 - **lim01-dual-ambiguous-lateral** — **HELD, fragile** (J=1.0, margin=0.0, FQ=-). APT matched; helpdesk still False-Q as a separate campaign — soft near-miss (check margin).
+- **lim07-dropped-mid-chain** — **PARTIAL** (J=0.5, margin=0.1, FQ=-). 
 - **lim08-out-of-order-arrival** — **HELD, fragile** (J=1.0, margin=0.1, FQ=host-c, host-d). 
 - **lim09c-positional-bias** — **HELD, fragile** (J=1.0, margin=0.0, FQ=-). 
 
@@ -67,27 +66,26 @@ Ordered by operational severity, not by suite index.
 |---|----------|---------|---------|--------|--------|-------------|-------|---------|-------------|---------------|
 | 1 | lim01-dual-ambiguous-lateral | **HELD, fragile** | 1.0 | 0.0 | - | - | host-d, host-e | - | - | False |
 | 2 | lim02-triple-concurrent-shared | **HELD** | 1.0 | 0.9 | - | - | - | - | - | False |
-| 3 | lim03-slow-low-day-gaps | **PARTIAL** | 0.6667 | 0.0 | - | - | host-d, host-e | - | - | False |
+| 3 | lim03-slow-low-day-gaps | **HELD** | 1.0 | 1.0 | - | - | host-d, host-e | - | - | False |
 | 4 | lim04-timing-jitter | **HELD** | 1.0 | 1.0 | - | - | host-d, host-e | - | - | False |
 | 5 | lim05-technique-sub-kerberoast | **HELD** | 1.0 | 1.0 | - | - | host-d, host-e | - | - | False |
 | 6 | lim06-clock-skew-47s | **HELD** | 1.0 | 1.0 | - | - | host-d, host-e | - | - | False |
-| 7 | lim07-dropped-mid-chain | **HELD** | 1.0 | 1.0 | - | - | host-e | - | - | False |
+| 7 | lim07-dropped-mid-chain | **PARTIAL** | 0.5 | 0.1 | - | - | host-e | - | - | False |
 | 8 | lim08-out-of-order-arrival | **HELD, fragile** | 1.0 | 0.1 | - | - | host-e | host-c, host-d | - | False |
 | 9 | lim09-max-density-overlap ★ | **HELD** | 1.0 | 1.0 | - | - | - | - | - | False |
 | 10 | lim09b-sequential-reuse ★ | **HELD, fragile** | 1.0 | 0.0 | - | - | host-d, host-e | - | - | False |
 | 11 | lim09c-positional-bias ★ | **HELD, fragile** | 1.0 | 0.0 | - | - | host-c, host-d | - | - | False |
 | 12 | lim09d-benign-hub-pivot ★ | **HELD, fragile** | 1.0 | 0.1 | - | - | host-b, host-d | - | host-b, host-d | False |
 | 13 | lim10-authorized-redteam ★ | **HELD** | 1.0 | 1.0 | - | host-a, host-b, host-c | host-a, host-b, host-c, host-d, host-e | - | - | False |
-| 14 | lim11-hostname-split-brain | **BROKE** | 0.0 | None | host-a, host-b, host-c | - | host-d, host-e | - | - | False |
+| 14 | lim11-hostname-split-brain | **HELD** | 1.0 | 1.0 | - | - | host-d, host-e | - | - | False |
 | 15 | lim12-near-dup-cdn-mimicry | **HELD** | 1.0 | 1.0 | - | - | host-d, host-e | - | - | False |
 
 ## Where it broke / partial / fragile (priority order)
 
 - **lim09b-sequential-reuse** (HELD, fragile): sequential incidents split across 2 campaigns — incident1 and incident2 reported as a single continuous campaign
-- **lim11-hostname-split-brain** (BROKE): alias coverage miss: ['host-a', 'host-b', 'host-c']; truth never recovered: ['host-a', 'host-b', 'host-c'] — b's two identities treated as separate hosts, splitting coverage
-- **lim03-slow-low-day-gaps** (PARTIAL): jaccard 0.6667 in PARTIAL band — any truth-host event outside the window silently dropped from campaign reconstruction
 - **lim09d-benign-hub-pivot** (HELD, fragile): matched truth without merge-FQ; break_criterion not triggered: attack missed (BROKE) or b/d False Q via association — attack missed (BROKE) or b/d False Q via association
 - **lim01-dual-ambiguous-lateral** (HELD, fragile): matched truth without merge-FQ; break_criterion not triggered: d or e appears in the malicious campaign's Q dry-run list — d or e appears in the malicious campaign's Q dry-run list
+- **lim07-dropped-mid-chain** (PARTIAL): jaccard 0.5 in PARTIAL band — PARTIAL/BROKE, or false confidence that a,d is complete
 - **lim08-out-of-order-arrival** (HELD, fragile): matched truth without merge-FQ; break_criterion not triggered: causal chain backwards, or split into two false fragments — causal chain backwards, or split into two false fragments
 - **lim09c-positional-bias** (HELD, fragile): matched truth without merge-FQ; break_criterion not triggered: Jaccard or margin regression vs original #1/#6 from host relabeling alone — Jaccard or margin regression vs original #1/#6 from host relabeling alone
 
@@ -95,9 +93,9 @@ Ordered by operational severity, not by suite index.
 
 None — correlator never lost to single-host isolation on FQ/coverage.
 
-## Clean HELD (8) — not fragile
+## Clean HELD (9) — not fragile
 
-`lim02-triple-concurrent-shared`, `lim04-timing-jitter`, `lim05-technique-sub-kerberoast`, `lim06-clock-skew-47s`, `lim07-dropped-mid-chain`, `lim09-max-density-overlap`, `lim10-authorized-redteam`, `lim12-near-dup-cdn-mimicry` — confident passes (margin ≥ 0.2, no fragile flag).
+`lim02-triple-concurrent-shared`, `lim03-slow-low-day-gaps`, `lim04-timing-jitter`, `lim05-technique-sub-kerberoast`, `lim06-clock-skew-47s`, `lim09-max-density-overlap`, `lim10-authorized-redteam`, `lim11-hostname-split-brain`, `lim12-near-dup-cdn-mimicry` — confident passes (margin ≥ 0.2, no fragile flag).
 
 ## Per-attack detail
 
@@ -125,8 +123,8 @@ None — correlator never lost to single-host isolation on FQ/coverage.
 
 - Break criterion: any truth-host event outside the window silently dropped from campaign reconstruction
 - Truth: host-a, host-b, host-c
-- Verdict: **PARTIAL** | Jaccard=0.6667 | margin=0.0
-- Reasons: jaccard 0.6667 in PARTIAL band
+- Verdict: **HELD** | Jaccard=1.0 | margin=1.0
+- Reasons: matched truth without merge-FQ; break_criterion not triggered: any truth-host event outside the window silently dropped from campaign reconstruction
 - Quarantine dry-run: -
 - Saved: host-d, host-e | False Q: -
 - Baseline FQ: - | baseline_wins=False
@@ -165,9 +163,9 @@ None — correlator never lost to single-host isolation on FQ/coverage.
 
 - Break criterion: PARTIAL/BROKE, or false confidence that a,d is complete
 - Truth: host-a, host-b, host-c, host-d
-- Verdict: **HELD** | Jaccard=1.0 | margin=1.0
-- Reasons: matched truth without merge-FQ; break_criterion not triggered: PARTIAL/BROKE, or false confidence that a,d is complete
-- Quarantine dry-run: host-a, host-b, host-c, host-d
+- Verdict: **PARTIAL** | Jaccard=0.5 | margin=0.1
+- Reasons: jaccard 0.5 in PARTIAL band
+- Quarantine dry-run: host-a, host-b
 - Saved: host-e | False Q: -
 - Baseline FQ: - | baseline_wins=False
 
@@ -235,9 +233,9 @@ None — correlator never lost to single-host isolation on FQ/coverage.
 
 - Break criterion: b's two identities treated as separate hosts, splitting coverage
 - Truth: host-a, host-b, host-c
-- Verdict: **BROKE** | Jaccard=0.0 | margin=None
-- Reasons: alias coverage miss: ['host-a', 'host-b', 'host-c']; truth never recovered: ['host-a', 'host-b', 'host-c']
-- Quarantine dry-run: -
+- Verdict: **HELD** | Jaccard=1.0 | margin=1.0
+- Reasons: matched truth without merge-FQ; break_criterion not triggered: b's two identities treated as separate hosts, splitting coverage
+- Quarantine dry-run: host-a, host-b, host-c
 - Saved: host-d, host-e | False Q: -
 - Baseline FQ: - | baseline_wins=False
 

@@ -1,0 +1,30 @@
+{
+  "name": "otrf-lsass-metasploit-nanodump",
+  "corpus_kind": "opensource_attack_capture",
+  "source": {
+    "project": "OTRF/Security-Datasets",
+    "url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/master/datasets/compound/LSASS_campaign_07/metasploit_nanodump_lsass_memory_dump.zip",
+    "family": "credential_dump_campaign",
+    "tool": "Metasploit/NanoDump",
+    "attack": "LSASS campaign: NanoDump (evasive)",
+    "techniques": [
+      "T1003.001"
+    ],
+    "note": "LSASS campaign: NanoDump (evasive)",
+    "authorship": "external"
+  },
+  "raw_glob": "raw/*.sanitized.jsonl",
+  "host_map": {},
+  "fetch": {
+    "source_url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/master/datasets/compound/LSASS_campaign_07/metasploit_nanodump_lsass_memory_dump.zip",
+    "archive_sha256": "5335635ef2bce0fb3f8704e17fb04a3be7400ac7c4bcd6ec7c14454632acaaaf",
+    "format": "zip",
+    "extracted": [
+      "metasploit_nanodump_lsass_memory_dump.sanitized.jsonl"
+    ],
+    "family": "credential_dump_campaign",
+    "note": null,
+    "license_note": "OTRF Security-Datasets \u2014 see upstream LICENSE (GPL-3.0).",
+    "authorship": "external \u2014 OTRF / MITRE ATT&CK Evals capture, not Corvex authors"
+  }
+}

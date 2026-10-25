@@ -1,0 +1,28 @@
+{
+  "name": "otrf-cmd-service-mod-fax",
+  "corpus_kind": "opensource_attack_capture",
+  "source": {
+    "project": "OTRF/Security-Datasets",
+    "url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/master/datasets/atomic/windows/privilege_escalation/host/cmd_service_mod_fax.zip",
+    "family": "privilege_escalation",
+    "tool": "native",
+    "attack": "cmd service mod fax",
+    "techniques": [],
+    "note": "cmd service mod fax",
+    "authorship": "external"
+  },
+  "raw_glob": "raw/*.sanitized.jsonl",
+  "host_map": {},
+  "fetch": {
+    "source_url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/master/datasets/atomic/windows/privilege_escalation/host/cmd_service_mod_fax.zip",
+    "archive_sha256": "4a40cb09c514f1a4c601588cbfa5c81e12a6f8a5ab92fd76bad846c1a4352447",
+    "format": "zip",
+    "extracted": [
+      "cmd_service_mod_fax_2020-10-2120454410.sanitized.jsonl"
+    ],
+    "family": "privilege_escalation",
+    "note": null,
+    "license_note": "OTRF Security-Datasets \u2014 see upstream LICENSE (GPL-3.0).",
+    "authorship": "external \u2014 OTRF / MITRE ATT&CK Evals capture, not Corvex authors"
+  }
+}

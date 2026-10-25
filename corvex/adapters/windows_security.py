@@ -98,6 +98,30 @@ def _src_ip(rec: Mapping[str, Any]) -> str:
     return "0.0.0.0"
 
 
+def _src_peer(rec: Mapping[str, Any]) -> str:
+    """Prefer WorkstationName / peer hostname over raw source IP for lateral hops."""
+    data = rec.get("EventData") or {}
+    if not isinstance(data, Mapping):
+        data = {}
+    for key in (
+        "WorkstationName",
+        "wsname",
+        "TargetServerName",
+        "ClientName",
+    ):
+        val = rec.get(key) if rec.get(key) is not None else data.get(key)
+        if val is None:
+            continue
+        s = str(val).strip().strip("\\")
+        if not s or s in {"-", "?", "localhost"}:
+            continue
+        # DOMAIN\HOST → HOST
+        if "\\" in s:
+            s = s.rsplit("\\", 1)[-1]
+        return s
+    return _src_ip(rec)
+
+
 def _iter_records(path: Path) -> Iterator[Mapping[str, Any]]:
     text = path.read_text(encoding="utf-8").strip()
     if not text:
@@ -178,7 +202,7 @@ def adapt_windows_security_export(
                 "payload": {
                     "user": _user(rec),
                     "result": "success",
-                    "src": _src_ip(rec),
+                    "src": _src_peer(rec),
                     "windows_event_id": eid_norm,
                 },
             }

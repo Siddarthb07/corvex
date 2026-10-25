@@ -286,3 +286,80 @@ def test_hub_degree_refuses_distinct_lateral_merge(tmp_path: Path) -> None:
         }
         for camp in camps
     )
+
+
+def test_shared_svc_two_disjoint_chains_do_not_overmerge(tmp_path: Path) -> None:
+    """Two unrelated svc-sql chains (no hop path) must stay separate campaigns."""
+    base = datetime(2026, 7, 25, 12, 0, 0, tzinfo=timezone.utc)
+    c = _corr(tmp_path)
+    c.ingest(
+        [
+            # Chain A: a → b
+            _auth("a1", "host-a", "svc-sql", _ts(base, 0)),
+            _auth("a2", "host-b", "svc-sql", _ts(base, 20), src="host-a"),
+            _exfil("ax", "host-b", "198.51.100.10", 12000, _ts(base, 40)),
+            # Chain B: c → d (same user, no host overlap, no hops between)
+            _auth("b1", "host-c", "svc-sql", _ts(base, 10)),
+            _auth("b2", "host-d", "svc-sql", _ts(base, 30), src="host-c"),
+            _exfil("bx", "host-d", "198.51.100.20", 13000, _ts(base, 50)),
+        ]
+    )
+    camps = c.store.all()
+    host_sets = [set(x.host_ids) for x in camps]
+    assert not any(hs >= {"host-a", "host-b", "host-c", "host-d"} for hs in host_sets)
+    assert any(hs >= {"host-a", "host-b"} for hs in host_sets)
+    assert any(hs >= {"host-c", "host-d"} for hs in host_sets)
+
+
+def test_noise_5k_cdn_does_not_bury_needle(tmp_path: Path) -> None:
+    """Dense CDN egress to one dst must not swallow a lateral+exfil needle."""
+    base = datetime(2026, 7, 25, 12, 0, 0, tzinfo=timezone.utc)
+    c = _corr(tmp_path)
+    hosts = [f"host-{i}" for i in range(8)]
+    events = []
+    # Ambient CDN flood
+    for i, h in enumerate(hosts):
+        for j in range(12):
+            events.append(
+                _exfil(f"cdn-{h}-{j}", h, "104.18.32.7", 7500, _ts(base, i * 2 + j * 0.1))
+            )
+    # Needle APT
+    events.extend(
+        [
+            _auth("n1", "host-0", "apt", _ts(base, 5)),
+            _auth("n2", "host-1", "apt", _ts(base, 15), src="host-0"),
+            _auth("n3", "host-2", "apt", _ts(base, 25), src="host-1"),
+            _exfil("nx1", "host-1", "198.51.100.99", 14000, _ts(base, 40)),
+            _exfil("nx2", "host-2", "198.51.100.99", 15000, _ts(base, 45)),
+        ]
+    )
+    c.ingest(events)
+    camps = c.store.all()
+    # CDN dst should be poisoned — no mega-camp of all hosts on 104.18.32.7
+    assert not any(set(x.host_ids) >= set(hosts) for x in camps)
+    assert any(set(x.host_ids) >= {"host-0", "host-1", "host-2"} for x in camps)
+
+
+def test_sleeper_resume_across_day_gap_extends_chain(tmp_path: Path) -> None:
+    """Day-scale quiet gap: hop/overlap-linked same-user chain extends (lim03)."""
+    base = datetime(2026, 7, 25, 12, 0, 0, tzinfo=timezone.utc)
+    day = 24 * 3600
+    c = Correlator(
+        CampaignStore(tmp_path / "campaigns.jsonl"),
+        AuditLog(tmp_path / "audit.jsonl"),
+        config=CorrelatorConfig(window_seconds=600, min_hosts=2),
+        allow_unverified=True,
+    )
+    c.ingest(
+        [
+            _auth("a1", "host-a", "sleeper", _ts(base, 0)),
+            _auth("a2", "host-b", "sleeper", _ts(base, 30), src="host-a"),
+            _exfil("x1", "host-b", "198.51.100.90", 12000, _ts(base, 50)),
+            # Quiet for 2 days, then continue from host-b → host-c
+            _auth("b1", "host-b", "sleeper", _ts(base, 2 * day)),
+            _auth("b2", "host-c", "sleeper", _ts(base, 2 * day + 20), src="host-b"),
+            _exfil("x2", "host-c", "198.51.100.91", 15000, _ts(base, 2 * day + 40)),
+        ]
+    )
+    camps = c.store.all()
+    assert any(set(x.host_ids) >= {"host-a", "host-b", "host-c"} for x in camps)

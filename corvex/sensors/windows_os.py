@@ -297,7 +297,12 @@ def append_events(path: Path, envelopes: Sequence[EventEnvelope]) -> int:
     return len(envelopes)
 
 
-def recompute_run(run_dir: Path, enrollment: Enrollment) -> Dict[str, Any]:
+def recompute_run(
+    run_dir: Path,
+    enrollment: Enrollment,
+    *,
+    host_aliases: Optional[Mapping[str, str]] = None,
+) -> Dict[str, Any]:
     """Load events.jsonl, adapt flat lab rows, verify HMAC, rewrite timeline.json.
 
     Flat Docker-lab rows are adapted and re-signed with ``enrollment`` (offline lab
@@ -306,6 +311,7 @@ def recompute_run(run_dir: Path, enrollment: Enrollment) -> Dict[str, Any]:
     """
     from corvex.adapters.lab_flat import try_adapt_row
     from corvex.auth import AuthError
+    from corvex.correlator import load_host_aliases
     from corvex.envelope import EventEnvelope, verify_envelope
 
     run_dir = Path(run_dir)
@@ -346,7 +352,15 @@ def recompute_run(run_dir: Path, enrollment: Enrollment) -> Dict[str, Any]:
         store_path.write_text("", encoding="utf-8")
     store = CampaignStore(store_path)
     audit = AuditLog(run_dir / "audit.jsonl")
-    corr = Correlator(store, audit, config=CorrelatorConfig(), enrollment=enrollment)
+    aliases = dict(host_aliases) if host_aliases else load_host_aliases(
+        run_dir / "host_aliases.json"
+    )
+    corr = Correlator(
+        store,
+        audit,
+        config=CorrelatorConfig(host_aliases=aliases or None),
+        enrollment=enrollment,
+    )
     t0 = time.perf_counter()
     if envs:
         corr.ingest(envs)
@@ -393,6 +407,7 @@ def run_sensor_windows(
     host_id: Optional[str] = None,
     producer_id: Optional[str] = None,
     host_map: Optional[Mapping[str, str]] = None,
+    host_aliases: Optional[Mapping[str, str]] = None,
     follow: bool = False,
     once: bool = True,
     max_per_sec: float = 50.0,
@@ -412,6 +427,11 @@ def run_sensor_windows(
     audit_path = run_dir / "sensor_audit.jsonl"
     allow = load_allowlist(allowlist_path)
     chans = [c.strip().lower() for c in channels if c.strip()]
+    aliases = {str(k): str(v) for k, v in (host_aliases or {}).items()}
+    if aliases:
+        (run_dir / "host_aliases.json").write_text(
+            json.dumps(aliases, indent=2) + "\n", encoding="utf-8"
+        )
     limiter = RateLimiter(max_per_sec)
     bookmarks = _load_bookmarks(bookmark_path)
     channel_bookmarks: Dict[str, Any] = dict(bookmarks.get("channels") or {})
@@ -509,6 +529,10 @@ def run_sensor_windows(
         stats["skipped"] += int(st.get("skipped", 0))
         for k, v in (st.get("by_channel") or {}).items():
             stats["channels"][k] = int(stats["channels"].get(k, 0)) + int(v)
+        # DNS arrives as Sysmon EID 22; count payload_type for channel_health.dns.
+        for rec in unsigned:
+            if rec.get("payload_type") == "dns":
+                stats["channels"]["dns"] = int(stats["channels"].get("dns", 0)) + 1
 
         kept = []
         for rec in unsigned:
@@ -551,7 +575,9 @@ def run_sensor_windows(
         cycles += 1
         stats["cycles"] = cycles
         if recompute_every > 0 and cycles % recompute_every == 0:
-            stats["timeline"] = recompute_run(run_dir, enrollment)
+            stats["timeline"] = recompute_run(
+                run_dir, enrollment, host_aliases=aliases or None
+            )
         if once and not follow:
             break
         if max_cycles is not None and cycles >= max_cycles:
@@ -571,7 +597,76 @@ def run_sensor_windows(
                 "or drop --require-live for fixture CI."
             )
 
+    # DNS is not a wevtutil channel — it arrives as Sysmon EID 22 → payload_type dns.
+    # Surface an honest channel_health.dns so operators never assume DNS C2 coverage.
+    _annotate_windows_dns_health(stats, chans)
+
     (run_dir / "sensor_status.json").write_text(
         json.dumps(stats, indent=2) + "\n", encoding="utf-8"
     )
     return stats
+
+
+def _annotate_windows_dns_health(stats: Dict[str, Any], chans: Sequence[str]) -> None:
+    """Write ``channel_health.dns`` from Sysmon EID 22 / adapted dns counts.
+
+    Correlator can fuse DNS when events exist; sensors must not silently imply
+    coverage when Sysmon is missing, denied, or EID 22 never arrives.
+    """
+    health = stats.setdefault("channel_health", {})
+    by_ch = stats.get("channels") or {}
+    dns_adapted = int(by_ch.get("dns") or by_ch.get("sysmon_dns") or 0)
+    # Also count sysmon adaptations that may be mixed; prefer explicit dns key.
+    sysmon_h = health.get("sysmon") or {}
+    sysmon_ok = bool(sysmon_h.get("ok"))
+    sysmon_reason = sysmon_h.get("reason")
+    sysmon_requested = "sysmon" in {c.lower() for c in chans}
+
+    if dns_adapted > 0:
+        health["dns"] = {
+            "ok": True,
+            "reason": "sysmon_eid22",
+            "hits": dns_adapted,
+            "note": "DNS via Sysmon EID 22 — correlator dns_beacon path available.",
+        }
+        return
+
+    if not sysmon_requested:
+        health["dns"] = {
+            "ok": False,
+            "reason": "sysmon_channel_not_requested",
+            "hits": 0,
+            "note": (
+                "DNS-only C2 is a blind spot: enable Sysmon (EID 22) or do not "
+                "claim DNS coverage. channel_health.dns=GAP."
+            ),
+        }
+        if "dns" not in stats.get("degraded", []):
+            stats.setdefault("degraded", []).append("dns")
+        return
+
+    if not sysmon_ok:
+        health["dns"] = {
+            "ok": False,
+            "reason": str(sysmon_reason or "sysmon_unavailable"),
+            "hits": 0,
+            "note": (
+                "Sysmon missing/denied — no EID 22 DNS queries. "
+                "Do not claim DNS C2 coverage (dns_only_c2_blind)."
+            ),
+        }
+        if "dns" not in stats.get("degraded", []):
+            stats.setdefault("degraded", []).append("dns")
+        return
+
+    health["dns"] = {
+        "ok": False,
+        "reason": "no_sysmon_eid22_hits",
+        "hits": 0,
+        "note": (
+            "Sysmon polled but no EID 22 in this window. DNS C2 coverage is "
+            "unproven for this run — treat as channel GAP, not silent pass."
+        ),
+    }
+    if "dns" not in stats.get("degraded", []):
+        stats.setdefault("degraded", []).append("dns")

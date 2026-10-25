@@ -366,7 +366,7 @@ corvex sensor-macos --run-dir runs/os-wide-macos-live --once \
 |---------|--------------|------------|
 | Exit 2, Stage B message | Gate locked | `corvex stage-b-lab-unlock --reason '…'` or honest stranger path |
 | `published: 0`, `require_live_failed` | No live net/auth hits | Check `channel_health`; try `--channels net` only; confirm Darwin + `lsof` |
-| `sandboxed` / `permission_denied` on auth/dns | Unified log restricted | Expected in many environments; use fixture or net-only |
+| `sandboxed` / `permission_denied` on auth/dns | Unified log restricted | Expected in many environments; use fixture or net-only. **Do not claim DNS-only C2 coverage** when `channel_health.dns` is degraded — same honesty rule as Windows Sysmon EID 22 (`docs/sensor-windows.md`). |
 | `rate_limited` high | Busy host / low cap | Raise `--max-per-sec` or narrow `--channels` |
 | `hmac_rejected` on recompute | Wrong enrollment / tampered rows | Re-run with same `CORVEX_ENROLLMENT`; do not hand-edit `events.jsonl` |
 | Campaigns empty after live net | Benign egress only, no multi-host auth chain | Expected — correlator needs multi-host weak signals; use fixture pack or fuse with lab attack JSONL |

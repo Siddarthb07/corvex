@@ -1,0 +1,96 @@
+{
+  "campaign_id": "mf-cross-bare-burst-pth_lateral",
+  "family": "intensive_multifactor",
+  "ood": true,
+  "hosts": [
+    "corp-ws01",
+    "corp-ws02",
+    "dmz-gw01",
+    "dmz-app01",
+    "corp-ws03"
+  ],
+  "truth_hosts": [
+    "corp-ws01",
+    "corp-ws02",
+    "dmz-gw01"
+  ],
+  "producers": {
+    "corp-ws01": "prod-mf-corp-ws01",
+    "corp-ws02": "prod-mf-corp-ws02",
+    "dmz-gw01": "prod-mf-dmz-gw01",
+    "dmz-app01": "prod-mf-dmz-app01",
+    "corp-ws03": "prod-mf-corp-ws03"
+  },
+  "base_time_utc": "2026-07-25T14:00:00Z",
+  "fleet_origin": "original",
+  "fleet_suite": "intensive",
+  "factors": {
+    "domain": "cross",
+    "container": "bare",
+    "sequence": "burst",
+    "style": "pth_lateral"
+  },
+  "source": {
+    "style": "Intensive multi-factor stress sketches",
+    "repo": "https://github.com/Siddarthb07/corvex",
+    "techniques": [
+      "T1003.001",
+      "T1550.002",
+      "T1041"
+    ],
+    "note": "cross/bare/burst/pth_lateral"
+  },
+  "narrative": [
+    "Factor cell: domain=cross container=bare sequence=burst style=pth_lateral."
+  ],
+  "break_intent": {
+    "name": "mf-cross-bare-burst-pth_lateral",
+    "break_criterion": "Jaccard < 0.5 OR truth host never recovered OR benign merge-FQ",
+    "success_criteria_defender": [
+      "matched truth_hosts",
+      "empty over_merged_hosts"
+    ]
+  },
+  "steps": [
+    {
+      "kind": "auth",
+      "host": "corp-ws01",
+      "user": "Administrator",
+      "src": "203.0.113.10",
+      "offset_seconds": 0,
+      "technique": "T1003.001"
+    },
+    {
+      "kind": "auth",
+      "host": "corp-ws02",
+      "user": "Administrator",
+      "src": "corp-ws01",
+      "offset_seconds": 12,
+      "technique": "T1550.002"
+    },
+    {
+      "kind": "auth",
+      "host": "dmz-gw01",
+      "user": "Administrator",
+      "src": "corp-ws02",
+      "offset_seconds": 24,
+      "technique": "T1550.002"
+    },
+    {
+      "kind": "exfil",
+      "host": "dmz-gw01",
+      "dst_ip": "198.51.100.20",
+      "bytes": 22000,
+      "offset_seconds": 36,
+      "technique": "T1041"
+    },
+    {
+      "kind": "exfil",
+      "host": "corp-ws02",
+      "dst_ip": "198.51.100.20",
+      "bytes": 18000,
+      "offset_seconds": 48,
+      "technique": "T1041"
+    }
+  ]
+}

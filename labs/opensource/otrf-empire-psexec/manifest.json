@@ -1,0 +1,25 @@
+{
+  "name": "otrf-empire-psexec",
+  "corpus_kind": "opensource_attack_capture",
+  "source": {
+    "project": "OTRF/Security-Datasets",
+    "url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/master/datasets/atomic/windows/lateral_movement/host/empire_psexec_dcerpc_tcp_svcctl.zip",
+    "family": "lateral_movement",
+    "note": "Empire PsExec / svcctl lateral",
+    "authorship": "external"
+  },
+  "raw_glob": "raw/*.json",
+  "host_map": {},
+  "fetch": {
+    "source_url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/master/datasets/atomic/windows/lateral_movement/host/empire_psexec_dcerpc_tcp_svcctl.zip",
+    "archive_sha256": "8f40e7fc86bbbf31ebd50b3ba537cf0f4378392ae3e74de84bee00aeb0de1fa5",
+    "format": "zip",
+    "extracted": [
+      "empire_psexec_dcerpc_tcp_svcctl_2020-09-20121608.sanitized.jsonl"
+    ],
+    "family": "lateral_movement",
+    "note": "Empire PsExec / svcctl lateral",
+    "license_note": "OTRF Security-Datasets \u2014 see upstream LICENSE (GPL-3.0).",
+    "authorship": "external \u2014 OTRF / MITRE ATT&CK Evals capture, not Corvex authors"
+  }
+}

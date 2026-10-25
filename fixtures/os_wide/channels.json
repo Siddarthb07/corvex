@@ -1,10 +1,10 @@
 {
   "allowlist": {
-    "security": [4624, 4625, 4648],
+    "security": [4624, 4625, 4648, 4768, 4769, 4776, 5140, 5145],
     "sysmon": [1, 3, 22],
     "firewall": [2004, 2005, 2006, 5156, 5157],
     "powershell": [4103, 4104]
   },
   "max_per_sec": 50,
-  "honesty": "Default OS-wide noise allowlist. Expand carefully — broad IDs increase correlator blast radius."
+  "honesty": "Default OS-wide noise allowlist. Kerberos/NTLM/share IDs added for lateral hop signal; ambient metadata egress is filtered in adapters/detectors."
 }

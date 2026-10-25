@@ -65,6 +65,11 @@ labs/breaktest/shared/
 labs/benign/**/raw/
 labs/benign/**/converted/
 !labs/benign/**/raw/.gitkeep
+# Open-source OTRF captures (re-fetch via scripts/fetch_opensource_corpora.py)
+labs/opensource/**/raw/
+labs/opensource/**/converted/
+!labs/opensource/**/raw/.gitkeep
+!labs/opensource/catalog.json
 
 # local Sysmon installer (downloaded for Phase 0 home-lab)
 tools/sysmon/

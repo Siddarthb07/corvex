@@ -1,0 +1,28 @@
+{
+  "name": "otrf-empire-mimikatz-backupkeys-dcerpc-smb-lsarpc",
+  "corpus_kind": "opensource_attack_capture",
+  "source": {
+    "project": "OTRF/Security-Datasets",
+    "url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/master/datasets/atomic/windows/credential_access/host/empire_mimikatz_backupkeys_dcerpc_smb_lsarpc.zip",
+    "family": "credential_access",
+    "tool": "Empire",
+    "attack": "empire mimikatz backupkeys dcerpc smb lsarpc",
+    "techniques": [],
+    "note": "empire mimikatz backupkeys dcerpc smb lsarpc",
+    "authorship": "external"
+  },
+  "raw_glob": "raw/*.sanitized.jsonl",
+  "host_map": {},
+  "fetch": {
+    "source_url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/master/datasets/atomic/windows/credential_access/host/empire_mimikatz_backupkeys_dcerpc_smb_lsarpc.zip",
+    "archive_sha256": "63ee26d89071b9026a2381c31cd9d5842435e3859e1c0d84825cdbb01475e4d8",
+    "format": "zip",
+    "extracted": [
+      "empire_mimikatz_backupkeys_dcerpc_smb_lsarpc_2020-10-22143243.sanitized.jsonl"
+    ],
+    "family": "credential_access",
+    "note": null,
+    "license_note": "OTRF Security-Datasets \u2014 see upstream LICENSE (GPL-3.0).",
+    "authorship": "external \u2014 OTRF / MITRE ATT&CK Evals capture, not Corvex authors"
+  }
+}

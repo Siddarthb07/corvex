@@ -1,0 +1,30 @@
+{
+  "name": "otrf-empire-run-keys",
+  "corpus_kind": "opensource_attack_capture",
+  "source": {
+    "project": "OTRF/Security-Datasets",
+    "url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/master/datasets/atomic/windows/persistence/host/empire_persistence_registry_modification_run_keys_elevated_user.zip",
+    "family": "persistence",
+    "tool": "Empire",
+    "attack": "Registry Run keys (elevated)",
+    "techniques": [
+      "T1547.001"
+    ],
+    "note": "Registry Run keys (elevated)",
+    "authorship": "external"
+  },
+  "raw_glob": "raw/*.sanitized.jsonl",
+  "host_map": {},
+  "fetch": {
+    "source_url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/master/datasets/atomic/windows/persistence/host/empire_persistence_registry_modification_run_keys_elevated_user.zip",
+    "archive_sha256": "2809354d679025859d723be3ceb1e2c9f9e5dde2ebec5bbea7c398e165a9b67d",
+    "format": "zip",
+    "extracted": [
+      "empire_persistence_registry_modification_run_keys_elevated_user_2020-07-22001847.sanitized.jsonl"
+    ],
+    "family": "persistence",
+    "note": null,
+    "license_note": "OTRF Security-Datasets \u2014 see upstream LICENSE (GPL-3.0).",
+    "authorship": "external \u2014 OTRF / MITRE ATT&CK Evals capture, not Corvex authors"
+  }
+}

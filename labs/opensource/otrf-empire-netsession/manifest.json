@@ -1,0 +1,30 @@
+{
+  "name": "otrf-empire-netsession",
+  "corpus_kind": "opensource_attack_capture",
+  "source": {
+    "project": "OTRF/Security-Datasets",
+    "url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/master/datasets/atomic/windows/discovery/host/empire_getsession_dcerpc_smb_srvsvc_NetSessEnum.zip",
+    "family": "discovery",
+    "tool": "Empire",
+    "attack": "NetSessEnum session enum",
+    "techniques": [
+      "T1049"
+    ],
+    "note": "NetSessEnum session enum",
+    "authorship": "external"
+  },
+  "raw_glob": "raw/*.sanitized.jsonl",
+  "host_map": {},
+  "fetch": {
+    "source_url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/master/datasets/atomic/windows/discovery/host/empire_getsession_dcerpc_smb_srvsvc_NetSessEnum.zip",
+    "archive_sha256": "43e39d48cbdd2c7c235240b19f7def568968a6abff0d8f355a76deedc7f75659",
+    "format": "zip",
+    "extracted": [
+      "empire_getsession_dcerpc_smb_srvsvc_NetSessEnum_2020-09-22034513.sanitized.jsonl"
+    ],
+    "family": "discovery",
+    "note": null,
+    "license_note": "OTRF Security-Datasets \u2014 see upstream LICENSE (GPL-3.0).",
+    "authorship": "external \u2014 OTRF / MITRE ATT&CK Evals capture, not Corvex authors"
+  }
+}

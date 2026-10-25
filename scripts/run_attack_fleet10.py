@@ -15,7 +15,7 @@ import subprocess
 import sys
 import time
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 ROOT = Path(__file__).resolve().parents[1]
 FLEET_DIR = ROOT / "labs" / "breaktest" / "manifests" / "fleet20"
@@ -26,6 +26,25 @@ REPORT_MD = ROOT / "reports" / "attack_fleet20.md"
 HOSTS = ["host-a", "host-b", "host-c", "host-d", "host-e"]
 PRODUCERS = {h: f"prod-{h[-1]}" for h in HOSTS}
 ART = "https://github.com/redcanaryco/atomic-red-team"
+# Same bar as fleet-limits: HELD with margin < this is HELD, fragile — never hero bare 20/20.
+FRAGILE_MARGIN = 0.2
+
+
+def _is_fragile(verdict: str, margin: Optional[float], false_q: List[str]) -> bool:
+    if verdict != "HELD":
+        return False
+    if margin is None:
+        return bool(false_q)
+    try:
+        return float(margin) < FRAGILE_MARGIN
+    except (TypeError, ValueError):
+        return bool(false_q)
+
+
+def _verdict_label(verdict: str, fragile: bool) -> str:
+    if fragile and verdict == "HELD":
+        return "HELD, fragile"
+    return verdict
 
 
 def base_man(
@@ -612,6 +631,7 @@ def score_one(path: Path, intensity_rounds: int = 3) -> Dict[str, Any]:
                     "fusion_lift": bp.get("fusion_lift"),
                     "both_missed": bp.get("both_missed"),
                     "corr_hosts": corr.get("hosts_union") or [],
+                    "confidence_margin": corr.get("confidence_margin"),
                 }
             )
             # quarantine dry-run via replay
@@ -662,12 +682,21 @@ def score_one(path: Path, intensity_rounds: int = 3) -> Dict[str, Any]:
         verdict = "BROKE"
     elif missed or over or j < 0.99:
         verdict = "PARTIAL"
+    margin_raw = last.get("confidence_margin")
+    try:
+        margin = float(margin_raw) if margin_raw is not None else None
+    except (TypeError, ValueError):
+        margin = None
+    fragile = _is_fragile(verdict, margin, false_q)
     return {
         "campaign_id": man["campaign_id"],
         "origin": man.get("fleet_origin"),
         "techniques": (man.get("source") or {}).get("techniques"),
         "truth_hosts": sorted(truth),
         "verdict": verdict,
+        "verdict_label": _verdict_label(verdict, fragile),
+        "fragile": fragile,
+        "confidence_margin": margin,
         "intensity_rounds": intensity_rounds,
         "wall_seconds": wall,
         "corr_jaccard": last.get("corr_jaccard"),
@@ -685,6 +714,11 @@ def score_one(path: Path, intensity_rounds: int = 3) -> Dict[str, Any]:
 
 
 def markdown(report: Dict[str, Any]) -> str:
+    attacks = list(report.get("attacks") or [])
+    held_n = int((report.get("counts") or {}).get("HELD") or 0)
+    fragile_n = sum(1 for a in attacks if a.get("fragile") and a.get("verdict") == "HELD")
+    clean_n = held_n - fragile_n
+    fragile_rate = round(fragile_n / held_n, 4) if held_n else None
     lines = [
         "# Attack fleet 20 — full-intensity black-box benchmark",
         "",
@@ -694,20 +728,27 @@ def markdown(report: Dict[str, Any]) -> str:
         "",
         f"- Attacks: **{report['n']}** | Intensity rounds/attack: **{report['intensity_rounds']}**",
         f"- Wall: **{report['total_wall_seconds']}s**",
-        f"- HELD: **{report['counts']['HELD']}** | PARTIAL: **{report['counts']['PARTIAL']}** | BROKE: **{report['counts']['BROKE']}**",
+        (
+            f"- HELD: **{held_n}** (clean: **{clean_n}**, fragile: **{fragile_n}**, "
+            f"fragile_rate={fragile_rate}) | "
+            f"PARTIAL: **{report['counts']['PARTIAL']}** | BROKE: **{report['counts']['BROKE']}**"
+        ),
+        f"- Fragile bar: HELD with confidence_margin < {FRAGILE_MARGIN} → **HELD, fragile** "
+        "(never summarize as bare 20/20 without fragile count).",
         "",
         "## Fleet scoreboard",
         "",
-        "| # | Campaign | Origin | Verdict | Jaccard | Missed | Over-merged | Saved | False Q |",
-        "|---|----------|--------|---------|---------|--------|-------------|-------|---------|",
+        "| # | Campaign | Origin | Verdict | Margin | Jaccard | Missed | Over-merged | Saved | False Q |",
+        "|---|----------|--------|---------|--------|---------|--------|-------------|-------|---------|",
     ]
-    for i, a in enumerate(report["attacks"], 1):
+    for i, a in enumerate(attacks, 1):
         lines.append(
-            "| {i} | {cid} | {o} | **{v}** | {j} | {m} | {om} | {s} | {fq} |".format(
+            "| {i} | {cid} | {o} | **{v}** | {mgn} | {j} | {m} | {om} | {s} | {fq} |".format(
                 i=i,
                 cid=a["campaign_id"],
                 o=a["origin"],
-                v=a["verdict"],
+                v=a.get("verdict_label") or a["verdict"],
+                mgn=a.get("confidence_margin"),
                 j=a.get("corr_jaccard"),
                 m=", ".join(a.get("missed_hosts") or []) or "-",
                 om=", ".join(a.get("over_merged_hosts") or []) or "-",
@@ -715,14 +756,23 @@ def markdown(report: Dict[str, Any]) -> str:
                 fq=", ".join(a.get("false_quarantine") or []) or "-",
             )
         )
-    lines.extend(["", "## Where it broke", ""])
-    broke = [a for a in report["attacks"] if a["verdict"] != "HELD"]
-    if not broke:
-        lines.append("No stable breaks — all attacks matched truth without over-merge.")
+    lines.extend(["", "## Where it broke / fragile", ""])
+    broke = [a for a in attacks if a["verdict"] != "HELD"]
+    fragile = [a for a in attacks if a.get("fragile") and a.get("verdict") == "HELD"]
+    if not broke and not fragile:
+        lines.append(
+            "No stable breaks — all attacks matched truth without over-merge "
+            f"(fragile_rate={fragile_rate})."
+        )
     for a in broke:
         lines.append(
             f"- **{a['campaign_id']}** ({a['origin']}, {a['verdict']}): "
             f"missed={a['missed_hosts']} over_merged={a['over_merged_hosts']} "
+            f"— {a['narrative']}"
+        )
+    for a in fragile:
+        lines.append(
+            f"- **{a['campaign_id']}** (HELD, fragile, margin={a.get('confidence_margin')}): "
             f"— {a['narrative']}"
         )
     lines.extend(
@@ -732,14 +782,17 @@ def markdown(report: Dict[str, Any]) -> str:
             "",
         ]
     )
-    for a in report["attacks"]:
+    for a in attacks:
         lines.extend(
             [
                 f"### {a['campaign_id']}",
                 "",
                 f"- Origin: `{a['origin']}` | Techniques: {', '.join(a.get('techniques') or [])}",
-                f"- Truth: {', '.join(a['truth_hosts'])}",
-                f"- Verdict: **{a['verdict']}** | Jaccard={a.get('corr_jaccard')} | fusion_lift={a.get('fusion_lift')}",
+                (
+                    f"- Verdict: **{a.get('verdict_label') or a['verdict']}** | "
+                    f"Jaccard={a.get('corr_jaccard')} | margin={a.get('confidence_margin')} | "
+                    f"fusion_lift={a.get('fusion_lift')}"
+                ),
                 f"- Quarantine dry-run: {', '.join(a.get('quarantine_proposed') or []) or '-'}",
                 f"- Saved: {', '.join(a.get('hosts_saved') or []) or '-'} | False Q: {', '.join(a.get('false_quarantine') or []) or '-'}",
                 "",
@@ -750,6 +803,7 @@ def markdown(report: Dict[str, Any]) -> str:
             "## Honesty",
             "",
             "- Black-box narratives; scoring uses Corvex break-point machinery.",
+            "- Always report HELD vs fragile — never hero bare 20/20 alone.",
             "- DNS-only and window-gap packs are intentional stress cases.",
             "- Live OS quarantine remains unimplemented.",
             "",
@@ -774,16 +828,22 @@ def main() -> int:
         attacks.append(row)
         print(json.dumps({k: row[k] for k in ("campaign_id", "verdict", "corr_jaccard", "missed_hosts", "over_merged_hosts", "hosts_saved")}, indent=2), flush=True)
     counts = {k: sum(1 for a in attacks if a["verdict"] == k) for k in ("HELD", "PARTIAL", "BROKE")}
+    fragile_n = sum(1 for a in attacks if a.get("fragile") and a.get("verdict") == "HELD")
+    held_n = counts["HELD"]
     report = {
         "test": "Attack fleet 20 — full intensity black-box benchmark",
         "n": len(attacks),
         "intensity_rounds": intensity,
         "total_wall_seconds": round(time.perf_counter() - wall0, 4),
         "counts": counts,
+        "fragile_held": fragile_n,
+        "clean_held": held_n - fragile_n,
+        "fragile_rate_held": round(fragile_n / held_n, 4) if held_n else None,
+        "fragile_margin_bar": FRAGILE_MARGIN,
         "attacks": attacks,
         "honesty": (
             "Event sketches from public ATT&CK/Atomic technique IDs + original breakers. "
-            "No live exploitation."
+            "No live exploitation. Always report HELD vs fragile — never bare 20/20 alone."
         ),
     }
     REPORT_JSON.parent.mkdir(parents=True, exist_ok=True)

@@ -3,7 +3,7 @@
 Lab correlator stress only — **no live SQL injection** was executed.
 
 - Manifest: `labs/breaktest/manifests/break_sql_continuous_art.json`
-- Retries: **8** in ~**29.3787s** wall
+- Retries: **8** in ~**6.4421s** wall
 - First host breached (scripted): **host-a** at **T+42.0s** (FIRST_COMPROMISE method=stacked_xp_cmdshell_success)
 - Truth compromised hosts: host-a, host-b, host-c
 - Saved hosts (innocent + not falsely quarantined): **2** -> host-d, host-e
@@ -25,14 +25,14 @@ Lab correlator stress only — **no live SQL injection** was executed.
 
 | # | OK | Wall s | Jaccard | Matched | Over-merged | Quarantine proposed |
 |---|----|--------|---------|---------|-------------|---------------------|
-| 1 | yes | 4.1373 | 1.0 | True | - | host-a, host-b, host-c |
-| 2 | yes | 4.5333 | 1.0 | True | - | host-a, host-b, host-c |
-| 3 | yes | 3.7951 | 1.0 | True | - | host-a, host-b, host-c |
-| 4 | yes | 2.5115 | 1.0 | True | - | host-a, host-b, host-c |
-| 5 | yes | 3.0136 | 1.0 | True | - | host-a, host-b, host-c |
-| 6 | yes | 4.2141 | 1.0 | True | - | host-a, host-b, host-c |
-| 7 | yes | 3.7248 | 1.0 | True | - | host-a, host-b, host-c |
-| 8 | yes | 3.3533 | 1.0 | True | - | host-a, host-b, host-c |
+| 1 | yes | 0.906 | 1.0 | True | - | host-a, host-b, host-c |
+| 2 | yes | 0.7074 | 1.0 | True | - | host-a, host-b, host-c |
+| 3 | yes | 0.8326 | 1.0 | True | - | host-a, host-b, host-c |
+| 4 | yes | 0.7248 | 1.0 | True | - | host-a, host-b, host-c |
+| 5 | yes | 0.7553 | 1.0 | True | - | host-a, host-b, host-c |
+| 6 | yes | 0.7758 | 1.0 | True | - | host-a, host-b, host-c |
+| 7 | yes | 0.7851 | 1.0 | True | - | host-a, host-b, host-c |
+| 8 | yes | 0.7905 | 1.0 | True | - | host-a, host-b, host-c |
 
 ## Honesty
 

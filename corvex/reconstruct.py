@@ -229,15 +229,43 @@ def quarantine_plan_for(
                 "(exfil-shaped authorized activity can still clear this gate)."
             ),
         )
+
+    egress_hosts: set[str] = set()
+    recon_hosts: set[str] = set()
+    lateral_hosts: set[str] = set()
+    for st in steps:
+        name = str(st.name or "")
+        hs = {str(h) for h in (st.hosts or [])}
+        if name in CONTAIN_EGRESS_STAGES:
+            egress_hosts |= hs
+        if name in CONTAIN_RECON_STAGES:
+            recon_hosts |= hs
+        if name in CONTAIN_LATERAL_STAGES:
+            lateral_hosts |= hs
+
     cut: Optional[str] = None
     if len(hosts) >= 2:
-        # Prefer second host in first multi-host stage as mid-chain cut.
         for st in steps:
             if len(st.hosts) >= 2:
                 cut = st.hosts[1]
                 break
         if cut is None:
             cut = hosts[1]
+
+    # Surgical IsolateHost: multi-host campaigns propose the mid-chain cut only.
+    # Proposing every member (or both ends of every 2-host camp) made the eval
+    # union look like Q_DRYRUN_ALL_HOSTS on small APT29 fleets.
+    if len(hosts) >= 2:
+        proposed = {cut} if cut else set()
+    elif egress_hosts:
+        proposed = set(egress_hosts)
+    elif recon_hosts and lateral_hosts:
+        proposed = recon_hosts & lateral_hosts
+    else:
+        proposed = set()
+
+    proposed &= set(hosts)
+
     if mode == "lab_flag":
         honesty = (
             "Lab sandbox only: isolate writes a flag file that virtual hosts honor. "
@@ -246,19 +274,21 @@ def quarantine_plan_for(
     elif mode == "dry_run":
         honesty = (
             "Dry-run IsolateHost proposals only. Live quarantine executor is not armed "
-            "(CORVEX_CONTAIN=0 until L1 checklist + hostile-bus tests)."
+            "(CORVEX_CONTAIN=0 until L1 checklist + hostile-bus tests). "
+            "Targets are egress / cut-point hosts — not every campaign member."
         )
     else:
         honesty = (
             "Cannot quarantine real hosts: live contain blocked. "
             "Refusing to pretend isolation succeeded."
         )
+    sorted_hosts = sorted(proposed)
     return QuarantinePlan(
         verb="IsolateHost",
-        host_ids=hosts,
-        cut_point_host=cut,
+        host_ids=sorted_hosts,
+        cut_point_host=cut if cut in proposed else (sorted_hosts[0] if sorted_hosts else cut),
         rationale=(
-            f"Propose IsolateHost on campaign hosts"
+            f"Propose IsolateHost on {len(sorted_hosts)} evidence-backed host(s)"
             + (f"; mid-chain cut at {cut}" if cut else "")
             + "; containment evidence present (egress and/or recon+lateral)"
         ),

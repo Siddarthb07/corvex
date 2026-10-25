@@ -20,6 +20,8 @@ corvex byo-windows fixtures/windows_security_sample.json \
 corvex dash --run-dir runs/stranger-wedge --build
 ```
 
+`byo-windows` echoes `unlocks_claim: false`. Lab enrollment HMAC on event envelopes is **not** a claim unlock — same rule as author `--hmac` on the attestation.
+
 5. Confirm the dashboard shows a multi-host campaign and a reconstruction status that is not invented (gaps listed if partial).
 6. Write attestation:
 

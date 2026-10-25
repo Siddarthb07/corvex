@@ -2,12 +2,16 @@
   "test": "Attack fleet 20 \u2014 full intensity black-box benchmark",
   "n": 20,
   "intensity_rounds": 2,
-  "total_wall_seconds": 47.1071,
+  "total_wall_seconds": 30.4538,
   "counts": {
     "HELD": 20,
     "PARTIAL": 0,
     "BROKE": 0
   },
+  "fragile_held": 1,
+  "clean_held": 19,
+  "fragile_rate_held": 0.05,
+  "fragile_margin_bar": 0.2,
   "attacks": [
     {
       "campaign_id": "fleet01-art-cred-dump-pth",
@@ -24,8 +28,11 @@
         "host-c"
       ],
       "verdict": "HELD",
+      "verdict_label": "HELD",
+      "fragile": false,
+      "confidence_margin": 1.0,
       "intensity_rounds": 2,
-      "wall_seconds": 4.1365,
+      "wall_seconds": 1.4008,
       "corr_jaccard": 1.0,
       "corr_matched": true,
       "det_jaccard": 1.0,
@@ -59,6 +66,7 @@
             "host-b",
             "host-c"
           ],
+          "confidence_margin": 1.0,
           "quarantine_proposed": [
             "host-a",
             "host-b",
@@ -81,6 +89,7 @@
             "host-b",
             "host-c"
           ],
+          "confidence_margin": 1.0,
           "quarantine_proposed": [
             "host-a",
             "host-b",
@@ -104,8 +113,11 @@
         "host-d"
       ],
       "verdict": "HELD",
+      "verdict_label": "HELD",
+      "fragile": false,
+      "confidence_margin": 1.0,
       "intensity_rounds": 2,
-      "wall_seconds": 2.8209,
+      "wall_seconds": 1.5786,
       "corr_jaccard": 1.0,
       "corr_matched": true,
       "det_jaccard": 1.0,
@@ -139,6 +151,7 @@
             "host-b",
             "host-d"
           ],
+          "confidence_margin": 1.0,
           "quarantine_proposed": [
             "host-a",
             "host-b",
@@ -161,6 +174,7 @@
             "host-b",
             "host-d"
           ],
+          "confidence_margin": 1.0,
           "quarantine_proposed": [
             "host-a",
             "host-b",
@@ -185,8 +199,11 @@
         "host-d"
       ],
       "verdict": "HELD",
+      "verdict_label": "HELD",
+      "fragile": false,
+      "confidence_margin": 1.0,
       "intensity_rounds": 2,
-      "wall_seconds": 2.7287,
+      "wall_seconds": 1.7553,
       "corr_jaccard": 1.0,
       "corr_matched": true,
       "det_jaccard": 1.0,
@@ -221,6 +238,7 @@
             "host-c",
             "host-d"
           ],
+          "confidence_margin": 1.0,
           "quarantine_proposed": [
             "host-a",
             "host-b",
@@ -245,6 +263,7 @@
             "host-c",
             "host-d"
           ],
+          "confidence_margin": 1.0,
           "quarantine_proposed": [
             "host-a",
             "host-b",
@@ -268,8 +287,11 @@
         "host-c"
       ],
       "verdict": "HELD",
+      "verdict_label": "HELD",
+      "fragile": false,
+      "confidence_margin": 1.0,
       "intensity_rounds": 2,
-      "wall_seconds": 4.6679,
+      "wall_seconds": 1.4484,
       "corr_jaccard": 1.0,
       "corr_matched": true,
       "det_jaccard": 1.0,
@@ -302,6 +324,7 @@
             "host-b",
             "host-c"
           ],
+          "confidence_margin": 1.0,
           "quarantine_proposed": [
             "host-b",
             "host-c"
@@ -322,6 +345,7 @@
             "host-b",
             "host-c"
           ],
+          "confidence_margin": 1.0,
           "quarantine_proposed": [
             "host-b",
             "host-c"
@@ -343,8 +367,11 @@
         "host-c"
       ],
       "verdict": "HELD",
+      "verdict_label": "HELD",
+      "fragile": false,
+      "confidence_margin": 1.0,
       "intensity_rounds": 2,
-      "wall_seconds": 1.5013,
+      "wall_seconds": 1.6015,
       "corr_jaccard": 1.0,
       "corr_matched": true,
       "det_jaccard": 0.0,
@@ -378,6 +405,7 @@
             "host-b",
             "host-c"
           ],
+          "confidence_margin": 1.0,
           "quarantine_proposed": [
             "host-a",
             "host-b",
@@ -400,6 +428,7 @@
             "host-b",
             "host-c"
           ],
+          "confidence_margin": 1.0,
           "quarantine_proposed": [
             "host-a",
             "host-b",
@@ -423,8 +452,11 @@
         "host-c"
       ],
       "verdict": "HELD",
+      "verdict_label": "HELD",
+      "fragile": false,
+      "confidence_margin": 1.0,
       "intensity_rounds": 2,
-      "wall_seconds": 1.5577,
+      "wall_seconds": 1.5138,
       "corr_jaccard": 1.0,
       "corr_matched": true,
       "det_jaccard": 1.0,
@@ -458,6 +490,7 @@
             "host-b",
             "host-c"
           ],
+          "confidence_margin": 1.0,
           "quarantine_proposed": [
             "host-a",
             "host-b",
@@ -480,6 +513,7 @@
             "host-b",
             "host-c"
           ],
+          "confidence_margin": 1.0,
           "quarantine_proposed": [
             "host-a",
             "host-b",
@@ -503,8 +537,11 @@
         "host-c"
       ],
       "verdict": "HELD",
+      "verdict_label": "HELD",
+      "fragile": false,
+      "confidence_margin": 1.0,
       "intensity_rounds": 2,
-      "wall_seconds": 1.3801,
+      "wall_seconds": 1.5669,
       "corr_jaccard": 1.0,
       "corr_matched": true,
       "det_jaccard": 1.0,
@@ -538,6 +575,7 @@
             "host-b",
             "host-c"
           ],
+          "confidence_margin": 1.0,
           "quarantine_proposed": [
             "host-a",
             "host-b",
@@ -560,6 +598,7 @@
             "host-b",
             "host-c"
           ],
+          "confidence_margin": 1.0,
           "quarantine_proposed": [
             "host-a",
             "host-b",
@@ -582,8 +621,11 @@
         "host-b"
       ],
       "verdict": "HELD",
+      "verdict_label": "HELD",
+      "fragile": false,
+      "confidence_margin": 1.0,
       "intensity_rounds": 2,
-      "wall_seconds": 2.8635,
+      "wall_seconds": 1.4427,
       "corr_jaccard": 1.0,
       "corr_matched": true,
       "det_jaccard": 1.0,
@@ -616,6 +658,7 @@
             "host-a",
             "host-b"
           ],
+          "confidence_margin": 1.0,
           "quarantine_proposed": [
             "host-a",
             "host-b"
@@ -636,6 +679,7 @@
             "host-a",
             "host-b"
           ],
+          "confidence_margin": 1.0,
           "quarantine_proposed": [
             "host-a",
             "host-b"
@@ -657,8 +701,11 @@
         "host-c"
       ],
       "verdict": "HELD",
+      "verdict_label": "HELD",
+      "fragile": false,
+      "confidence_margin": 1.0,
       "intensity_rounds": 2,
-      "wall_seconds": 1.6126,
+      "wall_seconds": 1.5709,
       "corr_jaccard": 1.0,
       "corr_matched": true,
       "det_jaccard": 1.0,
@@ -692,6 +739,7 @@
             "host-b",
             "host-c"
           ],
+          "confidence_margin": 1.0,
           "quarantine_proposed": [
             "host-a",
             "host-b",
@@ -714,6 +762,7 @@
             "host-b",
             "host-c"
           ],
+          "confidence_margin": 1.0,
           "quarantine_proposed": [
             "host-a",
             "host-b",
@@ -737,8 +786,11 @@
         "host-c"
       ],
       "verdict": "HELD",
+      "verdict_label": "HELD",
+      "fragile": false,
+      "confidence_margin": 1.0,
       "intensity_rounds": 2,
-      "wall_seconds": 1.5641,
+      "wall_seconds": 1.7496,
       "corr_jaccard": 1.0,
       "corr_matched": true,
       "det_jaccard": 1.0,
@@ -772,6 +824,7 @@
             "host-b",
             "host-c"
           ],
+          "confidence_margin": 1.0,
           "quarantine_proposed": [
             "host-a",
             "host-b",
@@ -794,6 +847,7 @@
             "host-b",
             "host-c"
           ],
+          "confidence_margin": 1.0,
           "quarantine_proposed": [
             "host-a",
             "host-b",
@@ -817,8 +871,11 @@
         "host-c"
       ],
       "verdict": "HELD",
+      "verdict_label": "HELD",
+      "fragile": false,
+      "confidence_margin": 1.0,
       "intensity_rounds": 2,
-      "wall_seconds": 1.4092,
+      "wall_seconds": 1.5919,
       "corr_jaccard": 1.0,
       "corr_matched": true,
       "det_jaccard": 1.0,
@@ -852,6 +909,7 @@
             "host-b",
             "host-c"
           ],
+          "confidence_margin": 1.0,
           "quarantine_proposed": [
             "host-a",
             "host-b",
@@ -874,6 +932,7 @@
             "host-b",
             "host-c"
           ],
+          "confidence_margin": 1.0,
           "quarantine_proposed": [
             "host-a",
             "host-b",
@@ -897,8 +956,11 @@
         "host-d"
       ],
       "verdict": "HELD",
+      "verdict_label": "HELD",
+      "fragile": false,
+      "confidence_margin": 1.0,
       "intensity_rounds": 2,
-      "wall_seconds": 1.5449,
+      "wall_seconds": 1.4396,
       "corr_jaccard": 1.0,
       "corr_matched": true,
       "det_jaccard": 1.0,
@@ -932,6 +994,7 @@
             "host-b",
             "host-d"
           ],
+          "confidence_margin": 1.0,
           "quarantine_proposed": [
             "host-a",
             "host-b",
@@ -954,6 +1017,7 @@
             "host-b",
             "host-d"
           ],
+          "confidence_margin": 1.0,
           "quarantine_proposed": [
             "host-a",
             "host-b",
@@ -976,8 +1040,11 @@
         "host-c"
       ],
       "verdict": "HELD",
+      "verdict_label": "HELD",
+      "fragile": false,
+      "confidence_margin": 1.0,
       "intensity_rounds": 2,
-      "wall_seconds": 1.5657,
+      "wall_seconds": 1.4832,
       "corr_jaccard": 1.0,
       "corr_matched": true,
       "det_jaccard": 1.0,
@@ -1010,6 +1077,7 @@
             "host-b",
             "host-c"
           ],
+          "confidence_margin": 1.0,
           "quarantine_proposed": [
             "host-b",
             "host-c"
@@ -1030,6 +1098,7 @@
             "host-b",
             "host-c"
           ],
+          "confidence_margin": 1.0,
           "quarantine_proposed": [
             "host-b",
             "host-c"
@@ -1052,8 +1121,11 @@
         "host-e"
       ],
       "verdict": "HELD",
+      "verdict_label": "HELD",
+      "fragile": false,
+      "confidence_margin": 1.0,
       "intensity_rounds": 2,
-      "wall_seconds": 1.4476,
+      "wall_seconds": 1.4542,
       "corr_jaccard": 1.0,
       "corr_matched": true,
       "det_jaccard": 1.0,
@@ -1087,6 +1159,7 @@
             "host-c",
             "host-e"
           ],
+          "confidence_margin": 1.0,
           "quarantine_proposed": [
             "host-a",
             "host-c",
@@ -1109,6 +1182,7 @@
             "host-c",
             "host-e"
           ],
+          "confidence_margin": 1.0,
           "quarantine_proposed": [
             "host-a",
             "host-c",
@@ -1131,8 +1205,11 @@
         "host-b"
       ],
       "verdict": "HELD",
+      "verdict_label": "HELD",
+      "fragile": false,
+      "confidence_margin": 1.0,
       "intensity_rounds": 2,
-      "wall_seconds": 1.5994,
+      "wall_seconds": 1.4997,
       "corr_jaccard": 1.0,
       "corr_matched": true,
       "det_jaccard": 1.0,
@@ -1165,6 +1242,7 @@
             "host-a",
             "host-b"
           ],
+          "confidence_margin": 1.0,
           "quarantine_proposed": [
             "host-a",
             "host-b"
@@ -1185,6 +1263,7 @@
             "host-a",
             "host-b"
           ],
+          "confidence_margin": 1.0,
           "quarantine_proposed": [
             "host-a",
             "host-b"
@@ -1206,8 +1285,11 @@
         "host-c"
       ],
       "verdict": "HELD",
+      "verdict_label": "HELD",
+      "fragile": false,
+      "confidence_margin": 1.0,
       "intensity_rounds": 2,
-      "wall_seconds": 1.3133,
+      "wall_seconds": 1.4946,
       "corr_jaccard": 1.0,
       "corr_matched": true,
       "det_jaccard": 0.6667,
@@ -1241,6 +1323,7 @@
             "host-b",
             "host-c"
           ],
+          "confidence_margin": 1.0,
           "quarantine_proposed": [
             "host-a",
             "host-b",
@@ -1263,6 +1346,7 @@
             "host-b",
             "host-c"
           ],
+          "confidence_margin": 1.0,
           "quarantine_proposed": [
             "host-a",
             "host-b",
@@ -1286,8 +1370,11 @@
         "host-c"
       ],
       "verdict": "HELD",
+      "verdict_label": "HELD",
+      "fragile": false,
+      "confidence_margin": 1.0,
       "intensity_rounds": 2,
-      "wall_seconds": 1.2831,
+      "wall_seconds": 1.4516,
       "corr_jaccard": 1.0,
       "corr_matched": true,
       "det_jaccard": 1.0,
@@ -1321,6 +1408,7 @@
             "host-b",
             "host-c"
           ],
+          "confidence_margin": 1.0,
           "quarantine_proposed": [
             "host-a",
             "host-b",
@@ -1343,6 +1431,7 @@
             "host-b",
             "host-c"
           ],
+          "confidence_margin": 1.0,
           "quarantine_proposed": [
             "host-a",
             "host-b",
@@ -1366,8 +1455,11 @@
         "host-c"
       ],
       "verdict": "HELD",
+      "verdict_label": "HELD",
+      "fragile": false,
+      "confidence_margin": 1.0,
       "intensity_rounds": 2,
-      "wall_seconds": 1.2426,
+      "wall_seconds": 1.4576,
       "corr_jaccard": 1.0,
       "corr_matched": true,
       "det_jaccard": 1.0,
@@ -1401,6 +1493,7 @@
             "host-b",
             "host-c"
           ],
+          "confidence_margin": 1.0,
           "quarantine_proposed": [
             "host-a",
             "host-b",
@@ -1423,6 +1516,7 @@
             "host-b",
             "host-c"
           ],
+          "confidence_margin": 1.0,
           "quarantine_proposed": [
             "host-a",
             "host-b",
@@ -1445,8 +1539,11 @@
         "host-c"
       ],
       "verdict": "HELD",
+      "verdict_label": "HELD, fragile",
+      "fragile": true,
+      "confidence_margin": 0.1,
       "intensity_rounds": 2,
-      "wall_seconds": 4.123,
+      "wall_seconds": 1.4731,
       "corr_jaccard": 1.0,
       "corr_matched": true,
       "det_jaccard": 1.0,
@@ -1481,6 +1578,7 @@
             "host-c",
             "host-d"
           ],
+          "confidence_margin": 0.1,
           "quarantine_proposed": [
             "host-a",
             "host-b",
@@ -1504,6 +1602,7 @@
             "host-c",
             "host-d"
           ],
+          "confidence_margin": 0.1,
           "quarantine_proposed": [
             "host-a",
             "host-b",
@@ -1527,8 +1626,11 @@
         "host-c"
       ],
       "verdict": "HELD",
+      "verdict_label": "HELD",
+      "fragile": false,
+      "confidence_margin": 1.0,
       "intensity_rounds": 2,
-      "wall_seconds": 6.7352,
+      "wall_seconds": 1.47,
       "corr_jaccard": 1.0,
       "corr_matched": true,
       "det_jaccard": 1.0,
@@ -1562,6 +1664,7 @@
             "host-b",
             "host-c"
           ],
+          "confidence_margin": 1.0,
           "quarantine_proposed": [
             "host-a",
             "host-b",
@@ -1584,6 +1687,7 @@
             "host-b",
             "host-c"
           ],
+          "confidence_margin": 1.0,
           "quarantine_proposed": [
             "host-a",
             "host-b",
@@ -1594,5 +1698,5 @@
       "narrative": "Everyone hits CDN. APT still moves underneath."
     }
   ],
-  "honesty": "Event sketches from public ATT&CK/Atomic technique IDs + original breakers. No live exploitation."
+  "honesty": "Event sketches from public ATT&CK/Atomic technique IDs + original breakers. No live exploitation. Always report HELD vs fragile \u2014 never bare 20/20 alone."
 }

@@ -2,7 +2,7 @@
   "test": "Continuous SQL ART stress",
   "manifest": "labs/breaktest/manifests/break_sql_continuous_art.json",
   "retries": 8,
-  "total_wall_seconds": 29.3787,
+  "total_wall_seconds": 6.4421,
   "first_compromise": {
     "host": "host-a",
     "offset_seconds": 42.0,
@@ -141,9 +141,9 @@
     {
       "attempt": 1,
       "ok": true,
-      "build_seconds": 2.0717,
-      "replay_seconds": 2.0656,
-      "wall_seconds": 4.1373,
+      "build_seconds": 0.5106,
+      "replay_seconds": 0.3953,
+      "wall_seconds": 0.906,
       "correlator_jaccard": 1.0,
       "correlator_matched": true,
       "correlator_hosts": [
@@ -171,9 +171,9 @@
     {
       "attempt": 2,
       "ok": true,
-      "build_seconds": 2.0893,
-      "replay_seconds": 2.4439,
-      "wall_seconds": 4.5333,
+      "build_seconds": 0.3381,
+      "replay_seconds": 0.3694,
+      "wall_seconds": 0.7074,
       "correlator_jaccard": 1.0,
       "correlator_matched": true,
       "correlator_hosts": [
@@ -201,9 +201,9 @@
     {
       "attempt": 3,
       "ok": true,
-      "build_seconds": 1.8178,
-      "replay_seconds": 1.9773,
-      "wall_seconds": 3.7951,
+      "build_seconds": 0.3885,
+      "replay_seconds": 0.4442,
+      "wall_seconds": 0.8326,
       "correlator_jaccard": 1.0,
       "correlator_matched": true,
       "correlator_hosts": [
@@ -231,9 +231,9 @@
     {
       "attempt": 4,
       "ok": true,
-      "build_seconds": 1.6241,
-      "replay_seconds": 0.8874,
-      "wall_seconds": 2.5115,
+      "build_seconds": 0.3715,
+      "replay_seconds": 0.3533,
+      "wall_seconds": 0.7248,
       "correlator_jaccard": 1.0,
       "correlator_matched": true,
       "correlator_hosts": [
@@ -261,9 +261,9 @@
     {
       "attempt": 5,
       "ok": true,
-      "build_seconds": 0.8349,
-      "replay_seconds": 2.1787,
-      "wall_seconds": 3.0136,
+      "build_seconds": 0.3956,
+      "replay_seconds": 0.3597,
+      "wall_seconds": 0.7553,
       "correlator_jaccard": 1.0,
       "correlator_matched": true,
       "correlator_hosts": [
@@ -291,9 +291,9 @@
     {
       "attempt": 6,
       "ok": true,
-      "build_seconds": 1.9736,
-      "replay_seconds": 2.2404,
-      "wall_seconds": 4.2141,
+      "build_seconds": 0.376,
+      "replay_seconds": 0.3998,
+      "wall_seconds": 0.7758,
       "correlator_jaccard": 1.0,
       "correlator_matched": true,
       "correlator_hosts": [
@@ -321,9 +321,9 @@
     {
       "attempt": 7,
       "ok": true,
-      "build_seconds": 2.0531,
-      "replay_seconds": 1.6718,
-      "wall_seconds": 3.7248,
+      "build_seconds": 0.3696,
+      "replay_seconds": 0.4154,
+      "wall_seconds": 0.7851,
       "correlator_jaccard": 1.0,
       "correlator_matched": true,
       "correlator_hosts": [
@@ -351,9 +351,9 @@
     {
       "attempt": 8,
       "ok": true,
-      "build_seconds": 1.4591,
-      "replay_seconds": 1.8942,
-      "wall_seconds": 3.3533,
+      "build_seconds": 0.3351,
+      "replay_seconds": 0.4554,
+      "wall_seconds": 0.7905,
       "correlator_jaccard": 1.0,
       "correlator_matched": true,
       "correlator_hosts": [

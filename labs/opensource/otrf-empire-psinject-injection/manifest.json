@@ -1,0 +1,28 @@
+{
+  "name": "otrf-empire-psinject-injection",
+  "corpus_kind": "opensource_attack_capture",
+  "source": {
+    "project": "OTRF/Security-Datasets",
+    "url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/master/datasets/atomic/windows/defense_evasion/host/empire_psinject_PEinjection.zip",
+    "family": "defense_evasion",
+    "tool": "Empire",
+    "attack": "empire psinject PEinjection",
+    "techniques": [],
+    "note": "empire psinject PEinjection",
+    "authorship": "external"
+  },
+  "raw_glob": "raw/*.sanitized.jsonl",
+  "host_map": {},
+  "fetch": {
+    "source_url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/master/datasets/atomic/windows/defense_evasion/host/empire_psinject_PEinjection.zip",
+    "archive_sha256": "ad6297ce8cfb908126e2ec1271d62f6cd8dcdac6006d7b6e5ecd377488b04df0",
+    "format": "zip",
+    "extracted": [
+      "empire_psinject_PEinjection_2020-08-07143205.sanitized.jsonl"
+    ],
+    "family": "defense_evasion",
+    "note": null,
+    "license_note": "OTRF Security-Datasets \u2014 see upstream LICENSE (GPL-3.0).",
+    "authorship": "external \u2014 OTRF / MITRE ATT&CK Evals capture, not Corvex authors"
+  }
+}

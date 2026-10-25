@@ -1,0 +1,98 @@
+{
+  "campaign_id": "mf-forest-bare-burst-pth_lateral",
+  "family": "intensive_multifactor",
+  "ood": true,
+  "hosts": [
+    "corp-dc01",
+    "partner-ws01",
+    "finance-ws01",
+    "corp-ws02",
+    "partner-ws02",
+    "finance-ws02"
+  ],
+  "truth_hosts": [
+    "corp-dc01",
+    "partner-ws01",
+    "finance-ws01"
+  ],
+  "producers": {
+    "corp-dc01": "prod-mf-corp-dc01",
+    "partner-ws01": "prod-mf-partner-ws01",
+    "finance-ws01": "prod-mf-finance-ws01",
+    "corp-ws02": "prod-mf-corp-ws02",
+    "partner-ws02": "prod-mf-partner-ws02",
+    "finance-ws02": "prod-mf-finance-ws02"
+  },
+  "base_time_utc": "2026-07-25T14:00:00Z",
+  "fleet_origin": "original",
+  "fleet_suite": "intensive",
+  "factors": {
+    "domain": "forest",
+    "container": "bare",
+    "sequence": "burst",
+    "style": "pth_lateral"
+  },
+  "source": {
+    "style": "Intensive multi-factor stress sketches",
+    "repo": "https://github.com/Siddarthb07/corvex",
+    "techniques": [
+      "T1003.001",
+      "T1550.002",
+      "T1041"
+    ],
+    "note": "forest/bare/burst/pth_lateral"
+  },
+  "narrative": [
+    "Factor cell: domain=forest container=bare sequence=burst style=pth_lateral."
+  ],
+  "break_intent": {
+    "name": "mf-forest-bare-burst-pth_lateral",
+    "break_criterion": "Jaccard < 0.5 OR truth host never recovered OR benign merge-FQ",
+    "success_criteria_defender": [
+      "matched truth_hosts",
+      "empty over_merged_hosts"
+    ]
+  },
+  "steps": [
+    {
+      "kind": "auth",
+      "host": "corp-dc01",
+      "user": "Administrator",
+      "src": "203.0.113.10",
+      "offset_seconds": 0,
+      "technique": "T1003.001"
+    },
+    {
+      "kind": "auth",
+      "host": "partner-ws01",
+      "user": "Administrator",
+      "src": "corp-dc01",
+      "offset_seconds": 12,
+      "technique": "T1550.002"
+    },
+    {
+      "kind": "auth",
+      "host": "finance-ws01",
+      "user": "Administrator",
+      "src": "partner-ws01",
+      "offset_seconds": 24,
+      "technique": "T1550.002"
+    },
+    {
+      "kind": "exfil",
+      "host": "finance-ws01",
+      "dst_ip": "198.51.100.20",
+      "bytes": 22000,
+      "offset_seconds": 36,
+      "technique": "T1041"
+    },
+    {
+      "kind": "exfil",
+      "host": "partner-ws01",
+      "dst_ip": "198.51.100.20",
+      "bytes": 18000,
+      "offset_seconds": 48,
+      "technique": "T1041"
+    }
+  ]
+}

@@ -1,0 +1,2740 @@
+{
+  "test": "Live open-source OTRF stress on laptop",
+  "mode": "offline_lab_replay_into_live_correlator",
+  "generated_utc": "2026-10-24T09:36:01Z",
+  "claim_allowed": false,
+  "n": 56,
+  "wall_seconds": 675.1844,
+  "run_dir": "C:\\Users\\siddu\\projects\\corvex\\runs\\live-oss-stress",
+  "dash_url": "http://127.0.0.1:8765/",
+  "dash_running": true,
+  "sensor_once": {
+    "ok": false,
+    "returncode": 2,
+    "stdout_tail": "producer prod-a not enrolled for host cyborg_1\n",
+    "stderr_tail": ""
+  },
+  "final_snapshot": {
+    "n_events": 139594,
+    "n_campaigns": 55,
+    "n_multi_host": 55,
+    "multi_hosts": [
+      "acct001",
+      "acct01",
+      "adfs01",
+      "dc01",
+      "file001",
+      "hfdc01",
+      "hr001",
+      "it001",
+      "it01",
+      "mkt01",
+      "mordordc",
+      "nashua",
+      "newyork",
+      "prd01",
+      "scranton",
+      "utica",
+      "workstation5",
+      "workstation6",
+      "workstation7"
+    ],
+    "top_campaigns": [
+      {
+        "id": "camp-recon-multi",
+        "n_hosts": 17,
+        "hosts": [
+          "acct001",
+          "acct01",
+          "dc01",
+          "file001",
+          "hfdc01",
+          "hr001",
+          "it001",
+          "it01",
+          "mkt01",
+          "mordordc",
+          "nashua",
+          "newyork",
+          "prd01",
+          "scranton",
+          "utica",
+          "workstation5",
+          "workstation6"
+        ],
+        "score": 1.0
+      },
+      {
+        "id": "camp-lateral-pgustavo-1",
+        "n_hosts": 5,
+        "hosts": [
+          "acct001",
+          "file001",
+          "hfdc01",
+          "hr001",
+          "it001"
+        ],
+        "score": 1.0
+      },
+      {
+        "id": "camp-lateral-ACCT001$-22",
+        "n_hosts": 5,
+        "hosts": [
+          "acct001",
+          "file001",
+          "hfdc01",
+          "hr001",
+          "it001"
+        ],
+        "score": 1.0
+      },
+      {
+        "id": "camp-lateral-pgustavo-16",
+        "n_hosts": 4,
+        "hosts": [
+          "mordordc",
+          "workstation5",
+          "workstation6",
+          "workstation7"
+        ],
+        "score": 1.0
+      },
+      {
+        "id": "camp-lateral-SCRANTON$-28",
+        "n_hosts": 4,
+        "hosts": [
+          "nashua",
+          "newyork",
+          "scranton",
+          "utica"
+        ],
+        "score": 1.0
+      },
+      {
+        "id": "camp-lateral-SCRANTON$-30",
+        "n_hosts": 4,
+        "hosts": [
+          "nashua",
+          "newyork",
+          "scranton",
+          "utica"
+        ],
+        "score": 1.0
+      },
+      {
+        "id": "camp-lateral-pgustavo-2",
+        "n_hosts": 3,
+        "hosts": [
+          "mordordc",
+          "workstation5",
+          "workstation6"
+        ],
+        "score": 1.0
+      },
+      {
+        "id": "camp-lateral-pgustavo-5",
+        "n_hosts": 3,
+        "hosts": [
+          "mordordc",
+          "workstation5",
+          "workstation6"
+        ],
+        "score": 1.0
+      }
+    ]
+  },
+  "catch_counts": {
+    "CAUGHT": 20,
+    "SINGLE_HOST_BATCH": 17,
+    "ALREADY_COVERED": 19
+  },
+  "attacks": [
+    {
+      "id": "otrf-apt29-day1",
+      "ok": true,
+      "attack": "ATT&CK Evals Round 2 APT29 day1 (full multi-host)",
+      "tool": "MITRE ATT&CK Evals R2 (manual)",
+      "family": "compound_apt29",
+      "techniques": [
+        "G0016",
+        "APT29",
+        "CozyBear"
+      ],
+      "n_hosts_batch": 4,
+      "hosts_batch": [
+        "nashua",
+        "newyork",
+        "scranton",
+        "utica"
+      ],
+      "n_events_batch": 10980,
+      "adapt_skip_rate": null,
+      "live_after": {
+        "n_events": 10980,
+        "n_campaigns": 4,
+        "n_multi_host": 4,
+        "multi_hosts": [
+          "nashua",
+          "newyork",
+          "scranton",
+          "utica"
+        ]
+      },
+      "catch": {
+        "label": "CAUGHT",
+        "caught": true,
+        "detail": "multi-host camps 0->4; new bridge hosts=['nashua', 'newyork', 'scranton', 'utica']",
+        "multi_delta": 4
+      }
+    },
+    {
+      "id": "otrf-apt29-day2",
+      "ok": true,
+      "attack": "ATT&CK Evals Round 2 APT29 day2 (full multi-host)",
+      "tool": "MITRE ATT&CK Evals R2 (manual)",
+      "family": "compound_apt29",
+      "techniques": [
+        "G0016",
+        "APT29",
+        "CozyBear"
+      ],
+      "n_hosts_batch": 4,
+      "hosts_batch": [
+        "nashua",
+        "newyork",
+        "scranton",
+        "utica"
+      ],
+      "n_events_batch": 67693,
+      "adapt_skip_rate": null,
+      "live_after": {
+        "n_events": 78673,
+        "n_campaigns": 8,
+        "n_multi_host": 8,
+        "multi_hosts": [
+          "nashua",
+          "newyork",
+          "scranton",
+          "utica"
+        ]
+      },
+      "catch": {
+        "label": "CAUGHT",
+        "caught": true,
+        "detail": "multi-host camps 4->8; new bridge hosts=\u2014",
+        "multi_delta": 4
+      }
+    },
+    {
+      "id": "otrf-caldera-apt3-day1",
+      "ok": true,
+      "attack": "ATT&CK Evals Round 1 APT3 day1 (full scenario)",
+      "tool": "Caldera (MITRE ATT&CK Evals R1)",
+      "family": "compound_apt3",
+      "techniques": [
+        "G0022",
+        "APT3"
+      ],
+      "n_hosts_batch": 5,
+      "hosts_batch": [
+        "acct001",
+        "file001",
+        "hfdc01",
+        "hr001",
+        "it001"
+      ],
+      "n_events_batch": 14423,
+      "adapt_skip_rate": null,
+      "live_after": {
+        "n_events": 93096,
+        "n_campaigns": 15,
+        "n_multi_host": 15,
+        "multi_hosts": [
+          "acct001",
+          "file001",
+          "hfdc01",
+          "hr001",
+          "it001",
+          "nashua",
+          "newyork",
+          "scranton",
+          "utica"
+        ]
+      },
+      "catch": {
+        "label": "CAUGHT",
+        "caught": true,
+        "detail": "multi-host camps 8->15; new bridge hosts=['acct001', 'file001', 'hfdc01', 'hr001', 'it001']",
+        "multi_delta": 7
+      }
+    },
+    {
+      "id": "otrf-empire-apt3",
+      "ok": true,
+      "attack": "Empire APT3 multi-day compound",
+      "tool": "Empire (OTRF APT3 compound)",
+      "family": "compound_apt3",
+      "techniques": [
+        "G0022",
+        "APT3"
+      ],
+      "n_hosts_batch": 1,
+      "hosts_batch": [
+        "wecserver"
+      ],
+      "n_events_batch": 7571,
+      "adapt_skip_rate": null,
+      "live_after": {
+        "n_events": 100667,
+        "n_campaigns": 15,
+        "n_multi_host": 15,
+        "multi_hosts": [
+          "acct001",
+          "file001",
+          "hfdc01",
+          "hr001",
+          "it001",
+          "nashua",
+          "newyork",
+          "scranton",
+          "utica"
+        ]
+      },
+      "catch": {
+        "label": "SINGLE_HOST_BATCH",
+        "caught": true,
+        "detail": "batch has <2 hosts \u2014 fusion not required; campaign growth counts as soft catch",
+        "multi_delta": 0
+      }
+    },
+    {
+      "id": "otrf-goldensaml-windows",
+      "ok": true,
+      "attack": "Golden SAML ADFS mail-access \u2014 Windows host events",
+      "tool": "Golden SAML / ADFS",
+      "family": "identity_federation",
+      "techniques": [
+        "T1606.002",
+        "T1552"
+      ],
+      "n_hosts_batch": 2,
+      "hosts_batch": [
+        "adfs01",
+        "dc01"
+      ],
+      "n_events_batch": 29,
+      "adapt_skip_rate": null,
+      "live_after": {
+        "n_events": 100696,
+        "n_campaigns": 17,
+        "n_multi_host": 17,
+        "multi_hosts": [
+          "acct001",
+          "adfs01",
+          "dc01",
+          "file001",
+          "hfdc01",
+          "hr001",
+          "it001",
+          "nashua",
+          "newyork",
+          "scranton",
+          "utica"
+        ]
+      },
+      "catch": {
+        "label": "CAUGHT",
+        "caught": true,
+        "detail": "multi-host camps 15->17; new bridge hosts=['adfs01', 'dc01']",
+        "multi_delta": 2
+      }
+    },
+    {
+      "id": "otrf-log4shell-security",
+      "ok": true,
+      "attack": "Log4Shell JNDI exploit \u2014 Security auditing host",
+      "tool": "Log4Shell CVE-2021-44228",
+      "family": "exploit_cve",
+      "techniques": [
+        "T1190",
+        "T1059.007"
+      ],
+      "n_hosts_batch": 1,
+      "hosts_batch": [
+        "workstation5"
+      ],
+      "n_events_batch": 5,
+      "adapt_skip_rate": null,
+      "live_after": {
+        "n_events": 100701,
+        "n_campaigns": 17,
+        "n_multi_host": 17,
+        "multi_hosts": [
+          "acct001",
+          "adfs01",
+          "dc01",
+          "file001",
+          "hfdc01",
+          "hr001",
+          "it001",
+          "nashua",
+          "newyork",
+          "scranton",
+          "utica"
+        ]
+      },
+      "catch": {
+        "label": "SINGLE_HOST_BATCH",
+        "caught": true,
+        "detail": "batch has <2 hosts \u2014 fusion not required; campaign growth counts as soft catch",
+        "multi_delta": 0
+      }
+    },
+    {
+      "id": "otrf-log4shell-sysmon",
+      "ok": true,
+      "attack": "Log4Shell JNDI exploit \u2014 Sysmon host telemetry",
+      "tool": "Log4Shell CVE-2021-44228",
+      "family": "exploit_cve",
+      "techniques": [
+        "T1190",
+        "T1059.007"
+      ],
+      "n_hosts_batch": 1,
+      "hosts_batch": [
+        "workstation5"
+      ],
+      "n_events_batch": 9,
+      "adapt_skip_rate": null,
+      "live_after": {
+        "n_events": 100710,
+        "n_campaigns": 17,
+        "n_multi_host": 17,
+        "multi_hosts": [
+          "acct001",
+          "adfs01",
+          "dc01",
+          "file001",
+          "hfdc01",
+          "hr001",
+          "it001",
+          "nashua",
+          "newyork",
+          "scranton",
+          "utica"
+        ]
+      },
+      "catch": {
+        "label": "SINGLE_HOST_BATCH",
+        "caught": true,
+        "detail": "batch has <2 hosts \u2014 fusion not required; campaign growth counts as soft catch",
+        "multi_delta": 0
+      }
+    },
+    {
+      "id": "otrf-lsass-metasploit-comsvcs",
+      "ok": true,
+      "attack": "LSASS campaign: comsvcs MiniDump",
+      "tool": "Metasploit/comsvcs",
+      "family": "credential_dump_campaign",
+      "techniques": [
+        "T1003.001"
+      ],
+      "n_hosts_batch": 1,
+      "hosts_batch": [
+        "prd01"
+      ],
+      "n_events_batch": 1158,
+      "adapt_skip_rate": null,
+      "live_after": {
+        "n_events": 101868,
+        "n_campaigns": 17,
+        "n_multi_host": 17,
+        "multi_hosts": [
+          "acct001",
+          "adfs01",
+          "dc01",
+          "file001",
+          "hfdc01",
+          "hr001",
+          "it001",
+          "nashua",
+          "newyork",
+          "prd01",
+          "scranton",
+          "utica"
+        ]
+      },
+      "catch": {
+        "label": "SINGLE_HOST_BATCH",
+        "caught": true,
+        "detail": "batch has <2 hosts \u2014 fusion not required; campaign growth counts as soft catch",
+        "multi_delta": 0
+      }
+    },
+    {
+      "id": "otrf-lsass-metasploit-dumpert",
+      "ok": true,
+      "attack": "LSASS campaign: Outflank Dumpert (syscalls)",
+      "tool": "Metasploit/Outflank Dumpert",
+      "family": "credential_dump_campaign",
+      "techniques": [
+        "T1003.001"
+      ],
+      "n_hosts_batch": 1,
+      "hosts_batch": [
+        "mkt01"
+      ],
+      "n_events_batch": 1379,
+      "adapt_skip_rate": null,
+      "live_after": {
+        "n_events": 103247,
+        "n_campaigns": 17,
+        "n_multi_host": 17,
+        "multi_hosts": [
+          "acct001",
+          "adfs01",
+          "dc01",
+          "file001",
+          "hfdc01",
+          "hr001",
+          "it001",
+          "mkt01",
+          "nashua",
+          "newyork",
+          "prd01",
+          "scranton",
+          "utica"
+        ]
+      },
+      "catch": {
+        "label": "SINGLE_HOST_BATCH",
+        "caught": true,
+        "detail": "batch has <2 hosts \u2014 fusion not required; campaign growth counts as soft catch",
+        "multi_delta": 0
+      }
+    },
+    {
+      "id": "otrf-lsass-metasploit-logonpasswords",
+      "ok": true,
+      "attack": "LSASS campaign: Mimikatz logonpasswords memory dump",
+      "tool": "Metasploit",
+      "family": "credential_dump_campaign",
+      "techniques": [
+        "T1003.001"
+      ],
+      "n_hosts_batch": 1,
+      "hosts_batch": [
+        "mkt01"
+      ],
+      "n_events_batch": 1238,
+      "adapt_skip_rate": null,
+      "live_after": {
+        "n_events": 104485,
+        "n_campaigns": 17,
+        "n_multi_host": 17,
+        "multi_hosts": [
+          "acct001",
+          "adfs01",
+          "dc01",
+          "file001",
+          "hfdc01",
+          "hr001",
+          "it001",
+          "mkt01",
+          "nashua",
+          "newyork",
+          "prd01",
+          "scranton",
+          "utica"
+        ]
+      },
+      "catch": {
+        "label": "SINGLE_HOST_BATCH",
+        "caught": true,
+        "detail": "batch has <2 hosts \u2014 fusion not required; campaign growth counts as soft catch",
+        "multi_delta": 0
+      }
+    },
+    {
+      "id": "otrf-lsass-metasploit-nanodump",
+      "ok": true,
+      "attack": "LSASS campaign: NanoDump (evasive)",
+      "tool": "Metasploit/NanoDump",
+      "family": "credential_dump_campaign",
+      "techniques": [
+        "T1003.001"
+      ],
+      "n_hosts_batch": 1,
+      "hosts_batch": [
+        "mkt01"
+      ],
+      "n_events_batch": 1112,
+      "adapt_skip_rate": null,
+      "live_after": {
+        "n_events": 105597,
+        "n_campaigns": 17,
+        "n_multi_host": 17,
+        "multi_hosts": [
+          "acct001",
+          "adfs01",
+          "dc01",
+          "file001",
+          "hfdc01",
+          "hr001",
+          "it001",
+          "mkt01",
+          "nashua",
+          "newyork",
+          "prd01",
+          "scranton",
+          "utica"
+        ]
+      },
+      "catch": {
+        "label": "SINGLE_HOST_BATCH",
+        "caught": true,
+        "detail": "batch has <2 hosts \u2014 fusion not required; campaign growth counts as soft catch",
+        "multi_delta": 0
+      }
+    },
+    {
+      "id": "otrf-lsass-metasploit-out-minidump",
+      "ok": true,
+      "attack": "LSASS campaign: Out-Minidump PowerShell",
+      "tool": "Metasploit/Out-Minidump",
+      "family": "credential_dump_campaign",
+      "techniques": [
+        "T1003.001"
+      ],
+      "n_hosts_batch": 1,
+      "hosts_batch": [
+        "it01"
+      ],
+      "n_events_batch": 1209,
+      "adapt_skip_rate": null,
+      "live_after": {
+        "n_events": 106806,
+        "n_campaigns": 17,
+        "n_multi_host": 17,
+        "multi_hosts": [
+          "acct001",
+          "adfs01",
+          "dc01",
+          "file001",
+          "hfdc01",
+          "hr001",
+          "it001",
+          "it01",
+          "mkt01",
+          "nashua",
+          "newyork",
+          "prd01",
+          "scranton",
+          "utica"
+        ]
+      },
+      "catch": {
+        "label": "SINGLE_HOST_BATCH",
+        "caught": true,
+        "detail": "batch has <2 hosts \u2014 fusion not required; campaign growth counts as soft catch",
+        "multi_delta": 0
+      }
+    },
+    {
+      "id": "otrf-lsass-metasploit-procdump",
+      "ok": true,
+      "attack": "LSASS campaign: ProcDump LSASS memory dump",
+      "tool": "Metasploit/ProcDump",
+      "family": "credential_dump_campaign",
+      "techniques": [
+        "T1003.001"
+      ],
+      "n_hosts_batch": 1,
+      "hosts_batch": [
+        "acct01"
+      ],
+      "n_events_batch": 1076,
+      "adapt_skip_rate": null,
+      "live_after": {
+        "n_events": 107882,
+        "n_campaigns": 17,
+        "n_multi_host": 17,
+        "multi_hosts": [
+          "acct001",
+          "acct01",
+          "adfs01",
+          "dc01",
+          "file001",
+          "hfdc01",
+          "hr001",
+          "it001",
+          "it01",
+          "mkt01",
+          "nashua",
+          "newyork",
+          "prd01",
+          "scranton",
+          "utica"
+        ]
+      },
+      "catch": {
+        "label": "SINGLE_HOST_BATCH",
+        "caught": true,
+        "detail": "batch has <2 hosts \u2014 fusion not required; campaign growth counts as soft catch",
+        "multi_delta": 0
+      }
+    },
+    {
+      "id": "otrf-lsass-metasploit-sharpdump",
+      "ok": true,
+      "attack": "LSASS campaign: SharpDump",
+      "tool": "Metasploit/SharpDump",
+      "family": "credential_dump_campaign",
+      "techniques": [
+        "T1003.001"
+      ],
+      "n_hosts_batch": 1,
+      "hosts_batch": [
+        "mkt01"
+      ],
+      "n_events_batch": 1573,
+      "adapt_skip_rate": null,
+      "live_after": {
+        "n_events": 109455,
+        "n_campaigns": 17,
+        "n_multi_host": 17,
+        "multi_hosts": [
+          "acct001",
+          "acct01",
+          "adfs01",
+          "dc01",
+          "file001",
+          "hfdc01",
+          "hr001",
+          "it001",
+          "it01",
+          "mkt01",
+          "nashua",
+          "newyork",
+          "prd01",
+          "scranton",
+          "utica"
+        ]
+      },
+      "catch": {
+        "label": "SINGLE_HOST_BATCH",
+        "caught": true,
+        "detail": "batch has <2 hosts \u2014 fusion not required; campaign growth counts as soft catch",
+        "multi_delta": 0
+      }
+    },
+    {
+      "id": "otrf-covenant-dcom-excel4",
+      "ok": true,
+      "attack": "DCOM Excel4Macro (allowed)",
+      "tool": "Covenant",
+      "family": "lateral_movement",
+      "techniques": [
+        "T1021.003",
+        "T1137.001"
+      ],
+      "n_hosts_batch": 3,
+      "hosts_batch": [
+        "mordordc",
+        "workstation5",
+        "workstation6"
+      ],
+      "n_events_batch": 290,
+      "adapt_skip_rate": null,
+      "live_after": {
+        "n_events": 109745,
+        "n_campaigns": 20,
+        "n_multi_host": 20,
+        "multi_hosts": [
+          "acct001",
+          "acct01",
+          "adfs01",
+          "dc01",
+          "file001",
+          "hfdc01",
+          "hr001",
+          "it001",
+          "it01",
+          "mkt01",
+          "mordordc",
+          "nashua",
+          "newyork",
+          "prd01",
+          "scranton",
+          "utica",
+          "workstation5",
+          "workstation6"
+        ]
+      },
+      "catch": {
+        "label": "CAUGHT",
+        "caught": true,
+        "detail": "multi-host camps 17->20; new bridge hosts=['mordordc', 'workstation5', 'workstation6']",
+        "multi_delta": 3
+      }
+    },
+    {
+      "id": "otrf-covenant-dcom-iertutil-dll-hijack",
+      "ok": true,
+      "attack": "covenant dcom iertutil dll hijack",
+      "tool": "Covenant",
+      "family": "lateral_movement",
+      "techniques": [],
+      "n_hosts_batch": 3,
+      "hosts_batch": [
+        "mordordc",
+        "workstation5",
+        "workstation6"
+      ],
+      "n_events_batch": 548,
+      "adapt_skip_rate": null,
+      "live_after": {
+        "n_events": 110293,
+        "n_campaigns": 22,
+        "n_multi_host": 22,
+        "multi_hosts": [
+          "acct001",
+          "acct01",
+          "adfs01",
+          "dc01",
+          "file001",
+          "hfdc01",
+          "hr001",
+          "it001",
+          "it01",
+          "mkt01",
+          "mordordc",
+          "nashua",
+          "newyork",
+          "prd01",
+          "scranton",
+          "utica",
+          "workstation5",
+          "workstation6"
+        ]
+      },
+      "catch": {
+        "label": "CAUGHT",
+        "caught": true,
+        "detail": "multi-host camps 20->22; new bridge hosts=\u2014",
+        "multi_delta": 2
+      }
+    },
+    {
+      "id": "otrf-covenant-dcom-registerxll",
+      "ok": true,
+      "attack": "covenant dcom registerxll",
+      "tool": "Covenant",
+      "family": "lateral_movement",
+      "techniques": [],
+      "n_hosts_batch": 3,
+      "hosts_batch": [
+        "mordordc",
+        "workstation5",
+        "workstation6"
+      ],
+      "n_events_batch": 362,
+      "adapt_skip_rate": null,
+      "live_after": {
+        "n_events": 110655,
+        "n_campaigns": 23,
+        "n_multi_host": 23,
+        "multi_hosts": [
+          "acct001",
+          "acct01",
+          "adfs01",
+          "dc01",
+          "file001",
+          "hfdc01",
+          "hr001",
+          "it001",
+          "it01",
+          "mkt01",
+          "mordordc",
+          "nashua",
+          "newyork",
+          "prd01",
+          "scranton",
+          "utica",
+          "workstation5",
+          "workstation6"
+        ]
+      },
+      "catch": {
+        "label": "CAUGHT",
+        "caught": true,
+        "detail": "multi-host camps 22->23; new bridge hosts=\u2014",
+        "multi_delta": 1
+      }
+    },
+    {
+      "id": "otrf-covenant-dcom-wsman",
+      "ok": true,
+      "attack": "COM/WSMAN automation",
+      "tool": "Covenant",
+      "family": "lateral_movement",
+      "techniques": [
+        "T1021.003",
+        "T1021.006"
+      ],
+      "n_hosts_batch": 3,
+      "hosts_batch": [
+        "mordordc",
+        "workstation5",
+        "workstation6"
+      ],
+      "n_events_batch": 87,
+      "adapt_skip_rate": null,
+      "live_after": {
+        "n_events": 110742,
+        "n_campaigns": 23,
+        "n_multi_host": 23,
+        "multi_hosts": [
+          "acct001",
+          "acct01",
+          "adfs01",
+          "dc01",
+          "file001",
+          "hfdc01",
+          "hr001",
+          "it001",
+          "it01",
+          "mkt01",
+          "mordordc",
+          "nashua",
+          "newyork",
+          "prd01",
+          "scranton",
+          "utica",
+          "workstation5",
+          "workstation6"
+        ]
+      },
+      "catch": {
+        "label": "ALREADY_COVERED",
+        "caught": true,
+        "detail": "attack hosts already inside existing multi-host campaigns",
+        "multi_delta": 0
+      }
+    },
+    {
+      "id": "otrf-covenant-psremoting",
+      "ok": true,
+      "attack": "PS remoting command",
+      "tool": "Covenant",
+      "family": "lateral_movement",
+      "techniques": [
+        "T1021.006"
+      ],
+      "n_hosts_batch": 3,
+      "hosts_batch": [
+        "mordordc",
+        "workstation5",
+        "workstation6"
+      ],
+      "n_events_batch": 209,
+      "adapt_skip_rate": null,
+      "live_after": {
+        "n_events": 110951,
+        "n_campaigns": 26,
+        "n_multi_host": 26,
+        "multi_hosts": [
+          "acct001",
+          "acct01",
+          "adfs01",
+          "dc01",
+          "file001",
+          "hfdc01",
+          "hr001",
+          "it001",
+          "it01",
+          "mkt01",
+          "mordordc",
+          "nashua",
+          "newyork",
+          "prd01",
+          "scranton",
+          "utica",
+          "workstation5",
+          "workstation6"
+        ]
+      },
+      "catch": {
+        "label": "CAUGHT",
+        "caught": true,
+        "detail": "multi-host camps 23->26; new bridge hosts=\u2014",
+        "multi_delta": 3
+      }
+    },
+    {
+      "id": "otrf-covenant-psremoting-grunt",
+      "ok": true,
+      "attack": "PS remoting Grunt implant",
+      "tool": "Covenant",
+      "family": "lateral_movement",
+      "techniques": [
+        "T1021.006"
+      ],
+      "n_hosts_batch": 5,
+      "hosts_batch": [
+        "acct001",
+        "file001",
+        "hfdc01",
+        "hr001",
+        "it001"
+      ],
+      "n_events_batch": 1069,
+      "adapt_skip_rate": null,
+      "live_after": {
+        "n_events": 112020,
+        "n_campaigns": 29,
+        "n_multi_host": 29,
+        "multi_hosts": [
+          "acct001",
+          "acct01",
+          "adfs01",
+          "dc01",
+          "file001",
+          "hfdc01",
+          "hr001",
+          "it001",
+          "it01",
+          "mkt01",
+          "mordordc",
+          "nashua",
+          "newyork",
+          "prd01",
+          "scranton",
+          "utica",
+          "workstation5",
+          "workstation6"
+        ]
+      },
+      "catch": {
+        "label": "CAUGHT",
+        "caught": true,
+        "detail": "multi-host camps 26->29; new bridge hosts=\u2014",
+        "multi_delta": 3
+      }
+    },
+    {
+      "id": "otrf-covenant-sharpsc-create-dcerpc-smb-svcctl",
+      "ok": true,
+      "attack": "covenant sharpsc create dcerpc smb svcctl",
+      "tool": "Covenant",
+      "family": "lateral_movement",
+      "techniques": [],
+      "n_hosts_batch": 3,
+      "hosts_batch": [
+        "mordordc",
+        "workstation5",
+        "workstation6"
+      ],
+      "n_events_batch": 260,
+      "adapt_skip_rate": null,
+      "live_after": {
+        "n_events": 112280,
+        "n_campaigns": 31,
+        "n_multi_host": 31,
+        "multi_hosts": [
+          "acct001",
+          "acct01",
+          "adfs01",
+          "dc01",
+          "file001",
+          "hfdc01",
+          "hr001",
+          "it001",
+          "it01",
+          "mkt01",
+          "mordordc",
+          "nashua",
+          "newyork",
+          "prd01",
+          "scranton",
+          "utica",
+          "workstation5",
+          "workstation6"
+        ]
+      },
+      "catch": {
+        "label": "CAUGHT",
+        "caught": true,
+        "detail": "multi-host camps 29->31; new bridge hosts=\u2014",
+        "multi_delta": 2
+      }
+    },
+    {
+      "id": "otrf-covenant-sharpsc-start-dcerpc-smb-svcctl",
+      "ok": true,
+      "attack": "covenant sharpsc start dcerpc smb svcctl",
+      "tool": "Covenant",
+      "family": "lateral_movement",
+      "techniques": [],
+      "n_hosts_batch": 3,
+      "hosts_batch": [
+        "mordordc",
+        "workstation5",
+        "workstation6"
+      ],
+      "n_events_batch": 336,
+      "adapt_skip_rate": null,
+      "live_after": {
+        "n_events": 112616,
+        "n_campaigns": 31,
+        "n_multi_host": 31,
+        "multi_hosts": [
+          "acct001",
+          "acct01",
+          "adfs01",
+          "dc01",
+          "file001",
+          "hfdc01",
+          "hr001",
+          "it001",
+          "it01",
+          "mkt01",
+          "mordordc",
+          "nashua",
+          "newyork",
+          "prd01",
+          "scranton",
+          "utica",
+          "workstation5",
+          "workstation6"
+        ]
+      },
+      "catch": {
+        "label": "ALREADY_COVERED",
+        "caught": true,
+        "detail": "attack hosts already inside existing multi-host campaigns",
+        "multi_delta": 0
+      }
+    },
+    {
+      "id": "otrf-covenant-sharpwmi",
+      "ok": true,
+      "attack": "SharpWMI create via DCERPC",
+      "tool": "Covenant",
+      "family": "lateral_movement",
+      "techniques": [
+        "T1047"
+      ],
+      "n_hosts_batch": 3,
+      "hosts_batch": [
+        "mordordc",
+        "workstation5",
+        "workstation6"
+      ],
+      "n_events_batch": 184,
+      "adapt_skip_rate": null,
+      "live_after": {
+        "n_events": 112800,
+        "n_campaigns": 33,
+        "n_multi_host": 33,
+        "multi_hosts": [
+          "acct001",
+          "acct01",
+          "adfs01",
+          "dc01",
+          "file001",
+          "hfdc01",
+          "hr001",
+          "it001",
+          "it01",
+          "mkt01",
+          "mordordc",
+          "nashua",
+          "newyork",
+          "prd01",
+          "scranton",
+          "utica",
+          "workstation5",
+          "workstation6"
+        ]
+      },
+      "catch": {
+        "label": "CAUGHT",
+        "caught": true,
+        "detail": "multi-host camps 31->33; new bridge hosts=\u2014",
+        "multi_delta": 2
+      }
+    },
+    {
+      "id": "otrf-covenant-smb-copy",
+      "ok": true,
+      "attack": "SMB copy CreateRequest",
+      "tool": "Covenant",
+      "family": "lateral_movement",
+      "techniques": [
+        "T1021.002",
+        "T1570"
+      ],
+      "n_hosts_batch": 3,
+      "hosts_batch": [
+        "mordordc",
+        "workstation5",
+        "workstation6"
+      ],
+      "n_events_batch": 39,
+      "adapt_skip_rate": null,
+      "live_after": {
+        "n_events": 112839,
+        "n_campaigns": 33,
+        "n_multi_host": 33,
+        "multi_hosts": [
+          "acct001",
+          "acct01",
+          "adfs01",
+          "dc01",
+          "file001",
+          "hfdc01",
+          "hr001",
+          "it001",
+          "it01",
+          "mkt01",
+          "mordordc",
+          "nashua",
+          "newyork",
+          "prd01",
+          "scranton",
+          "utica",
+          "workstation5",
+          "workstation6"
+        ]
+      },
+      "catch": {
+        "label": "ALREADY_COVERED",
+        "caught": true,
+        "detail": "attack hosts already inside existing multi-host campaigns",
+        "multi_delta": 0
+      }
+    },
+    {
+      "id": "otrf-covenant-wmi-event-sub",
+      "ok": true,
+      "attack": "WMI remote event subscription (ActiveScript)",
+      "tool": "Covenant",
+      "family": "lateral_movement",
+      "techniques": [
+        "T1047",
+        "T1546.003"
+      ],
+      "n_hosts_batch": 3,
+      "hosts_batch": [
+        "mordordc",
+        "workstation5",
+        "workstation6"
+      ],
+      "n_events_batch": 300,
+      "adapt_skip_rate": null,
+      "live_after": {
+        "n_events": 113139,
+        "n_campaigns": 36,
+        "n_multi_host": 36,
+        "multi_hosts": [
+          "acct001",
+          "acct01",
+          "adfs01",
+          "dc01",
+          "file001",
+          "hfdc01",
+          "hr001",
+          "it001",
+          "it01",
+          "mkt01",
+          "mordordc",
+          "nashua",
+          "newyork",
+          "prd01",
+          "scranton",
+          "utica",
+          "workstation5",
+          "workstation6"
+        ]
+      },
+      "catch": {
+        "label": "CAUGHT",
+        "caught": true,
+        "detail": "multi-host camps 33->36; new bridge hosts=\u2014",
+        "multi_delta": 3
+      }
+    },
+    {
+      "id": "otrf-covenant-wmi-hijack",
+      "ok": true,
+      "attack": "WMI wbemcomn.dll hijack",
+      "tool": "Covenant",
+      "family": "lateral_movement",
+      "techniques": [
+        "T1047",
+        "T1574.001"
+      ],
+      "n_hosts_batch": 3,
+      "hosts_batch": [
+        "mordordc",
+        "workstation5",
+        "workstation6"
+      ],
+      "n_events_batch": 418,
+      "adapt_skip_rate": null,
+      "live_after": {
+        "n_events": 113557,
+        "n_campaigns": 36,
+        "n_multi_host": 36,
+        "multi_hosts": [
+          "acct001",
+          "acct01",
+          "adfs01",
+          "dc01",
+          "file001",
+          "hfdc01",
+          "hr001",
+          "it001",
+          "it01",
+          "mkt01",
+          "mordordc",
+          "nashua",
+          "newyork",
+          "prd01",
+          "scranton",
+          "utica",
+          "workstation5",
+          "workstation6"
+        ]
+      },
+      "catch": {
+        "label": "ALREADY_COVERED",
+        "caught": true,
+        "detail": "attack hosts already inside existing multi-host campaigns",
+        "multi_delta": 0
+      }
+    },
+    {
+      "id": "otrf-empire-dcom-shellwindows",
+      "ok": true,
+      "attack": "DCOM ShellWindows stager",
+      "tool": "Empire",
+      "family": "lateral_movement",
+      "techniques": [
+        "T1021.003"
+      ],
+      "n_hosts_batch": 3,
+      "hosts_batch": [
+        "mordordc",
+        "workstation5",
+        "workstation6"
+      ],
+      "n_events_batch": 521,
+      "adapt_skip_rate": null,
+      "live_after": {
+        "n_events": 114078,
+        "n_campaigns": 36,
+        "n_multi_host": 36,
+        "multi_hosts": [
+          "acct001",
+          "acct01",
+          "adfs01",
+          "dc01",
+          "file001",
+          "hfdc01",
+          "hr001",
+          "it001",
+          "it01",
+          "mkt01",
+          "mordordc",
+          "nashua",
+          "newyork",
+          "prd01",
+          "scranton",
+          "utica",
+          "workstation5",
+          "workstation6"
+        ]
+      },
+      "catch": {
+        "label": "ALREADY_COVERED",
+        "caught": true,
+        "detail": "attack hosts already inside existing multi-host campaigns",
+        "multi_delta": 0
+      }
+    },
+    {
+      "id": "otrf-empire-msbuild-wmi-smb",
+      "ok": true,
+      "attack": "MSBuild via WMI/SMB",
+      "tool": "Empire",
+      "family": "lateral_movement",
+      "techniques": [
+        "T1047",
+        "T1127.001"
+      ],
+      "n_hosts_batch": 3,
+      "hosts_batch": [
+        "mordordc",
+        "workstation5",
+        "workstation6"
+      ],
+      "n_events_batch": 437,
+      "adapt_skip_rate": null,
+      "live_after": {
+        "n_events": 114515,
+        "n_campaigns": 36,
+        "n_multi_host": 36,
+        "multi_hosts": [
+          "acct001",
+          "acct01",
+          "adfs01",
+          "dc01",
+          "file001",
+          "hfdc01",
+          "hr001",
+          "it001",
+          "it01",
+          "mkt01",
+          "mordordc",
+          "nashua",
+          "newyork",
+          "prd01",
+          "scranton",
+          "utica",
+          "workstation5",
+          "workstation6"
+        ]
+      },
+      "catch": {
+        "label": "ALREADY_COVERED",
+        "caught": true,
+        "detail": "attack hosts already inside existing multi-host campaigns",
+        "multi_delta": 0
+      }
+    },
+    {
+      "id": "otrf-empire-psexec",
+      "ok": true,
+      "attack": "PsExec / svcctl remote service",
+      "tool": "Empire",
+      "family": "lateral_movement",
+      "techniques": [
+        "T1021.002",
+        "T1570"
+      ],
+      "n_hosts_batch": 3,
+      "hosts_batch": [
+        "mordordc",
+        "workstation5",
+        "workstation6"
+      ],
+      "n_events_batch": 462,
+      "adapt_skip_rate": null,
+      "live_after": {
+        "n_events": 114977,
+        "n_campaigns": 36,
+        "n_multi_host": 36,
+        "multi_hosts": [
+          "acct001",
+          "acct01",
+          "adfs01",
+          "dc01",
+          "file001",
+          "hfdc01",
+          "hr001",
+          "it001",
+          "it01",
+          "mkt01",
+          "mordordc",
+          "nashua",
+          "newyork",
+          "prd01",
+          "scranton",
+          "utica",
+          "workstation5",
+          "workstation6"
+        ]
+      },
+      "catch": {
+        "label": "ALREADY_COVERED",
+        "caught": true,
+        "detail": "attack hosts already inside existing multi-host campaigns",
+        "multi_delta": 0
+      }
+    },
+    {
+      "id": "otrf-empire-psremoting",
+      "ok": true,
+      "attack": "PowerShell remoting stager",
+      "tool": "Empire",
+      "family": "lateral_movement",
+      "techniques": [
+        "T1021.006"
+      ],
+      "n_hosts_batch": 3,
+      "hosts_batch": [
+        "mordordc",
+        "workstation5",
+        "workstation6"
+      ],
+      "n_events_batch": 245,
+      "adapt_skip_rate": null,
+      "live_after": {
+        "n_events": 115222,
+        "n_campaigns": 36,
+        "n_multi_host": 36,
+        "multi_hosts": [
+          "acct001",
+          "acct01",
+          "adfs01",
+          "dc01",
+          "file001",
+          "hfdc01",
+          "hr001",
+          "it001",
+          "it01",
+          "mkt01",
+          "mordordc",
+          "nashua",
+          "newyork",
+          "prd01",
+          "scranton",
+          "utica",
+          "workstation5",
+          "workstation6"
+        ]
+      },
+      "catch": {
+        "label": "ALREADY_COVERED",
+        "caught": true,
+        "detail": "attack hosts already inside existing multi-host campaigns",
+        "multi_delta": 0
+      }
+    },
+    {
+      "id": "otrf-empire-service-dll-hijack",
+      "ok": true,
+      "attack": "Remote service DLL hijack",
+      "tool": "Empire",
+      "family": "lateral_movement",
+      "techniques": [
+        "T1574.001",
+        "T1543.003"
+      ],
+      "n_hosts_batch": 3,
+      "hosts_batch": [
+        "mordordc",
+        "workstation5",
+        "workstation6"
+      ],
+      "n_events_batch": 920,
+      "adapt_skip_rate": null,
+      "live_after": {
+        "n_events": 116142,
+        "n_campaigns": 38,
+        "n_multi_host": 38,
+        "multi_hosts": [
+          "acct001",
+          "acct01",
+          "adfs01",
+          "dc01",
+          "file001",
+          "hfdc01",
+          "hr001",
+          "it001",
+          "it01",
+          "mkt01",
+          "mordordc",
+          "nashua",
+          "newyork",
+          "prd01",
+          "scranton",
+          "utica",
+          "workstation5",
+          "workstation6"
+        ]
+      },
+      "catch": {
+        "label": "CAUGHT",
+        "caught": true,
+        "detail": "multi-host camps 36->38; new bridge hosts=\u2014",
+        "multi_delta": 2
+      }
+    },
+    {
+      "id": "otrf-empire-smbexec",
+      "ok": true,
+      "attack": "smbexec via svcctl",
+      "tool": "Empire",
+      "family": "lateral_movement",
+      "techniques": [
+        "T1021.002"
+      ],
+      "n_hosts_batch": 3,
+      "hosts_batch": [
+        "mordordc",
+        "workstation5",
+        "workstation6"
+      ],
+      "n_events_batch": 516,
+      "adapt_skip_rate": null,
+      "live_after": {
+        "n_events": 116658,
+        "n_campaigns": 39,
+        "n_multi_host": 39,
+        "multi_hosts": [
+          "acct001",
+          "acct01",
+          "adfs01",
+          "dc01",
+          "file001",
+          "hfdc01",
+          "hr001",
+          "it001",
+          "it01",
+          "mkt01",
+          "mordordc",
+          "nashua",
+          "newyork",
+          "prd01",
+          "scranton",
+          "utica",
+          "workstation5",
+          "workstation6"
+        ]
+      },
+      "catch": {
+        "label": "CAUGHT",
+        "caught": true,
+        "detail": "multi-host camps 38->39; new bridge hosts=\u2014",
+        "multi_delta": 1
+      }
+    },
+    {
+      "id": "otrf-empire-wmi-exec",
+      "ok": true,
+      "attack": "WMI IWbemServices ExecMethod",
+      "tool": "Empire",
+      "family": "lateral_movement",
+      "techniques": [
+        "T1047"
+      ],
+      "n_hosts_batch": 3,
+      "hosts_batch": [
+        "mordordc",
+        "workstation5",
+        "workstation6"
+      ],
+      "n_events_batch": 641,
+      "adapt_skip_rate": null,
+      "live_after": {
+        "n_events": 117299,
+        "n_campaigns": 39,
+        "n_multi_host": 39,
+        "multi_hosts": [
+          "acct001",
+          "acct01",
+          "adfs01",
+          "dc01",
+          "file001",
+          "hfdc01",
+          "hr001",
+          "it001",
+          "it01",
+          "mkt01",
+          "mordordc",
+          "nashua",
+          "newyork",
+          "prd01",
+          "scranton",
+          "utica",
+          "workstation5",
+          "workstation6"
+        ]
+      },
+      "catch": {
+        "label": "ALREADY_COVERED",
+        "caught": true,
+        "detail": "attack hosts already inside existing multi-host campaigns",
+        "multi_delta": 0
+      }
+    },
+    {
+      "id": "otrf-empire-wmic-add-user-backdoor",
+      "ok": true,
+      "attack": "empire wmic add user backdoor",
+      "tool": "Empire",
+      "family": "lateral_movement",
+      "techniques": [],
+      "n_hosts_batch": 3,
+      "hosts_batch": [
+        "mordordc",
+        "workstation5",
+        "workstation6"
+      ],
+      "n_events_batch": 411,
+      "adapt_skip_rate": null,
+      "live_after": {
+        "n_events": 117710,
+        "n_campaigns": 39,
+        "n_multi_host": 39,
+        "multi_hosts": [
+          "acct001",
+          "acct01",
+          "adfs01",
+          "dc01",
+          "file001",
+          "hfdc01",
+          "hr001",
+          "it001",
+          "it01",
+          "mkt01",
+          "mordordc",
+          "nashua",
+          "newyork",
+          "prd01",
+          "scranton",
+          "utica",
+          "workstation5",
+          "workstation6"
+        ]
+      },
+      "catch": {
+        "label": "ALREADY_COVERED",
+        "caught": true,
+        "detail": "attack hosts already inside existing multi-host campaigns",
+        "multi_delta": 0
+      }
+    },
+    {
+      "id": "otrf-schtask-modification",
+      "ok": true,
+      "attack": "schtask modification",
+      "tool": "native",
+      "family": "lateral_movement",
+      "techniques": [],
+      "n_hosts_batch": 2,
+      "hosts_batch": [
+        "workstation5",
+        "workstation6"
+      ],
+      "n_events_batch": 46,
+      "adapt_skip_rate": null,
+      "live_after": {
+        "n_events": 117756,
+        "n_campaigns": 40,
+        "n_multi_host": 40,
+        "multi_hosts": [
+          "acct001",
+          "acct01",
+          "adfs01",
+          "dc01",
+          "file001",
+          "hfdc01",
+          "hr001",
+          "it001",
+          "it01",
+          "mkt01",
+          "mordordc",
+          "nashua",
+          "newyork",
+          "prd01",
+          "scranton",
+          "utica",
+          "workstation5",
+          "workstation6"
+        ]
+      },
+      "catch": {
+        "label": "CAUGHT",
+        "caught": true,
+        "detail": "multi-host camps 39->40; new bridge hosts=\u2014",
+        "multi_delta": 1
+      }
+    },
+    {
+      "id": "otrf-cmd-dumping-ntds-dit-file-volume-shadow-copy",
+      "ok": true,
+      "attack": "cmd dumping ntds dit file volume shadow copy",
+      "tool": "native",
+      "family": "credential_access",
+      "techniques": [],
+      "n_hosts_batch": 1,
+      "hosts_batch": [
+        "dc01"
+      ],
+      "n_events_batch": 612,
+      "adapt_skip_rate": null,
+      "live_after": {
+        "n_events": 118368,
+        "n_campaigns": 40,
+        "n_multi_host": 40,
+        "multi_hosts": [
+          "acct001",
+          "acct01",
+          "adfs01",
+          "dc01",
+          "file001",
+          "hfdc01",
+          "hr001",
+          "it001",
+          "it01",
+          "mkt01",
+          "mordordc",
+          "nashua",
+          "newyork",
+          "prd01",
+          "scranton",
+          "utica",
+          "workstation5",
+          "workstation6"
+        ]
+      },
+      "catch": {
+        "label": "SINGLE_HOST_BATCH",
+        "caught": true,
+        "detail": "batch has <2 hosts \u2014 fusion not required; campaign growth counts as soft catch",
+        "multi_delta": 0
+      }
+    },
+    {
+      "id": "otrf-cmd-seatbelt-group-user",
+      "ok": true,
+      "attack": "cmd seatbelt group user",
+      "tool": "native",
+      "family": "discovery",
+      "techniques": [],
+      "n_hosts_batch": 1,
+      "hosts_batch": [
+        "workstation5"
+      ],
+      "n_events_batch": 3,
+      "adapt_skip_rate": null,
+      "live_after": {
+        "n_events": 118371,
+        "n_campaigns": 40,
+        "n_multi_host": 40,
+        "multi_hosts": [
+          "acct001",
+          "acct01",
+          "adfs01",
+          "dc01",
+          "file001",
+          "hfdc01",
+          "hr001",
+          "it001",
+          "it01",
+          "mkt01",
+          "mordordc",
+          "nashua",
+          "newyork",
+          "prd01",
+          "scranton",
+          "utica",
+          "workstation5",
+          "workstation6"
+        ]
+      },
+      "catch": {
+        "label": "SINGLE_HOST_BATCH",
+        "caught": true,
+        "detail": "batch has <2 hosts \u2014 fusion not required; campaign growth counts as soft catch",
+        "multi_delta": 0
+      }
+    },
+    {
+      "id": "otrf-cmd-service-mod-fax",
+      "ok": true,
+      "attack": "cmd service mod fax",
+      "tool": "native",
+      "family": "privilege_escalation",
+      "techniques": [],
+      "n_hosts_batch": 1,
+      "hosts_batch": [
+        "workstation5"
+      ],
+      "n_events_batch": 6,
+      "adapt_skip_rate": null,
+      "live_after": {
+        "n_events": 118377,
+        "n_campaigns": 40,
+        "n_multi_host": 40,
+        "multi_hosts": [
+          "acct001",
+          "acct01",
+          "adfs01",
+          "dc01",
+          "file001",
+          "hfdc01",
+          "hr001",
+          "it001",
+          "it01",
+          "mkt01",
+          "mordordc",
+          "nashua",
+          "newyork",
+          "prd01",
+          "scranton",
+          "utica",
+          "workstation5",
+          "workstation6"
+        ]
+      },
+      "catch": {
+        "label": "SINGLE_HOST_BATCH",
+        "caught": true,
+        "detail": "batch has <2 hosts \u2014 fusion not required; campaign growth counts as soft catch",
+        "multi_delta": 0
+      }
+    },
+    {
+      "id": "otrf-cmd-sharpview-pcre-net",
+      "ok": true,
+      "attack": "cmd sharpview pcre net",
+      "tool": "native",
+      "family": "execution",
+      "techniques": [],
+      "n_hosts_batch": 1,
+      "hosts_batch": [
+        "workstation5"
+      ],
+      "n_events_batch": 8,
+      "adapt_skip_rate": null,
+      "live_after": {
+        "n_events": 118385,
+        "n_campaigns": 40,
+        "n_multi_host": 40,
+        "multi_hosts": [
+          "acct001",
+          "acct01",
+          "adfs01",
+          "dc01",
+          "file001",
+          "hfdc01",
+          "hr001",
+          "it001",
+          "it01",
+          "mkt01",
+          "mordordc",
+          "nashua",
+          "newyork",
+          "prd01",
+          "scranton",
+          "utica",
+          "workstation5",
+          "workstation6"
+        ]
+      },
+      "catch": {
+        "label": "SINGLE_HOST_BATCH",
+        "caught": true,
+        "detail": "batch has <2 hosts \u2014 fusion not required; campaign growth counts as soft catch",
+        "multi_delta": 0
+      }
+    },
+    {
+      "id": "otrf-empire-launcher-vbs",
+      "ok": true,
+      "attack": "empire launcher vbs",
+      "tool": "Empire",
+      "family": "execution",
+      "techniques": [],
+      "n_hosts_batch": 3,
+      "hosts_batch": [
+        "mordordc",
+        "workstation5",
+        "workstation6"
+      ],
+      "n_events_batch": 147,
+      "adapt_skip_rate": null,
+      "live_after": {
+        "n_events": 118532,
+        "n_campaigns": 40,
+        "n_multi_host": 40,
+        "multi_hosts": [
+          "acct001",
+          "acct01",
+          "adfs01",
+          "dc01",
+          "file001",
+          "hfdc01",
+          "hr001",
+          "it001",
+          "it01",
+          "mkt01",
+          "mordordc",
+          "nashua",
+          "newyork",
+          "prd01",
+          "scranton",
+          "utica",
+          "workstation5",
+          "workstation6"
+        ]
+      },
+      "catch": {
+        "label": "ALREADY_COVERED",
+        "caught": true,
+        "detail": "attack hosts already inside existing multi-host campaigns",
+        "multi_delta": 0
+      }
+    },
+    {
+      "id": "otrf-empire-mimikatz-backupkeys-dcerpc-smb-lsarpc",
+      "ok": true,
+      "attack": "empire mimikatz backupkeys dcerpc smb lsarpc",
+      "tool": "Empire",
+      "family": "credential_access",
+      "techniques": [],
+      "n_hosts_batch": 4,
+      "hosts_batch": [
+        "mordordc",
+        "workstation5",
+        "workstation6",
+        "workstation7"
+      ],
+      "n_events_batch": 3544,
+      "adapt_skip_rate": null,
+      "live_after": {
+        "n_events": 122076,
+        "n_campaigns": 40,
+        "n_multi_host": 40,
+        "multi_hosts": [
+          "acct001",
+          "acct01",
+          "adfs01",
+          "dc01",
+          "file001",
+          "hfdc01",
+          "hr001",
+          "it001",
+          "it01",
+          "mkt01",
+          "mordordc",
+          "nashua",
+          "newyork",
+          "prd01",
+          "scranton",
+          "utica",
+          "workstation5",
+          "workstation6"
+        ]
+      },
+      "catch": {
+        "label": "ALREADY_COVERED",
+        "caught": true,
+        "detail": "attack hosts already inside existing multi-host campaigns",
+        "multi_delta": 0
+      }
+    },
+    {
+      "id": "otrf-empire-mimikatz-extract-keys",
+      "ok": true,
+      "attack": "empire mimikatz extract keys",
+      "tool": "Empire",
+      "family": "credential_access",
+      "techniques": [],
+      "n_hosts_batch": 3,
+      "hosts_batch": [
+        "mordordc",
+        "workstation5",
+        "workstation6"
+      ],
+      "n_events_batch": 3586,
+      "adapt_skip_rate": null,
+      "live_after": {
+        "n_events": 125662,
+        "n_campaigns": 40,
+        "n_multi_host": 40,
+        "multi_hosts": [
+          "acct001",
+          "acct01",
+          "adfs01",
+          "dc01",
+          "file001",
+          "hfdc01",
+          "hr001",
+          "it001",
+          "it01",
+          "mkt01",
+          "mordordc",
+          "nashua",
+          "newyork",
+          "prd01",
+          "scranton",
+          "utica",
+          "workstation5",
+          "workstation6"
+        ]
+      },
+      "catch": {
+        "label": "ALREADY_COVERED",
+        "caught": true,
+        "detail": "attack hosts already inside existing multi-host campaigns",
+        "multi_delta": 0
+      }
+    },
+    {
+      "id": "otrf-empire-mimikatz-lsadump-patch",
+      "ok": true,
+      "attack": "empire mimikatz lsadump patch",
+      "tool": "Empire",
+      "family": "credential_access",
+      "techniques": [],
+      "n_hosts_batch": 3,
+      "hosts_batch": [
+        "mordordc",
+        "workstation5",
+        "workstation6"
+      ],
+      "n_events_batch": 2774,
+      "adapt_skip_rate": null,
+      "live_after": {
+        "n_events": 128436,
+        "n_campaigns": 41,
+        "n_multi_host": 41,
+        "multi_hosts": [
+          "acct001",
+          "acct01",
+          "adfs01",
+          "dc01",
+          "file001",
+          "hfdc01",
+          "hr001",
+          "it001",
+          "it01",
+          "mkt01",
+          "mordordc",
+          "nashua",
+          "newyork",
+          "prd01",
+          "scranton",
+          "utica",
+          "workstation5",
+          "workstation6"
+        ]
+      },
+      "catch": {
+        "label": "CAUGHT",
+        "caught": true,
+        "detail": "multi-host camps 40->41; new bridge hosts=\u2014",
+        "multi_delta": 1
+      }
+    },
+    {
+      "id": "otrf-empire-ninjacopy-dumping-ntds-dit-file",
+      "ok": true,
+      "attack": "empire ninjacopy dumping ntds dit file",
+      "tool": "Empire",
+      "family": "credential_access",
+      "techniques": [],
+      "n_hosts_batch": 1,
+      "hosts_batch": [
+        "dc01"
+      ],
+      "n_events_batch": 1221,
+      "adapt_skip_rate": null,
+      "live_after": {
+        "n_events": 129657,
+        "n_campaigns": 41,
+        "n_multi_host": 41,
+        "multi_hosts": [
+          "acct001",
+          "acct01",
+          "adfs01",
+          "dc01",
+          "file001",
+          "hfdc01",
+          "hr001",
+          "it001",
+          "it01",
+          "mkt01",
+          "mordordc",
+          "nashua",
+          "newyork",
+          "prd01",
+          "scranton",
+          "utica",
+          "workstation5",
+          "workstation6"
+        ]
+      },
+      "catch": {
+        "label": "SINGLE_HOST_BATCH",
+        "caught": true,
+        "detail": "batch has <2 hosts \u2014 fusion not required; campaign growth counts as soft catch",
+        "multi_delta": 0
+      }
+    },
+    {
+      "id": "otrf-empire-persistence-registry-modification-run-keys-",
+      "ok": true,
+      "attack": "empire persistence registry modification run keys standard user",
+      "tool": "Empire",
+      "family": "persistence",
+      "techniques": [],
+      "n_hosts_batch": 3,
+      "hosts_batch": [
+        "mordordc",
+        "workstation5",
+        "workstation6"
+      ],
+      "n_events_batch": 1825,
+      "adapt_skip_rate": null,
+      "live_after": {
+        "n_events": 131482,
+        "n_campaigns": 42,
+        "n_multi_host": 42,
+        "multi_hosts": [
+          "acct001",
+          "acct01",
+          "adfs01",
+          "dc01",
+          "file001",
+          "hfdc01",
+          "hr001",
+          "it001",
+          "it01",
+          "mkt01",
+          "mordordc",
+          "nashua",
+          "newyork",
+          "prd01",
+          "scranton",
+          "utica",
+          "workstation5",
+          "workstation6"
+        ]
+      },
+      "catch": {
+        "label": "CAUGHT",
+        "caught": true,
+        "detail": "multi-host camps 41->42; new bridge hosts=\u2014",
+        "multi_delta": 1
+      }
+    },
+    {
+      "id": "otrf-empire-powerview-ldap-ntsecuritydescriptor",
+      "ok": true,
+      "attack": "empire powerview ldap ntsecuritydescriptor",
+      "tool": "Empire",
+      "family": "defense_evasion",
+      "techniques": [],
+      "n_hosts_batch": 3,
+      "hosts_batch": [
+        "mordordc",
+        "workstation5",
+        "workstation6"
+      ],
+      "n_events_batch": 3052,
+      "adapt_skip_rate": null,
+      "live_after": {
+        "n_events": 134534,
+        "n_campaigns": 45,
+        "n_multi_host": 45,
+        "multi_hosts": [
+          "acct001",
+          "acct01",
+          "adfs01",
+          "dc01",
+          "file001",
+          "hfdc01",
+          "hr001",
+          "it001",
+          "it01",
+          "mkt01",
+          "mordordc",
+          "nashua",
+          "newyork",
+          "prd01",
+          "scranton",
+          "utica",
+          "workstation5",
+          "workstation6"
+        ]
+      },
+      "catch": {
+        "label": "CAUGHT",
+        "caught": true,
+        "detail": "multi-host camps 42->45; new bridge hosts=\u2014",
+        "multi_delta": 3
+      }
+    },
+    {
+      "id": "otrf-empire-psinject-injection",
+      "ok": true,
+      "attack": "empire psinject PEinjection",
+      "tool": "Empire",
+      "family": "defense_evasion",
+      "techniques": [],
+      "n_hosts_batch": 3,
+      "hosts_batch": [
+        "mordordc",
+        "workstation5",
+        "workstation6"
+      ],
+      "n_events_batch": 2302,
+      "adapt_skip_rate": null,
+      "live_after": {
+        "n_events": 136836,
+        "n_campaigns": 45,
+        "n_multi_host": 45,
+        "multi_hosts": [
+          "acct001",
+          "acct01",
+          "adfs01",
+          "dc01",
+          "file001",
+          "hfdc01",
+          "hr001",
+          "it001",
+          "it01",
+          "mkt01",
+          "mordordc",
+          "nashua",
+          "newyork",
+          "prd01",
+          "scranton",
+          "utica",
+          "workstation5",
+          "workstation6"
+        ]
+      },
+      "catch": {
+        "label": "ALREADY_COVERED",
+        "caught": true,
+        "detail": "attack hosts already inside existing multi-host campaigns",
+        "multi_delta": 0
+      }
+    },
+    {
+      "id": "otrf-empire-schtasks-creation-standard-user",
+      "ok": true,
+      "attack": "empire schtasks creation standard user",
+      "tool": "Empire",
+      "family": "persistence",
+      "techniques": [],
+      "n_hosts_batch": 3,
+      "hosts_batch": [
+        "mordordc",
+        "workstation5",
+        "workstation6"
+      ],
+      "n_events_batch": 246,
+      "adapt_skip_rate": null,
+      "live_after": {
+        "n_events": 137082,
+        "n_campaigns": 45,
+        "n_multi_host": 45,
+        "multi_hosts": [
+          "acct001",
+          "acct01",
+          "adfs01",
+          "dc01",
+          "file001",
+          "hfdc01",
+          "hr001",
+          "it001",
+          "it01",
+          "mkt01",
+          "mordordc",
+          "nashua",
+          "newyork",
+          "prd01",
+          "scranton",
+          "utica",
+          "workstation5",
+          "workstation6"
+        ]
+      },
+      "catch": {
+        "label": "ALREADY_COVERED",
+        "caught": true,
+        "detail": "attack hosts already inside existing multi-host campaigns",
+        "multi_delta": 0
+      }
+    },
+    {
+      "id": "otrf-empire-shell-rpc-samr-smb-group-domain-admins-stan",
+      "ok": true,
+      "attack": "empire shell rpc samr smb group domain admins standard user",
+      "tool": "Empire",
+      "family": "discovery",
+      "techniques": [],
+      "n_hosts_batch": 3,
+      "hosts_batch": [
+        "mordordc",
+        "workstation5",
+        "workstation6"
+      ],
+      "n_events_batch": 198,
+      "adapt_skip_rate": null,
+      "live_after": {
+        "n_events": 137280,
+        "n_campaigns": 46,
+        "n_multi_host": 46,
+        "multi_hosts": [
+          "acct001",
+          "acct01",
+          "adfs01",
+          "dc01",
+          "file001",
+          "hfdc01",
+          "hr001",
+          "it001",
+          "it01",
+          "mkt01",
+          "mordordc",
+          "nashua",
+          "newyork",
+          "prd01",
+          "scranton",
+          "utica",
+          "workstation5",
+          "workstation6"
+        ]
+      },
+      "catch": {
+        "label": "CAUGHT",
+        "caught": true,
+        "detail": "multi-host camps 45->46; new bridge hosts=\u2014",
+        "multi_delta": 1
+      }
+    },
+    {
+      "id": "otrf-empire-shell-rubeus-asktgt-createnetonly",
+      "ok": true,
+      "attack": "empire shell rubeus asktgt createnetonly",
+      "tool": "Empire",
+      "family": "credential_access",
+      "techniques": [],
+      "n_hosts_batch": 3,
+      "hosts_batch": [
+        "mordordc",
+        "workstation5",
+        "workstation6"
+      ],
+      "n_events_batch": 263,
+      "adapt_skip_rate": null,
+      "live_after": {
+        "n_events": 137543,
+        "n_campaigns": 46,
+        "n_multi_host": 46,
+        "multi_hosts": [
+          "acct001",
+          "acct01",
+          "adfs01",
+          "dc01",
+          "file001",
+          "hfdc01",
+          "hr001",
+          "it001",
+          "it01",
+          "mkt01",
+          "mordordc",
+          "nashua",
+          "newyork",
+          "prd01",
+          "scranton",
+          "utica",
+          "workstation5",
+          "workstation6"
+        ]
+      },
+      "catch": {
+        "label": "ALREADY_COVERED",
+        "caught": true,
+        "detail": "attack hosts already inside existing multi-host campaigns",
+        "multi_delta": 0
+      }
+    },
+    {
+      "id": "otrf-empire-uac-shellapi-fodhelper",
+      "ok": true,
+      "attack": "empire uac shellapi fodhelper",
+      "tool": "Empire",
+      "family": "privilege_escalation",
+      "techniques": [],
+      "n_hosts_batch": 3,
+      "hosts_batch": [
+        "mordordc",
+        "workstation5",
+        "workstation6"
+      ],
+      "n_events_batch": 324,
+      "adapt_skip_rate": null,
+      "live_after": {
+        "n_events": 137867,
+        "n_campaigns": 46,
+        "n_multi_host": 46,
+        "multi_hosts": [
+          "acct001",
+          "acct01",
+          "adfs01",
+          "dc01",
+          "file001",
+          "hfdc01",
+          "hr001",
+          "it001",
+          "it01",
+          "mkt01",
+          "mordordc",
+          "nashua",
+          "newyork",
+          "prd01",
+          "scranton",
+          "utica",
+          "workstation5",
+          "workstation6"
+        ]
+      },
+      "catch": {
+        "label": "ALREADY_COVERED",
+        "caught": true,
+        "detail": "attack hosts already inside existing multi-host campaigns",
+        "multi_delta": 0
+      }
+    },
+    {
+      "id": "otrf-empire-wmic-add-user-backdoor-2",
+      "ok": true,
+      "attack": "empire wmic add user backdoor",
+      "tool": "Empire",
+      "family": "defense_evasion",
+      "techniques": [],
+      "n_hosts_batch": 3,
+      "hosts_batch": [
+        "mordordc",
+        "workstation5",
+        "workstation6"
+      ],
+      "n_events_batch": 411,
+      "adapt_skip_rate": null,
+      "live_after": {
+        "n_events": 138278,
+        "n_campaigns": 46,
+        "n_multi_host": 46,
+        "multi_hosts": [
+          "acct001",
+          "acct01",
+          "adfs01",
+          "dc01",
+          "file001",
+          "hfdc01",
+          "hr001",
+          "it001",
+          "it01",
+          "mkt01",
+          "mordordc",
+          "nashua",
+          "newyork",
+          "prd01",
+          "scranton",
+          "utica",
+          "workstation5",
+          "workstation6"
+        ]
+      },
+      "catch": {
+        "label": "ALREADY_COVERED",
+        "caught": true,
+        "detail": "attack hosts already inside existing multi-host campaigns",
+        "multi_delta": 0
+      }
+    },
+    {
+      "id": "otrf-msf-record-mic",
+      "ok": true,
+      "attack": "msf record mic",
+      "tool": "Metasploit",
+      "family": "collection",
+      "techniques": [],
+      "n_hosts_batch": 3,
+      "hosts_batch": [
+        "mordordc",
+        "workstation5",
+        "workstation6"
+      ],
+      "n_events_batch": 232,
+      "adapt_skip_rate": null,
+      "live_after": {
+        "n_events": 138510,
+        "n_campaigns": 46,
+        "n_multi_host": 46,
+        "multi_hosts": [
+          "acct001",
+          "acct01",
+          "adfs01",
+          "dc01",
+          "file001",
+          "hfdc01",
+          "hr001",
+          "it001",
+          "it01",
+          "mkt01",
+          "mordordc",
+          "nashua",
+          "newyork",
+          "prd01",
+          "scranton",
+          "utica",
+          "workstation5",
+          "workstation6"
+        ]
+      },
+      "catch": {
+        "label": "ALREADY_COVERED",
+        "caught": true,
+        "detail": "attack hosts already inside existing multi-host campaigns",
+        "multi_delta": 0
+      }
+    },
+    {
+      "id": "otrf-proxylogon-ssrf-rce-poc",
+      "ok": true,
+      "attack": "proxylogon ssrf rce poc",
+      "tool": "native",
+      "family": "persistence",
+      "techniques": [],
+      "n_hosts_batch": 1,
+      "hosts_batch": [
+        "mxs01"
+      ],
+      "n_events_batch": 296,
+      "adapt_skip_rate": null,
+      "live_after": {
+        "n_events": 138806,
+        "n_campaigns": 46,
+        "n_multi_host": 46,
+        "multi_hosts": [
+          "acct001",
+          "acct01",
+          "adfs01",
+          "dc01",
+          "file001",
+          "hfdc01",
+          "hr001",
+          "it001",
+          "it01",
+          "mkt01",
+          "mordordc",
+          "nashua",
+          "newyork",
+          "prd01",
+          "scranton",
+          "utica",
+          "workstation5",
+          "workstation6"
+        ]
+      },
+      "catch": {
+        "label": "SINGLE_HOST_BATCH",
+        "caught": true,
+        "detail": "batch has <2 hosts \u2014 fusion not required; campaign growth counts as soft catch",
+        "multi_delta": 0
+      }
+    },
+    {
+      "id": "otrf-psh-python-webserver",
+      "ok": true,
+      "attack": "psh python webserver",
+      "tool": "native",
+      "family": "execution",
+      "techniques": [],
+      "n_hosts_batch": 1,
+      "hosts_batch": [
+        "workstation5"
+      ],
+      "n_events_batch": 8,
+      "adapt_skip_rate": null,
+      "live_after": {
+        "n_events": 138814,
+        "n_campaigns": 46,
+        "n_multi_host": 46,
+        "multi_hosts": [
+          "acct001",
+          "acct01",
+          "adfs01",
+          "dc01",
+          "file001",
+          "hfdc01",
+          "hr001",
+          "it001",
+          "it01",
+          "mkt01",
+          "mordordc",
+          "nashua",
+          "newyork",
+          "prd01",
+          "scranton",
+          "utica",
+          "workstation5",
+          "workstation6"
+        ]
+      },
+      "catch": {
+        "label": "SINGLE_HOST_BATCH",
+        "caught": true,
+        "detail": "batch has <2 hosts \u2014 fusion not required; campaign growth counts as soft catch",
+        "multi_delta": 0
+      }
+    },
+    {
+      "id": "otrf-purplesharp-ad-playbook-i",
+      "ok": true,
+      "attack": "PurpleSharp AD playbook I (multi-step)",
+      "tool": "PurpleSharp",
+      "family": "playbook",
+      "techniques": [
+        "T1021",
+        "T1078",
+        "T1087"
+      ],
+      "n_hosts_batch": 4,
+      "hosts_batch": [
+        "mordordc",
+        "workstation5",
+        "workstation6",
+        "workstation7"
+      ],
+      "n_events_batch": 780,
+      "adapt_skip_rate": null,
+      "live_after": {
+        "n_events": 139594,
+        "n_campaigns": 55,
+        "n_multi_host": 55,
+        "multi_hosts": [
+          "acct001",
+          "acct01",
+          "adfs01",
+          "dc01",
+          "file001",
+          "hfdc01",
+          "hr001",
+          "it001",
+          "it01",
+          "mkt01",
+          "mordordc",
+          "nashua",
+          "newyork",
+          "prd01",
+          "scranton",
+          "utica",
+          "workstation5",
+          "workstation6",
+          "workstation7"
+        ]
+      },
+      "catch": {
+        "label": "CAUGHT",
+        "caught": true,
+        "detail": "multi-host camps 46->55; new bridge hosts=['workstation7']",
+        "multi_delta": 9
+      }
+    }
+  ],
+  "honesty": "OTRF captures streamed into a live Corvex correlator on this Windows laptop. Not executing attacker tooling. Not enterprise validation. claim_allowed=false."
+}

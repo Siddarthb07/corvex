@@ -164,15 +164,22 @@ def seal_day0(
     rules_path = heldout_dir / "scorer_rules.json"
     rules_path.write_text(scorer_rules_blob(), encoding="utf-8")
 
+    # Expand attack N beyond the original 3 (CSET review: N too small).
+    # Still synthetic / author-generated — seal before correlator retune; do not
+    # pretend outsider authorship. Families cover distinct detector-key shapes.
     heldout_specs = [
         ("held-lateral-ood", "lateral", host_pairs[:3], True),
         ("held-exfil", "exfil", host_pairs[1:4], False),
         ("held-fusion-chain", "fusion_chain", host_pairs[:5], True),
+        ("held-recon-lateral", "recon_lateral", host_pairs[:4], True),
+        ("held-lateral-b", "lateral", host_pairs[1:4], False),
+        ("held-exfil-b", "exfil", host_pairs[:3], True),
         ("held-benign-a", "benign", host_pairs[:3], False),
         ("held-benign-b", "benign", host_pairs[1:4], False),
         ("held-benign-c", "benign", host_pairs[2:5], False),
         ("held-benign-d", "benign", host_pairs[:4], False),
         ("held-benign-e", "benign", host_pairs[0:5:2], False),
+        ("held-benign-f", "benign", host_pairs[1:5], False),
     ]
     digests = []
     with tempfile.TemporaryDirectory() as tmp:
@@ -217,8 +224,15 @@ def replay(
     out_dir: Path = typer.Option(Path("runs/replay"), help="Output run directory"),
     ablation_no_cross: bool = typer.Option(False, help="Disable cross-host fusion"),
     detector_only: bool = typer.Option(False, help="Detector alerts path only"),
+    host_aliases: Optional[Path] = typer.Option(
+        None,
+        "--host-aliases",
+        help="JSON map alias→canonical host_id (DHCP split-brain stitch)",
+    ),
 ) -> None:
     """Run correlator on a pack and write campaign store + timeline."""
+    from corvex.correlator import load_host_aliases
+
     enrollment = ensure_lab_enrollment()
     events, gt = load_pack_events(pack)
     # Committed train packs were signed with a prior enrollment — re-HMAC for this machine.
@@ -231,7 +245,17 @@ def replay(
     feed_bus(bus, events, enrollment)
     store = CampaignStore(out_dir / "campaigns.jsonl")
     audit = AuditLog(out_dir / "audit.jsonl")
-    cfg = CorrelatorConfig(cross_host_enabled=not ablation_no_cross)
+    aliases = load_host_aliases(host_aliases) or {
+        str(k): str(v) for k, v in (gt.get("host_aliases") or {}).items()
+    } or None
+    if aliases:
+        (out_dir / "host_aliases.json").write_text(
+            json.dumps(aliases, indent=2) + "\n", encoding="utf-8"
+        )
+    cfg = CorrelatorConfig(
+        cross_host_enabled=not ablation_no_cross,
+        host_aliases=aliases,
+    )
     corr = Correlator(store, audit, cfg, detector_only=detector_only, enrollment=enrollment)
     t0 = time.perf_counter()
     corr.ingest(events)
@@ -562,9 +586,15 @@ def score_non_author_cmd(
 def correlate_byo_cmd(
     path: Path = typer.Argument(..., help="Signed BYO JSONL"),
     out_dir: Path = typer.Option(Path("runs/byo"), help="Output run directory"),
+    host_aliases: Optional[Path] = typer.Option(
+        None,
+        "--host-aliases",
+        help="JSON map alias→canonical host_id",
+    ),
 ) -> None:
     """Correlate signed BYO events → timeline + reconstruction (Windows wedge)."""
     from corvex.contain.quarantine import resolve_quarantine_mode
+    from corvex.correlator import load_host_aliases
     from corvex.ingest import load_byo_jsonl
     from corvex.reconstruct import write_reconstruction
 
@@ -579,8 +609,18 @@ def correlate_byo_cmd(
     feed_bus(bus, events, enrollment)
     store = CampaignStore(out_dir / "campaigns.jsonl")
     audit = AuditLog(out_dir / "audit.jsonl")
+    aliases = load_host_aliases(host_aliases)
+    if aliases:
+        (out_dir / "host_aliases.json").write_text(
+            json.dumps(aliases, indent=2) + "\n", encoding="utf-8"
+        )
     t0 = time.perf_counter()
-    Correlator(store, audit, enrollment=enrollment).ingest(events)
+    Correlator(
+        store,
+        audit,
+        CorrelatorConfig(host_aliases=aliases),
+        enrollment=enrollment,
+    ).ingest(events)
     ttu = time.perf_counter() - t0
     timeline = {
         "pack": str(path),
@@ -620,6 +660,11 @@ def byo_windows_cmd(
     host_map: Optional[Path] = typer.Option(
         None, "--host-map", help="JSON map Computer→host_id (e.g. fixtures/windows_host_map.json)"
     ),
+    host_aliases: Optional[Path] = typer.Option(
+        None,
+        "--host-aliases",
+        help="JSON map alias→canonical host_id (DHCP / rename stitch)",
+    ),
     default_host: str = typer.Option("host-a"),
 ) -> None:
     """Full wedge: Windows 4624 export → adapt → correlate → reconstruct."""
@@ -627,6 +672,7 @@ def byo_windows_cmd(
     adapted = Path(out_dir) / "windows_auth.jsonl"
     # Call adapt inline
     from corvex.adapters.windows_security import adapt_windows_security_export
+    from corvex.correlator import load_host_aliases
     from corvex.envelope import sign_envelope
 
     enrollment = ensure_lab_enrollment()
@@ -636,6 +682,7 @@ def byo_windows_cmd(
         if isinstance(loaded, dict):
             hmap.update({str(k).lower(): str(v) for k, v in loaded.items()})
             hmap.update({str(k): str(v) for k, v in loaded.items()})
+    aliases = load_host_aliases(host_aliases)
     raw = adapt_windows_security_export(
         Path(export),
         producer_id=DEMO_HOSTS.get(default_host, "prod-a"),
@@ -671,10 +718,30 @@ def byo_windows_cmd(
     # Correlate into out_dir (correlate-byo clears out_dir — preserve adapted by writing to subpath first)
     auth_copy = Path(tempfile.mkdtemp()) / "windows_auth.jsonl"
     shutil.copy(adapted, auth_copy)
-    correlate_byo_cmd(auth_copy, out_dir=Path(out_dir))
+    correlate_byo_cmd(auth_copy, out_dir=Path(out_dir), host_aliases=host_aliases)
     # Restore adapted artifact into out_dir
     shutil.copy(auth_copy, Path(out_dir) / "windows_auth.jsonl")
-    typer.echo(json.dumps({"adapted": n, "out_dir": str(out_dir)}, indent=2))
+    if aliases:
+        Path(out_dir).mkdir(parents=True, exist_ok=True)
+        (Path(out_dir) / "host_aliases.json").write_text(
+            json.dumps(aliases, indent=2) + "\n", encoding="utf-8"
+        )
+    typer.echo(
+        json.dumps(
+            {
+                "adapted": n,
+                "out_dir": str(out_dir),
+                "host_aliases": aliases or {},
+                "unlocks_claim": False,
+                "note": (
+                    "BYO / author HMAC path is advisory only. "
+                    "claim_allowed still requires human Ed25519 stranger + live_second_host "
+                    "+ other claim-gates — see docs/stranger-checklist.md."
+                ),
+            },
+            indent=2,
+        )
+    )
 
 
 @app.command("hostile-bus-test")
@@ -705,11 +772,18 @@ def ingest_byo_cmd(
     typer.echo(f"ingested {n} events into {out_bus}")
 
 
-def _predict_from_events(events, mode: str, enrollment=None) -> tuple:
+def _predict_from_events(
+    events,
+    mode: str,
+    enrollment=None,
+    *,
+    host_aliases: Optional[Dict[str, str]] = None,
+) -> tuple:
     from corvex.envelope import EventEnvelope
 
     dicts = [e.to_dict() if isinstance(e, EventEnvelope) else e for e in events]
     t0 = time.perf_counter()
+    cfg = CorrelatorConfig(host_aliases=host_aliases or None)
     if mode == "b1":
         camps = baseline_b1(dicts)
     elif mode == "b2":
@@ -717,21 +791,26 @@ def _predict_from_events(events, mode: str, enrollment=None) -> tuple:
     elif mode == "detector_only":
         store = CampaignStore(Path(tempfile.mkdtemp()) / "c.jsonl")
         audit = AuditLog(Path(tempfile.mkdtemp()) / "a.jsonl")
-        corr = Correlator(store, audit, detector_only=True, enrollment=enrollment)
+        corr = Correlator(
+            store, audit, cfg, detector_only=True, enrollment=enrollment
+        )
         corr.ingest(events)
         camps = store.all()
     elif mode == "ablate":
         store = CampaignStore(Path(tempfile.mkdtemp()) / "c.jsonl")
         audit = AuditLog(Path(tempfile.mkdtemp()) / "a.jsonl")
         corr = Correlator(
-            store, audit, CorrelatorConfig(cross_host_enabled=False), enrollment=enrollment
+            store,
+            audit,
+            CorrelatorConfig(cross_host_enabled=False, host_aliases=host_aliases or None),
+            enrollment=enrollment,
         )
         corr.ingest(events)
         camps = store.all()
     else:
         store = CampaignStore(Path(tempfile.mkdtemp()) / "c.jsonl")
         audit = AuditLog(Path(tempfile.mkdtemp()) / "a.jsonl")
-        corr = Correlator(store, audit, enrollment=enrollment)
+        corr = Correlator(store, audit, cfg, enrollment=enrollment)
         corr.ingest(events)
         camps = store.all()
     ttu = time.perf_counter() - t0
@@ -1014,6 +1093,11 @@ def sensor_windows_cmd(
     host_map: Optional[Path] = typer.Option(
         None, "--host-map", help="Computer→host_id JSON map"
     ),
+    host_aliases: Optional[Path] = typer.Option(
+        None,
+        "--host-aliases",
+        help="JSON map alias→canonical host_id (DHCP split-brain)",
+    ),
     follow: bool = typer.Option(False, "--follow", help="Continuous poll (wevtutil or wait)"),
     once: bool = typer.Option(True, "--once/--no-once", help="Single drain cycle (default)"),
     max_per_sec: float = typer.Option(50.0, help="Soft rate cap (envelopes/sec)"),
@@ -1028,6 +1112,7 @@ def sensor_windows_cmd(
     ),
 ) -> None:
     """Stage B observe-only OS-wide Windows sensor → events.jsonl + timeline."""
+    from corvex.correlator import load_host_aliases
     from corvex.sensors.windows_os import run_sensor_windows
     from corvex.stage_b import StageBGateError
 
@@ -1049,6 +1134,7 @@ def sensor_windows_cmd(
     for h in list(hosts):
         hmap.setdefault(f"{h}.lab.local", h)
     chans = [c.strip() for c in channels.split(",") if c.strip()]
+    aliases = load_host_aliases(host_aliases)
     try:
         stats = run_sensor_windows(
             run_dir=Path(run_dir),
@@ -1059,6 +1145,7 @@ def sensor_windows_cmd(
             host_id=host_id,
             producer_id=producer or (hosts.get(str(host_id)) if host_id else None),
             host_map=hmap,
+            host_aliases=aliases,
             follow=follow,
             once=once and not follow,
             max_per_sec=max_per_sec,
@@ -1491,24 +1578,45 @@ def build_breaktest_cmd(
     from corvex.eval.break_points import analyze_break_points, write_break_report
 
     man = load_manifest(manifest)
-    # Enroll every host/producer the manifest (and emit_host aliases) may need.
+    # Enroll canonical hosts only. emit_host / DHCP aliases are rewritten to the
+    # persistent asset id at adapt time; enrolling both under one producer trips
+    # the 1:1 producer↔host trust model (lim11).
+    alias_keys = {
+        str(k) for k in (man.get("host_aliases") or {}).keys()
+    }
     wanted = dict(DEMO_HOSTS)
     for h in man.get("hosts") or []:
-        wanted[str(h)] = str((man.get("producers") or {}).get(h) or wanted.get(h) or f"prod-{str(h)[-1]}")
+        hid = str(h)
+        if hid in alias_keys:
+            continue
+        wanted[hid] = str(
+            (man.get("producers") or {}).get(h)
+            or wanted.get(h)
+            or f"prod-{str(h)[-1]}"
+        )
     for h, p in (man.get("producers") or {}).items():
-        wanted[str(h)] = str(p)
+        hid = str(h)
+        if hid in alias_keys:
+            continue
+        wanted[hid] = str(p)
+    # emit_host without an explicit host_aliases entry still needs enrollment only
+    # if adapt will keep that label (no alias rewrite). Skip known aliases.
     for step in man.get("steps") or []:
         emit = step.get("emit_host") or step.get("host_id_override")
-        if emit:
-            logical = str(step.get("host") or emit)
-            wanted[str(emit)] = str(
-                (man.get("producers") or {}).get(emit)
-                or (man.get("producers") or {}).get(logical)
-                or wanted.get(logical)
-                or f"prod-{str(emit)[-1]}"
-            )
+        if not emit or str(emit) in alias_keys:
+            continue
+        logical = str(step.get("host") or emit)
+        wanted[str(emit)] = str(
+            (man.get("producers") or {}).get(emit)
+            or (man.get("producers") or {}).get(logical)
+            or wanted.get(logical)
+            or f"prod-{str(emit)[-1]}"
+        )
     enrollment = ensure_lab_enrollment(hosts=wanted)
     raw_events, gt = adapt_attack_manifest(man)
+    aliases = {
+        str(k): str(v) for k, v in (gt.get("host_aliases") or man.get("host_aliases") or {}).items()
+    }
     signed = []
     for rec in raw_events:
         secret = enrollment.require(rec["producer_id"], rec["host_id"])
@@ -1528,9 +1636,15 @@ def build_breaktest_cmd(
 
     payload: Dict[str, Any] = {"pack": str(out), "hosts": gt.get("host_ids"), "events": len(signed)}
     if report is not None:
-        corr_camps, _ = _predict_from_events(signed, "correlator", enrollment=enrollment)
-        det_camps, _ = _predict_from_events(signed, "detector_only", enrollment=enrollment)
-        b1_camps, _ = _predict_from_events(signed, "b1", enrollment=enrollment)
+        corr_camps, _ = _predict_from_events(
+            signed, "correlator", enrollment=enrollment, host_aliases=aliases or None
+        )
+        det_camps, _ = _predict_from_events(
+            signed, "detector_only", enrollment=enrollment, host_aliases=aliases or None
+        )
+        b1_camps, _ = _predict_from_events(
+            signed, "b1", enrollment=enrollment, host_aliases=aliases or None
+        )
         br = analyze_break_points(
             truth=gt,
             correlator=corr_camps,

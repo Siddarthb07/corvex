@@ -9,10 +9,10 @@ Standing claim unchanged: research correlator — holds up against synthetic ATT
 | Suite | Result | Artifact |
 |-------|--------|----------|
 | Unit tests | 88 passed (pre-macos); macos tests added separately | `pytest tests` |
-| Fleet-limits T0 (5–6 hosts) | {'HELD, fragile': 5, 'HELD': 8, 'PARTIAL': 1, 'BROKE': 1} | `reports/attack_fleet_limits.md` |
+| Fleet-limits T0 (5–6 hosts) | HELD 14 (clean 9, fragile 5) / PARTIAL 1 / BROKE **0** (2026-10-23 re-score: lim11+lim03 HELD) | `reports/attack_fleet_limits.md` |
 | Fleet-limits T1 (15 hosts) | {'HELD, fragile': 13, 'PARTIAL': 1, 'BROKE': 1} | `reports/attack_fleet_limits_t1.md` |
 | Fleet-limits T2 (50 hosts) | {'HELD, fragile': 13, 'PARTIAL': 1, 'BROKE': 1} | `reports/attack_fleet_limits_t2.md` |
-| Fleet20 black-box | {'HELD': 20} | `reports/attack_fleet20.md` |
+| Fleet20 black-box | HELD 20 (clean 19, fragile 1, fragile_rate=0.05) — never bare 20/20 | `reports/attack_fleet20.md` (refreshed 2026-10-23) |
 | SQL ART continuous stress | ok rounds / retries recorded | `reports/sql_art_stress.md` |
 | Custom adversarial battery | BROKE=12 HELD=6 | `runs/adversarial-limits/report.json` |
 
@@ -20,11 +20,11 @@ Standing claim unchanged: research correlator — holds up against synthetic ATT
 
 | Failure mode | Where seen | What happens |
 |--------------|------------|--------------|
-| Hostname / DHCP alias split-brain | `lim11` BROKE at T0/T1/T2 (J=0.0) | `host-b` vs `host-b-dhcp` never stitch — truth never recovered |
-| Day-scale lookback cliff | `lim03` PARTIAL (J≈0.67); custom `day_gap_*` BROKE even at 1d w/ 24h window | Sleeper identity across quiet gaps fragments the campaign |
-| DNS-only C2 | custom `dns_only_c2_blind` → 0 campaigns | No DNS correlator path from dns-only traffic in this harness shape |
-| Shared service-account glue | custom `shared_svc_two_campaigns` → 1 campaign, J=0.5/0.5 | Two unrelated `svc-sql` chains over-merge |
-| High-volume benign egress bury | custom `noise_5k_needle` J=0.15 | 5k CDN-ish conns → one mega-campaign of all hosts; needle lost |
+| Hostname / DHCP alias split-brain | was `lim11` BROKE (enrollment multihost + no runtime aliases) | **In-repo fix 2026-10-23:** skip alias hosts at enroll; `CorrelatorConfig.host_aliases` canonicalize after verify. Re-run fleet-limits to refresh T0–T2 rows. |
+| Day-scale lookback cliff | `lim03` PARTIAL; custom `day_gap_*` BROKE | **In-repo:** separate `sleeper_resume_seconds` (14d) with hop/overlap gate — does not inflate `resume_window`. Unit: `test_sleeper_resume_across_day_gap_extends_chain`. |
+| DNS-only C2 | custom `dns_only_c2_blind` when no DNS events | Correlator DNS path exists; sensors must surface `channel_health.dns` GAP (Windows Sysmon EID 22 / macOS unified-log). Do not claim coverage when degraded. |
+| Shared service-account glue | custom `shared_svc_two_campaigns` over-merge | **In-repo:** hop-component partition + same-user resume hop-gate. Unit: `test_shared_svc_two_disjoint_chains_do_not_overmerge`. |
+| High-volume benign egress bury | custom `noise_5k_needle` | **In-repo:** tighter `poisoned_dst` + exfil-merge requires lateral co-evidence. Unit: `test_noise_5k_cdn_does_not_bury_needle`. |
 | Window-edge bleed | custom `window_edge_600s` | Event at `window+1s` still merges into prior campaign |
 | Disjoint islands | `break_disjoint_islands` | `both_missed`, misses `host-c` |
 | Jumpbox over-merge | `break_overmerge_jumpbox` | Innocent `host-c` pulled into campaign |

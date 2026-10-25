@@ -2,15 +2,18 @@
 
 from __future__ import annotations
 
+import json
 from collections import defaultdict
 from dataclasses import dataclass
 from datetime import datetime
+from pathlib import Path
 from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Set, Tuple
 
 from corvex.audit import AuditLog
 from corvex.auth import AuthError, Enrollment
 from corvex.detectors import Signal, run_all
 from corvex.envelope import EventEnvelope, verify_envelope
+from corvex.net_noise import canon_fleet_peer, is_ambient_dst, is_fleet_peer
 from corvex.store import Campaign, CampaignStore
 
 
@@ -80,6 +83,9 @@ def _ranges_overlap(
 class CorrelatorConfig:
     window_seconds: int = 600
     resume_window_seconds: int = 3600  # same-user lateral resume across quiet gaps
+    # Day-scale sleeper resume (lim03 / day_gap_*). Separate from resume_window so
+    # sequential-reuse / lim09b hard-splits are not inflated to days.
+    sleeper_resume_seconds: int = 14 * 24 * 3600
     min_hosts: int = 2
     cross_host_enabled: bool = True  # ablation toggle
     # Shape/gap hard split: defaults derived from window_seconds (no retune dial).
@@ -88,6 +94,62 @@ class CorrelatorConfig:
     # Hub degree bridge bar: None → max(2, fleet_n // 2). High-degree overlap
     # cannot expand into another operator's hosts (lim09 / lim02), with handoff exceptions.
     hub_degree_bar: Optional[int] = None
+    # Runtime host identity: alias → canonical (e.g. host-b-dhcp → host-b). Applied
+    # after HMAC verify so live/BYO split-brain stitches without adapt-time rewrite.
+    host_aliases: Optional[Dict[str, str]] = None
+    # Exfil flood poison: mark dst poisoned when unique hosts in a window component
+    # reach this floor (also capped by fanout_bar). CDN bury / noise_5k.
+    exfil_poison_host_floor: int = 3
+    # Require lateral/auth co-evidence before expanding exfil-only multi-host camps
+    # into other clusters (noise_5k_needle).
+    exfil_merge_requires_lateral: bool = True
+
+
+def load_host_aliases(path: Optional[Path] = None) -> Optional[Dict[str, str]]:
+    """Load alias→canonical map from JSON (e.g. ``{\"host-b-dhcp\": \"host-b\"}``)."""
+    if path is None:
+        return None
+    # Typer OptionInfo leaks when CLI commands are invoked as plain Python callables.
+    if not isinstance(path, (str, Path)):
+        return None
+    p = Path(path)
+    if not p.exists():
+        return None
+    try:
+        data = json.loads(p.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return None
+    if not isinstance(data, dict):
+        return None
+    out = {str(k): str(v) for k, v in data.items() if k and v}
+    return out or None
+
+
+def _resolve_host_alias(host_id: str, aliases: Optional[Mapping[str, str]]) -> str:
+    """Map alias host_id → canonical; identity if unknown."""
+    if not aliases:
+        return host_id
+    hid = str(host_id)
+    # Single-hop alias table (DHCP re-lease → persistent asset id).
+    return str(aliases.get(hid, hid))
+
+
+def _canonicalize_event(
+    ev: Dict[str, Any], aliases: Optional[Mapping[str, str]]
+) -> Dict[str, Any]:
+    """Rewrite host_id and host-* auth src through host_aliases for fusion."""
+    if not aliases:
+        return ev
+    out = dict(ev)
+    out["host_id"] = _resolve_host_alias(str(ev.get("host_id") or ""), aliases)
+    payload = ev.get("payload")
+    if isinstance(payload, dict):
+        payload = dict(payload)
+        src = payload.get("src")
+        if src and str(src).startswith("host-"):
+            payload["src"] = _resolve_host_alias(str(src), aliases)
+        out["payload"] = payload
+    return out
 
 
 def _stage_names(stages: Sequence[Mapping[str, Any]]) -> frozenset:
@@ -139,6 +201,39 @@ def _hop_reachable(edges: Sequence[Tuple[str, str]]) -> Set[str]:
             seen.add(cur)
             stack.extend(adj[cur] - seen)
     return seen
+
+
+def _hop_components_within(
+    edges: Sequence[Tuple[str, str]], hosts: Set[str]
+) -> List[Set[str]]:
+    """Connected components of the hop graph induced by ``hosts``.
+
+    Hosts with no hop edge become singletons. Used so time-windowed lateral
+    groups do not glue disjoint svc-account chains that share a quiet window.
+    """
+    if not hosts:
+        return []
+    adj: Dict[str, Set[str]] = defaultdict(set)
+    for a, b in edges:
+        if a in hosts and b in hosts:
+            adj[a].add(b)
+            adj[b].add(a)
+    seen: Set[str] = set()
+    comps: List[Set[str]] = []
+    for start in sorted(hosts):
+        if start in seen:
+            continue
+        stack = [start]
+        comp: Set[str] = set()
+        while stack:
+            cur = stack.pop()
+            if cur in seen:
+                continue
+            seen.add(cur)
+            comp.add(cur)
+            stack.extend((adj.get(cur) or set()) - seen)
+        comps.append(comp)
+    return comps
 
 
 class Correlator:
@@ -208,7 +303,11 @@ class Correlator:
             if env.event_id in self._seen:
                 continue
             self._seen.add(env.event_id)
-            self._events.append(env.to_dict())
+            # Verify against the envelope's original host_id; canonicalize for fusion.
+            rec = env.to_dict()
+            self._events.append(
+                _canonicalize_event(rec, self.config.host_aliases)
+            )
         self._recompute()
 
     def _recompute(self) -> None:
@@ -319,9 +418,12 @@ class Correlator:
         """
         window = float(self.config.window_seconds)
         resume = float(self.config.resume_window_seconds)
+        sleeper = float(self.config.sleeper_resume_seconds)
         user_timed: Dict[str, List[Tuple[datetime, str]]] = defaultdict(list)
         user_hops: Dict[str, List[Tuple[str, str]]] = defaultdict(list)
         exfil_timed: Dict[str, List[Tuple[datetime, str]]] = defaultdict(list)
+        # dst → event count across all timed rows (ambient CDN density).
+        exfil_event_count: Dict[str, int] = defaultdict(int)
         dns_timed: Dict[str, List[Tuple[datetime, str]]] = defaultdict(list)
         recon_hosts: Set[str] = set()
         all_hosts_in_events: Set[str] = {
@@ -338,15 +440,23 @@ class Correlator:
                 if user and ts is not None:
                     user_timed[user].append((ts, host))
                     src = str(payload.get("src") or "")
-                    if src.startswith("host-") and src != host:
-                        user_timed[user].append((ts, src))
-                        user_hops[user].append((src, host))
-                        all_hosts_in_events.add(src)
+                    # Fleet peers (host-* or short Windows names), not IPs.
+                    if is_fleet_peer(src, host, all_hosts_in_events):
+                        peer = canon_fleet_peer(src, all_hosts_in_events)
+                        user_timed[user].append((ts, peer))
+                        user_hops[user].append((peer, host))
+                        all_hosts_in_events.add(peer)
             if ptype == "net_conn" and payload.get("egress"):
                 dst = str(payload.get("dst_ip", ""))
                 nbytes = int(payload.get("bytes", 0))
-                if dst and 0 < nbytes <= 50_000 and ts is not None:
+                if (
+                    dst
+                    and not is_ambient_dst(dst)
+                    and 0 < nbytes <= 50_000
+                    and ts is not None
+                ):
                     exfil_timed[dst].append((ts, host))
+                    exfil_event_count[dst] += 1
             if ptype == "dns":
                 apex = _dns_apex(str(payload.get("query") or ""))
                 if apex and ts is not None:
@@ -379,37 +489,87 @@ class Correlator:
             return len(hop_degree.get(h) or ())
 
         for user, timed in user_timed.items():
-            hop_hosts = _hop_reachable(user_hops.get(user) or [])
+            edges = user_hops.get(user) or []
+            hop_hosts = _hop_reachable(edges)
+            # Domain computer / SYSTEM accounts without hop topology are ambient
+            # AD noise on OTRF fleets — do not form mega laterals from
+            # time-cooccurrence alone.
+            _weak = user.endswith("$") or user.upper() in {
+                "SYSTEM",
+                "LOCAL SERVICE",
+                "NETWORK SERVICE",
+                "ANONYMOUS LOGON",
+            }
+            if _weak and not edges:
+                continue
             for group in _connected_host_components(timed, window):
                 hosts = {h for _, h in group}
                 if len(hosts) < self.config.min_hosts:
                     continue
-                if len(hosts) >= fanout_bar:
-                    chained = hosts & hop_hosts
-                    if len(chained) >= self.config.min_hosts:
-                        hosts = chained
-                    else:
+                # Partition by hop islands so disjoint svc-* chains in the same
+                # quiet window do not form one mega lateral (shared_svc).
+                if edges:
+                    host_parts = [
+                        comp
+                        for comp in _hop_components_within(edges, hosts)
+                        if len(comp) >= self.config.min_hosts
+                    ]
+                    # No multi-host hop island: keep the time component only when
+                    # it is below the fanout bar (non-ubiquitous shared account).
+                    if not host_parts and len(hosts) < fanout_bar:
+                        host_parts = [hosts]
+                else:
+                    host_parts = [hosts]
+                for part_hosts in host_parts:
+                    if len(part_hosts) >= fanout_bar:
+                        chained = part_hosts & hop_hosts
+                        if len(chained) >= self.config.min_hosts:
+                            part_hosts = chained
+                        else:
+                            continue
+                    times = [t for t, h in group if h in part_hosts]
+                    if len(part_hosts) < self.config.min_hosts or not times:
                         continue
-                times = [t for t, h in group if h in hosts]
-                if len(hosts) < self.config.min_hosts:
-                    continue
-                part += 1
-                clusters.append(
-                    (
-                        f"camp-lateral-{user}-{part}",
-                        set(hosts),
-                        [{"name": "lateral_auth", "user": user, "hosts": sorted(hosts)}],
-                        min(times) if times else None,
-                        max(times) if times else None,
+                    part += 1
+                    clusters.append(
+                        (
+                            f"camp-lateral-{user}-{part}",
+                            set(part_hosts),
+                            [
+                                {
+                                    "name": "lateral_auth",
+                                    "user": user,
+                                    "hosts": sorted(part_hosts),
+                                }
+                            ],
+                            min(times),
+                            max(times),
+                        )
                     )
-                )
 
+        # Poison floor for *density* CDN bury only — host-count poison still uses
+        # fanout_bar so small sealed exfil fleets (3 hosts, 1 event each) HELD.
+        density_floor = max(
+            self.config.min_hosts + 1,
+            min(fanout_bar, int(self.config.exfil_poison_host_floor)),
+        )
         poisoned_dst: Set[str] = set()
         for dst, timed in exfil_timed.items():
             for group in _connected_host_components(timed, window):
                 hosts = {h for _, h in group}
+                n_ev = len(group)
+                # Ubiquitous fanout (original) OR dense ambient (noise_5k).
                 if len(hosts) >= fanout_bar:
                     poisoned_dst.add(dst)
+                elif len(hosts) >= density_floor and n_ev >= max(20, 10 * len(hosts)):
+                    poisoned_dst.add(dst)
+            # Global density: CDN flood to one dst across the pack.
+            uniq = {h for _, h in timed}
+            if (
+                len(uniq) >= density_floor
+                and exfil_event_count.get(dst, 0) >= max(50, 8 * len(uniq))
+            ):
+                poisoned_dst.add(dst)
 
         for dst, timed in exfil_timed.items():
             if dst in poisoned_dst:
@@ -448,15 +608,23 @@ class Correlator:
                     )
                 )
 
+        # Annotate overlapping recon hosts on existing clusters — do NOT union
+        # every recon_fanout host into the campaign (that forced Q-all-hosts on
+        # noisy OTRF fleets). Multi-host recon stays as camp-recon-multi below.
         if recon_hosts:
             for i, (cid, hosts, stages, t0, t1) in enumerate(list(clusters)):
-                if hosts & recon_hosts:
+                overlap = hosts & recon_hosts
+                if overlap:
                     stages = list(stages)
-                    stages.insert(0, {"name": "recon_fanout", "hosts": sorted(hosts & recon_hosts)})
-                    hosts = set(hosts) | recon_hosts
+                    stages.insert(0, {"name": "recon_fanout", "hosts": sorted(overlap)})
                     clusters[i] = (cid, hosts, stages, t0, t1)
 
-        if len(recon_hosts) >= self.config.min_hosts:
+        # Fleet-wide recon (every host noisy) is ambient, not a campaign — emitting
+        # camp-recon-multi on APT29/Caldera inflated multi-host counts and Q unions.
+        if (
+            len(recon_hosts) >= self.config.min_hosts
+            and len(recon_hosts) < fanout_bar
+        ):
             clusters.append(
                 (
                     "camp-recon-multi",
@@ -483,33 +651,6 @@ class Correlator:
                     return str(st.get("user"))
             return None
 
-        def _single_host_bridge_ok(
-            hosts_a: Set[str],
-            stages_a: Sequence[Mapping[str, Any]],
-            hosts_b: Set[str],
-            stages_b: Sequence[Mapping[str, Any]],
-        ) -> bool:
-            overlap = hosts_a & hosts_b
-            if len(overlap) >= 2:
-                return True
-            if len(overlap) != 1:
-                return False
-            h = next(iter(overlap))
-            a_lat = _host_in_stages(stages_a, h, {"lateral_auth"})
-            b_lat = _host_in_stages(stages_b, h, {"lateral_auth"})
-            a_ex = _host_in_stages(stages_a, h, {"micro_exfil", "dns_beacon"})
-            b_ex = _host_in_stages(stages_b, h, {"micro_exfil", "dns_beacon"})
-            cross = (a_lat and b_ex) or (b_lat and a_ex)
-            if not cross:
-                return False
-            # Two lateral campaigns meeting at a jumpbox must not glue — even if
-            # one side also has exfil on that host (helpdesk hitchhiking).
-            a_is_lat = any(str(st.get("name", "")) == "lateral_auth" for st in stages_a)
-            b_is_lat = any(str(st.get("name", "")) == "lateral_auth" for st in stages_b)
-            if a_is_lat and b_is_lat:
-                return False
-            return True
-
         def _cross_key_present(
             stages_a: Sequence[Mapping[str, Any]],
             stages_b: Sequence[Mapping[str, Any]],
@@ -532,9 +673,87 @@ class Correlator:
                             out.add(str(st.get("dst_ip")))
                         if st.get("dns_apex"):
                             out.add(str(st.get("dns_apex")))
+                        if st.get("apex"):
+                            out.add(str(st.get("apex")))
                 return out
 
             return bool(_dsts(stages_a) & _dsts(stages_b))
+
+        def _single_host_bridge_ok(
+            hosts_a: Set[str],
+            stages_a: Sequence[Mapping[str, Any]],
+            hosts_b: Set[str],
+            stages_b: Sequence[Mapping[str, Any]],
+        ) -> bool:
+            overlap = hosts_a & hosts_b
+            if not overlap:
+                return False
+            ua, ub = _stage_user(stages_a), _stage_user(stages_b)
+            # Multi-host overlap alone used to auto-merge — that glued every
+            # ambient exfil/dns camp into one APT29 mega-campaign. Require a
+            # semantic bridge: cross-key, shared needle dst, or same lateral user.
+            if len(overlap) >= 2:
+                if ua and ub and ua == ub:
+                    return True
+                if _cross_key_present(stages_a, stages_b):
+                    # Two laterals meeting on shared hosts still refuse (helpdesk)
+                    a_is_lat = "lateral_auth" in _stage_names(stages_a)
+                    b_is_lat = "lateral_auth" in _stage_names(stages_b)
+                    if a_is_lat and b_is_lat and ua and ub and ua != ub:
+                        return False
+                    return True
+                if _shared_exfil_dst(stages_a, stages_b):
+                    return True
+                return False
+            if len(overlap) != 1:
+                return False
+            h = next(iter(overlap))
+            a_lat = _host_in_stages(stages_a, h, {"lateral_auth"})
+            b_lat = _host_in_stages(stages_b, h, {"lateral_auth"})
+            a_ex = _host_in_stages(stages_a, h, {"micro_exfil", "dns_beacon"})
+            b_ex = _host_in_stages(stages_b, h, {"micro_exfil", "dns_beacon"})
+            cross = (a_lat and b_ex) or (b_lat and a_ex)
+            if not cross:
+                return False
+            # Two lateral campaigns meeting at a jumpbox must not glue — even if
+            # one side also has exfil on that host (helpdesk hitchhiking).
+            a_is_lat = any(str(st.get("name", "")) == "lateral_auth" for st in stages_a)
+            b_is_lat = any(str(st.get("name", "")) == "lateral_auth" for st in stages_b)
+            if a_is_lat and b_is_lat:
+                return False
+            return True
+
+        def _user_hop_links(user: Optional[str], a: Set[str], b: Set[str]) -> bool:
+            """True if any host in a reaches any host in b via this user's hop graph."""
+            if not user or not a or not b:
+                return False
+            edges = user_hops.get(user) or []
+            if not edges:
+                return False
+            reachable = _hop_reachable(edges)
+            # Also require an actual path between the two sets, not just membership
+            # in the global reachable set of that user.
+            adj: Dict[str, Set[str]] = defaultdict(set)
+            for x, y in edges:
+                adj[x].add(y)
+                adj[y].add(x)
+            for start in a:
+                if start not in adj and start not in reachable:
+                    continue
+                seen: Set[str] = set()
+                stack = [start]
+                while stack:
+                    cur = stack.pop()
+                    if cur in seen:
+                        continue
+                    seen.add(cur)
+                    if cur in b:
+                        return True
+                    stack.extend((adj.get(cur) or set()) - seen)
+            return False
+
+        def _has_lateral(stages: Sequence[Mapping[str, Any]]) -> bool:
+            return "lateral_auth" in _stage_names(stages)
 
         def _refuse_merge(
             hosts: Set[str],
@@ -548,6 +767,7 @@ class Correlator:
             *,
             allow_same_user_resume: bool,
             time_window: float,
+            sleeper_mode: bool = False,
         ) -> bool:
             """Return True if this absorb should be refused (Slice B hard split)."""
             overlap = hosts & mhosts
@@ -563,9 +783,24 @@ class Correlator:
                 self.config.force_split_on_shape_gap
                 and gap >= shape_gap
                 and _stage_names(stages) != _stage_names(mstages)
-                and not same_user
+                and not (same_user and (allow_same_user_resume or sleeper_mode))
             ):
                 return True
+
+            # Exfil-only mega-camp glue: refuse expanding pure egress into another
+            # cluster unless lateral co-evidence exists on at least one side.
+            if self.config.exfil_merge_requires_lateral:
+                na, nb = _stage_names(stages), _stage_names(mstages)
+                eg = {"micro_exfil", "dns_beacon"}
+                if (na <= eg and nb <= eg) and not (
+                    _has_lateral(stages) or _has_lateral(mstages)
+                ):
+                    # Shared dst alone still OK for same needle; refuse host-union grow
+                    # when neither side has lateral (CDN flood swallowing needle).
+                    if not _shared_exfil_dst(stages, mstages):
+                        return True
+                    if not (hosts <= mhosts or mhosts <= hosts):
+                        return True
 
             # Hub bridge: high-degree overlap may attach subset egress to a lateral,
             # but must not expand through a hub into another operator's hosts.
@@ -610,10 +845,20 @@ class Correlator:
                     if not ((na | nb) & {"micro_exfil", "dns_beacon"}):
                         return True
 
-            # Resume pass: same-user glue without overlap is OK; otherwise
-            # fall through to existing bridge checks in caller.
+            # Same-user resume: require host overlap OR hop path between clusters.
+            # Disjoint svc-sql chains must not glue (shared_svc_two_campaigns).
             if not overlap and allow_same_user_resume and same_user:
-                return False
+                if _user_hop_links(ua, hosts, mhosts):
+                    return False
+                return True
+            # Day-scale sleeper: hop- or overlap-linked extension only — never
+            # re-glue an identical host-set re-run (48h sequential reuse).
+            if sleeper_mode and same_user:
+                if hosts == mhosts:
+                    return True
+                if overlap or _user_hop_links(ua, hosts, mhosts):
+                    return False
+                return True
             return False
 
         def _merge_pass(
@@ -623,6 +868,7 @@ class Correlator:
             *,
             time_window: float,
             allow_same_user_resume: bool,
+            sleeper_mode: bool = False,
         ) -> List[
             Tuple[str, Set[str], List[Dict[str, Any]], Optional[datetime], Optional[datetime]]
         ]:
@@ -649,7 +895,7 @@ class Correlator:
                             continue
                         overlap = hosts & mhosts
                         same_user = False
-                        if allow_same_user_resume:
+                        if allow_same_user_resume or sleeper_mode:
                             ua, ub = _stage_user(stages), _stage_user(mstages)
                             same_user = bool(ua and ub and ua == ub)
                         if not overlap and not same_user:
@@ -665,6 +911,7 @@ class Correlator:
                             mt1,
                             allow_same_user_resume=allow_same_user_resume,
                             time_window=time_window,
+                            sleeper_mode=sleeper_mode,
                         ):
                             continue
                         if overlap and not same_user:
@@ -695,6 +942,14 @@ class Correlator:
 
         merged = _merge_pass(clusters, time_window=window, allow_same_user_resume=False)
         merged = _merge_pass(merged, time_window=resume, allow_same_user_resume=True)
+        # Day-scale sleeper: hop-linked same-user only (does not widen resume_window).
+        if sleeper > resume:
+            merged = _merge_pass(
+                merged,
+                time_window=sleeper,
+                allow_same_user_resume=False,
+                sleeper_mode=True,
+            )
 
         out: List[Campaign] = []
         for cid, hosts, stages, _t0, _t1 in merged:

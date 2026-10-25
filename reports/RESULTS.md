@@ -1,49 +1,44 @@
 # Evaluation results
 
-Sealed synthetic multi-host packs after `corvex seal-day0 --force` (fusion_chain + expanded benign N). **Care vs commercial tools: unproven.** Claim language: **`lab_verified`** (sealed + breaktest); **`claim_allowed=false`** until live second-host evidence lands (signed stranger + trust integrity already hold — see `reports/claim_gates.json`).
+Sealed synthetic multi-host packs after `corvex seal-day0 --force` (expanded attack N + micro-F1 fix, 2026-10-23). **Care vs commercial tools: unproven.** Claim language: **`lab_verified`** (sealed + breaktest); **`claim_allowed=false`** until live second-host evidence lands.
+
+**F1 reporting:** `campaign_f1` is the harmonic mean of **micro-averaged** precision and recall from pooled TP/FP/FN. Macro mean of per-pack F1 is `macro_campaign_f1` only (diagnostics). Prior tables that showed detector-only P≈0.33, R≈0.67, F1≈0.67 were inconsistent; that bug is fixed in `corvex.eval.aggregate_scores`.
 
 ## Held-out detection (sealed)
 
-| Metric | Corvex | Notes |
-|--------|--------|--------|
-| Precision | **1.00** | Flagged campaigns that matched ground truth |
-| Recall | **1.00** | True multi-host campaigns recovered |
-| Campaign F1 | **1.00** | Harmonic mean of P+R |
-| Precision@1 | **1.00** | Top-ranked campaign correct |
-| Benign false-campaign rate | **0.00** | Held-out benign packs (**N=5**) |
-| Time-to-correlate | **~0.01 s** | Wall time ingest→campaigns (lab machine) |
+| Metric | Corvex | Detector-only | Notes |
+|--------|--------|---------------|--------|
+| Precision (micro) | **1.00** | **0.50** | Pooled TP/FP |
+| Recall (micro) | **1.00** | **0.83** | Pooled TP/FN |
+| Campaign F1 (micro) | **1.00** | **0.625** | `2PR/(P+R)` from pooled counts |
+| Macro F1 (diagnostic) | 1.00 | ≈0.78 | Mean of pack F1s — not the headline |
+| Precision@1 | **1.00** | ≈0.83 | |
+| Benign false-campaign rate | **0.00** | — | Held-out benign packs (**N=6**) |
+| Time-to-correlate | **~0.01 s** | — | Lab machine |
 
-**Sample size (held-out):** attack packs **N=3** (lateral OOD, exfil, fusion_chain); benign packs **N=5**.
+**Sample size (held-out):** attack packs **N=6** (lateral×2, exfil×2, fusion_chain, recon_lateral); benign packs **N=6**.
 
-### Fusion vs detector-only (the correlator premise)
+### Fusion vs detector-only
 
 | | Correlator | Detector-only | B1 naive |
 |--|------------|---------------|----------|
-| F1 | **1.00** | **0.67** | **0.00** |
-| Precision | **1.00** | **0.33** | **0.00** |
-| Recall | **1.00** | **0.67** | **0.00** |
+| F1 (micro) | **1.00** | **0.625** | **0.00** |
+| Precision | **1.00** | **0.50** | **0.00** |
+| Recall | **1.00** | **0.83** | **0.00** |
 
-**Lift:** correlator F1 **+0.33** vs detector-only on this sealed set (fusion_chain is what separates them). B1 still misses multi-host campaigns entirely.
+**Lift:** correlator micro-F1 **+0.375** vs detector-only on this sealed set. B1 misses multi-host campaigns.
 
-Break-test / public-TTP manifests (`corvex score-non-author`): correlator F1 **~0.63** vs detector-only **~0.19** (lift **~+0.44** after window/anti-jumpbox honesty). Necessary for P3 non-author gate; **not** stranger Windows telemetry.
+Break-test / public-TTP manifests (`corvex score-non-author`): correlator micro-F1 **≈0.65** vs detector-only **≈0.20** (lift **≈+0.44**). Necessary for P3 non-author gate; **not** stranger Windows telemetry. Manifests are author-assembled with public TTP IDs.
 
 ## Held-out vs train
 
-| Split | Precision | Recall | F1 | Det-only F1 | Benign FCR | TTU |
-|-------|-----------|--------|-----|-------------|------------|-----|
-| Train | 1.00 | 1.00 | 1.00 | 0.67 | 0.00 (N=2) | ~0.01 s |
-| Held-out | 1.00 | 1.00 | 1.00 | 0.67 | 0.00 (N=5) | ~0.01 s |
+Re-run `corvex eval --split train` / `heldout` after seal. Prefer micro P/R/F1 columns in any table.
 
 ## By attack pattern (held-out)
 
-| Family | Precision | Recall | F1 | Benign FCR |
-|--------|-----------|--------|-----|------------|
-| lateral (OOD) | 1.00 | 1.00 | 1.00 | — |
-| exfil | 1.00 | 1.00 | 1.00 | — |
-| fusion_chain | 1.00 | 1.00 | 1.00 | — |
-| benign (N=5) | — | — | — | **0.00** |
+After expansion, families include lateral, exfil, fusion_chain, recon_lateral, benign. See latest `reports/stageA_heldout.json` / eval markdown for per-family micro metrics.
 
-## Stage A correlator honesty (post CDN Bridge)
+## Stage A correlator honesty
 
 | Control | Status |
 |---------|--------|
@@ -51,68 +46,110 @@ Break-test / public-TTP manifests (`corvex score-non-author`): correlator F1 **~
 | Fleet-wide / poisoned SaaS dst skip | **shipped** |
 | Jumpbox: no lateral↔lateral 1-host glue | **shipped** |
 | Auth↔exfil 1-host bridges (fusion_chain) | **kept** |
-
-**Operation CDN Bridge** (`labs/breaktest/manifests/break_cdn_bridge_compound.json`): best Jaccard vs truth **1.0** (APT `{a,b,c}` no longer fat-merged with CDN). Residual: separate helpdesk campaign still contributes `host-d` to the all-campaigns union; DNS / >50KB blob remain invisible by design.
+| Micro-F1 aggregation | **shipped** (2026-10-23) |
 
 ## Stage B OS-wide sensor
 
-Observe-only Windows collector: `corvex sensor-windows` (Security + Sysmon + Firewall + PowerShell). Fixture CI path: `fixtures/os_wide/multi_channel.jsonl`. Lab unlock: `corvex stage-b-lab-unlock` (`CORVEX_STAGE_B=1` removed). Honest unlock needs **human** stranger PASS + `reports/stage-b-allowed`.
+Observe-only Windows / macOS collectors. Lab unlock: `corvex stage-b-lab-unlock` (`CORVEX_STAGE_B=1` removed). DNS coverage requires Sysmon EID 22 (Windows) or unified-log dns (macOS); otherwise `channel_health.dns` GAP.
 
 | Check | Status |
 |-------|--------|
-| Fixture `--once` → campaigns | **pass** (unit + smoke) |
-| Multi-host exporter shape | **pass** (`scripts/smoke_os_wide_multihost.py`) |
-| Allowlist + rate cap | **shipped** |
-| Stranger attestation | **pass** — Jack Ed25519 self-sign (`reports/stranger_dry_run.json`) |
-| `claim_allowed` | **locked** — still needs `reports/live_second_host.json` |
-| HMAC verify on recompute **and** `Correlator.ingest` | **shipped** |
-| Dash token covers static + API; no embedded snap | **shipped** |
-| wevtutil `--follow` / `--require-live` | shipped (elevated Security often needed) |
-| `corvex fuse-run` | shipped — offline lab+PC file merge |
-
-Docs: [`docs/os-wide-sensor.md`](../docs/os-wide-sensor.md).
-
-## Reconstruction regression
-
-`corvex eval-recon --split heldout` → **8/8** packs ok (3 attack + 5 benign). Manifests labeled `regression_only`.
-
-## Containment dry-run (not live)
-
-| Metric | Held-out |
-|--------|----------|
-| Hosts proposed | 11 |
-| Correct isolates | 11 |
-| False isolates | **0** |
-| False-isolate rate | **0.00** |
-
-`CORVEX_CONTAIN=0`. Live path scaffolded behind L1 + hostile-bus; OS quarantine still unimplemented.
+| Stranger attestation | **pass** — Jack Ed25519 |
+| `claim_allowed` | **locked** — needs `reports/live_second_host.json` |
+| HMAC verify on ingest | **shipped** |
 
 ## Claim gates (`corvex claim-gates`)
 
 | Gate | Status |
 |------|--------|
-| non_author_fusion_lift | pass (breaktest lift ~+0.44) |
-| benign_fcr_real_n | pass (N=5, FCR=0) |
-| stranger_success | **pass** (Jack, Ed25519, `attestation_custody=stranger_private_key`) |
-| trust_integrity | pass (HMAC ingest, no-enrollment reject, resign, dash) |
-| live_second_host | **fail** until elevated wevtutil on a second physical PC |
-| **lab_verified** | **true** — sealed + breaktest + trust probes |
-| **claim_allowed** | **false** — blocked on live second host only |
+| non_author_fusion_lift | pass (breaktest micro lift ≈+0.44) |
+| benign_fcr_real_n | pass (N=6, FCR=0) |
+| stranger_success | **pass** (Jack, Ed25519) |
+| trust_integrity | pass |
+| live_second_host | **fail** until second physical PC |
+| **lab_verified** | **true** |
+| **claim_allowed** | **false** |
+
+Blocked overclaim demo: `python scripts/demo_blocked_claim.py`. Semantics: `docs/claim-gates.md`. Stress WHY: `docs/stress-failure-modes.md`.
+
+## Open-source attack eval (primary — external authorship)
+
+[`opensource_attack_eval.md`](opensource_attack_eval.md) · [`opensource_attack_inventory.md`](opensource_attack_inventory.md) · [`../labs/opensource/`](../labs/opensource/)
+
+**36** OTRF/Security-Datasets + ATT&CK Evals corpora (Empire, Covenant, PurpleSharp, Caldera APT3, native). **Not** Corvex-authored tests.
+
+| Result | Detail |
+|--------|--------|
+| Verdicts | **34** MULTI_HOST_NO_LIFT · **2** SINGLE_HOST (Empire APT3 compound, ntdsutil) |
+| Breaks | FUSION_NO_LIFT×34 · Q_DRYRUN_ALL_HOSTS×30 · ADAPTER_HEAVY_SKIP×26 |
+| Read | Forms multi-host camps on public captures; **never** beats detector-only host coverage; dry-run Q often marks every host; adapter drops most raw events |
+
+```bash
+python scripts/fetch_opensource_corpora.py --full
+python scripts/run_opensource_attack_eval.py
+```
+
+## Aggressive compound battery (hardest public captures)
+
+[`opensource_aggressive_eval.md`](opensource_aggressive_eval.md) · [`opensource_aggressive_inventory.md`](opensource_aggressive_inventory.md)
+
+**14** hardest OTRF compounds: APT29 day1/day2 (ATT&CK Evals R2), Caldera/Empire APT3, 7× Metasploit LSASS dump variants, Log4Shell Sysmon/Security, Golden SAML Windows.
+
+| Result | Detail |
+|--------|--------|
+| Verdicts | **4** FUSION_HELD · **10** SINGLE_HOST · **0** MULTI_HOST_NO_LIFT · **0** Q_DRYRUN_ALL_HOSTS |
+| APT29 day1/day2 | FUSION_HELD — saturated 4-host lab; correlator consolidates vs detector; surgical Q (cut-point) |
+| Caldera APT3 | FUSION_HELD — 5-host fleet; same |
+| Golden SAML | FUSION_HELD — 2-host ADFS lateral |
+| Empire APT3 / LSASS×7 / Log4Shell | SINGLE_HOST — capture shape, fusion not testable |
+| Remaining breaks | ADAPTER_HEAVY_SKIP (allowlist noise) · SINGLE_HOST only — not fusion failures |
+| Fixes landed | ambient micro-exfil poison · hop peers (WorkstationName) · no recon host-union · no fleet-wide recon camp · surgical Q · weak-account hop gate |
+
+```bash
+python scripts/fetch_opensource_corpora.py --aggressive
+python scripts/run_opensource_attack_eval.py --aggressive
+```
+
+**claim_allowed stays false** — lab purple-team only; not enterprise validation.
+
+## Live laptop stress (Corvex running + OTRF replay)
+
+[`live_opensource_stress.md`](live_opensource_stress.md) · run dir `runs/live-oss-stress/` · dash `http://127.0.0.1:8765/`
+
+Catalog expanded to **76** OTRF entries (**58** `live_stress`); **56** streamed on this Windows laptop while correlator+dash stayed up. Mode: `offline_lab_replay_into_live_correlator` — **not** live malware execution.
+
+| Catch | N |
+|-------|---|
+| **CAUGHT** (new multi-host bridge / camp growth) | **20** |
+| **ALREADY_COVERED** (hosts already in multi-host camps) | **19** |
+| **SINGLE_HOST_BATCH** (capture &lt;2 hosts) | **17** |
+| **MISS** | **0** |
+
+Final live state: **55** multi-host campaigns, APT29/Caldera/Covenant/Empire/PurpleSharp all produced bridge growth. Optional `sensor-windows` once sampled PC telemetry (Stage B observe-only).
+
+```bash
+python scripts/fetch_opensource_corpora.py --live-stress
+python scripts/run_live_opensource_stress.py --dash --sensor
+```
+
+## Author-fleet battery (secondary)
+
+[`full_capability_battery.md`](full_capability_battery.md) · [`intensive_capability_matrix.md`](intensive_capability_matrix.md) · [`../docs/stress-failure-modes.md`](../docs/stress-failure-modes.md)
+
+Engineering probes only (exfil_bury BROKE, helpdesk fragile, lim07 PARTIAL). Do not lead with these for independence.
 
 ## What this does / does not prove
 
-**Proves (narrow):** Sealed packs separate fusion from detector-only; window/anti-jumpbox honesty holds; benign FCR holds at N=5; reconstruction round-trips; breaktest fusion lift remains positive; trust probes reject bad HMAC / dash snapshot bypass.
+**Proves (narrow):** Sealed micro-F1 discipline; breaktest fusion lift; open-source captures form multi-host campaigns without author-written GT; claim gate stays locked without second-host evidence.
 
-**Does not prove:** Independent live multi-host usefulness; second physical Windows host live wevtutil; OS quarantine; commercial parity; live contain safe to arm.
+**Does not prove:** Fusion lift on OTRF vs detector-only; enterprise telemetry; OS quarantine; commercial parity.
 
 ## Reproduce
 
 ```bash
-corvex seal-day0 --force
-corvex eval --split train
+python scripts/fetch_opensource_corpora.py
+python scripts/run_opensource_attack_eval.py
 corvex eval --split heldout
-corvex eval-recon --split heldout
-corvex score-non-author
 corvex claim-gates
-corvex hostile-bus-test
+python scripts/demo_blocked_claim.py
 ```

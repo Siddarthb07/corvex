@@ -1,0 +1,28 @@
+{
+  "name": "otrf-covenant-sharpsc-start-dcerpc-smb-svcctl",
+  "corpus_kind": "opensource_attack_capture",
+  "source": {
+    "project": "OTRF/Security-Datasets",
+    "url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/master/datasets/atomic/windows/lateral_movement/host/covenant_sharpsc_start_dcerpc_smb_svcctl.zip",
+    "family": "lateral_movement",
+    "tool": "Covenant",
+    "attack": "covenant sharpsc start dcerpc smb svcctl",
+    "techniques": [],
+    "note": "covenant sharpsc start dcerpc smb svcctl",
+    "authorship": "external"
+  },
+  "raw_glob": "raw/*.sanitized.jsonl",
+  "host_map": {},
+  "fetch": {
+    "source_url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/master/datasets/atomic/windows/lateral_movement/host/covenant_sharpsc_start_dcerpc_smb_svcctl.zip",
+    "archive_sha256": "a6cebf14f42f8f4e4f3ea457d88437ce16f0fce5b184ae70f097fcf48f68692c",
+    "format": "zip",
+    "extracted": [
+      "covenant_sharpsc_start_dcerpc_smb_svcctl_2020-08-06030120.sanitized.jsonl"
+    ],
+    "family": "lateral_movement",
+    "note": null,
+    "license_note": "OTRF Security-Datasets \u2014 see upstream LICENSE (GPL-3.0).",
+    "authorship": "external \u2014 OTRF / MITRE ATT&CK Evals capture, not Corvex authors"
+  }
+}

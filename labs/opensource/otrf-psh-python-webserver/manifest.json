@@ -1,0 +1,28 @@
+{
+  "name": "otrf-psh-python-webserver",
+  "corpus_kind": "opensource_attack_capture",
+  "source": {
+    "project": "OTRF/Security-Datasets",
+    "url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/master/datasets/atomic/windows/execution/host/psh_python_webserver.zip",
+    "family": "execution",
+    "tool": "native",
+    "attack": "psh python webserver",
+    "techniques": [],
+    "note": "psh python webserver",
+    "authorship": "external"
+  },
+  "raw_glob": "raw/*.sanitized.jsonl",
+  "host_map": {},
+  "fetch": {
+    "source_url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/master/datasets/atomic/windows/execution/host/psh_python_webserver.zip",
+    "archive_sha256": "58a62e35ee7a78e88cfca86e628e988a7192ec7fb24013b9d3b86766b25c8a17",
+    "format": "zip",
+    "extracted": [
+      "psh_python_webserver_2020-10-2900161507.sanitized.jsonl"
+    ],
+    "family": "execution",
+    "note": null,
+    "license_note": "OTRF Security-Datasets \u2014 see upstream LICENSE (GPL-3.0).",
+    "authorship": "external \u2014 OTRF / MITRE ATT&CK Evals capture, not Corvex authors"
+  }
+}

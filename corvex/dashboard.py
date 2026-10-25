@@ -229,6 +229,7 @@ def collect_snapshot(root: Path) -> Dict[str, Any]:
     reconstruction: Dict[str, Any] = {}
     raw_events: List[Dict[str, Any]] = []
     raw_audit: List[Dict[str, Any]] = []
+    sensor_status: Dict[str, Any] = {}
     if run_dir is not None:
         tl_path = run_dir / "timeline.json"
         if tl_path.exists():
@@ -237,6 +238,7 @@ def collect_snapshot(root: Path) -> Dict[str, Any]:
         recon_path = run_dir / "reconstruction.json"
         if recon_path.exists():
             reconstruction = json.loads(recon_path.read_text(encoding="utf-8"))
+        sensor_status = _load(run_dir / "sensor_status.json") or {}
         raw_events = _load_jsonl(run_dir / "events.jsonl", limit=500)
         # Replay puts audit next to timeline; live Docker lab uses shared/corvex/
         raw_audit = _load_jsonl(run_dir / "audit.jsonl", limit=200)
@@ -382,6 +384,25 @@ def collect_snapshot(root: Path) -> Dict[str, Any]:
             "allowed": claim_allowed,
             "language": claim.get("claim_language")
             or "lab / BYO campaign stitch only — claim locked",
+        },
+        "sensor": {
+            "source": sensor_status.get("source"),
+            "degraded": list(sensor_status.get("degraded") or []),
+            "channel_health": dict(sensor_status.get("channel_health") or {}),
+            "published": sensor_status.get("published"),
+            "honesty": sensor_status.get("honesty"),
+            "note": (
+                "channel_health.dns GAP means DNS-only C2 is a blind spot — "
+                "do not claim coverage."
+                if "dns" in (sensor_status.get("degraded") or [])
+                or (
+                    isinstance((sensor_status.get("channel_health") or {}).get("dns"), dict)
+                    and not (sensor_status.get("channel_health") or {})
+                    .get("dns", {})
+                    .get("ok")
+                )
+                else None
+            ),
         },
         "checklist": {
             "role": "engineering_notebook",

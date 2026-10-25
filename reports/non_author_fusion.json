@@ -2,6 +2,7 @@
   "source": "labs/breaktest/manifests",
   "packs": [
     "art_cred_hop.json",
+    "art_lateral_chain.atomic.json",
     "art_lateral_chain.json",
     "art_recon_exfil_split.json",
     "art_recon_pivot.json",
@@ -9,7 +10,8 @@
     "break_blind_dns_c2.json",
     "break_cdn_bridge_compound.json",
     "break_disjoint_islands.json",
-    "break_overmerge_jumpbox.json"
+    "break_overmerge_jumpbox.json",
+    "break_sql_continuous_art.json"
   ],
   "skipped": [
     {
@@ -18,28 +20,32 @@
     }
   ],
   "correlator": {
-    "campaign_f1": 0.6296296296296297,
-    "precision": 0.6,
-    "recall": 0.6666666666666666,
-    "precision_at_1": 0.6666666666666666,
+    "campaign_f1": 0.6451612903225806,
+    "macro_campaign_f1": 0.6666666666666667,
+    "precision": 0.5,
+    "recall": 0.9090909090909091,
+    "precision_at_1": 0.9090909090909091,
     "false_campaign_rate": 0.0,
-    "ttu_seconds": 0.012122500000000008,
-    "tp": 6.0,
-    "fp": 4.0,
-    "fn": 3.0
+    "ttu_seconds": 0.006591400000000025,
+    "tp": 10.0,
+    "fp": 10.0,
+    "fn": 1.0,
+    "f1_aggregation": "micro_from_tp_fp_fn"
   },
   "detector_only": {
-    "campaign_f1": 0.1888888888888889,
-    "precision": 0.12903225806451613,
-    "recall": 0.4444444444444444,
-    "precision_at_1": 0.2222222222222222,
+    "campaign_f1": 0.2040816326530612,
+    "macro_campaign_f1": 0.2,
+    "precision": 0.13157894736842105,
+    "recall": 0.45454545454545453,
+    "precision_at_1": 0.18181818181818182,
     "false_campaign_rate": 0.0,
-    "ttu_seconds": 0.014841199999999999,
-    "tp": 4.0,
-    "fp": 27.0,
-    "fn": 5.0
+    "ttu_seconds": 0.008854699999999993,
+    "tp": 5.0,
+    "fp": 33.0,
+    "fn": 6.0,
+    "f1_aggregation": "micro_from_tp_fp_fn"
   },
-  "f1_lift": 0.44074074074074077,
+  "f1_lift": 0.4410796576695194,
   "pass": true,
   "note": "Public-TTP/breaktest manifest score. Still not stranger Windows telemetry \u2014 necessary but not sufficient for claim_allowed.",
   "honesty": "Breaktest manifests are public-TTP shaped, not independent enterprise traffic."

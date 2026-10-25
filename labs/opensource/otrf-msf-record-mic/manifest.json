@@ -1,0 +1,28 @@
+{
+  "name": "otrf-msf-record-mic",
+  "corpus_kind": "opensource_attack_capture",
+  "source": {
+    "project": "OTRF/Security-Datasets",
+    "url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/master/datasets/atomic/windows/collection/host/msf_record_mic.zip",
+    "family": "collection",
+    "tool": "Metasploit",
+    "attack": "msf record mic",
+    "techniques": [],
+    "note": "msf record mic",
+    "authorship": "external"
+  },
+  "raw_glob": "raw/*.sanitized.jsonl",
+  "host_map": {},
+  "fetch": {
+    "source_url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/master/datasets/atomic/windows/collection/host/msf_record_mic.zip",
+    "archive_sha256": "5ea8ac17aceb7a83273019235fcdee67dd0b21cdce6b5d00b2d7e1665444de9e",
+    "format": "zip",
+    "extracted": [
+      "msf_record_mic_2020-06-09225055.sanitized.jsonl"
+    ],
+    "family": "collection",
+    "note": null,
+    "license_note": "OTRF Security-Datasets \u2014 see upstream LICENSE (GPL-3.0).",
+    "authorship": "external \u2014 OTRF / MITRE ATT&CK Evals capture, not Corvex authors"
+  }
+}

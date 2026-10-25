@@ -1,6 +1,6 @@
 {
   "schema_ver": "3",
-  "generated_at": "2026-08-15T13:48:37Z",
+  "generated_at": "2026-10-23T15:27:32Z",
   "claim_allowed": false,
   "lab_verified": true,
   "claim_language": "lab_verified \u2014 sealed held-out + breaktest + trust probes; need Ed25519 stranger self-sign + live second host for claim_allowed",
@@ -8,7 +8,7 @@
     "non_author_fusion_lift": {
       "id": "non_author_fusion_lift",
       "pass": true,
-      "f1_lift": 0.44074074074074077,
+      "f1_lift": 0.4410796576695194,
       "min_lift": 0.05,
       "source": "labs/breaktest/manifests",
       "note": "Public-TTP/breaktest manifest score. Still not stranger Windows telemetry \u2014 necessary but not sufficient for claim_allowed."
@@ -26,11 +26,11 @@
     "benign_fcr_real_n": {
       "id": "benign_fcr_real_n",
       "pass": true,
-      "n_benign": 5,
+      "n_benign": 6,
       "min_n": 5,
       "false_campaign_rate": 0.0,
       "max_fcr": 0.1,
-      "note": "Held-out benign N=5 (need >=5), FCR=0.000."
+      "note": "Held-out benign N=6 (need >=5), FCR=0.000."
     },
     "trust_integrity": {
       "id": "trust_integrity",

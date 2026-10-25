@@ -1,0 +1,31 @@
+{
+  "name": "otrf-covenant-wmi-event-sub",
+  "corpus_kind": "opensource_attack_capture",
+  "source": {
+    "project": "OTRF/Security-Datasets",
+    "url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/master/datasets/atomic/windows/lateral_movement/host/covenant_wmi_remote_event_subscription_ActiveScriptEventConsumers.zip",
+    "family": "lateral_movement",
+    "tool": "Covenant",
+    "attack": "WMI remote event subscription (ActiveScript)",
+    "techniques": [
+      "T1047",
+      "T1546.003"
+    ],
+    "note": "WMI remote event subscription (ActiveScript)",
+    "authorship": "external"
+  },
+  "raw_glob": "raw/*.sanitized.jsonl",
+  "host_map": {},
+  "fetch": {
+    "source_url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/master/datasets/atomic/windows/lateral_movement/host/covenant_wmi_remote_event_subscription_ActiveScriptEventConsumers.zip",
+    "archive_sha256": "6167815b2f1901a267d965335251dc035b211f2b6e0d2063903d764305b80415",
+    "format": "zip",
+    "extracted": [
+      "covenant_wmi_remote_event_subscription_ActiveScriptEventConsumers_2020-09-01214330.sanitized.jsonl"
+    ],
+    "family": "lateral_movement",
+    "note": null,
+    "license_note": "OTRF Security-Datasets \u2014 see upstream LICENSE (GPL-3.0).",
+    "authorship": "external \u2014 OTRF / MITRE ATT&CK Evals capture, not Corvex authors"
+  }
+}

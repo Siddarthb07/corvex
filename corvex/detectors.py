@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Dict, List, Mapping, Sequence
+from typing import Any, Dict, List, Mapping, Sequence, Set
+
+from corvex.net_noise import is_ambient_dst
 
 
 @dataclass(frozen=True)
@@ -18,6 +20,10 @@ def _events(window: Sequence[Mapping[str, Any]]) -> List[Mapping[str, Any]]:
     return list(window)
 
 
+def _fleet_hosts(window: Sequence[Mapping[str, Any]]) -> Set[str]:
+    return {str(ev["host_id"]) for ev in _events(window) if ev.get("host_id") is not None}
+
+
 def detect_recon_fanout(window: Sequence[Mapping[str, Any]]) -> List[Signal]:
     """Flag hosts that connect to many distinct destinations (scan-like)."""
     by_host: Dict[str, set] = {}
@@ -26,7 +32,7 @@ def detect_recon_fanout(window: Sequence[Mapping[str, Any]]) -> List[Signal]:
             continue
         host = str(ev["host_id"])
         dst = str(ev.get("payload", {}).get("dst_ip", ""))
-        if not dst:
+        if not dst or is_ambient_dst(dst):
             continue
         by_host.setdefault(host, set()).add(dst)
     out: List[Signal] = []
@@ -44,33 +50,60 @@ def detect_recon_fanout(window: Sequence[Mapping[str, Any]]) -> List[Signal]:
 
 
 def detect_lateral_auth(window: Sequence[Mapping[str, Any]]) -> List[Signal]:
-    """Same user authenticating on multiple hosts."""
+    """Same user authenticating on multiple hosts.
+
+    Computer accounts (``*$``) alone are weak multi-host signal on domain fleets —
+    require at least one auth hop (``payload.src`` naming another fleet host) so
+    ambient machine-account logons do not saturate the detector bridge.
+    """
+    fleet = _fleet_hosts(window)
     user_hosts: Dict[str, set] = {}
+    user_has_hop: Dict[str, bool] = {}
     for ev in _events(window):
         if ev.get("payload_type") != "auth":
             continue
         user = str(ev.get("payload", {}).get("user", ""))
         if not user:
             continue
-        user_hosts.setdefault(user, set()).add(str(ev["host_id"]))
+        host = str(ev["host_id"])
+        user_hosts.setdefault(user, set()).add(host)
+        src = str((ev.get("payload") or {}).get("src") or "")
+        if src and src != host and (src in fleet or src.startswith("host-")):
+            user_has_hop[user] = True
+        elif src and src.lower() in {h.lower() for h in fleet} and src.lower() != host.lower():
+            user_has_hop[user] = True
     out: List[Signal] = []
     for user, hosts in user_hosts.items():
-        if len(hosts) >= 2:
-            for host in hosts:
-                out.append(
-                    Signal(
-                        kind="lateral_auth",
-                        host_id=host,
-                        weight=min(1.0, len(hosts) / 3.0),
-                        attrs={"user": user, "host_count": len(hosts)},
-                    )
+        if len(hosts) < 2:
+            continue
+        weak = user.endswith("$") or user.upper() in {
+            "SYSTEM",
+            "LOCAL SERVICE",
+            "NETWORK SERVICE",
+            "ANONYMOUS LOGON",
+        }
+        if weak and not user_has_hop.get(user):
+            continue
+        for host in hosts:
+            out.append(
+                Signal(
+                    kind="lateral_auth",
+                    host_id=host,
+                    weight=min(1.0, len(hosts) / 3.0),
+                    attrs={"user": user, "host_count": len(hosts)},
                 )
+            )
     return out
 
 
 def detect_micro_exfil(window: Sequence[Mapping[str, Any]]) -> List[Signal]:
-    """Many small egress bursts across hosts to shared external destination."""
-    # (dst_ip) -> set of hosts with small egress
+    """Many small egress bursts across hosts to shared external destination.
+
+    Skips ambient/metadata destinations and fleet-wide fanout (aligned with
+    correlator poison) so detector_only cannot claim free full-fleet coverage.
+    """
+    fleet_n = max(1, len(_fleet_hosts(window)))
+    fanout_bar = max(4, fleet_n - 1)
     dst_hosts: Dict[str, set] = {}
     dst_bytes: Dict[str, int] = {}
     for ev in _events(window):
@@ -83,23 +116,26 @@ def detect_micro_exfil(window: Sequence[Mapping[str, Any]]) -> List[Signal]:
         if nbytes <= 0 or nbytes > 50_000:
             continue
         dst = str(payload.get("dst_ip", ""))
-        if not dst:
+        if not dst or is_ambient_dst(dst):
             continue
         host = str(ev["host_id"])
         dst_hosts.setdefault(dst, set()).add(host)
         dst_bytes[dst] = dst_bytes.get(dst, 0) + nbytes
     out: List[Signal] = []
     for dst, hosts in dst_hosts.items():
-        if len(hosts) >= 2:
-            for host in hosts:
-                out.append(
-                    Signal(
-                        kind="micro_exfil",
-                        host_id=host,
-                        weight=min(1.0, len(hosts) / 3.0),
-                        attrs={"dst_ip": dst, "host_count": len(hosts), "bytes": dst_bytes[dst]},
-                    )
+        if len(hosts) < 2:
+            continue
+        if len(hosts) >= fanout_bar:
+            continue  # ubiquitous shared egress — correlator poisons these too
+        for host in hosts:
+            out.append(
+                Signal(
+                    kind="micro_exfil",
+                    host_id=host,
+                    weight=min(1.0, len(hosts) / 3.0),
+                    attrs={"dst_ip": dst, "host_count": len(hosts), "bytes": dst_bytes[dst]},
                 )
+            )
     return out
 
 

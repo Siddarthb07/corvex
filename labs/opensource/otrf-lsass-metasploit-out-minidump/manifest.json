@@ -1,0 +1,30 @@
+{
+  "name": "otrf-lsass-metasploit-out-minidump",
+  "corpus_kind": "opensource_attack_capture",
+  "source": {
+    "project": "OTRF/Security-Datasets",
+    "url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/master/datasets/compound/LSASS_campaign_04/metasploit_out-minidump_lsass_memory_dump.zip",
+    "family": "credential_dump_campaign",
+    "tool": "Metasploit/Out-Minidump",
+    "attack": "LSASS campaign: Out-Minidump PowerShell",
+    "techniques": [
+      "T1003.001"
+    ],
+    "note": "LSASS campaign: Out-Minidump PowerShell",
+    "authorship": "external"
+  },
+  "raw_glob": "raw/*.sanitized.jsonl",
+  "host_map": {},
+  "fetch": {
+    "source_url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/master/datasets/compound/LSASS_campaign_04/metasploit_out-minidump_lsass_memory_dump.zip",
+    "archive_sha256": "d6150eab4013ed0a7fc9c6b7266187214706c543c9dc3a370603f524def5de63",
+    "format": "zip",
+    "extracted": [
+      "metasploit_out-minidump_lsass_memory_dump.sanitized.jsonl"
+    ],
+    "family": "credential_dump_campaign",
+    "note": null,
+    "license_note": "OTRF Security-Datasets \u2014 see upstream LICENSE (GPL-3.0).",
+    "authorship": "external \u2014 OTRF / MITRE ATT&CK Evals capture, not Corvex authors"
+  }
+}

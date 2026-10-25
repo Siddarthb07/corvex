@@ -1,0 +1,28 @@
+{
+  "name": "otrf-proxylogon-ssrf-rce-poc",
+  "corpus_kind": "opensource_attack_capture",
+  "source": {
+    "project": "OTRF/Security-Datasets",
+    "url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/master/datasets/atomic/windows/persistence/host/proxylogon_ssrf_rce_poc.zip",
+    "family": "persistence",
+    "tool": "native",
+    "attack": "proxylogon ssrf rce poc",
+    "techniques": [],
+    "note": "proxylogon ssrf rce poc",
+    "authorship": "external"
+  },
+  "raw_glob": "raw/*.sanitized.jsonl",
+  "host_map": {},
+  "fetch": {
+    "source_url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/master/datasets/atomic/windows/persistence/host/proxylogon_ssrf_rce_poc.zip",
+    "archive_sha256": "cc6ef822788c25b03b20e4d6cf3fa268ea0277483b31614c5d432fd7a55bd3e2",
+    "format": "zip",
+    "extracted": [
+      "proxylogon_ssrf_rce_poc_2021-03-14T01401970.sanitized.jsonl"
+    ],
+    "family": "persistence",
+    "note": null,
+    "license_note": "OTRF Security-Datasets \u2014 see upstream LICENSE (GPL-3.0).",
+    "authorship": "external \u2014 OTRF / MITRE ATT&CK Evals capture, not Corvex authors"
+  }
+}

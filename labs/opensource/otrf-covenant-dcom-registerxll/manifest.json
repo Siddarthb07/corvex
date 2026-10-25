@@ -1,0 +1,28 @@
+{
+  "name": "otrf-covenant-dcom-registerxll",
+  "corpus_kind": "opensource_attack_capture",
+  "source": {
+    "project": "OTRF/Security-Datasets",
+    "url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/master/datasets/atomic/windows/lateral_movement/host/covenant_dcom_registerxll.zip",
+    "family": "lateral_movement",
+    "tool": "Covenant",
+    "attack": "covenant dcom registerxll",
+    "techniques": [],
+    "note": "covenant dcom registerxll",
+    "authorship": "external"
+  },
+  "raw_glob": "raw/*.sanitized.jsonl",
+  "host_map": {},
+  "fetch": {
+    "source_url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/master/datasets/atomic/windows/lateral_movement/host/covenant_dcom_registerxll.zip",
+    "archive_sha256": "a18d37fe9d6d5f7cda35911070c94edbf8ab8876489780c6177d6294cab38b80",
+    "format": "zip",
+    "extracted": [
+      "covenant_dcom_registerxll_2020-09-18145959.sanitized.jsonl"
+    ],
+    "family": "lateral_movement",
+    "note": null,
+    "license_note": "OTRF Security-Datasets \u2014 see upstream LICENSE (GPL-3.0).",
+    "authorship": "external \u2014 OTRF / MITRE ATT&CK Evals capture, not Corvex authors"
+  }
+}

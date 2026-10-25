@@ -1,0 +1,399 @@
+{
+  "campaign_id": "mf-single-docker-ooo-exfil_bury",
+  "family": "intensive_multifactor",
+  "ood": true,
+  "hosts": [
+    "ctr-ws01-web",
+    "ctr-ws02-api",
+    "ctr-ws03-db",
+    "ctr-ws04-cache",
+    "node-ws05"
+  ],
+  "truth_hosts": [
+    "ctr-ws01-web",
+    "ctr-ws02-api",
+    "ctr-ws03-db"
+  ],
+  "producers": {
+    "ctr-ws01-web": "prod-mf-ctr-ws01-web",
+    "ctr-ws02-api": "prod-mf-ctr-ws02-api",
+    "ctr-ws03-db": "prod-mf-ctr-ws03-db",
+    "ctr-ws04-cache": "prod-mf-ctr-ws04-cache",
+    "node-ws05": "prod-mf-node-ws05"
+  },
+  "base_time_utc": "2026-07-25T14:00:00Z",
+  "fleet_origin": "original",
+  "fleet_suite": "intensive",
+  "factors": {
+    "domain": "single",
+    "container": "docker",
+    "sequence": "ooo",
+    "style": "exfil_bury"
+  },
+  "source": {
+    "style": "Intensive multi-factor stress sketches",
+    "repo": "https://github.com/Siddarthb07/corvex",
+    "techniques": [
+      "T1041",
+      "T1078"
+    ],
+    "note": "single/docker/ooo/exfil_bury"
+  },
+  "narrative": [
+    "Factor cell: domain=single container=docker sequence=ooo style=exfil_bury."
+  ],
+  "break_intent": {
+    "name": "mf-single-docker-ooo-exfil_bury",
+    "break_criterion": "Jaccard < 0.5 OR truth host never recovered OR benign merge-FQ",
+    "success_criteria_defender": [
+      "matched truth_hosts",
+      "empty over_merged_hosts"
+    ]
+  },
+  "steps": [
+    {
+      "kind": "auth",
+      "host": "ctr-ws01-web",
+      "user": "apt-op",
+      "src": "203.0.113.40",
+      "offset_seconds": 80,
+      "technique": "T1078"
+    },
+    {
+      "kind": "auth",
+      "host": "ctr-ws02-api",
+      "user": "apt-op",
+      "src": "ctr-ws01-web",
+      "offset_seconds": 20,
+      "technique": "T1078"
+    },
+    {
+      "kind": "exfil",
+      "host": "ctr-ws02-api",
+      "dst_ip": "198.51.100.77",
+      "bytes": 14000,
+      "offset_seconds": 40,
+      "technique": "T1041"
+    },
+    {
+      "kind": "exfil",
+      "host": "ctr-ws01-web",
+      "dst_ip": "203.0.113.200",
+      "bytes": 9000,
+      "offset_seconds": 10.0,
+      "technique": "T1041"
+    },
+    {
+      "kind": "exfil",
+      "host": "ctr-ws01-web",
+      "dst_ip": "203.0.113.200",
+      "bytes": 9100,
+      "offset_seconds": 10.5,
+      "technique": "T1041"
+    },
+    {
+      "kind": "exfil",
+      "host": "ctr-ws01-web",
+      "dst_ip": "203.0.113.200",
+      "bytes": 9200,
+      "offset_seconds": 11.0,
+      "technique": "T1041"
+    },
+    {
+      "kind": "exfil",
+      "host": "ctr-ws01-web",
+      "dst_ip": "203.0.113.200",
+      "bytes": 9300,
+      "offset_seconds": 11.5,
+      "technique": "T1041"
+    },
+    {
+      "kind": "exfil",
+      "host": "ctr-ws01-web",
+      "dst_ip": "203.0.113.200",
+      "bytes": 9400,
+      "offset_seconds": 12.0,
+      "technique": "T1041"
+    },
+    {
+      "kind": "exfil",
+      "host": "ctr-ws01-web",
+      "dst_ip": "203.0.113.200",
+      "bytes": 9500,
+      "offset_seconds": 12.5,
+      "technique": "T1041"
+    },
+    {
+      "kind": "exfil",
+      "host": "ctr-ws01-web",
+      "dst_ip": "203.0.113.200",
+      "bytes": 9600,
+      "offset_seconds": 13.0,
+      "technique": "T1041"
+    },
+    {
+      "kind": "exfil",
+      "host": "ctr-ws01-web",
+      "dst_ip": "203.0.113.200",
+      "bytes": 9700,
+      "offset_seconds": 13.5,
+      "technique": "T1041"
+    },
+    {
+      "kind": "exfil",
+      "host": "ctr-ws02-api",
+      "dst_ip": "203.0.113.200",
+      "bytes": 9000,
+      "offset_seconds": 13.0,
+      "technique": "T1041"
+    },
+    {
+      "kind": "exfil",
+      "host": "ctr-ws02-api",
+      "dst_ip": "203.0.113.200",
+      "bytes": 9100,
+      "offset_seconds": 13.5,
+      "technique": "T1041"
+    },
+    {
+      "kind": "exfil",
+      "host": "ctr-ws02-api",
+      "dst_ip": "203.0.113.200",
+      "bytes": 9200,
+      "offset_seconds": 14.0,
+      "technique": "T1041"
+    },
+    {
+      "kind": "exfil",
+      "host": "ctr-ws02-api",
+      "dst_ip": "203.0.113.200",
+      "bytes": 9300,
+      "offset_seconds": 14.5,
+      "technique": "T1041"
+    },
+    {
+      "kind": "exfil",
+      "host": "ctr-ws02-api",
+      "dst_ip": "203.0.113.200",
+      "bytes": 9400,
+      "offset_seconds": 15.0,
+      "technique": "T1041"
+    },
+    {
+      "kind": "exfil",
+      "host": "ctr-ws02-api",
+      "dst_ip": "203.0.113.200",
+      "bytes": 9500,
+      "offset_seconds": 15.5,
+      "technique": "T1041"
+    },
+    {
+      "kind": "exfil",
+      "host": "ctr-ws02-api",
+      "dst_ip": "203.0.113.200",
+      "bytes": 9600,
+      "offset_seconds": 16.0,
+      "technique": "T1041"
+    },
+    {
+      "kind": "exfil",
+      "host": "ctr-ws02-api",
+      "dst_ip": "203.0.113.200",
+      "bytes": 9700,
+      "offset_seconds": 16.5,
+      "technique": "T1041"
+    },
+    {
+      "kind": "exfil",
+      "host": "ctr-ws03-db",
+      "dst_ip": "203.0.113.200",
+      "bytes": 9000,
+      "offset_seconds": 16.0,
+      "technique": "T1041"
+    },
+    {
+      "kind": "exfil",
+      "host": "ctr-ws03-db",
+      "dst_ip": "203.0.113.200",
+      "bytes": 9100,
+      "offset_seconds": 16.5,
+      "technique": "T1041"
+    },
+    {
+      "kind": "exfil",
+      "host": "ctr-ws03-db",
+      "dst_ip": "203.0.113.200",
+      "bytes": 9200,
+      "offset_seconds": 17.0,
+      "technique": "T1041"
+    },
+    {
+      "kind": "exfil",
+      "host": "ctr-ws03-db",
+      "dst_ip": "203.0.113.200",
+      "bytes": 9300,
+      "offset_seconds": 17.5,
+      "technique": "T1041"
+    },
+    {
+      "kind": "exfil",
+      "host": "ctr-ws03-db",
+      "dst_ip": "203.0.113.200",
+      "bytes": 9400,
+      "offset_seconds": 18.0,
+      "technique": "T1041"
+    },
+    {
+      "kind": "exfil",
+      "host": "ctr-ws03-db",
+      "dst_ip": "203.0.113.200",
+      "bytes": 9500,
+      "offset_seconds": 18.5,
+      "technique": "T1041"
+    },
+    {
+      "kind": "exfil",
+      "host": "ctr-ws03-db",
+      "dst_ip": "203.0.113.200",
+      "bytes": 9600,
+      "offset_seconds": 19.0,
+      "technique": "T1041"
+    },
+    {
+      "kind": "exfil",
+      "host": "ctr-ws03-db",
+      "dst_ip": "203.0.113.200",
+      "bytes": 9700,
+      "offset_seconds": 19.5,
+      "technique": "T1041"
+    },
+    {
+      "kind": "exfil",
+      "host": "ctr-ws04-cache",
+      "dst_ip": "203.0.113.200",
+      "bytes": 9000,
+      "offset_seconds": 19.0,
+      "technique": "T1041"
+    },
+    {
+      "kind": "exfil",
+      "host": "ctr-ws04-cache",
+      "dst_ip": "203.0.113.200",
+      "bytes": 9100,
+      "offset_seconds": 19.5,
+      "technique": "T1041"
+    },
+    {
+      "kind": "exfil",
+      "host": "ctr-ws04-cache",
+      "dst_ip": "203.0.113.200",
+      "bytes": 9200,
+      "offset_seconds": 20.0,
+      "technique": "T1041"
+    },
+    {
+      "kind": "exfil",
+      "host": "ctr-ws04-cache",
+      "dst_ip": "203.0.113.200",
+      "bytes": 9300,
+      "offset_seconds": 20.5,
+      "technique": "T1041"
+    },
+    {
+      "kind": "exfil",
+      "host": "ctr-ws04-cache",
+      "dst_ip": "203.0.113.200",
+      "bytes": 9400,
+      "offset_seconds": 21.0,
+      "technique": "T1041"
+    },
+    {
+      "kind": "exfil",
+      "host": "ctr-ws04-cache",
+      "dst_ip": "203.0.113.200",
+      "bytes": 9500,
+      "offset_seconds": 21.5,
+      "technique": "T1041"
+    },
+    {
+      "kind": "exfil",
+      "host": "ctr-ws04-cache",
+      "dst_ip": "203.0.113.200",
+      "bytes": 9600,
+      "offset_seconds": 22.0,
+      "technique": "T1041"
+    },
+    {
+      "kind": "exfil",
+      "host": "ctr-ws04-cache",
+      "dst_ip": "203.0.113.200",
+      "bytes": 9700,
+      "offset_seconds": 22.5,
+      "technique": "T1041"
+    },
+    {
+      "kind": "exfil",
+      "host": "node-ws05",
+      "dst_ip": "203.0.113.200",
+      "bytes": 9000,
+      "offset_seconds": 22.0,
+      "technique": "T1041"
+    },
+    {
+      "kind": "exfil",
+      "host": "node-ws05",
+      "dst_ip": "203.0.113.200",
+      "bytes": 9100,
+      "offset_seconds": 22.5,
+      "technique": "T1041"
+    },
+    {
+      "kind": "exfil",
+      "host": "node-ws05",
+      "dst_ip": "203.0.113.200",
+      "bytes": 9200,
+      "offset_seconds": 23.0,
+      "technique": "T1041"
+    },
+    {
+      "kind": "exfil",
+      "host": "node-ws05",
+      "dst_ip": "203.0.113.200",
+      "bytes": 9300,
+      "offset_seconds": 23.5,
+      "technique": "T1041"
+    },
+    {
+      "kind": "exfil",
+      "host": "node-ws05",
+      "dst_ip": "203.0.113.200",
+      "bytes": 9400,
+      "offset_seconds": 24.0,
+      "technique": "T1041"
+    },
+    {
+      "kind": "exfil",
+      "host": "node-ws05",
+      "dst_ip": "203.0.113.200",
+      "bytes": 9500,
+      "offset_seconds": 24.5,
+      "technique": "T1041"
+    },
+    {
+      "kind": "exfil",
+      "host": "node-ws05",
+      "dst_ip": "203.0.113.200",
+      "bytes": 9600,
+      "offset_seconds": 25.0,
+      "technique": "T1041"
+    },
+    {
+      "kind": "exfil",
+      "host": "node-ws05",
+      "dst_ip": "203.0.113.200",
+      "bytes": 9700,
+      "offset_seconds": 25.5,
+      "technique": "T1041"
+    }
+  ]
+}

@@ -45,7 +45,9 @@ def host_id(i: int) -> str:
 
 
 def producer_id(i: int) -> str:
-    return f"prod-{i:02d}"
+    # Unique per host index — must not reuse prod-00..N (persistent lab enrollment
+    # may already map those slots to other host_ids from multifactor / demos).
+    return f"prod-scale-{i:02d}"
 
 
 def scale_hosts(n: int) -> List[str]:
