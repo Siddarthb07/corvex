@@ -133,7 +133,7 @@ def test_score_non_author_skips_non_attack_manifests(tmp_path: Path, monkeypatch
     man = tmp_path / "manifests"
     man.mkdir()
     shutil.copy(
-        root / "labs" / "breaktest" / "manifests" / "art_lateral_chain.json",
+        root / "fixtures" / "breaktest" / "art_lateral_chain.json",
         man / "art_lateral_chain.json",
     )
     (man / "break_os_wide_sensors.json").write_text(
