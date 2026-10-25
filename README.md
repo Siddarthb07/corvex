@@ -6,12 +6,6 @@ Multi-host **campaign correlator** for threat hunting — fuses weak per-host de
 
 **Public claim (standing):** research correlator — holds up against synthetic ATT&CK-shaped fleets; **not yet validated against real telemetry or benign baselines.** Observe and correlate first. Live containment stays locked behind safety controls.
 
-*Docs pass: 2026-09-07 — Atomic playbook replay path linked under Labs; claim language unchanged.*
-
-Real/realistic benign baseline (next gate): `labs/benign/` + `python scripts/run_benign_baseline.py` — pre-committed FP bars in `future-plans.md`; no hand-crafted “admin noise.” Operator sequence: [`docs/real-world-test-sequences.md`](docs/real-world-test-sequences.md).
-
-Local stress / break write-up (no Docker): [`reports/local_stress_break_results.md`](reports/local_stress_break_results.md).
-
 ## Quick start
 
 Requires Python 3.9+.
@@ -33,11 +27,10 @@ corvex dash --run-dir runs/demo
 | Monitor | `/` — campaigns + eval + safety controls |
 | Prevention log | `/logs.html` |
 
-Defaults bind to loopback. Share on a lab LAN (view-only checklist from remote hosts):
+Defaults bind to loopback. Share on a lab LAN:
 
 ```bash
 corvex dash --host 0.0.0.0 --port 8765 --run-dir runs/demo
-# browse http://<this-machine-ip>:8765/
 ```
 
 CLI: `corvex` (legacy alias `cfuse`). Optional: `corvex init` to create enrollment without replaying.
@@ -48,36 +41,26 @@ Stage B gated collectors write HMAC-signed envelopes into a shared run directory
 Unlock locally with `corvex stage-b-lab-unlock --reason "…"` (does **not** flip
 `claim_allowed`), or via the honest stranger path.
 
-| Platform | CLI | Live source (primary) | Guide |
-|----------|-----|----------------------|--------|
-| Windows | `corvex sensor-windows` | wevtutil (Security / Sysmon / Firewall / PowerShell) | [`docs/sensor-windows.md`](docs/sensor-windows.md) · [`docs/os-wide-sensor.md`](docs/os-wide-sensor.md) |
-| macOS | `corvex sensor-macos` | `lsof` TCP established (+ optional unified-log auth/dns, `ps`, pf) | [`docs/sensor-macos.md`](docs/sensor-macos.md) |
+| Platform | CLI | Live source (primary) |
+|----------|-----|----------------------|
+| Windows | `corvex sensor-windows` | wevtutil (Security / Sysmon / Firewall / PowerShell) |
+| macOS | `corvex sensor-macos` | `lsof` TCP established (+ optional unified-log auth/dns, `ps`, pf) |
 
-### macOS (no Docker)
+### macOS fixture
 
 ```bash
 corvex stage-b-lab-unlock --reason "local macos fixture CI"
 
-# Fixture / CI
 corvex sensor-macos \
   --fixture fixtures/os_wide_macos/multi_channel.jsonl \
   --allowlist fixtures/os_wide_macos/channels.json \
   --host-map fixtures/os_wide_macos/host_map.json \
   --run-dir runs/os-wide-macos --once
 
-# Live net on this Mac
-corvex sensor-macos --run-dir runs/os-wide-macos-live --once \
-  --channels net,process \
-  --host-id host-mac --producer prod-mac
-
-corvex dash --run-dir runs/os-wide-macos-live
+corvex dash --run-dir runs/os-wide-macos
 ```
 
-Channels: `net` (primary), `auth`, `dns`, `process`, `pf`. Missing channels
-**degrade honestly** (`sensor_status.json` → `channel_health`). Not
-EndpointSecurity — process is a `ps` sample; net is per-user `lsof` visibility.
-
-### Windows
+### Windows fixture
 
 ```bash
 corvex stage-b-lab-unlock --reason "local fixture CI"
@@ -87,83 +70,7 @@ corvex sensor-windows --fixture fixtures/os_wide/multi_channel.jsonl \
   --run-dir runs/os-wide --once
 ```
 
-Stranger / BYO auth wedge (ungated converter): `corvex byo-windows` — see
-[`docs/stranger-checklist.md`](docs/stranger-checklist.md).
-
-### Multi-host + fuse
-
-Run the same binary on each enrolled host into one `run_dir`, or merge offline:
-
-```bash
-corvex fuse-run \
-  --lab labs/breaktest/shared/events.jsonl \
-  --pc runs/os-wide-macos-live \
-  --out-dir runs/pc-and-lab --once
-```
-
-Mode is **offline_lab_replay** (file merge + HMAC verify) — not JetStream.
-
-## Results (sealed held-out, synthetic)
-
-Synthetic multi-host packs (incl. `fusion_chain` + benign **N=5**). **Care vs commercial tools: unproven.** Sealed/breaktest quality is `lab_verified`; publish “useful on real attacks” only when `claim_allowed=true` (signed stranger + trust integrity).
-
-### Detection
-
-| Metric | Corvex | Notes |
-|--------|--------|--------|
-| Precision | **1.00** | Flagged campaigns that matched ground truth |
-| Recall | **1.00** | True multi-host campaigns recovered |
-| Campaign F1 | **1.00** | Harmonic mean of P+R |
-| Precision@1 | **1.00** | Top-ranked campaign correct |
-| Benign false-campaign rate | **0.00** | Held-out benign packs (**N=5**) |
-| Time-to-correlate | **~0.005 s** | First ingest → campaigns (lab machine) |
-
-**N:** attack packs **3**; benign packs **5**.
-
-### vs baselines (why fusion)
-
-| | Correlator | Detector-only | B1 naive |
-|--|------------|---------------|----------|
-| F1 | **1.00** | **0.67** | **0.00** |
-| Precision | **1.00** | **0.33** | **0.00** |
-| Recall | **1.00** | **0.67** | **0.00** |
-
-Held-out now separates fusion from detector-only (**+0.33 F1**). Break-test public-TTP manifests: correlator **1.00** vs detector-only **0.16** (lift **+0.84**).
-
-### Held-out vs train
-
-| Split | Precision | Recall | F1 | Det-only F1 | Benign FCR | TTU |
-|-------|-----------|--------|-----|-------------|------------|-----|
-| Train (dev only) | 1.00 | 1.00 | 1.00 | 0.67 | 0.00 (N=2) | ~0.006 s |
-| Held-out (sealed) | 1.00 | 1.00 | 1.00 | 0.67 | 0.00 (N=5) | ~0.005 s |
-
-Train is **context**, not the sealed claim.
-
-### By attack pattern (held-out)
-
-| Family | Precision | Recall | F1 | Benign FCR |
-|--------|-----------|--------|-----|------------|
-| lateral (OOD timing) | 1.00 | 1.00 | 1.00 | — |
-| exfil | 1.00 | 1.00 | 1.00 | — |
-| fusion_chain | 1.00 | 1.00 | 1.00 | — |
-| benign (N=5) | — | — | — | **0.00** |
-
-### Contain dry-run (`IsolateHost`, not live)
-
-| Metric | Held-out |
-|--------|----------|
-| Hosts proposed | 11 |
-| Correct isolates | 11 |
-| False isolates | **0** |
-| False-isolate rate | **0.00** |
-
-`CORVEX_CONTAIN=0`. Live path is scaffolded (L1 + hostile-bus) but OS quarantine is not implemented.
-
-**Proves (narrow):** Sealed packs; fusion beats detector-only; benign FCR at N=5; dry-run isolates clean.  
-**Does not prove:** Real malware defense, stranger Windows success, commercial parity, or live contain safety.
-
-Full write-up: [`reports/RESULTS.md`](reports/RESULTS.md).  
-Where it breaks under stress (alias split-brain, day-gap lookback, shared svc glue, …): [`reports/local_stress_break_results.md`](reports/local_stress_break_results.md).
+Stranger / BYO auth wedge: `corvex byo-windows`.
 
 ## Bring your own events
 
@@ -176,90 +83,16 @@ Enrollment / HMAC secrets live **outside** the repo (`~/.corvex/` by default). D
 
 Public train packs are re-signed with your local enrollment on replay so a clean clone works without sealed held-out material.
 
-## Labs (synthetic)
-
-### No Docker — score breaktest manifests
-
-```bash
-corvex build-breaktest labs/breaktest/manifests/art_lateral_chain.json \
-  --out runs/breaktest/art_lateral_chain.jsonl \
-  --report runs/breaktest/art_lateral_chain.breaks.json
-
-python scripts/run_attack_fleet_limits.py --intensity 2
-python scripts/run_breaker_attacks.py
-```
-
-See [`labs/breaktest/README.md`](labs/breaktest/README.md).
-
-### Atomic Red Team replay (lab Windows)
-
-Reusable playbooks that invoke operator-installed ART (not vendored). Gated; does not flip `claim_allowed`.
-
-```bash
-corvex atomic-bind labs/breaktest/manifests/art_lateral_chain.json \
-  --out labs/breaktest/manifests/art_lateral_chain.atomic.json
-# then: CORVEX_ATOMIC=1 + stage-b-lab-unlock + --i-authorize-lab-ttp
-# corvex atomic-run … --role host-a
-```
-
-See [`docs/atomic-replay.md`](docs/atomic-replay.md).
-
-### Docker attack lab
-
-Needs Docker. Sources live in `labs/live/`:
-
-```bash
-python scripts/run_live_lab.py
-```
-
-Spins up 3 virtual hosts + attacker + Corvex on an isolated bridge network. Same flow as the live-lab demo.
-
-## What works today vs later
+## What works today
 
 | Capability | Status |
 |------------|--------|
 | Correlator + monitor + prevention log | Ready |
 | Replay / BYO JSONL ingest | Ready |
-| Fusion-gap packs (`fusion_chain`) + break-test lab | Ready (local score **or** Docker live — [`labs/breaktest/README.md`](labs/breaktest/README.md)) |
-| Atomic Red Team playbook replay (`atomic-bind` / `atomic-run`) | Ready — gated lab Windows; ART not vendored — [`docs/atomic-replay.md`](docs/atomic-replay.md) |
 | Windows auth export → BYO (`adapt-windows` / `byo-windows`) | Ready (observe-only) |
 | OS-wide Windows sensor (`sensor-windows`) | Ready — Stage B gated / `stage-b-lab-unlock` |
 | OS-wide macOS network sensor (`sensor-macos`) | Ready — Stage B gated; live net via `lsof` |
-| Fleet-limits / stress break reports | Ready — [`reports/local_stress_break_results.md`](reports/local_stress_break_results.md) |
-| Sensors + JetStream/mTLS bus | JetStream still stub; OS-wide file path shipped |
 | Live host isolate | Dry-run only (`CORVEX_CONTAIN=0`) |
-
-```text
-[Host sensors: Windows wevtutil | macOS lsof/log/ps]
-        --(signed JSONL / later mTLS)--> [Event bus]
-                                              |
-                                              v
-                                    Corvex correlator
-                                              |
-                                              v
-                                    Prevention log + Monitor
-                                              |
-                         safety checklist complete
-                         + contain switch armed
-                                              v
-                                    Contain executor (IsolateHost)
-```
-
-## Safety
-
-Dashboard toggles map to `reports/security_l1_checklist.json`. They gate detect → act:
-
-- Prove sensor identity (mTLS)
-- Signed ≠ allowed (authz separate from HMAC)
-- Named actions only (no free-form shell)
-- Anti-replay, dual control, blast-radius caps
-- Fail closed, tamper-evident log, off-bus kill switch
-
-Flipping toggles does **not** unlock real LAN quarantine. When the dash is bound on `0.0.0.0`, checklist POSTs are still **loopback-only**.
-
-Details: [`corvex/contain/CHECKLIST.md`](corvex/contain/CHECKLIST.md) · [`docs/contain.md`](docs/contain.md)
-
-## Architecture
 
 ```text
 Sensors (Windows / macOS) / Feeder / BYO-JSONL
@@ -281,13 +114,20 @@ corvex quarantine host-a,host-b --rationale "mid-chain cut"
 
 Reconstruction writes `reconstruction.json` with status `complete` / `partial` / `insufficient_evidence` — gaps listed, no invented TTPs. Quarantine is `dry_run` (default), `lab_flag` (sandbox), or `blocked` (refuse; no live OS executor yet).
 
-## Docs
+## Safety
 
-- [`CHANGELOG.md`](CHANGELOG.md) · [`SECURITY.md`](SECURITY.md) · [`THREAT_MODEL.md`](THREAT_MODEL.md) · [`LICENSE`](LICENSE)
-- Sensors: [`docs/sensor-macos.md`](docs/sensor-macos.md) · [`docs/sensor-windows.md`](docs/sensor-windows.md) · [`docs/os-wide-sensor.md`](docs/os-wide-sensor.md)
-- [`docs/how-corvex-works.md`](docs/how-corvex-works.md) · [`docs/DEEP_DIVE.md`](docs/DEEP_DIVE.md) · [`docs/contain.md`](docs/contain.md) · [`docs/stranger-checklist.md`](docs/stranger-checklist.md) · [`docs/external-operator-packet.md`](docs/external-operator-packet.md) · [`docs/real-world-test-sequences.md`](docs/real-world-test-sequences.md) · [`docs/s2-second-host.md`](docs/s2-second-host.md)
-- Results: [`reports/RESULTS.md`](reports/RESULTS.md) · [`reports/local_stress_break_results.md`](reports/local_stress_break_results.md)
-- [`labs/breaktest/README.md`](labs/breaktest/README.md) · [`docs/atomic-replay.md`](docs/atomic-replay.md) · [`future-plans.md`](future-plans.md)
+Dashboard toggles gate detect → act (sensor identity, authz ≠ HMAC, named actions only, anti-replay, dual control, blast-radius caps, fail closed). Flipping toggles does **not** unlock real LAN quarantine. Checklist POSTs stay **loopback-only** when the dash is bound on `0.0.0.0`.
+
+Details: [`corvex/contain/CHECKLIST.md`](corvex/contain/CHECKLIST.md) · [`SECURITY.md`](SECURITY.md) · [`THREAT_MODEL.md`](THREAT_MODEL.md)
+
+## Repo layout
+
+| Path | Role |
+|------|------|
+| `corvex/` | Package / CLI |
+| `tests/` | Unit + abuse tests |
+| `fixtures/` | Sensor / adapter smoke fixtures |
+| `train/` | Public signed train packs for `corvex replay` |
 
 ## License
 
