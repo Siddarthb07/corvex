@@ -22,6 +22,15 @@ reusable attack.
 **`claim_allowed` does not flip** because you ran Atomic tests. Standing public
 claim stays synthetic-fleet research until stranger + second-host gates pass.
 
+### Protocol B vs `atomic-run` (do not conflate)
+
+| Path | What it is | Used for locked paper numbers? |
+|------|------------|--------------------------------|
+| `labs/breaktest/` + Docker `art_attack.py` | Synthetic event sketches (JSON POSTs / net_conn records) | **Yes** — Protocol B / breaktest F1 |
+| `corvex atomic-run` / `atomic-lab` | Optional wrapper around operator-installed `Invoke-AtomicTest` | **No** — not the locked scoreboard |
+
+Gates (`CORVEX_ATOMIC`, `--i-authorize-lab-ttp`, Stage B unlock) are **self-issued** by the same operator. They are interlocks, not a second-party authorization. InputArgs **keys** must be PowerShell identifiers (`[A-Za-z_][A-Za-z0-9_]*`).
+
 ## Gates (all required)
 
 1. `CORVEX_ATOMIC=1` in the shell

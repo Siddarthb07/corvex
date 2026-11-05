@@ -159,6 +159,18 @@ def _ps_quote(value: str) -> str:
     return "'" + str(value).replace("'", "''") + "'"
 
 
+def _ps_identifier(key: str) -> str:
+    """Reject non-identifier hashtable keys (blocks PowerShell breakout via keys)."""
+    import re
+
+    name = str(key)
+    if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", name):
+        raise AtomicGateError(
+            f"refusing Atomic InputArgs key {name!r}: must be [A-Za-z_][A-Za-z0-9_]*"
+        )
+    return name
+
+
 def build_invoke_script(
     *,
     technique: str,
@@ -179,7 +191,7 @@ def build_invoke_script(
         # Hashtable literal for -InputArgs @{ k = 'v'; ... }
         kv = []
         for k, v in input_args.items():
-            kv.append(f"{k} = {_ps_quote(str(v))}")
+            kv.append(f"{_ps_identifier(k)} = {_ps_quote(str(v))}")
         args_frag = " -InputArgs @{" + "; ".join(kv) + "}"
     if phase == "prereq":
         parts.append(

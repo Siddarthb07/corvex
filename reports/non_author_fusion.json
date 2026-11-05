@@ -47,6 +47,6 @@
   },
   "f1_lift": 0.4410796576695194,
   "pass": true,
-  "note": "Public-TTP/breaktest manifest score. Still not stranger Windows telemetry \u2014 necessary but not sufficient for claim_allowed.",
+  "note": "Public-TTP/breaktest author-assembled manifest score (gate id non_author_fusion_lift is historical naming). Still not stranger Windows telemetry \u2014 necessary but not sufficient for claim_allowed.",
   "honesty": "Breaktest manifests are public-TTP shaped, not independent enterprise traffic."
 }

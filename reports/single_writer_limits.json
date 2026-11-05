@@ -1,0 +1,37 @@
+{
+  "schema_ver": "1",
+  "mode": "local_tmpfs_or_disk_microbench",
+  "claim": "Lab single-writer file pipeline limits only. Not multi-writer bus throughput; not enterprise SIEM scale.",
+  "bus_append": {
+    "n_1k": {
+      "n_events": 1000,
+      "seconds": 0.311308,
+      "events_per_sec": 3212.25,
+      "bytes": 205780
+    },
+    "n_10k": {
+      "n_events": 10000,
+      "seconds": 3.506616,
+      "events_per_sec": 2851.75,
+      "bytes": 2077780
+    }
+  },
+  "store_rewrite": {
+    "upserts_200": {
+      "n_upserts": 200,
+      "n_campaigns": 20,
+      "seconds": 0.166742,
+      "upserts_per_sec": 1199.46,
+      "bytes_after": 3366,
+      "note": "each upsert rewrites the full campaigns.jsonl (single-writer)"
+    },
+    "upserts_1000": {
+      "n_upserts": 1000,
+      "n_campaigns": 20,
+      "seconds": 0.96603,
+      "upserts_per_sec": 1035.16,
+      "bytes_after": 3366,
+      "note": "each upsert rewrites the full campaigns.jsonl (single-writer)"
+    }
+  }
+}

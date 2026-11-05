@@ -1456,10 +1456,14 @@ def dash_cmd(
 
     bound_host, bound_port = httpd.server_address[:2]
     display_host = "127.0.0.1" if bound_host in ("0.0.0.0", "::") else bound_host
+    # Do not put the token in the URL (Referer / history leak on LAN).
     url = f"http://{display_host}:{bound_port}/"
     if access:
-        url = f"{url}?token={access}"
-        typer.echo(f"snapshot auth: Authorization: Bearer {access}  (or ?token=)")
+        typer.echo(
+            "snapshot auth: Authorization: Bearer <token> "
+            "(query ?token= still accepted for curl; not printed into the URL)"
+        )
+        typer.echo(f"token: {access}")
     typer.echo(f"Monitor (read-only): {url}")
     if host in ("0.0.0.0", "::"):
         typer.echo(f"bound on {host}:{bound_port} — token required for /api/snapshot")

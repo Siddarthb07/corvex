@@ -24,7 +24,7 @@ fuse with Windows sensors and lab JSONL.
 | Observe-only Mac exporter (gated Stage B) | EndpointSecurity / Network Extension kernel sensor |
 | Live `lsof` TCP established flows (per-user visibility) | Full-system netmon for every process as root |
 | Fixture CI without admin rights | Proof of real-attack usefulness |
-| Multi-host exporter into one `run_dir` | JetStream / mTLS bus (still stub) |
+| Multi-host exporter into one `run_dir` | Multi-writer message bus (not shipped; JsonlBus only) |
 | Same `auth` / `net_conn` / `dns` / `process` payload types as Windows | Live OS quarantine / pf mutation |
 | Honest degrade reasons in `sensor_status.json` | Silent inventing of missing channel data |
 

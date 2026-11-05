@@ -1,12 +1,12 @@
 # Corvex
 
+**Standing claim (read this first):** research correlator — holds up against **synthetic ATT&CK-shaped fleets**; **not** validated on real enterprise telemetry or a multi-host pure-benign estate. Observe and correlate first. Live containment stays locked (`CORVEX_CONTAIN=0`). `claim_allowed=false` until second-host physical evidence lands; `lab_verified` covers sealed held-out + breaktest + trust probes only. The `claim_allowed` bit is a **local, re-runnable discipline check** — not remote attestation (see [`docs/claim-gates.md`](docs/claim-gates.md)).
+
 **Keywords:** threat hunting · MITRE ATT&CK · multi-host campaign correlation · lateral movement · SIEM-style fusion · cybersecurity research · observe-only sensors
 
-Multi-host **campaign correlator** for threat hunting — fuses weak per-host detectors (lateral auth, micro-exfil, recon fanout) into ATT&CK-shaped attack timelines. SIEM-style correlation without an LLM or cloud API.
+Multi-host **campaign correlator** — fuses weak per-host detectors (lateral auth, micro-exfil, recon fanout) into ATT&CK-shaped campaign objects. No LLM, no cloud API. Bus today is **append-only JSONL (single-writer)**; there is no shipped multi-writer message bus.
 
-**Public claim (standing):** research correlator — holds up against synthetic ATT&CK-shaped fleets; **not validated on real enterprise telemetry.** Observe and correlate first. Live containment stays locked (`CORVEX_CONTAIN=0`). `claim_allowed=false` until second-host physical evidence lands; `lab_verified` covers sealed held-out + breaktest + trust probes only.
-
-**IEEE TETC track (methods package):** sealed held-out + detector ablation + breaktest/known-break tables + OTRF open-source eval scripts live in-repo. Journal PDF stays outside this repo (papers workspace). Do not narrate sealed F1 as field efficacy.
+**IEEE TETC / methods package:** sealed held-out + detector ablation + breaktest/known-break tables + OTRF eval scripts in-repo. Journal PDF lives outside this repo. Do not narrate sealed F1 as field efficacy. Optional Atomic Red Team wrapper (`atomic-run`) is **not** used for locked Protocol B numbers — see [`docs/atomic-replay.md`](docs/atomic-replay.md).
 
 ## Quick start
 
@@ -109,12 +109,14 @@ Standing sealed numbers (author-held-out; N=6 attack / N=6 benign): correlator F
 
 ```text
 Sensors (Windows / macOS) / Feeder / BYO-JSONL
-        → EventBus (JSONL now; JetStream+mTLS later)
+        → JsonlBus (append-only file; single-writer lab bus)
         → detectors (pure functions)
-        → correlator
-        → CampaignStore + Prevention log
-        → Contain (gated)
+        → correlator (transitive merge)
+        → CampaignStore (JSONL rewrite) + Prevention log
+        → Contain (dry_run / lab_flag / blocked only)
 ```
+
+Measured single-writer limits: `python scripts/run_single_writer_limits.py` → `reports/single_writer_limits.json`.
 
 ## Reconstruct + quarantine (honest modes)
 

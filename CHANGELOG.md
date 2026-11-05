@@ -3,8 +3,15 @@
 ## [Unreleased]
 
 ### Added
+- `scripts/run_single_writer_limits.py` → `reports/single_writer_limits.json` (lab JsonlBus / CampaignStore microbench; not SIEM scale).
 - Restored TETC methods package in-tree: `labs/` (benign/breaktest/OTRF), eval `scripts/`, operator `docs/`, locked `reports/` (paper PDF stays out of this repo).
 - Regression: dual-user fusion-chain merge on asymmetric egress handoff (sealed held-out F1 1.00) without re-gluing helpdesk hitchhiking.
+
+### Changed
+- README / claim-gates / Atomic docs: standing claim first; `claim_allowed` documented as local forgeable discipline bit; Protocol B ≠ `atomic-run`; JetStream removed from architecture diagram.
+- `corvex dash`: LAN token printed separately — not embedded in the opened URL (Referer/history hygiene).
+- Atomic `InputArgs` keys must be PowerShell identifiers (blocks key-based breakout).
+- `JetStreamBus` docstring: explicit non-implementation; use JsonlBus only.
 
 ### Fixed
 - Sealed `held-fusion-chain` split into two campaigns after fusion hardening; correlator again merges dual-svc pivots when micro_exfil/dns sits on the overlap host.

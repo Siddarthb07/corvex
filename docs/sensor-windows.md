@@ -65,7 +65,7 @@ Corvex signs with local `~/.corvex/enrollment.json` (owner-only ACL on save). Ma
 | Is | Isn't |
 |----|--------|
 | Observe-only 4624 BYO wedge | Claim unlock by itself |
-| Stage B OS-wide collector (gated) | JetStream/mTLS bus (still stub) |
+| Stage B OS-wide collector (gated) | Multi-writer message bus (not shipped; JsonlBus only) |
 | Fixture CI without admin rights | Proof of real-attack usefulness (`claim_allowed`) |
 | Multi-host exporter shape | Live OS quarantine |
 | HMAC verify on recompute | Trusted remote provenance from lab adapter signing |

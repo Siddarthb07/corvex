@@ -19,11 +19,11 @@ Standing public sentence until `claim_allowed=true`:
 
 | Gate | Evidence file / probe | What it blocks |
 |------|----------------------|----------------|
-| `non_author_fusion_lift` | `reports/non_author_fusion.json` | Publishing fusion as useful when detector-only is as good |
-| `stranger_success` | `reports/stranger_dry_run.json` + Ed25519 | Author-only “outsider” attestations; agent dry-runs; author HMAC |
-| `benign_fcr_real_n` | sealed held-out benign metrics | Claiming low FP without ≥N benign packs |
+| `non_author_fusion_lift` | `reports/non_author_fusion.json` (breaktest / public-TTP **author-assembled** manifests) | Publishing fusion as useful when detector-only is as good. **Name is historical** — manifests are not outsider-authored. |
+| `stranger_success` | `reports/stranger_dry_run.json` + Ed25519 | Soft “outsider” stories. **Honest limit:** Ed25519 pubkey is embedded in the same attestation (unpinned); a local process can mint a passing file (see `tests/test_phase0_trust.py`). |
+| `benign_fcr_real_n` | sealed held-out benign metrics | Claiming low FP without ≥N sealed benign packs. **Not** the multi-host home-lab S5 bar. |
 | `trust_integrity` | in-process probes | Dash snapshot bypass, unsigned ingest, resign without verify |
-| `live_second_host` | `reports/live_second_host.json` (`source=wevtutil`) | Single-machine “fleet” stories |
+| `live_second_host` | `reports/live_second_host.json` (`source=wevtutil`) | Single-machine “fleet” stories. **Honest limit:** shape check (`source`, `host_id`, event count) — forgeable offline. |
 
 Demo of a blocked overclaim:
 

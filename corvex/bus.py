@@ -74,11 +74,16 @@ class JsonlBus:
 
 
 class JetStreamBus:
-    """Stage B+ stub — not implemented in Stage A."""
+    """Explicit non-implementation.
+
+    Corvex ships **JsonlBus only**. This class exists so imports fail closed
+    instead of silently pretending a multi-writer bus is available. Do not
+    cite JetStream as a product capability in papers or README diagrams.
+    """
 
     def __init__(self, *args, **kwargs):
         raise NotImplementedError(
-            "JetStreamBus is Stage B only. Stage A must use JsonlBus."
+            "JetStreamBus is not implemented. Use JsonlBus (single-writer JSONL)."
         )
 
     def publish(self, envelope: EventEnvelope) -> None:
