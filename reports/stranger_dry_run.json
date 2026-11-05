@@ -1,0 +1,16 @@
+{
+  "pass": true,
+  "operator": "Jack",
+  "attestation_kind": "human",
+  "date": "2026-07-25",
+  "note": "Completed Windows export \u2192 byo-windows \u2192 timeline without author help.",
+  "run_dir": "runs/stranger-wedge",
+  "prior_agent_dry_run": {
+    "operator": "cursor-stranger-agent",
+    "note": "Historical agent dry-run only \u2014 does not unlock claim_allowed."
+  },
+  "attestation_alg": "ed25519",
+  "attestation_custody": "stranger_private_key",
+  "attestation_pubkey": "tUKldqfUrQsetX6eUPE44BD23l_EdGN28ZRPfJKR16c",
+  "attestation_sig": "RZOoBHzmdmKxPvtPFqNPIQdj3vahshjqEDeS0iBh4_xHvwoVYhYVUr0RHQFVE9h4f0OZxQpiTdRb8g-84Ke3BQ"
+}

@@ -1,0 +1,25 @@
+{
+  "name": "otrf-schtask-create",
+  "corpus_kind": "opensource_attack_capture",
+  "source": {
+    "project": "OTRF/Security-Datasets",
+    "url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/master/datasets/atomic/windows/lateral_movement/host/schtask_create.zip",
+    "family": "persistence_lateral",
+    "note": "Remote scheduled task create",
+    "authorship": "external"
+  },
+  "raw_glob": "raw/*.json",
+  "host_map": {},
+  "fetch": {
+    "source_url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/master/datasets/atomic/windows/lateral_movement/host/schtask_create.zip",
+    "archive_sha256": "74394c64b660d5b229936d00ea8b3ceb900126cd9e261f58fa2be766579ec5de",
+    "format": "zip",
+    "extracted": [
+      "schtask_create_2020-12-1907003032.sanitized.jsonl"
+    ],
+    "family": "persistence_lateral",
+    "note": "Remote scheduled task create",
+    "license_note": "OTRF Security-Datasets \u2014 see upstream LICENSE (GPL-3.0).",
+    "authorship": "external \u2014 OTRF / MITRE ATT&CK Evals capture, not Corvex authors"
+  }
+}

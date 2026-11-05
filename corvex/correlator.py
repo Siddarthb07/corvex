@@ -696,10 +696,32 @@ class Correlator:
                 if ua and ub and ua == ub:
                     return True
                 if _cross_key_present(stages_a, stages_b):
-                    # Two laterals meeting on shared hosts still refuse (helpdesk)
+                    # Two laterals meeting on shared hosts still refuse bare
+                    # helpdesk hitchhiking. Allow when egress handoff evidence
+                    # sits on the overlap (sealed fusion_chain dual-svc pivot).
                     a_is_lat = "lateral_auth" in _stage_names(stages_a)
                     b_is_lat = "lateral_auth" in _stage_names(stages_b)
                     if a_is_lat and b_is_lat and ua and ub and ua != ub:
+                        if _shared_exfil_dst(stages_a, stages_b):
+                            return True
+
+                        def _exfil_hosts(
+                            sts: Sequence[Mapping[str, Any]],
+                        ) -> Set[str]:
+                            hs: Set[str] = set()
+                            for st in sts:
+                                if str(st.get("name") or "") in {
+                                    "micro_exfil",
+                                    "dns_beacon",
+                                }:
+                                    hs |= {
+                                        str(x) for x in (st.get("hosts") or [])
+                                    }
+                            return hs
+
+                        ea, eb = _exfil_hosts(stages_a), _exfil_hosts(stages_b)
+                        if overlap & (ea | eb):
+                            return True
                         return False
                     return True
                 if _shared_exfil_dst(stages_a, stages_b):
@@ -715,12 +737,18 @@ class Correlator:
             cross = (a_lat and b_ex) or (b_lat and a_ex)
             if not cross:
                 return False
-            # Two lateral campaigns meeting at a jumpbox must not glue — even if
-            # one side also has exfil on that host (helpdesk hitchhiking).
+            # Two lateral campaigns meeting at a jumpbox must not glue on host
+            # co-occurrence alone (helpdesk hitchhiking). Allow only when the
+            # pivot host is an asymmetric egress handoff: one side's
+            # micro_exfil/dns on h, the other side's lateral on h (and not both
+            # laterals on h).
             a_is_lat = any(str(st.get("name", "")) == "lateral_auth" for st in stages_a)
             b_is_lat = any(str(st.get("name", "")) == "lateral_auth" for st in stages_b)
             if a_is_lat and b_is_lat:
-                return False
+                handoff = (a_ex and b_lat and not a_lat) or (
+                    b_ex and a_lat and not b_lat
+                )
+                return bool(handoff)
             return True
 
         def _user_hop_links(user: Optional[str], a: Set[str], b: Set[str]) -> bool:

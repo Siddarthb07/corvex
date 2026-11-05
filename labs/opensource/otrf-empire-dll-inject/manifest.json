@@ -1,0 +1,30 @@
+{
+  "name": "otrf-empire-dll-inject",
+  "corpus_kind": "opensource_attack_capture",
+  "source": {
+    "project": "OTRF/Security-Datasets",
+    "url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/master/datasets/atomic/windows/defense_evasion/host/empire_dllinjection_LoadLibrary_CreateRemoteThread.zip",
+    "family": "defense_evasion",
+    "tool": "Empire",
+    "attack": "LoadLibrary CreateRemoteThread inject",
+    "techniques": [
+      "T1055.001"
+    ],
+    "note": "LoadLibrary CreateRemoteThread inject",
+    "authorship": "external"
+  },
+  "raw_glob": "raw/*.sanitized.jsonl",
+  "host_map": {},
+  "fetch": {
+    "source_url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/master/datasets/atomic/windows/defense_evasion/host/empire_dllinjection_LoadLibrary_CreateRemoteThread.zip",
+    "archive_sha256": "98071a478f57f2ca71530c4cb839f2054da0e6bd8b106caaa5d9518d1be0ccc8",
+    "format": "zip",
+    "extracted": [
+      "empire_dllinjection_LoadLibrary_CreateRemoteThread_2020-07-22000048.sanitized.jsonl"
+    ],
+    "family": "defense_evasion",
+    "note": null,
+    "license_note": "OTRF Security-Datasets \u2014 see upstream LICENSE (GPL-3.0).",
+    "authorship": "external \u2014 OTRF / MITRE ATT&CK Evals capture, not Corvex authors"
+  }
+}

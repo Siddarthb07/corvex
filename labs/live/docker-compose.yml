@@ -1,0 +1,63 @@
+services:
+  host-a:
+    build: ./host
+    environment:
+      HOST_ID: host-a
+      HOST_ROLE: workstation
+      LAB_DIR: /lab
+    volumes:
+      - ./shared:/lab
+    networks: [labnet]
+
+  host-b:
+    build: ./host
+    environment:
+      HOST_ID: host-b
+      HOST_ROLE: fileserver
+      LAB_DIR: /lab
+    volumes:
+      - ./shared:/lab
+    networks: [labnet]
+
+  host-c:
+    build: ./host
+    environment:
+      HOST_ID: host-c
+      HOST_ROLE: jump box
+      LAB_DIR: /lab
+    volumes:
+      - ./shared:/lab
+    networks: [labnet]
+
+  corvex:
+    build: ./corvex
+    environment:
+      LAB_DIR: /lab
+      PYTHONPATH: /app
+    volumes:
+      - ./shared:/lab
+      - ../..:/app
+    depends_on:
+      - host-a
+      - host-b
+      - host-c
+    networks: [labnet]
+
+  attacker:
+    build: ./attacker
+    environment:
+      LAB_DIR: /lab
+      ATTACKER_SRC: 10.1.0.5
+      ATTACK_USER: alice
+    volumes:
+      - ./shared:/lab
+    depends_on:
+      - host-a
+      - host-b
+      - host-c
+      - corvex
+    networks: [labnet]
+
+networks:
+  labnet:
+    driver: bridge

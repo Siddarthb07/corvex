@@ -4,7 +4,9 @@
 
 Multi-host **campaign correlator** for threat hunting — fuses weak per-host detectors (lateral auth, micro-exfil, recon fanout) into ATT&CK-shaped attack timelines. SIEM-style correlation without an LLM or cloud API.
 
-**Public claim (standing):** research correlator — holds up against synthetic ATT&CK-shaped fleets; **not yet validated against real telemetry or benign baselines.** Observe and correlate first. Live containment stays locked behind safety controls.
+**Public claim (standing):** research correlator — holds up against synthetic ATT&CK-shaped fleets; **not validated on real enterprise telemetry.** Observe and correlate first. Live containment stays locked (`CORVEX_CONTAIN=0`). `claim_allowed=false` until second-host physical evidence lands; `lab_verified` covers sealed held-out + breaktest + trust probes only.
+
+**IEEE TETC track (methods package):** sealed held-out + detector ablation + breaktest/known-break tables + OTRF open-source eval scripts live in-repo. Journal PDF stays outside this repo (papers workspace). Do not narrate sealed F1 as field efficacy.
 
 ## Quick start
 
@@ -83,12 +85,23 @@ Enrollment / HMAC secrets live **outside** the repo (`~/.corvex/` by default). D
 
 Public train packs are re-signed with your local enrollment on replay so a clean clone works without sealed held-out material.
 
+## Locked lab scoreboard (re-run locally)
+
+```bash
+corvex eval --split heldout     # writes reports/stageA_heldout.json
+corvex claim-gates              # claim_allowed stays false without live second host
+```
+
+Standing sealed numbers (author-held-out; N=6 attack / N=6 benign): correlator F1 **1.00** vs detector-only **0.625** vs B1 **0.00**; benign FCR **0.00**. Breaktest / public-TTP fusion lift and named breaks (hostname split-brain, day-scale lookback, DNS-only C2, shared-svc over-merge, benign egress bury) live under `labs/breaktest/` + `reports/`.
+
 ## What works today
 
 | Capability | Status |
 |------------|--------|
 | Correlator + monitor + prevention log | Ready |
 | Replay / BYO JSONL ingest | Ready |
+| Sealed held-out eval + claim gates | Ready (`lab_verified`; `claim_allowed=false`) |
+| Breaktest / OTRF / benign baseline harness | Ready (labs + scripts; synthetic / purple-team) |
 | Windows auth export → BYO (`adapt-windows` / `byo-windows`) | Ready (observe-only) |
 | OS-wide Windows sensor (`sensor-windows`) | Ready — Stage B gated / `stage-b-lab-unlock` |
 | OS-wide macOS network sensor (`sensor-macos`) | Ready — Stage B gated; live net via `lsof` |
@@ -128,6 +141,11 @@ Details: [`corvex/contain/CHECKLIST.md`](corvex/contain/CHECKLIST.md) · [`SECUR
 | `tests/` | Unit + abuse tests |
 | `fixtures/` | Sensor / adapter smoke fixtures |
 | `train/` | Public signed train packs for `corvex replay` |
+| `heldout/` | Sealed Day-0 packs (decrypt via local enrollment key) |
+| `labs/` | Benign / breaktest / OTRF purple-team manifests |
+| `scripts/` | Eval harnesses (`run_benign_baseline`, OTRF, fleets) |
+| `reports/` | Locked scoreboard JSON/MD (reproducibility, not field claims) |
+| `docs/` | Claim gates, sensors, stress failure modes, operator sequences |
 
 ## License
 

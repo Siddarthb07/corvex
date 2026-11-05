@@ -1,0 +1,30 @@
+{
+  "name": "otrf-empire-mimikatz-logonpasswords",
+  "corpus_kind": "opensource_attack_capture",
+  "source": {
+    "project": "OTRF/Security-Datasets",
+    "url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/master/datasets/atomic/windows/credential_access/host/empire_mimikatz_logonpasswords.zip",
+    "family": "credential_access",
+    "tool": "Empire/Mimikatz",
+    "attack": "Mimikatz sekurlsa::logonpasswords",
+    "techniques": [
+      "T1003.001"
+    ],
+    "note": "Mimikatz sekurlsa::logonpasswords",
+    "authorship": "external"
+  },
+  "raw_glob": "raw/*.sanitized.jsonl",
+  "host_map": {},
+  "fetch": {
+    "source_url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/master/datasets/atomic/windows/credential_access/host/empire_mimikatz_logonpasswords.zip",
+    "archive_sha256": "bb4c057b62d781be5426e011872ba1a15070c07afbb24848a14458f4b22b06fb",
+    "format": "zip",
+    "extracted": [
+      "empire_mimikatz_logonpasswords_2020-08-07103224.sanitized.jsonl"
+    ],
+    "family": "credential_access",
+    "note": null,
+    "license_note": "OTRF Security-Datasets \u2014 see upstream LICENSE (GPL-3.0).",
+    "authorship": "external \u2014 OTRF / MITRE ATT&CK Evals capture, not Corvex authors"
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "name": "otrf-lsass-metasploit-comsvcs",
+  "corpus_kind": "opensource_attack_capture",
+  "source": {
+    "project": "OTRF/Security-Datasets",
+    "url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/master/datasets/compound/LSASS_campaign_03/metasploit_comsvcs_lsass_memory_dump.zip",
+    "family": "credential_dump_campaign",
+    "tool": "Metasploit/comsvcs",
+    "attack": "LSASS campaign: comsvcs MiniDump",
+    "techniques": [
+      "T1003.001"
+    ],
+    "note": "LSASS campaign: comsvcs MiniDump",
+    "authorship": "external"
+  },
+  "raw_glob": "raw/*.sanitized.jsonl",
+  "host_map": {},
+  "fetch": {
+    "source_url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/master/datasets/compound/LSASS_campaign_03/metasploit_comsvcs_lsass_memory_dump.zip",
+    "archive_sha256": "97a834cd72b0803d544c62cc45a41b18a4cc04a605735096be4bc5dad5e9fe7b",
+    "format": "zip",
+    "extracted": [
+      "metasploit_comsvcs_lsass_memory_dump.sanitized.jsonl"
+    ],
+    "family": "credential_dump_campaign",
+    "note": null,
+    "license_note": "OTRF Security-Datasets \u2014 see upstream LICENSE (GPL-3.0).",
+    "authorship": "external \u2014 OTRF / MITRE ATT&CK Evals capture, not Corvex authors"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "campaign_id": "break-os-wide-sensors",
+  "family": "os_wide_sensor_break",
+  "ood": true,
+  "hosts": ["host-a", "host-b", "host-c", "host-d", "host-e"],
+  "truth_hosts": ["host-a", "host-b", "host-c"],
+  "required_channels": ["security", "sysmon", "firewall", "powershell"],
+  "fixture": "fixtures/os_wide/break_all_channels.jsonl",
+  "break_intent": {
+    "name": "OS-Wide Channel Liveness",
+    "target": "Prove Security+Sysmon+Firewall+PowerShell adapters all publish into one run",
+    "success_criteria_defender": [
+      "sensor_status.channels includes security, sysmon, firewall, powershell",
+      "each required channel count >= 1",
+      "timeline has >=1 campaign",
+      "no actuators invoked"
+    ]
+  },
+  "source": {
+    "style": "Stage B OS-wide sensor channel breaktest",
+    "repo": "https://github.com/Siddarthb07/corvex"
+  }
+}

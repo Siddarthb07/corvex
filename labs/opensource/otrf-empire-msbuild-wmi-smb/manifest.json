@@ -1,0 +1,31 @@
+{
+  "name": "otrf-empire-msbuild-wmi-smb",
+  "corpus_kind": "opensource_attack_capture",
+  "source": {
+    "project": "OTRF/Security-Datasets",
+    "url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/master/datasets/atomic/windows/lateral_movement/host/empire_msbuild_dcerpc_wmi_smb.zip",
+    "family": "lateral_movement",
+    "tool": "Empire",
+    "attack": "MSBuild via WMI/SMB",
+    "techniques": [
+      "T1047",
+      "T1127.001"
+    ],
+    "note": "MSBuild via WMI/SMB",
+    "authorship": "external"
+  },
+  "raw_glob": "raw/*.sanitized.jsonl",
+  "host_map": {},
+  "fetch": {
+    "source_url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/master/datasets/atomic/windows/lateral_movement/host/empire_msbuild_dcerpc_wmi_smb.zip",
+    "archive_sha256": "edbc2fdd9e118da0999d7b941c78501cd4142e2afe9e794aed4349101fb59ca8",
+    "format": "zip",
+    "extracted": [
+      "empire_msbuild_dcerpc_wmi_smb_2020-09-20173857.sanitized.jsonl"
+    ],
+    "family": "lateral_movement",
+    "note": null,
+    "license_note": "OTRF Security-Datasets \u2014 see upstream LICENSE (GPL-3.0).",
+    "authorship": "external \u2014 OTRF / MITRE ATT&CK Evals capture, not Corvex authors"
+  }
+}

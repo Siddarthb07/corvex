@@ -1,0 +1,17 @@
+# Live second-host evidence (claim gate)
+
+Copy to `reports/live_second_host.json` only after elevated wevtutil on a **second
+physical Windows host** (not Docker lab, not the author laptop alone).
+
+```json
+{
+  "pass": true,
+  "source": "wevtutil",
+  "host_id": "DESKTOP-OTHER",
+  "security_events_seen": true,
+  "run_dir": "runs/live-host-2",
+  "note": "Elevated corvex sensor-windows --require-live --follow; sensor_status.source=wevtutil"
+}
+```
+
+`source` must be `wevtutil`. Fixture / offline_lab_replay does not count.

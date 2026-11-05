@@ -1,0 +1,475 @@
+{
+  "campaign_id": "lim09d-benign-hub-pivot",
+  "family": "genuine_vuln_breaker",
+  "ood": true,
+  "hosts": [
+    "host-a",
+    "host-b",
+    "host-c",
+    "host-d",
+    "host-e"
+  ],
+  "truth_hosts": [
+    "host-a",
+    "host-c",
+    "host-e"
+  ],
+  "producers": {
+    "host-a": "prod-a",
+    "host-b": "prod-b",
+    "host-c": "prod-c",
+    "host-d": "prod-d",
+    "host-e": "prod-e"
+  },
+  "base_time_utc": "2026-07-25T14:00:00Z",
+  "fleet_origin": "original",
+  "fleet_suite": "limits",
+  "headline": true,
+  "source": {
+    "style": "Fleet-limits breaking-point sketches",
+    "repo": "https://github.com/Siddarthb07/corvex",
+    "techniques": [
+      "T1021.001",
+      "T1021.002",
+      "T1078",
+      "T1041"
+    ],
+    "note": "benign hub masking"
+  },
+  "narrative": [
+    "host-c is a busy legitimate jump box AND the real APT pivot; b/d are normal peers."
+  ],
+  "break_intent": {
+    "name": "benign hub masking",
+    "break_criterion": "attack missed (BROKE) or b/d False Q via association",
+    "success_criteria_attacker": [
+      "truth miss or false quarantine of hub peers"
+    ]
+  },
+  "steps": [
+    {
+      "kind": "auth",
+      "host": "host-c",
+      "user": "biz-a",
+      "src": "host-a",
+      "offset_seconds": 0,
+      "technique": "T1021.001"
+    },
+    {
+      "kind": "auth",
+      "host": "host-a",
+      "user": "biz-a",
+      "src": "host-c",
+      "offset_seconds": 1,
+      "technique": "T1021.002"
+    },
+    {
+      "kind": "auth",
+      "host": "host-c",
+      "user": "biz-a",
+      "src": "host-a",
+      "offset_seconds": 1,
+      "technique": "T1021.001"
+    },
+    {
+      "kind": "auth",
+      "host": "host-a",
+      "user": "biz-a",
+      "src": "host-c",
+      "offset_seconds": 2,
+      "technique": "T1021.002"
+    },
+    {
+      "kind": "auth",
+      "host": "host-c",
+      "user": "biz-a",
+      "src": "host-a",
+      "offset_seconds": 2,
+      "technique": "T1021.001"
+    },
+    {
+      "kind": "auth",
+      "host": "host-a",
+      "user": "biz-a",
+      "src": "host-c",
+      "offset_seconds": 3,
+      "technique": "T1021.002"
+    },
+    {
+      "kind": "auth",
+      "host": "host-c",
+      "user": "biz-a",
+      "src": "host-a",
+      "offset_seconds": 3,
+      "technique": "T1021.001"
+    },
+    {
+      "kind": "auth",
+      "host": "host-a",
+      "user": "biz-a",
+      "src": "host-c",
+      "offset_seconds": 4,
+      "technique": "T1021.002"
+    },
+    {
+      "kind": "auth",
+      "host": "host-c",
+      "user": "biz-a",
+      "src": "host-a",
+      "offset_seconds": 4,
+      "technique": "T1021.001"
+    },
+    {
+      "kind": "auth",
+      "host": "host-a",
+      "user": "biz-a",
+      "src": "host-c",
+      "offset_seconds": 5,
+      "technique": "T1021.002"
+    },
+    {
+      "kind": "auth",
+      "host": "host-c",
+      "user": "biz-a",
+      "src": "host-a",
+      "offset_seconds": 5,
+      "technique": "T1021.001"
+    },
+    {
+      "kind": "auth",
+      "host": "host-a",
+      "user": "biz-a",
+      "src": "host-c",
+      "offset_seconds": 6,
+      "technique": "T1021.002"
+    },
+    {
+      "kind": "auth",
+      "host": "host-c",
+      "user": "biz-b",
+      "src": "host-b",
+      "offset_seconds": 8,
+      "technique": "T1021.001"
+    },
+    {
+      "kind": "auth",
+      "host": "host-b",
+      "user": "biz-b",
+      "src": "host-c",
+      "offset_seconds": 9,
+      "technique": "T1021.002"
+    },
+    {
+      "kind": "auth",
+      "host": "host-c",
+      "user": "biz-b",
+      "src": "host-b",
+      "offset_seconds": 9,
+      "technique": "T1021.001"
+    },
+    {
+      "kind": "auth",
+      "host": "host-b",
+      "user": "biz-b",
+      "src": "host-c",
+      "offset_seconds": 10,
+      "technique": "T1021.002"
+    },
+    {
+      "kind": "auth",
+      "host": "host-c",
+      "user": "biz-b",
+      "src": "host-b",
+      "offset_seconds": 10,
+      "technique": "T1021.001"
+    },
+    {
+      "kind": "auth",
+      "host": "host-b",
+      "user": "biz-b",
+      "src": "host-c",
+      "offset_seconds": 11,
+      "technique": "T1021.002"
+    },
+    {
+      "kind": "auth",
+      "host": "host-c",
+      "user": "biz-b",
+      "src": "host-b",
+      "offset_seconds": 11,
+      "technique": "T1021.001"
+    },
+    {
+      "kind": "auth",
+      "host": "host-b",
+      "user": "biz-b",
+      "src": "host-c",
+      "offset_seconds": 12,
+      "technique": "T1021.002"
+    },
+    {
+      "kind": "auth",
+      "host": "host-c",
+      "user": "biz-b",
+      "src": "host-b",
+      "offset_seconds": 12,
+      "technique": "T1021.001"
+    },
+    {
+      "kind": "auth",
+      "host": "host-b",
+      "user": "biz-b",
+      "src": "host-c",
+      "offset_seconds": 13,
+      "technique": "T1021.002"
+    },
+    {
+      "kind": "auth",
+      "host": "host-c",
+      "user": "biz-b",
+      "src": "host-b",
+      "offset_seconds": 13,
+      "technique": "T1021.001"
+    },
+    {
+      "kind": "auth",
+      "host": "host-b",
+      "user": "biz-b",
+      "src": "host-c",
+      "offset_seconds": 14,
+      "technique": "T1021.002"
+    },
+    {
+      "kind": "auth",
+      "host": "host-c",
+      "user": "biz-d",
+      "src": "host-d",
+      "offset_seconds": 16,
+      "technique": "T1021.001"
+    },
+    {
+      "kind": "auth",
+      "host": "host-d",
+      "user": "biz-d",
+      "src": "host-c",
+      "offset_seconds": 17,
+      "technique": "T1021.002"
+    },
+    {
+      "kind": "auth",
+      "host": "host-c",
+      "user": "biz-d",
+      "src": "host-d",
+      "offset_seconds": 17,
+      "technique": "T1021.001"
+    },
+    {
+      "kind": "auth",
+      "host": "host-d",
+      "user": "biz-d",
+      "src": "host-c",
+      "offset_seconds": 18,
+      "technique": "T1021.002"
+    },
+    {
+      "kind": "auth",
+      "host": "host-c",
+      "user": "biz-d",
+      "src": "host-d",
+      "offset_seconds": 18,
+      "technique": "T1021.001"
+    },
+    {
+      "kind": "auth",
+      "host": "host-d",
+      "user": "biz-d",
+      "src": "host-c",
+      "offset_seconds": 19,
+      "technique": "T1021.002"
+    },
+    {
+      "kind": "auth",
+      "host": "host-c",
+      "user": "biz-d",
+      "src": "host-d",
+      "offset_seconds": 19,
+      "technique": "T1021.001"
+    },
+    {
+      "kind": "auth",
+      "host": "host-d",
+      "user": "biz-d",
+      "src": "host-c",
+      "offset_seconds": 20,
+      "technique": "T1021.002"
+    },
+    {
+      "kind": "auth",
+      "host": "host-c",
+      "user": "biz-d",
+      "src": "host-d",
+      "offset_seconds": 20,
+      "technique": "T1021.001"
+    },
+    {
+      "kind": "auth",
+      "host": "host-d",
+      "user": "biz-d",
+      "src": "host-c",
+      "offset_seconds": 21,
+      "technique": "T1021.002"
+    },
+    {
+      "kind": "auth",
+      "host": "host-c",
+      "user": "biz-d",
+      "src": "host-d",
+      "offset_seconds": 21,
+      "technique": "T1021.001"
+    },
+    {
+      "kind": "auth",
+      "host": "host-d",
+      "user": "biz-d",
+      "src": "host-c",
+      "offset_seconds": 22,
+      "technique": "T1021.002"
+    },
+    {
+      "kind": "auth",
+      "host": "host-c",
+      "user": "biz-e",
+      "src": "host-e",
+      "offset_seconds": 24,
+      "technique": "T1021.001"
+    },
+    {
+      "kind": "auth",
+      "host": "host-e",
+      "user": "biz-e",
+      "src": "host-c",
+      "offset_seconds": 25,
+      "technique": "T1021.002"
+    },
+    {
+      "kind": "auth",
+      "host": "host-c",
+      "user": "biz-e",
+      "src": "host-e",
+      "offset_seconds": 25,
+      "technique": "T1021.001"
+    },
+    {
+      "kind": "auth",
+      "host": "host-e",
+      "user": "biz-e",
+      "src": "host-c",
+      "offset_seconds": 26,
+      "technique": "T1021.002"
+    },
+    {
+      "kind": "auth",
+      "host": "host-c",
+      "user": "biz-e",
+      "src": "host-e",
+      "offset_seconds": 26,
+      "technique": "T1021.001"
+    },
+    {
+      "kind": "auth",
+      "host": "host-e",
+      "user": "biz-e",
+      "src": "host-c",
+      "offset_seconds": 27,
+      "technique": "T1021.002"
+    },
+    {
+      "kind": "auth",
+      "host": "host-c",
+      "user": "biz-e",
+      "src": "host-e",
+      "offset_seconds": 27,
+      "technique": "T1021.001"
+    },
+    {
+      "kind": "auth",
+      "host": "host-e",
+      "user": "biz-e",
+      "src": "host-c",
+      "offset_seconds": 28,
+      "technique": "T1021.002"
+    },
+    {
+      "kind": "auth",
+      "host": "host-c",
+      "user": "biz-e",
+      "src": "host-e",
+      "offset_seconds": 28,
+      "technique": "T1021.001"
+    },
+    {
+      "kind": "auth",
+      "host": "host-e",
+      "user": "biz-e",
+      "src": "host-c",
+      "offset_seconds": 29,
+      "technique": "T1021.002"
+    },
+    {
+      "kind": "auth",
+      "host": "host-c",
+      "user": "biz-e",
+      "src": "host-e",
+      "offset_seconds": 29,
+      "technique": "T1021.001"
+    },
+    {
+      "kind": "auth",
+      "host": "host-e",
+      "user": "biz-e",
+      "src": "host-c",
+      "offset_seconds": 30,
+      "technique": "T1021.002"
+    },
+    {
+      "kind": "auth",
+      "host": "host-a",
+      "user": "apt-pivot",
+      "src": "203.0.113.88",
+      "offset_seconds": 40,
+      "technique": "T1078"
+    },
+    {
+      "kind": "auth",
+      "host": "host-c",
+      "user": "apt-pivot",
+      "src": "host-a",
+      "offset_seconds": 48,
+      "technique": "T1078"
+    },
+    {
+      "kind": "auth",
+      "host": "host-e",
+      "user": "apt-pivot",
+      "src": "host-c",
+      "offset_seconds": 56,
+      "technique": "T1078"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-e",
+      "dst_ip": "198.51.100.220",
+      "bytes": 19000,
+      "offset_seconds": 70,
+      "technique": "T1041"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-c",
+      "dst_ip": "198.51.100.220",
+      "bytes": 15000,
+      "offset_seconds": 75,
+      "technique": "T1041"
+    }
+  ]
+}

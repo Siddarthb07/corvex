@@ -3,6 +3,13 @@
 ## [Unreleased]
 
 ### Added
+- Restored TETC methods package in-tree: `labs/` (benign/breaktest/OTRF), eval `scripts/`, operator `docs/`, locked `reports/` (paper PDF stays out of this repo).
+- Regression: dual-user fusion-chain merge on asymmetric egress handoff (sealed held-out F1 1.00) without re-gluing helpdesk hitchhiking.
+
+### Fixed
+- Sealed `held-fusion-chain` split into two campaigns after fusion hardening; correlator again merges dual-svc pivots when micro_exfil/dns sits on the overlap host.
+
+### Added
 - Stage B **macOS network-wide sensor**: `corvex sensor-macos` (net/auth/dns/process/pf), fixtures under `fixtures/os_wide_macos/`, `docs/sensor-macos.md`. Live net via `lsof` TCP established; unified-log auth/dns degrade honestly.
 - Local stress break write-up: `reports/local_stress_break_results.md`.
 - Stage B OS-wide Windows sensor: `corvex sensor-windows` (Security + Sysmon + Firewall + PowerShell), fixtures under `fixtures/os_wide/`, `docs/os-wide-sensor.md`, multi-host smoke script, `corvex habit-loop`.

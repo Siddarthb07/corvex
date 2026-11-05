@@ -1,0 +1,28 @@
+{
+  "name": "otrf-empire-shell-rubeus-asktgt-createnetonly",
+  "corpus_kind": "opensource_attack_capture",
+  "source": {
+    "project": "OTRF/Security-Datasets",
+    "url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/master/datasets/atomic/windows/credential_access/host/empire_shell_rubeus_asktgt_createnetonly.zip",
+    "family": "credential_access",
+    "tool": "Empire",
+    "attack": "empire shell rubeus asktgt createnetonly",
+    "techniques": [],
+    "note": "empire shell rubeus asktgt createnetonly",
+    "authorship": "external"
+  },
+  "raw_glob": "raw/*.sanitized.jsonl",
+  "host_map": {},
+  "fetch": {
+    "source_url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/master/datasets/atomic/windows/credential_access/host/empire_shell_rubeus_asktgt_createnetonly.zip",
+    "archive_sha256": "3ed7d6d93ccadac94b0022151aa76ab54070c0ff7b977f6642bb4ee2f34b13da",
+    "format": "zip",
+    "extracted": [
+      "empire_shell_rubeus_asktgt_createnetonly_2020-09-21230246.sanitized.jsonl"
+    ],
+    "family": "credential_access",
+    "note": null,
+    "license_note": "OTRF Security-Datasets \u2014 see upstream LICENSE (GPL-3.0).",
+    "authorship": "external \u2014 OTRF / MITRE ATT&CK Evals capture, not Corvex authors"
+  }
+}

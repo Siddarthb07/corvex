@@ -1,0 +1,12 @@
+{
+  "pass": false,
+  "rung": 1,
+  "operator": "NAME",
+  "attestation_kind": "human",
+  "date": "YYYY-MM-DD",
+  "run_dir": "runs/operator-rung1",
+  "events_sha256": "REPLACE_WITH_SHA256_OF_events.jsonl_OR_REPORT",
+  "reconstruction_status": "partial",
+  "note": "One paragraph: what ran, what broke, what gaps the dash listed. Do not overwrite reports/stranger_dry_run.json.",
+  "honesty": "Rung 1 = fixture install. Rung 2 = public OTRF replication. Rung 3 = operator telemetry. Unsigned JSON is replication evidence only and does not unlock claim_allowed. Agents do not count."
+}

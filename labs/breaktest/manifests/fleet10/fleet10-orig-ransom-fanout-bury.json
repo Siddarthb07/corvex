@@ -1,0 +1,168 @@
+{
+  "campaign_id": "fleet10-orig-ransom-fanout-bury",
+  "family": "genuine_vuln_breaker",
+  "ood": true,
+  "hosts": [
+    "host-a",
+    "host-b",
+    "host-c",
+    "host-d",
+    "host-e"
+  ],
+  "truth_hosts": [
+    "host-a",
+    "host-b",
+    "host-c"
+  ],
+  "producers": {
+    "host-a": "prod-a",
+    "host-b": "prod-b",
+    "host-c": "prod-c",
+    "host-d": "prod-d",
+    "host-e": "prod-e"
+  },
+  "base_time_utc": "2026-07-25T14:00:00Z",
+  "fleet_origin": "original",
+  "source": {
+    "style": "Black-box fleet \u2014 ATT&CK/Atomic-style telemetry sketches",
+    "repo": "https://github.com/Siddarthb07/corvex",
+    "techniques": [
+      "T1486",
+      "T1078",
+      "T1041"
+    ],
+    "note": "Original: fleet-wide backup account fanout (poison bait) while real APT uses buried user."
+  },
+  "narrative": [
+    "Encryptor prep: authenticate as backup everywhere. Real operator uses a quiet account underneath."
+  ],
+  "break_intent": {
+    "name": "fleet10-orig-ransom-fanout-bury",
+    "success_criteria_defender": [
+      "matched truth_hosts",
+      "empty over_merged_hosts"
+    ]
+  },
+  "steps": [
+    {
+      "kind": "auth",
+      "host": "host-a",
+      "user": "backup$",
+      "src": "10.0.0.5",
+      "offset_seconds": 0,
+      "technique": "T1486"
+    },
+    {
+      "kind": "auth",
+      "host": "host-b",
+      "user": "backup$",
+      "src": "10.0.0.5",
+      "offset_seconds": 2,
+      "technique": "T1486"
+    },
+    {
+      "kind": "auth",
+      "host": "host-c",
+      "user": "backup$",
+      "src": "10.0.0.5",
+      "offset_seconds": 4,
+      "technique": "T1486"
+    },
+    {
+      "kind": "auth",
+      "host": "host-d",
+      "user": "backup$",
+      "src": "10.0.0.5",
+      "offset_seconds": 6,
+      "technique": "T1486"
+    },
+    {
+      "kind": "auth",
+      "host": "host-e",
+      "user": "backup$",
+      "src": "10.0.0.5",
+      "offset_seconds": 8,
+      "technique": "T1486"
+    },
+    {
+      "kind": "auth",
+      "host": "host-a",
+      "user": "backup$",
+      "src": "10.0.0.5",
+      "offset_seconds": 20,
+      "technique": "T1486"
+    },
+    {
+      "kind": "auth",
+      "host": "host-b",
+      "user": "backup$",
+      "src": "10.0.0.5",
+      "offset_seconds": 22,
+      "technique": "T1486"
+    },
+    {
+      "kind": "auth",
+      "host": "host-c",
+      "user": "backup$",
+      "src": "10.0.0.5",
+      "offset_seconds": 24,
+      "technique": "T1486"
+    },
+    {
+      "kind": "auth",
+      "host": "host-d",
+      "user": "backup$",
+      "src": "10.0.0.5",
+      "offset_seconds": 26,
+      "technique": "T1486"
+    },
+    {
+      "kind": "auth",
+      "host": "host-e",
+      "user": "backup$",
+      "src": "10.0.0.5",
+      "offset_seconds": 28,
+      "technique": "T1486"
+    },
+    {
+      "kind": "auth",
+      "host": "host-a",
+      "user": "quiet-op",
+      "src": "203.0.113.77",
+      "offset_seconds": 40,
+      "technique": "T1078"
+    },
+    {
+      "kind": "auth",
+      "host": "host-b",
+      "user": "quiet-op",
+      "src": "host-a",
+      "offset_seconds": 46,
+      "technique": "T1078"
+    },
+    {
+      "kind": "auth",
+      "host": "host-c",
+      "user": "quiet-op",
+      "src": "host-b",
+      "offset_seconds": 52,
+      "technique": "T1078"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-c",
+      "dst_ip": "198.51.100.100",
+      "bytes": 25000,
+      "offset_seconds": 65,
+      "technique": "T1041"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-b",
+      "dst_ip": "198.51.100.100",
+      "bytes": 20000,
+      "offset_seconds": 70,
+      "technique": "T1041"
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "name": "otrf-empire-regsvr32-sct",
+  "corpus_kind": "opensource_attack_capture",
+  "source": {
+    "project": "OTRF/Security-Datasets",
+    "url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/master/datasets/atomic/windows/defense_evasion/host/empire_launcher_sct_regsvr32.zip",
+    "family": "defense_evasion",
+    "tool": "Empire",
+    "attack": "regsvr32 SCT launcher",
+    "techniques": [
+      "T1218.010"
+    ],
+    "note": "regsvr32 SCT launcher",
+    "authorship": "external"
+  },
+  "raw_glob": "raw/*.sanitized.jsonl",
+  "host_map": {},
+  "fetch": {
+    "source_url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/master/datasets/atomic/windows/defense_evasion/host/empire_launcher_sct_regsvr32.zip",
+    "archive_sha256": "abeb5c52c75286386e5eb999d7423d738a624191f4a95fb62694b471a10b2dab",
+    "format": "zip",
+    "extracted": [
+      "empire_launcher_sct_regsvr32_2020-07-21232741.sanitized.jsonl"
+    ],
+    "family": "defense_evasion",
+    "note": null,
+    "license_note": "OTRF Security-Datasets \u2014 see upstream LICENSE (GPL-3.0).",
+    "authorship": "external \u2014 OTRF / MITRE ATT&CK Evals capture, not Corvex authors"
+  }
+}

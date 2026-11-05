@@ -1,0 +1,9 @@
+{
+  "habit_loop_pass": false,
+  "definition": "external operator produces correct timeline from scripted purple run without author help",
+  "operator": "NAME",
+  "date": "YYYY-MM-DD",
+  "run_dir": "runs/os-wide",
+  "note": "Fill after outsider confirms dash timeline. Does not replace stranger_dry_run.json.",
+  "honesty": "habit_loop_pass is Stage B quality evidence only — does not flip claim_allowed."
+}

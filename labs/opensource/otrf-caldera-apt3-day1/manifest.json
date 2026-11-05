@@ -1,0 +1,31 @@
+{
+  "name": "otrf-caldera-apt3-day1",
+  "corpus_kind": "opensource_attack_capture",
+  "source": {
+    "project": "OTRF/Security-Datasets",
+    "url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/master/datasets/compound/windows/apt3/caldera_attack_evals_round1_day1_2019-10-20201108.tar.gz",
+    "family": "compound_apt3",
+    "tool": "Caldera (MITRE ATT&CK Evals R1)",
+    "attack": "ATT&CK Evals Round 1 APT3 day1 (full scenario)",
+    "techniques": [
+      "G0022",
+      "APT3"
+    ],
+    "note": "ATT&CK Evals Round 1 APT3 day1 (full scenario)",
+    "authorship": "external"
+  },
+  "raw_glob": "raw/*.sanitized.jsonl",
+  "host_map": {},
+  "fetch": {
+    "source_url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/master/datasets/compound/windows/apt3/caldera_attack_evals_round1_day1_2019-10-20201108.tar.gz",
+    "archive_sha256": "37d2f27f2c4fa35fa1cda926fa5b1a45497777107dd33ba04f03e0613a09636f",
+    "format": "tar.gz",
+    "extracted": [
+      "caldera_attack_evals_round1_day1_2019-10-20201108.sanitized.jsonl"
+    ],
+    "family": "compound_apt3",
+    "note": null,
+    "license_note": "OTRF Security-Datasets \u2014 see upstream LICENSE (GPL-3.0).",
+    "authorship": "external \u2014 OTRF / MITRE ATT&CK Evals capture, not Corvex authors"
+  }
+}

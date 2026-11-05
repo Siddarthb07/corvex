@@ -1,0 +1,203 @@
+{
+  "campaign_id": "break-cdn-bridge-compound",
+  "family": "genuine_vuln_breaker",
+  "ood": true,
+  "hosts": ["host-a", "host-b", "host-c", "host-d", "host-e"],
+  "truth_hosts": ["host-a", "host-b", "host-c"],
+  "producers": {
+    "host-a": "prod-a",
+    "host-b": "prod-b",
+    "host-c": "prod-c",
+    "host-d": "prod-d",
+    "host-e": "prod-e"
+  },
+  "base_time_utc": "2026-06-01T08:00:00Z",
+  "break_intent": {
+    "name": "Operation CDN Bridge",
+    "target_vulns": [
+      "unused_window_seconds",
+      "shared_saas_dst_false_stitch",
+      "transitive_jumpbox_overmerge",
+      "micro_exfil_byte_ceiling_evasion",
+      "dns_c2_blindness",
+      "quarantine_proposes_innocent_hosts"
+    ],
+    "expected_break_points": {
+      "over_merged_hosts": ["host-d", "host-e"],
+      "matched_despite_pollution": true,
+      "best_jaccard_approx": 0.6,
+      "fusion_lift": "maybe",
+      "both_missed": false,
+      "invisible_to_fusion": ["large_blob_c2", "dns_beacons"],
+      "false_isolate_pressure": "reconstruction + live defend would target d/e with a/b/c"
+    },
+    "success_criteria_attacker": [
+      "over_merged_hosts contains host-d and host-e",
+      "correlator host union is a superset of truth (false-positive blast radius)",
+      "real C2 channels (bytes>50000 and dns) do not appear as micro_exfil stitch keys",
+      "48h-separated CDN traffic still fuses with the live attack (proves window_seconds is dead)"
+    ],
+    "success_criteria_defender": [
+      "empty over_merged_hosts",
+      "campaign host set equals truth_hosts",
+      "large egress and dns either ignored safely or modeled without stitching innocents"
+    ]
+  },
+  "source": {
+    "style": "Compound purple-team scenario — genuine correlator failure modes",
+    "repo": "https://github.com/Siddarthb07/corvex",
+    "techniques": ["T1078", "T1021", "T1041", "T1071.004", "T1105"],
+    "note": "Compound purple-team scenario. After Stage A honesty fix: window_seconds is enforced; fleet CDN dst is poisoned; APT {a,b,c} no longer fat-merges with innocents via jumpbox. Residual: separate helpdesk lateral can still flag host-d. DNS / >50KB blob remain invisible."
+  },
+  "narrative": [
+    "T-48h: Every host (including innocent workstations d/e) talks to the org CDN/update endpoint 104.18.32.7 with small egress — looks like Windows Update / Cloudflare.",
+    "T+0: APT lands on host-a, authenticates as svc-backup, pivots a→b→c (jump box).",
+    "T+2m: Real loot leaves as a 240KB blob to attacker-controlled 198.51.100.66 — above Corvex micro_exfil ceiling.",
+    "T+3m: Host-b beacons C2 over DNS only — no auth/exfil detector fires.",
+    "T+5m: Benign IT uses helpdesk on host-c (shared jump) and host-d; both still hit the same CDN IP. Pre-fix: transitive merge glued APT {a,b,c} to innocents {d,e}."
+  ],
+  "steps": [
+    {
+      "kind": "exfil",
+      "host": "host-a",
+      "dst_ip": "104.18.32.7",
+      "dst_port": 443,
+      "bytes": 8200,
+      "offset_seconds": 0,
+      "technique": "T1105",
+      "note": "benign CDN — Phase 0 seed"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-b",
+      "dst_ip": "104.18.32.7",
+      "dst_port": 443,
+      "bytes": 7800,
+      "offset_seconds": 45,
+      "technique": "T1105",
+      "note": "benign CDN — Phase 0 seed"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-c",
+      "dst_ip": "104.18.32.7",
+      "dst_port": 443,
+      "bytes": 9100,
+      "offset_seconds": 90,
+      "technique": "T1105",
+      "note": "benign CDN — Phase 0 seed (jump box)"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-d",
+      "dst_ip": "104.18.32.7",
+      "dst_port": 443,
+      "bytes": 7600,
+      "offset_seconds": 120,
+      "technique": "T1105",
+      "note": "benign CDN — innocent workstation"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-e",
+      "dst_ip": "104.18.32.7",
+      "dst_port": 443,
+      "bytes": 7400,
+      "offset_seconds": 150,
+      "technique": "T1105",
+      "note": "benign CDN — innocent workstation"
+    },
+
+    {
+      "kind": "auth",
+      "host": "host-a",
+      "user": "svc-backup",
+      "offset_seconds": 172800,
+      "technique": "T1078",
+      "note": "APT start — 48h after CDN seed; should be outside window_seconds=600"
+    },
+    {
+      "kind": "auth",
+      "host": "host-b",
+      "user": "svc-backup",
+      "offset_seconds": 172830,
+      "technique": "T1021",
+      "note": "lateral hop"
+    },
+    {
+      "kind": "auth",
+      "host": "host-c",
+      "user": "svc-backup",
+      "offset_seconds": 172860,
+      "technique": "T1021",
+      "note": "lands on jump box"
+    },
+
+    {
+      "kind": "exfil",
+      "host": "host-c",
+      "dst_ip": "198.51.100.66",
+      "dst_port": 443,
+      "bytes": 240000,
+      "offset_seconds": 172920,
+      "technique": "T1041",
+      "note": "REAL C2 blob — bytes>50000 evades micro_exfil stitch"
+    },
+
+    {
+      "kind": "dns",
+      "host": "host-b",
+      "query": "a7f3.cdn-sync-updates.example",
+      "qtype": "TXT",
+      "offset_seconds": 172950,
+      "technique": "T1071.004",
+      "note": "DNS C2 beacon — correlator has no dns detector"
+    },
+    {
+      "kind": "dns",
+      "host": "host-b",
+      "query": "b91c.cdn-sync-updates.example",
+      "qtype": "TXT",
+      "offset_seconds": 172980,
+      "technique": "T1071.004",
+      "note": "DNS C2 beacon 2"
+    },
+
+    {
+      "kind": "auth",
+      "host": "host-c",
+      "user": "helpdesk",
+      "offset_seconds": 173100,
+      "technique": "T1078",
+      "note": "benign IT on jump box — bridge into APT cluster via host-c"
+    },
+    {
+      "kind": "auth",
+      "host": "host-d",
+      "user": "helpdesk",
+      "offset_seconds": 173130,
+      "technique": "T1078",
+      "note": "benign IT on innocent host-d"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-d",
+      "dst_ip": "104.18.32.7",
+      "dst_port": 443,
+      "bytes": 8800,
+      "offset_seconds": 173160,
+      "technique": "T1105",
+      "note": "benign CDN again — reinforces shared-dst stitch with APT hosts"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-e",
+      "dst_ip": "104.18.32.7",
+      "dst_port": 443,
+      "bytes": 8500,
+      "offset_seconds": 173190,
+      "technique": "T1105",
+      "note": "benign CDN — pulls host-e into the fat campaign"
+    }
+  ]
+}

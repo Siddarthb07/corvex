@@ -1,0 +1,88 @@
+{
+  "campaign_id": "mf-cross-docker-burst-spray",
+  "family": "intensive_multifactor",
+  "ood": true,
+  "hosts": [
+    "ctr-ws01-web",
+    "ctr-ws02-api",
+    "ctr-gw01-db",
+    "ctr-app01-cache",
+    "node-ws03"
+  ],
+  "truth_hosts": [
+    "ctr-ws01-web",
+    "ctr-ws02-api",
+    "ctr-gw01-db"
+  ],
+  "producers": {
+    "ctr-ws01-web": "prod-mf-ctr-ws01-web",
+    "ctr-ws02-api": "prod-mf-ctr-ws02-api",
+    "ctr-gw01-db": "prod-mf-ctr-gw01-db",
+    "ctr-app01-cache": "prod-mf-ctr-app01-cache",
+    "node-ws03": "prod-mf-node-ws03"
+  },
+  "base_time_utc": "2026-07-25T14:00:00Z",
+  "fleet_origin": "original",
+  "fleet_suite": "intensive",
+  "factors": {
+    "domain": "cross",
+    "container": "docker",
+    "sequence": "burst",
+    "style": "spray"
+  },
+  "source": {
+    "style": "Intensive multi-factor stress sketches",
+    "repo": "https://github.com/Siddarthb07/corvex",
+    "techniques": [
+      "T1110.003",
+      "T1078",
+      "T1041"
+    ],
+    "note": "cross/docker/burst/spray"
+  },
+  "narrative": [
+    "Factor cell: domain=cross container=docker sequence=burst style=spray."
+  ],
+  "break_intent": {
+    "name": "mf-cross-docker-burst-spray",
+    "break_criterion": "Jaccard < 0.5 OR truth host never recovered OR benign merge-FQ",
+    "success_criteria_defender": [
+      "matched truth_hosts",
+      "empty over_merged_hosts"
+    ]
+  },
+  "steps": [
+    {
+      "kind": "auth",
+      "host": "ctr-ws01-web",
+      "user": "spray-hit",
+      "src": "203.0.113.99",
+      "offset_seconds": 0,
+      "technique": "T1110.003"
+    },
+    {
+      "kind": "auth",
+      "host": "ctr-ws02-api",
+      "user": "spray-hit",
+      "src": "ctr-ws01-web",
+      "offset_seconds": 12,
+      "technique": "T1078"
+    },
+    {
+      "kind": "auth",
+      "host": "ctr-gw01-db",
+      "user": "spray-hit",
+      "src": "ctr-ws02-api",
+      "offset_seconds": 24,
+      "technique": "T1078"
+    },
+    {
+      "kind": "exfil",
+      "host": "ctr-gw01-db",
+      "dst_ip": "198.51.100.60",
+      "bytes": 16000,
+      "offset_seconds": 36,
+      "technique": "T1041"
+    }
+  ]
+}

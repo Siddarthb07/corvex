@@ -1,0 +1,96 @@
+{
+  "campaign_id": "mf-forest-mixed-ooo-spray",
+  "family": "intensive_multifactor",
+  "ood": true,
+  "hosts": [
+    "corp-dc01",
+    "partner-ws01",
+    "finance-ws01",
+    "corp-ws02",
+    "partner-ws02",
+    "finance-ws02"
+  ],
+  "truth_hosts": [
+    "corp-dc01",
+    "partner-ws01",
+    "finance-ws01"
+  ],
+  "producers": {
+    "corp-dc01": "prod-mf-corp-dc01",
+    "partner-ws01": "prod-mf-partner-ws01",
+    "finance-ws01": "prod-mf-finance-ws01",
+    "corp-ws02": "prod-mf-corp-ws02",
+    "partner-ws02": "prod-mf-partner-ws02",
+    "finance-ws02": "prod-mf-finance-ws02"
+  },
+  "base_time_utc": "2026-07-25T14:00:00Z",
+  "fleet_origin": "original",
+  "fleet_suite": "intensive",
+  "factors": {
+    "domain": "forest",
+    "container": "mixed",
+    "sequence": "ooo",
+    "style": "spray"
+  },
+  "source": {
+    "style": "Intensive multi-factor stress sketches",
+    "repo": "https://github.com/Siddarthb07/corvex",
+    "techniques": [
+      "T1110.003",
+      "T1078",
+      "T1041"
+    ],
+    "note": "forest/mixed/ooo/spray"
+  },
+  "narrative": [
+    "Factor cell: domain=forest container=mixed sequence=ooo style=spray."
+  ],
+  "break_intent": {
+    "name": "mf-forest-mixed-ooo-spray",
+    "break_criterion": "Jaccard < 0.5 OR truth host never recovered OR benign merge-FQ",
+    "success_criteria_defender": [
+      "matched truth_hosts",
+      "empty over_merged_hosts"
+    ]
+  },
+  "steps": [
+    {
+      "kind": "auth",
+      "host": "corp-dc01",
+      "user": "spray-hit",
+      "src": "203.0.113.99",
+      "offset_seconds": 80,
+      "technique": "T1110.003"
+    },
+    {
+      "kind": "auth",
+      "host": "partner-ws01",
+      "user": "spray-hit",
+      "src": "corp-dc01",
+      "offset_seconds": 20,
+      "technique": "T1078",
+      "emit_host": "ctr-partner-ws01"
+    },
+    {
+      "kind": "auth",
+      "host": "finance-ws01",
+      "user": "spray-hit",
+      "src": "partner-ws01",
+      "offset_seconds": 40,
+      "technique": "T1078"
+    },
+    {
+      "kind": "exfil",
+      "host": "finance-ws01",
+      "dst_ip": "198.51.100.60",
+      "bytes": 16000,
+      "offset_seconds": 5,
+      "technique": "T1041",
+      "emit_host": "ctr-finance-ws01"
+    }
+  ],
+  "host_aliases": {
+    "ctr-partner-ws01": "partner-ws01",
+    "ctr-finance-ws01": "finance-ws01"
+  }
+}

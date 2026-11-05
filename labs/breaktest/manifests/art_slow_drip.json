@@ -1,0 +1,30 @@
+{
+  "campaign_id": "art-slow-drip-5h",
+  "family": "attack_repo",
+  "ood": true,
+  "hosts": ["host-a", "host-b", "host-c", "host-d", "host-e"],
+  "producers": {
+    "host-a": "prod-a",
+    "host-b": "prod-b",
+    "host-c": "prod-c",
+    "host-d": "prod-d",
+    "host-e": "prod-e"
+  },
+  "base_time_utc": "2026-06-03T02:15:00Z",
+  "source": {
+    "style": "Atomic Red Team / ATT&CK technique telemetry (adapted)",
+    "repo": "https://github.com/redcanaryco/atomic-red-team",
+    "techniques": ["T1078", "T1021", "T1041"],
+    "note": "Slow-drip OOD: service accounts, long gaps, alternate egress ports — harder than burst lateral."
+  },
+  "steps": [
+    {"kind": "auth", "host": "host-a", "user": "svc-backup", "src": "10.1.0.9", "offset_seconds": 0, "technique": "T1078"},
+    {"kind": "auth", "host": "host-b", "user": "svc-backup", "src": "10.1.0.9", "offset_seconds": 95, "technique": "T1021"},
+    {"kind": "exfil", "host": "host-b", "dst_ip": "198.51.100.77", "dst_port": 8443, "bytes": 900, "offset_seconds": 180, "technique": "T1041"},
+    {"kind": "exfil", "host": "host-c", "dst_ip": "198.51.100.77", "dst_port": 8443, "bytes": 850, "offset_seconds": 260, "technique": "T1041"},
+    {"kind": "auth", "host": "host-c", "user": "svc-deploy", "src": "10.1.0.9", "offset_seconds": 340, "technique": "T1078"},
+    {"kind": "auth", "host": "host-d", "user": "svc-deploy", "src": "10.1.0.9", "offset_seconds": 420, "technique": "T1021"},
+    {"kind": "exfil", "host": "host-d", "dst_ip": "198.51.100.88", "dst_port": 8443, "bytes": 700, "offset_seconds": 500, "technique": "T1041"},
+    {"kind": "exfil", "host": "host-e", "dst_ip": "198.51.100.88", "dst_port": 8443, "bytes": 720, "offset_seconds": 580, "technique": "T1041"}
+  ]
+}

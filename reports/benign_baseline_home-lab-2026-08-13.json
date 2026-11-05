@@ -1,0 +1,57 @@
+{
+  "gate": "INCOMPLETE",
+  "bars": {
+    "min_host_hours": 72.0,
+    "min_distinct_hosts": 3,
+    "max_fp_iso_per_host_hour": 0.001,
+    "max_fp_seal_per_host_hour": 0.01,
+    "locked": "2026-07-25"
+  },
+  "corpus_kind": "home_lab_capture",
+  "eligible_for_gate": false,
+  "host_hours": 0,
+  "n_hosts": 1,
+  "fp_iso": 0,
+  "fp_seal": 0,
+  "fp_iso_per_host_hour": null,
+  "fp_seal_per_host_hour": null,
+  "hub_coverage": "GAP",
+  "hub": {
+    "hub_degree_bar": 2,
+    "degrees": {},
+    "hubs_at_or_above_bar": [],
+    "hub_coverage": "GAP",
+    "note": "No host meets hub-degree bar on this corpus; synthetic hub tests remain unvalidated by this run."
+  },
+  "reasons": [
+    "corpus below minimum size (host_hours=0, hosts=1; need \u226572.0 host-hours and \u22653 hosts)"
+  ],
+  "claim_sentence_still_applies": true,
+  "corpus_name": "home-lab-2026-08-13",
+  "corpus_path": "labs\\benign\\home-lab-2026-08-13",
+  "adapt_stats": {
+    "skipped": 0,
+    "adapted": 240,
+    "by_channel": {
+      "security": 80,
+      "sysmon": 80,
+      "powershell": 80
+    },
+    "files": 1,
+    "host_map_effective": {
+      "cyborg_1": "host-win",
+      "host-win": "host-win"
+    },
+    "source_files": [
+      "host-win.jsonl"
+    ]
+  },
+  "hosts": [
+    "host-win"
+  ],
+  "host_hours_per_host": {},
+  "isolate_hosts": [],
+  "campaign_ids": [],
+  "run_dir": "runs\\benign-baseline\\home-lab-2026-08-13",
+  "generated_at": "2026-08-13T14:18:19Z"
+}

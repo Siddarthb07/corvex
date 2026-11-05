@@ -1,0 +1,177 @@
+{
+  "campaign_id": "lim09-max-density-overlap",
+  "family": "genuine_vuln_breaker",
+  "ood": true,
+  "hosts": [
+    "host-a",
+    "host-b",
+    "host-c",
+    "host-d",
+    "host-e"
+  ],
+  "truth_hosts": [
+    "host-a",
+    "host-b",
+    "host-c",
+    "host-d",
+    "host-e"
+  ],
+  "producers": {
+    "host-a": "prod-a",
+    "host-b": "prod-b",
+    "host-c": "prod-c",
+    "host-d": "prod-d",
+    "host-e": "prod-e"
+  },
+  "base_time_utc": "2026-07-25T14:00:00Z",
+  "fleet_origin": "original",
+  "fleet_suite": "limits",
+  "headline": true,
+  "source": {
+    "style": "Fleet-limits breaking-point sketches",
+    "repo": "https://github.com/Siddarthb07/corvex",
+    "techniques": [
+      "T1003.001",
+      "T1550.002",
+      "T1110.003",
+      "T1486",
+      "T1078",
+      "T1041"
+    ],
+    "note": "max density overlap"
+  },
+  "narrative": [
+    "Three overlapping campaigns; host-c in all three \u2014 combinatorial density stress."
+  ],
+  "break_intent": {
+    "name": "max density overlap",
+    "break_criterion": "any two campaigns collapse, or host-c attribution near-random",
+    "success_criteria_attacker": [
+      "campaign collapse or mis-attribution at hub"
+    ]
+  },
+  "steps": [
+    {
+      "kind": "auth",
+      "host": "host-a",
+      "user": "Administrator",
+      "src": "203.0.113.10",
+      "offset_seconds": 0,
+      "technique": "T1003.001"
+    },
+    {
+      "kind": "auth",
+      "host": "host-b",
+      "user": "Administrator",
+      "src": "host-a",
+      "offset_seconds": 8,
+      "technique": "T1550.002"
+    },
+    {
+      "kind": "auth",
+      "host": "host-c",
+      "user": "Administrator",
+      "src": "host-b",
+      "offset_seconds": 16,
+      "technique": "T1550.002"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-c",
+      "dst_ip": "198.51.100.20",
+      "bytes": 22000,
+      "offset_seconds": 30,
+      "technique": "T1041"
+    },
+    {
+      "kind": "auth",
+      "host": "host-b",
+      "user": "spray-hit",
+      "src": "203.0.113.99",
+      "offset_seconds": 5,
+      "technique": "T1110.003"
+    },
+    {
+      "kind": "auth",
+      "host": "host-c",
+      "user": "spray-hit",
+      "src": "host-b",
+      "offset_seconds": 14,
+      "technique": "T1078"
+    },
+    {
+      "kind": "auth",
+      "host": "host-d",
+      "user": "spray-hit",
+      "src": "host-c",
+      "offset_seconds": 24,
+      "technique": "T1078"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-d",
+      "dst_ip": "198.51.100.60",
+      "bytes": 18000,
+      "offset_seconds": 40,
+      "technique": "T1041"
+    },
+    {
+      "kind": "auth",
+      "host": "host-c",
+      "user": "ransom-op",
+      "src": "203.0.113.77",
+      "offset_seconds": 10,
+      "technique": "T1486"
+    },
+    {
+      "kind": "auth",
+      "host": "host-d",
+      "user": "ransom-op",
+      "src": "host-c",
+      "offset_seconds": 20,
+      "technique": "T1486"
+    },
+    {
+      "kind": "auth",
+      "host": "host-e",
+      "user": "ransom-op",
+      "src": "host-d",
+      "offset_seconds": 32,
+      "technique": "T1486"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-e",
+      "dst_ip": "198.51.100.100",
+      "bytes": 25000,
+      "offset_seconds": 50,
+      "technique": "T1041"
+    }
+  ],
+  "truth_campaigns": [
+    {
+      "id": "c1-pth",
+      "hosts": [
+        "host-a",
+        "host-b",
+        "host-c"
+      ]
+    },
+    {
+      "id": "c2-spray",
+      "hosts": [
+        "host-b",
+        "host-c",
+        "host-d"
+      ]
+    },
+    {
+      "id": "c3-ransom",
+      "hosts": [
+        "host-c",
+        "host-d",
+        "host-e"
+      ]
+    }
+  ]
+}

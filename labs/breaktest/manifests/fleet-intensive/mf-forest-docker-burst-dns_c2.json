@@ -1,0 +1,98 @@
+{
+  "campaign_id": "mf-forest-docker-burst-dns_c2",
+  "family": "intensive_multifactor",
+  "ood": true,
+  "hosts": [
+    "ctr-dc01-web",
+    "ctr-ws01-api",
+    "ctr-ws01-db",
+    "ctr-ws02-cache",
+    "node-ws02",
+    "ctr-ws02-batch"
+  ],
+  "truth_hosts": [
+    "ctr-dc01-web",
+    "ctr-ws01-api",
+    "ctr-ws01-db"
+  ],
+  "producers": {
+    "ctr-dc01-web": "prod-mf-ctr-dc01-web",
+    "ctr-ws01-api": "prod-mf-ctr-ws01-api",
+    "ctr-ws01-db": "prod-mf-ctr-ws01-db",
+    "ctr-ws02-cache": "prod-mf-ctr-ws02-cache",
+    "node-ws02": "prod-mf-node-ws02",
+    "ctr-ws02-batch": "prod-mf-ctr-ws02-batch"
+  },
+  "base_time_utc": "2026-07-25T14:00:00Z",
+  "fleet_origin": "original",
+  "fleet_suite": "intensive",
+  "factors": {
+    "domain": "forest",
+    "container": "docker",
+    "sequence": "burst",
+    "style": "dns_c2"
+  },
+  "source": {
+    "style": "Intensive multi-factor stress sketches",
+    "repo": "https://github.com/Siddarthb07/corvex",
+    "techniques": [
+      "T1071.004"
+    ],
+    "note": "forest/docker/burst/dns_c2"
+  },
+  "narrative": [
+    "Factor cell: domain=forest container=docker sequence=burst style=dns_c2."
+  ],
+  "break_intent": {
+    "name": "mf-forest-docker-burst-dns_c2",
+    "break_criterion": "Jaccard < 0.5 OR truth host never recovered OR benign merge-FQ",
+    "success_criteria_defender": [
+      "matched truth_hosts",
+      "empty over_merged_hosts"
+    ]
+  },
+  "steps": [
+    {
+      "kind": "dns",
+      "host": "ctr-dc01-web",
+      "query": "0.c2.evil.test",
+      "offset_seconds": 0.0,
+      "technique": "T1071.004"
+    },
+    {
+      "kind": "dns",
+      "host": "ctr-dc01-web",
+      "query": "1.c2.evil.test",
+      "offset_seconds": 5.0,
+      "technique": "T1071.004"
+    },
+    {
+      "kind": "dns",
+      "host": "ctr-ws01-api",
+      "query": "2.c2.evil.test",
+      "offset_seconds": 10.0,
+      "technique": "T1071.004"
+    },
+    {
+      "kind": "dns",
+      "host": "ctr-ws01-api",
+      "query": "3.c2.evil.test",
+      "offset_seconds": 15.0,
+      "technique": "T1071.004"
+    },
+    {
+      "kind": "dns",
+      "host": "ctr-ws01-db",
+      "query": "4.c2.evil.test",
+      "offset_seconds": 20.0,
+      "technique": "T1071.004"
+    },
+    {
+      "kind": "dns",
+      "host": "ctr-ws01-db",
+      "query": "5.c2.evil.test",
+      "offset_seconds": 25.0,
+      "technique": "T1071.004"
+    }
+  ]
+}

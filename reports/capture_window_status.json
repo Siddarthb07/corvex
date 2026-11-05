@@ -1,0 +1,12 @@
+{
+  "window": "open",
+  "corpus": "labs/benign/home-lab-2026-08-13",
+  "hosts_enrolled": ["host-win"],
+  "min_hosts": 3,
+  "min_host_hours": 72,
+  "last_elevated_follow_write": "2026-08-13",
+  "last_unelevated_once": "2026-08-15T13:46Z",
+  "unelevated_once_note": "security and sysmon access_denied_need_elevation; powershell channel only. Restart elevated follow. Do not peek or curate.",
+  "join_next": ["host-pc-2", "host-mac"],
+  "honesty": "Not a benign-baseline PASS. Score stays INCOMPLETE until >=3 hosts and >=72 host-hours."
+}

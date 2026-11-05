@@ -1,0 +1,79 @@
+{
+  "campaign_id": "fleet15-art-mail-collect",
+  "family": "attack_repo",
+  "ood": true,
+  "hosts": [
+    "host-a",
+    "host-b",
+    "host-c",
+    "host-d",
+    "host-e"
+  ],
+  "truth_hosts": [
+    "host-a",
+    "host-b"
+  ],
+  "producers": {
+    "host-a": "prod-a",
+    "host-b": "prod-b",
+    "host-c": "prod-c",
+    "host-d": "prod-d",
+    "host-e": "prod-e"
+  },
+  "base_time_utc": "2026-07-25T14:00:00Z",
+  "fleet_origin": "github_art",
+  "source": {
+    "style": "Black-box fleet \u2014 ATT&CK/Atomic-style telemetry sketches",
+    "repo": "https://github.com/redcanaryco/atomic-red-team",
+    "techniques": [
+      "T1114",
+      "T1078",
+      "T1041"
+    ],
+    "note": "Atomic email collection then dual-host egress."
+  },
+  "narrative": [
+    "Mailbox access on two mail roles, sync out."
+  ],
+  "break_intent": {
+    "name": "fleet15-art-mail-collect",
+    "success_criteria_defender": [
+      "matched truth_hosts",
+      "empty over_merged_hosts"
+    ]
+  },
+  "steps": [
+    {
+      "kind": "auth",
+      "host": "host-a",
+      "user": "mailadmin",
+      "src": "203.0.113.16",
+      "offset_seconds": 0,
+      "technique": "T1114"
+    },
+    {
+      "kind": "auth",
+      "host": "host-b",
+      "user": "mailadmin",
+      "src": "host-a",
+      "offset_seconds": 10,
+      "technique": "T1078"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-a",
+      "dst_ip": "198.51.100.150",
+      "bytes": 32000,
+      "offset_seconds": 25,
+      "technique": "T1041"
+    },
+    {
+      "kind": "exfil",
+      "host": "host-b",
+      "dst_ip": "198.51.100.150",
+      "bytes": 27000,
+      "offset_seconds": 30,
+      "technique": "T1041"
+    }
+  ]
+}

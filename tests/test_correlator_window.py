@@ -104,6 +104,29 @@ def test_single_jumpbox_does_not_glue_campaigns(tmp_path: Path) -> None:
     assert not any(set(x.host_ids) == {"host-a", "host-b", "host-c", "host-d"} for x in camps)
 
 
+def test_dual_user_fusion_chain_merges_on_egress_handoff(tmp_path: Path) -> None:
+    """Sealed fusion_chain shape: two svc laterals pivot via exfil on overlap."""
+    base = datetime(2026, 7, 25, 12, 0, 0, tzinfo=timezone.utc)
+    c = _corr(tmp_path)
+    c.ingest(
+        [
+            _auth("a1", "host-a", "svc-backup", _ts(base, 0)),
+            _auth("a2", "host-b", "svc-backup", _ts(base, 20), src="host-a"),
+            _exfil("x1", "host-b", "198.51.100.77", 12000, _ts(base, 40)),
+            _exfil("x2", "host-c", "198.51.100.77", 11000, _ts(base, 50)),
+            _auth("b1", "host-c", "svc-deploy", _ts(base, 60)),
+            _auth("b2", "host-d", "svc-deploy", _ts(base, 80), src="host-c"),
+            _exfil("x3", "host-d", "198.51.100.88", 13000, _ts(base, 100)),
+            _exfil("x4", "host-e", "198.51.100.88", 14000, _ts(base, 110)),
+        ]
+    )
+    camps = c.store.all()
+    assert any(
+        set(camp.host_ids) >= {"host-a", "host-b", "host-c", "host-d", "host-e"}
+        for camp in camps
+    )
+
+
 def test_shared_svc_account_fanout_does_not_overmerge_innocents(tmp_path: Path) -> None:
     """Fleet-wide sql-svc (APT + DBA + BI) must not quarantine innocents."""
     base = datetime(2026, 7, 25, 12, 0, 0, tzinfo=timezone.utc)
