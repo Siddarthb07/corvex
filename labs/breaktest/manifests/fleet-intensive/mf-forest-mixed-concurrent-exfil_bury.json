@@ -72,11 +72,28 @@
       "emit_host": "ctr-partner-ws01"
     },
     {
+      "kind": "auth",
+      "host": "finance-ws01",
+      "user": "apt-op",
+      "src": "partner-ws01",
+      "offset_seconds": 20,
+      "technique": "T1078"
+    },
+    {
       "kind": "exfil",
       "host": "partner-ws01",
       "dst_ip": "198.51.100.77",
       "bytes": 14000,
-      "offset_seconds": 20,
+      "offset_seconds": 15,
+      "technique": "T1041",
+      "emit_host": "ctr-partner-ws01"
+    },
+    {
+      "kind": "exfil",
+      "host": "finance-ws01",
+      "dst_ip": "198.51.100.77",
+      "bytes": 15000,
+      "offset_seconds": 25,
       "technique": "T1041"
     },
     {

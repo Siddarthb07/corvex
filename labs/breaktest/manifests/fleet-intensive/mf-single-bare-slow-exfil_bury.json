@@ -68,11 +68,27 @@
       "technique": "T1078"
     },
     {
+      "kind": "auth",
+      "host": "corp-ws03",
+      "user": "apt-op",
+      "src": "corp-ws02",
+      "offset_seconds": 60,
+      "technique": "T1078"
+    },
+    {
       "kind": "exfil",
       "host": "corp-ws02",
       "dst_ip": "198.51.100.77",
       "bytes": 14000,
-      "offset_seconds": 60,
+      "offset_seconds": 1209600.0,
+      "technique": "T1041"
+    },
+    {
+      "kind": "exfil",
+      "host": "corp-ws03",
+      "dst_ip": "198.51.100.77",
+      "bytes": 15000,
+      "offset_seconds": 1209720.0,
       "technique": "T1041"
     },
     {

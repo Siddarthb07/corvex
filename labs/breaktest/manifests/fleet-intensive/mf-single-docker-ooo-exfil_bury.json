@@ -68,11 +68,27 @@
       "technique": "T1078"
     },
     {
+      "kind": "auth",
+      "host": "ctr-ws03-db",
+      "user": "apt-op",
+      "src": "ctr-ws02-api",
+      "offset_seconds": 40,
+      "technique": "T1078"
+    },
+    {
       "kind": "exfil",
       "host": "ctr-ws02-api",
       "dst_ip": "198.51.100.77",
       "bytes": 14000,
-      "offset_seconds": 40,
+      "offset_seconds": 5,
+      "technique": "T1041"
+    },
+    {
+      "kind": "exfil",
+      "host": "ctr-ws03-db",
+      "dst_ip": "198.51.100.77",
+      "bytes": 15000,
+      "offset_seconds": 100,
       "technique": "T1041"
     },
     {
