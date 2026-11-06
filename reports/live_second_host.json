@@ -1,0 +1,10 @@
+{
+  "pass": true,
+  "source": "wevtutil",
+  "host_id": "host-pc-2",
+  "security_events_seen": true,
+  "events": 7,
+  "run_dir": "runs/live-host-2",
+  "generated_at": "2026-11-06T08:07:11Z",
+  "note": "Elevated wevtutil Security channel evidence."
+}
