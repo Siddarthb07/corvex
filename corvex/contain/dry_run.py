@@ -9,7 +9,13 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Literal, Optional
 
-ActionVerb = Literal["IsolateHost", "KillPid", "AddFirewallRule"]
+ActionVerb = Literal[
+    "IsolateHost",
+    "ReleaseHost",
+    "EstateLockdown",
+    "KillPid",
+    "AddFirewallRule",
+]
 
 
 @dataclass(frozen=True)
@@ -28,7 +34,13 @@ class ActionEnvelope:
         return asdict(self)
 
 
-ALLOWED_VERBS = ("IsolateHost", "KillPid", "AddFirewallRule")
+ALLOWED_VERBS = (
+    "IsolateHost",
+    "ReleaseHost",
+    "EstateLockdown",
+    "KillPid",
+    "AddFirewallRule",
+)
 
 
 def propose_action(

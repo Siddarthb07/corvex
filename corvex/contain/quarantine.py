@@ -46,11 +46,14 @@ def resolve_quarantine_mode(
             "Not real firewall / EDR / VLAN isolation."
         )
     elif live_env != 0 and l1:
-        mode = "blocked"
-        can_attempt = False
+        # Live Windows Firewall path is implemented; still requires hostile-bus + authz
+        # at execute time. Mode signals capability — not that auto-enforce is on.
+        mode = "live_windows"
+        can_attempt = True
         message = (
-            "CORVEX_CONTAIN is nonzero and L1 checklist is complete, but no live "
-            "OS/network quarantine executor is implemented yet. Refusing to fake success."
+            "CORVEX_CONTAIN nonzero and L1 complete — Windows Firewall self-isolate "
+            "available for local host_id after hostile-bus + CORVEX_CONTAIN_AUTHZ. "
+            "Not EDR/VLAN. Fanout/agent required for remote peers."
         )
     elif live_env != 0 and not l1:
         mode = "blocked"
@@ -71,7 +74,10 @@ def resolve_quarantine_mode(
     return {
         "mode": mode,
         "can_attempt": can_attempt,
-        "live_executor": False,
+        "live_executor": mode in ("live_windows", "lab_flag"),
+        "live_executor_kind": "windows_firewall_self_isolate"
+        if mode == "live_windows"
+        else ("lab_flag" if mode == "lab_flag" else None),
         "corvex_contain": live_env,
         "l1_complete": l1,
         "l1_pct": st.get("pct"),
@@ -99,10 +105,15 @@ def attempt_quarantine(
     lab_dir: Optional[Path] = None,
     log_path: Optional[Path] = None,
     root: Optional[Path] = None,
+    enforce: bool = False,
+    authz_token: Optional[str] = None,
+    verb: str = "IsolateHost",
 ) -> Dict[str, Any]:
     """
     Attempt isolate/quarantine for each host. Returns per-host results and
     an aggregate that never claims real-world success when it didn't happen.
+
+    ``enforce=True`` requires mode live_windows (or lab_flag) and dual-control authz.
     """
     caps = resolve_quarantine_mode(lab_dir=lab_dir, root=root)
     mode = caps["mode"]
@@ -131,17 +142,57 @@ def attempt_quarantine(
                     "host_id": h,
                     "result": "refused",
                     "enforced": False,
-                    "honesty": "Did not isolate — live path blocked / unimplemented.",
+                    "honesty": "Did not isolate — live path blocked / incomplete L1.",
                 }
                 for h in hosts
             ],
             "capability": caps,
         }
 
+    if enforce and mode == "live_windows":
+        from corvex.contain.live import attempt_live_quarantine
+
+        live = attempt_live_quarantine(
+            hosts,
+            rationale=rationale,
+            root=root,
+            lab_dir=lab,
+            authz_token=authz_token,
+            verb=verb,
+        )
+        return {**live, "mode": mode, "capability": caps}
+
+    if enforce and mode == "dry_run":
+        return {
+            "ok": False,
+            "aggregate": "cannot_quarantine",
+            "mode": mode,
+            "message": "enforce requested but CORVEX_CONTAIN=0 — dry-run only.",
+            "hosts": [
+                {
+                    "host_id": h,
+                    "result": "refused",
+                    "enforced": False,
+                    "honesty": "Set CORVEX_CONTAIN!=0 + L1 + hostile-bus + AUTHZ to enforce.",
+                }
+                for h in hosts
+            ],
+            "capability": caps,
+        }
+
+    use_verb = verb if verb in ("IsolateHost", "ReleaseHost", "EstateLockdown") else "IsolateHost"
+    from corvex.contain.policy import filter_soc, load_policy
+
+    pol = load_policy()
+    hosts = filter_soc(hosts, pol) if use_verb != "ReleaseHost" else hosts
     for host in hosts:
+        edge = "IsolateHost" if use_verb == "EstateLockdown" else use_verb
+        tgt = {"host_id": host}
+        if use_verb == "EstateLockdown":
+            tgt["scope_verb"] = "EstateLockdown"
         env = propose_action(
-            "IsolateHost",
-            {"host_id": host},
+            edge,  # type: ignore[arg-type]
+            tgt,
             rationale=rationale,
         )
         # Always dry-run log the proposal

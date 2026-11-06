@@ -100,11 +100,13 @@ def contain_status(root: Optional[Path] = None) -> dict:
         "complete": checklist_complete(st, root=root),
         "items": st,
         "pct": 100.0 * done / len(L1_ITEMS),
-        "live_executor": False,
+        "live_executor": True,
+        "live_executor_kind": "windows_firewall_self_isolate",
         "dry_run_available": True,
         "honesty": (
-            "Live OS/EDR/VLAN quarantine is not implemented. "
-            "Dry-run IsolateHost logs proposals; lab_flag mode writes sandbox flags only."
+            "Default CORVEX_CONTAIN=0 is dry-run only. When gated live path unlocks, "
+            "Windows Firewall self-isolate/release can enforce on the local host_id. "
+            "Not EDR/VLAN. EstateLockdown fans out per-host IsolateHost minus SOC allowlist."
         ),
     }
 
