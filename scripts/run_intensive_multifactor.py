@@ -173,12 +173,15 @@ def _style_steps(
         ]
     elif style == "exfil_bury":
         tech = ["T1041", "T1078"]
+        # Full 3-host APT chain (truth includes h2) + distinct needle dst from CDN bury.
         steps = [
             {"kind": "auth", "host": h0, "user": "apt-op", "src": "203.0.113.40", "offset_seconds": gaps[0], "technique": "T1078"},
             {"kind": "auth", "host": h1, "user": "apt-op", "src": h0, "offset_seconds": gaps[1], "technique": "T1078"},
-            {"kind": "exfil", "host": h1, "dst_ip": "198.51.100.77", "bytes": 14000, "offset_seconds": gaps[2], "technique": "T1041"},
+            {"kind": "auth", "host": h2, "user": "apt-op", "src": h1, "offset_seconds": gaps[2], "technique": "T1078"},
+            {"kind": "exfil", "host": h1, "dst_ip": "198.51.100.77", "bytes": 14000, "offset_seconds": gaps[3], "technique": "T1041"},
+            {"kind": "exfil", "host": h2, "dst_ip": "198.51.100.77", "bytes": 15000, "offset_seconds": gaps[4] if len(gaps) > 4 else gaps[3] + 12, "technique": "T1041"},
         ]
-        # Benign CDN bury to shared dst
+        # Benign CDN bury to shared dst (must not swallow needle 198.51.100.77)
         bury_t0 = gaps[2] - 30 if gaps[2] > 30 else 0
         for i, h in enumerate(hosts):
             for j in range(8):
@@ -382,7 +385,8 @@ def factor_grid(*, quick: bool) -> List[Dict[str, Any]]:
         ("single", "mixed", "slow", "spray"),
         ("cross", "mixed", "burst", "dns_c2"),
         ("forest", "docker", "ooo", "helpdesk_overlap"),
-        # Intentional kill: day-gap with NO bridging host (topology confound)
+        # Slow exfil_bury: day-0 h0→h1→h2 lateral + needle 198.51.100.77
+        # (CDN bury 203.0.113.200 stays). Day-14 needle may be a second camp.
         ("single", "bare", "slow", "exfil_bury"),
         ("cross", "docker", "slow", "helpdesk_overlap"),
         ("forest", "mixed", "ooo", "spray"),

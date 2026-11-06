@@ -34,7 +34,15 @@ def main() -> int:
         return 1
     status = json.loads(status_path.read_text(encoding="utf-8"))
     source = str(status.get("source") or status.get("backend") or "").lower()
+    # Prefer Security-channel hits; sensor_status writes channels/channel_health,
+    # not a top-level "events" count.
     events = int(status.get("events") or status.get("security_events") or 0)
+    if events <= 0:
+        channels = status.get("channels") or {}
+        events = int(channels.get("security") or 0)
+    if events <= 0:
+        health = (status.get("channel_health") or {}).get("security") or {}
+        events = int(health.get("hits") or 0)
     host_id = args.host_id or str(status.get("host_id") or "")
     ok = source == "wevtutil" and events > 0 and bool(host_id)
     payload = {
