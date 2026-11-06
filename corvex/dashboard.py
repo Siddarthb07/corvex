@@ -197,6 +197,83 @@ def _audit_line(row: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 
+def _enrolled_host_ids() -> List[str]:
+    """Public host ids from enrollment JSON. Secrets stay out of the snapshot."""
+    try:
+        from corvex.auth import default_secrets_path
+
+        path = default_secrets_path()
+        if not path.is_file():
+            return []
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError, TypeError, ValueError):
+        return []
+    hosts_map = data.get("hosts") if isinstance(data, dict) else None
+    if not isinstance(hosts_map, dict):
+        return []
+    out = set()
+    for hosts in hosts_map.values():
+        if isinstance(hosts, (list, tuple, set)):
+            out.update(str(h) for h in hosts if str(h).strip())
+    return sorted(out)
+
+
+def _isolate_estate(hosts_seen: List[str]) -> tuple[List[str], str]:
+    enrolled = _enrolled_host_ids()
+    if enrolled:
+        return sorted(set(enrolled) | set(hosts_seen)), "enrolled"
+    return list(hosts_seen), "hosts_seen"
+
+
+def _contain_plan_for_run(
+    campaigns: List[Dict[str, Any]],
+    hosts_seen: List[str],
+    quarantine: Dict[str, Any],
+) -> Dict[str, Any]:
+    """Read-only isolate scope per campaign. Does not call an OS executor."""
+    from corvex.contain.policy import load_policy
+    from corvex.contain.severity import resolve_isolate_scope
+
+    estate_hosts, estate_source = _isolate_estate(hosts_seen)
+    policy = load_policy()
+    rows: List[Dict[str, Any]] = []
+    for camp in campaigns:
+        if not isinstance(camp, dict):
+            continue
+        scope = resolve_isolate_scope(
+            camp,
+            estate_hosts=estate_hosts,
+            policy=policy,
+        )
+        rows.append(
+            {
+                "campaign_id": str(camp.get("campaign_id") or camp.get("id") or "campaign"),
+                "band": scope.get("band"),
+                "scope": scope.get("scope"),
+                "targets": list(scope.get("targets") or []),
+                "pct_of_n": scope.get("pct_of_n"),
+                "soc_preserved": list(scope.get("soc_preserved") or []),
+                "requires_dual_control": bool(scope.get("requires_dual_control")),
+                "propose": bool(scope.get("propose")),
+                "honesty": list(scope.get("honesty") or []),
+            }
+        )
+    dry = (
+        "No campaigns in this run. "
+        + str(
+            quarantine.get("message")
+            or "Dry-run only (CORVEX_CONTAIN=0). No host is mutated."
+        )
+    )
+    return {
+        "read_only": True,
+        "estate_source": estate_source,
+        "estate_n": len(estate_hosts),
+        "campaigns": rows,
+        "message": dry if not rows else "Read-only isolate plan. The dashboard does not enforce.",
+    }
+
+
 def collect_snapshot(root: Path) -> Dict[str, Any]:
     """Run-centric snapshot (schema_version 3) with activity feed."""
     root = Path(root)
@@ -299,6 +376,7 @@ def collect_snapshot(root: Path) -> Dict[str, Any]:
         ).strftime("%Y-%m-%dT%H:%M:%SZ")
 
     hosts_seen = sorted({str(ev.get("host_id")) for ev in raw_events if ev.get("host_id")})
+    contain_plan = _contain_plan_for_run(campaigns, hosts_seen, quarantine)
     by_kind: Dict[str, int] = {}
     for row in activity:
         by_kind[row["kind"]] = by_kind.get(row["kind"], 0) + 1
@@ -370,10 +448,12 @@ def collect_snapshot(root: Path) -> Dict[str, Any]:
                 "(live lab / replay writing into the same run dir)."
             ),
         },
+        "contain_plan": contain_plan,
         "quarantine": {
             "mode": quarantine.get("mode"),
             "can_attempt": quarantine.get("can_attempt"),
             "live_executor": bool(quarantine.get("live_executor")),
+            "live_executor_kind": quarantine.get("live_executor_kind"),
             "corvex_contain": int(quarantine.get("corvex_contain") or CORVEX_CONTAIN or 0),
             "l1_complete": bool(quarantine.get("l1_complete")),
             "l1_pct": quarantine.get("l1_pct"),

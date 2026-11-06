@@ -271,6 +271,51 @@ body::before {
     }).join("");
   }
 
+  function bandClass(band) {
+    if (band === "critical") return "bad";
+    if (band === "medium") return "warn";
+    if (band === "low") return "ok";
+    return "";
+  }
+
+  function containIsolatePanel(s) {
+    const plan = s.contain_plan || {};
+    const q = s.quarantine || {};
+    const rows = plan.campaigns || [];
+    if (!rows.length) {
+      const msg = plan.message || q.message
+        || "CORVEX_CONTAIN=0. Dry-run only — proposals are logged; no host is mutated.";
+      return `
+        <div class="card" style="margin-top:12px">
+          <div class="id">Contain / Isolate</div>
+          <div class="meta">No campaigns in this run. Read-only — this panel does not call the OS.</div>
+          <div class="refuse">${esc(msg)}</div>
+        </div>`;
+    }
+    const cards = rows.map(p => {
+      const targets = p.targets || [];
+      const soc = p.soc_preserved || [];
+      const pct = p.pct_of_n != null ? `${p.pct_of_n}% of N` : "—";
+      const dual = p.requires_dual_control ? "required" : "not required";
+      return `
+        <article class="card" style="margin-top:8px">
+          <div class="top">
+            <div>
+              <div class="id">${esc(p.campaign_id || "campaign")} <span class="chip ${bandClass(p.band)}">${esc(p.band || "—")}</span></div>
+              <div class="meta">${esc(p.scope || "—")} · ${esc(pct)} · dual-control ${esc(dual)} · propose ${p.propose ? "yes" : "no"}</div>
+            </div>
+          </div>
+          <div class="meta">Targets: ${targets.length ? esc(targets.join(", ")) : "none"}</div>
+          <div class="meta">SOC preserved: ${soc.length ? esc(soc.join(", ")) : "none"}</div>
+          <div class="refuse">${esc((p.honesty || []).join(" ") || "Read-only plan. Not an enforce action.")}</div>
+        </article>`;
+    }).join("");
+    return `
+      <div style="padding:8px 12px 0;font-family:var(--mono);font-size:.7rem;color:var(--dim);letter-spacing:.08em;text-transform:uppercase">Contain / Isolate · read-only</div>
+      ${cards}
+      <div class="meta" style="margin:0 12px 8px">Dashboard does not call the OS. CORVEX_CONTAIN=${esc(q.corvex_contain)} · executor ${esc(q.live_executor_kind || "none")}.</div>`;
+  }
+
   function quarantinePanel(s) {
     const q = s.quarantine || {};
     const claim = s.claim || {};
@@ -287,16 +332,17 @@ body::before {
           </div>`).join("")
       : '<div class="empty">No prevention log entries yet.<br/>Dry-run / lab-flag actions appear here when recorded.</div>';
     return `
+      ${containIsolatePanel(s)}
       <div class="card active" style="margin-top:12px">
         <div class="top">
           <div>
             <div class="id">Contain mode · ${esc(q.mode||"—")}</div>
-            <div class="meta">CORVEX_CONTAIN=${esc(q.corvex_contain)} · live_executor=${esc(!!q.live_executor)}</div>
+            <div class="meta">CORVEX_CONTAIN=${esc(q.corvex_contain)} · live_executor=${esc(!!q.live_executor)} · kind=${esc(q.live_executor_kind||"none")}</div>
           </div>
           <span class="chip ${claim.allowed ? "ok" : "warn"}">${claim.allowed ? "claim open" : "claim locked"}</span>
         </div>
         <div class="meta">${esc(q.message||"")}</div>
-        <div class="refuse">${esc(honesty || "Live OS quarantine is not implemented.")}</div>
+        <div class="refuse">${esc(honesty || "Default is dry-run (CORVEX_CONTAIN=0). Windows Firewall self-isolate stays gated.")}</div>
         <div class="meta" style="margin-top:10px">${esc(claim.language||"")}</div>
       </div>
       <div style="padding:4px 0 8px 12px;font-family:var(--mono);font-size:.7rem;color:var(--dim);letter-spacing:.08em;text-transform:uppercase">Prevention log</div>
@@ -334,7 +380,7 @@ body::before {
       <h3 style="margin-top:18px">Sensor channels</h3>${healthBars}${dnsNote}
       <h3 style="margin-top:18px">Honesty</h3>
       <div class="bar"><span>quarantine</span><b>${esc((s.quarantine||{}).mode||"—")}</b></div>
-      <div class="bar"><span>live executor</span><b>false</b></div>
+      <div class="bar"><span>live executor</span><b>${esc((s.quarantine||{}).live_executor ? ((s.quarantine||{}).live_executor_kind||"on") : "off")}</b></div>
       <div class="bar"><span>claim</span><b>${(s.claim||{}).allowed ? "open" : "locked"}</b></div>`;
   }
 
