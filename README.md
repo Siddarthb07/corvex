@@ -105,7 +105,7 @@ Standing sealed numbers (author-held-out; N=6 attack / N=6 benign): correlator F
 | Windows auth export → BYO (`adapt-windows` / `byo-windows`) | Ready (observe-only) |
 | OS-wide Windows sensor (`sensor-windows`) | Ready — Stage B gated / `stage-b-lab-unlock` |
 | OS-wide macOS network sensor (`sensor-macos`) | Ready — Stage B gated; live net via `lsof` |
-| Live host isolate | Dry-run only (`CORVEX_CONTAIN=0`) |
+| Live isolate | Gated. Default `CORVEX_CONTAIN=0` (dry-run). Unlock is Windows Firewall self-isolate on the local host, plus SSH fanout / agent inbox for peers. Not enterprise EDR. S5 pure-benign and the paper stay deferred. |
 
 ```text
 Sensors (Windows / macOS) / Feeder / BYO-JSONL
@@ -113,7 +113,7 @@ Sensors (Windows / macOS) / Feeder / BYO-JSONL
         → detectors (pure functions)
         → correlator (transitive merge)
         → CampaignStore (JSONL rewrite) + Prevention log
-        → Contain (dry_run / lab_flag / blocked only)
+        → Contain (default dry_run; lab_flag; blocked; live_windows gated)
 ```
 
 Measured single-writer limits: `python scripts/run_single_writer_limits.py` → `reports/single_writer_limits.json`.
@@ -127,7 +127,7 @@ corvex quarantine-status
 corvex quarantine host-a,host-b --rationale "mid-chain cut"
 ```
 
-Reconstruction writes `reconstruction.json` with status `complete` / `partial` / `insufficient_evidence` — gaps listed, no invented TTPs. Quarantine is `dry_run` (default), `lab_flag` (sandbox), or `blocked` (refuse; no live OS executor yet).
+Reconstruction writes `reconstruction.json` with status `complete` / `partial` / `insufficient_evidence` — gaps listed, no invented TTPs. Quarantine default is `dry_run`. `lab_flag` writes sandbox flags. `live_windows` is gated Windows Firewall self-isolate on the local host (`CORVEX_CONTAIN!=0`, L1, hostile-bus, `CORVEX_CONTAIN_AUTHZ`), with SSH fanout or the agent inbox for other hosts. Not enterprise EDR. S5 and the paper are deferred. Details: [`docs/contain.md`](docs/contain.md).
 
 ## Safety
 

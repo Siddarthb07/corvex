@@ -18,7 +18,7 @@ engineering probes only. Full battery: `reports/full_capability_battery.md`.
 | lim03 | Day-scale sleeper gaps | `_connected_host_components` + `resume_window=1h` fragmented same-user chains across multi-day quiet | **HELD** after separate `sleeper_resume_seconds` (14d) with hop/overlap gate (does **not** inflate `resume_window`) |
 | lim07 | Dropped mid-chain host | Truth includes a host with no telemetry (`drop_hosts`); correlator cannot invent missing hops | **PARTIAL** (honest — incomplete evidence) |
 | shared_svc | Shared svc-account over-merge | Time-windowed lateral groups unioned disjoint hop islands sharing `svc-sql` | **Unit HELD** via hop-component partition + hop-gated resume |
-| noise_5k / exfil_bury | Benign egress bury | Dense CDN-like `net_conn` to one `dst_ip` buries needle; multifactor `exfil_bury` cells miss a truth host (J≈0.67) | **Unit HELD** on poison tests; **BROKE** on 3/4 intensive bury cells — bury still a live edge |
+| noise_5k / exfil_bury | Benign egress bury | CDN `net_conn` flood to one `dst_ip` can swallow a needle; older intensive cells listed h2 in `truth_hosts` without an h2 hop | **Unit HELD** (`test_noise_5k_cdn_does_not_bury_needle`). Generator chains h0→h1→h2 plus needle `198.51.100.77`, distinct from CDN `203.0.113.200`. 2026-11-06 4-cell probe: **3 HELD**, **1 HELD fragile** (slow, margin 0.1) |
 | dns_only | DNS-only C2 blind | Correlator can fuse `dns` payloads; Windows has no wevtutil DNS channel without Sysmon EID 22 | **Honest GAP** via `channel_health.dns`; correlator DNS cells mostly HELD; slow+cross DNS **PARTIAL** |
 | lim09b | Sequential reuse | Same hosts, different stage shapes across ≥window gap must split | **HELD, fragile** (margin 0) — split works; confidence thin |
 | fleet19 / helpdesk | Helpdesk vs APT | Concurrent legitimate lateral near APT campaign | **HELD, fragile** on all intensive helpdesk cells (margin ≤0.1) |
@@ -45,7 +45,9 @@ No Corvex-authored ground truth F1 on these packs (avoids self-grading). Fetch s
 | Fleet-limits T0/T1/T2 | 15 each | 14 | 5 | 1 | 0 |
 | Intensive multifactor | 28 | 23 | 5 | 2 | 3 |
 
-`claim_allowed` remains **false** (`live_second_host` gate open).
+The intensive row is the prior full battery. It still counts the old exfil_bury misses. Those four cells were re-probed on 2026-11-06 (below); the other 24 cells were not re-run.
+
+`live_second_host` gate is **pass** (verified `reports/claim_gates.json` and `reports/live_second_host.json`, 2026-11-06: elevated wevtutil Security, host-pc-2, 7 events). Standing scope for that gate is one host’s Security channel.
 
 ## Intensive factor pivots (where style hurts)
 
@@ -55,9 +57,9 @@ No Corvex-authored ground truth F1 on these packs (avoids self-grading). Fetch s
 | spray | 4 | 0 | 0 | 0 |
 | dns_c2 | 4 | 0 | 1 | 0 |
 | helpdesk_overlap | 0 | 5 | 0 | 0 |
-| exfil_bury | 0 | 0 | 1 | **3** |
+| exfil_bury | 3 | 1 | 0 | 0 |
 
-Domain / container / sequence axes alone do **not** dominate failures — **exfil bury** and **helpdesk fragility** do. Cross/forest/docker host_id namespaces hold when producers are unique.
+`exfil_bury` is the 2026-11-06 probe (intensity 1): three clean HELD, slow cell **HELD, fragile** (margin 0.1). Other style rows are the prior full battery. Helpdesk overlap stays fragile. Cross/forest/docker host_id namespaces hold when producers are unique.
 
 ## Authorship honesty
 
