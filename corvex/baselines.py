@@ -1,11 +1,29 @@
-"""Baselines B1 (per-host) and B2 (competitive SIEM joins)."""
+"""Baselines B1 (per-host), B2 (competitive SIEM joins), B3 (window+entity)."""
 
 from __future__ import annotations
 
 from collections import defaultdict
-from typing import Any, Dict, List, Mapping, Sequence
+from datetime import datetime, timezone
+from typing import Any, Dict, List, Mapping, Optional, Sequence, Set, Tuple
 
 from corvex.store import Campaign
+
+
+def _parse_ts(raw: Any) -> Optional[datetime]:
+    if raw is None:
+        return None
+    s = str(raw).strip()
+    if not s:
+        return None
+    if s.endswith("Z"):
+        s = s[:-1] + "+00:00"
+    try:
+        dt = datetime.fromisoformat(s)
+    except ValueError:
+        return None
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=timezone.utc)
+    return dt.astimezone(timezone.utc)
 
 
 def baseline_b1(events: Sequence[Mapping[str, Any]]) -> List[Campaign]:
@@ -103,3 +121,102 @@ def baseline_b2(events: Sequence[Mapping[str, Any]]) -> List[Campaign]:
             )
 
     return out
+
+
+class _UF:
+    def __init__(self) -> None:
+        self.p: Dict[str, str] = {}
+
+    def find(self, x: str) -> str:
+        self.p.setdefault(x, x)
+        while self.p[x] != x:
+            self.p[x] = self.p[self.p[x]]
+            x = self.p[x]
+        return x
+
+    def union(self, a: str, b: str) -> None:
+        ra, rb = self.find(a), self.find(b)
+        if ra != rb:
+            self.p[rb] = ra
+
+
+def baseline_window_entity(
+    events: Sequence[Mapping[str, Any]],
+    *,
+    window_seconds: float = 600.0,
+) -> List[Campaign]:
+    """Time-window + shared-entity clustering (non-Corvex correlator baseline).
+
+    Union hosts that share a user, auth src peer, or egress dst inside a sliding
+    ``window_seconds`` gap. No hop-graph anti-jumpbox / ambient-poison logic —
+    this is the simple clustering arm reviewers ask for beside detector-only.
+    """
+    rows: List[Tuple[datetime, str, str]] = []
+    for ev in events:
+        host = str(ev.get("host_id") or "")
+        if not host:
+            continue
+        ts = _parse_ts(ev.get("ts_utc"))
+        if ts is None:
+            continue
+        payload = ev.get("payload") or {}
+        ptype = str(ev.get("payload_type") or "")
+        entities: Set[str] = set()
+        if ptype == "auth":
+            user = str(payload.get("user") or "")
+            if user:
+                entities.add(f"user:{user}")
+            src = str(payload.get("src") or "")
+            if src:
+                entities.add(f"src:{src}")
+        elif ptype == "net_conn" and payload.get("egress"):
+            dst = str(payload.get("dst_ip") or payload.get("dst") or "")
+            if dst:
+                entities.add(f"egress:{dst}")
+        elif ptype == "dns":
+            q = str(payload.get("query") or payload.get("qname") or "")
+            if q:
+                entities.add(f"dns:{q.lower()}")
+        for ent in entities:
+            rows.append((ts, host, ent))
+
+    rows.sort(key=lambda r: r[0])
+    uf = _UF()
+    # entity -> list of (ts, host) recently seen
+    recent: Dict[str, List[Tuple[datetime, str]]] = defaultdict(list)
+    for ts, host, ent in rows:
+        bucket = recent[ent]
+        # drop stale
+        keep: List[Tuple[datetime, str]] = []
+        for pts, ph in bucket:
+            if (ts - pts).total_seconds() <= window_seconds:
+                keep.append((pts, ph))
+                if ph != host:
+                    uf.union(host, ph)
+        keep.append((ts, host))
+        recent[ent] = keep
+        uf.find(host)
+
+    comps: Dict[str, Set[str]] = defaultdict(set)
+    for host in list(uf.p.keys()):
+        comps[uf.find(host)].add(host)
+
+    out: List[Campaign] = []
+    for i, hosts in enumerate(sorted(comps.values(), key=lambda s: (-len(s), sorted(s)))):
+        if len(hosts) < 2:
+            continue
+        hs = sorted(hosts)
+        out.append(
+            Campaign(
+                campaign_id=f"b3-window-{i}",
+                host_ids=hs,
+                stages=[{"name": "window_entity_cluster", "hosts": hs}],
+                evidence=[{"rule": "time_window_shared_entity", "window_seconds": window_seconds}],
+                score=0.55,
+            )
+        )
+    return out
+
+
+# Alias used in CLI / raise harness
+baseline_b3 = baseline_window_entity
