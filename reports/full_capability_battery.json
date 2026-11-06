@@ -1,8 +1,274 @@
 {
-  "generated_utc": "2026-10-23T15:31:40Z",
-  "refreshed_after_scale_producer_fix": true,
-  "claim_allowed": false,
+  "generated_utc": "2026-11-06T09:29:48Z",
+  "wall_seconds": 153.6376,
+  "claim_allowed": true,
   "lab_verified": true,
+  "quick": false,
+  "intensity": 2,
+  "steps": [
+    {
+      "name": "pytest",
+      "ok": false,
+      "wall_seconds": 6.7876,
+      "returncode": 1
+    },
+    {
+      "name": "eval-heldout",
+      "ok": true,
+      "wall_seconds": 0.5568,
+      "returncode": 0
+    },
+    {
+      "name": "score-non-author",
+      "ok": true,
+      "wall_seconds": 0.4624,
+      "returncode": 0
+    },
+    {
+      "name": "claim-gates",
+      "ok": true,
+      "wall_seconds": 0.3784,
+      "returncode": 0
+    },
+    {
+      "name": "fleet20",
+      "ok": false,
+      "wall_seconds": 16.5885,
+      "returncode": 1
+    },
+    {
+      "name": "fleet-limits",
+      "ok": true,
+      "wall_seconds": 25.3377,
+      "returncode": 0
+    },
+    {
+      "name": "breakers",
+      "ok": true,
+      "wall_seconds": 1.3209,
+      "returncode": 0
+    },
+    {
+      "name": "sql-art",
+      "ok": true,
+      "wall_seconds": 7.0915,
+      "returncode": 0
+    },
+    {
+      "name": "intensive",
+      "ok": true,
+      "wall_seconds": 41.1873,
+      "returncode": 0
+    },
+    {
+      "name": "opensource-fetch",
+      "ok": true,
+      "wall_seconds": 1.205,
+      "returncode": 0
+    },
+    {
+      "name": "opensource-eval",
+      "ok": true,
+      "wall_seconds": 26.7564,
+      "returncode": 0
+    },
+    {
+      "name": "fleet-limits-t1",
+      "ok": true,
+      "wall_seconds": 13.3709,
+      "returncode": 0
+    },
+    {
+      "name": "fleet-limits-t2",
+      "ok": true,
+      "wall_seconds": 12.5248,
+      "returncode": 0
+    }
+  ],
+  "steps_detail": [
+    {
+      "cmd": [
+        "C:\\Users\\siddu\\AppData\\Local\\Microsoft\\WindowsApps\\PythonSoftwareFoundation.Python.3.9_qbz5n2kfra8p0\\python.exe",
+        "-m",
+        "pytest",
+        "-q",
+        "--tb=no"
+      ],
+      "ok": false,
+      "returncode": 1,
+      "wall_seconds": 6.7876,
+      "stdout_tail": "........................................................................ [ 53%]\n...............................F..............................           [100%]\n=========================== short test summary info ===========================\nFAILED tests/test_p1_p4.py::test_live_gates_not_ready_by_default - assert Tru...\n1 failed, 133 passed in 4.46s\n",
+      "stderr_tail": "",
+      "name": "pytest"
+    },
+    {
+      "cmd": [
+        "C:\\Users\\siddu\\AppData\\Local\\Microsoft\\WindowsApps\\PythonSoftwareFoundation.Python.3.9_qbz5n2kfra8p0\\python.exe",
+        "-m",
+        "corvex",
+        "eval",
+        "--split",
+        "heldout"
+      ],
+      "ok": true,
+      "returncode": 0,
+      "wall_seconds": 0.5568,
+      "stdout_tail": "    \"macro_campaign_f1\": 1.0,\n    \"precision\": 1.0,\n    \"recall\": 1.0,\n    \"precision_at_1\": 1.0,\n    \"false_campaign_rate\": 0.0,\n    \"ttu_seconds\": 0.004691300000000009,\n    \"tp\": 6.0,\n    \"fp\": 0.0,\n    \"fn\": 0.0,\n    \"f1_aggregation\": \"micro_from_tp_fp_fn\"\n  },\n  \"b1\": {\n    \"campaign_f1\": 0.0,\n    \"macro_campaign_f1\": 0.0,\n    \"precision\": 0.0,\n    \"recall\": 0.0,\n    \"precision_at_1\": 0.0,\n    \"false_campaign_rate\": 1.0,\n    \"ttu_seconds\": 1.6000000000016e-05,\n    \"tp\": 0.0,\n    \"fp\": 1.0,\n    \"fn\": 6.0,\n    \"f1_aggregation\": \"micro_from_tp_fp_fn\"\n  },\n  \"b2\": {\n    \"campaign_f1\": 0.6666666666666667,\n    \"macro_campaign_f1\": 0.8333333333333334,\n    \"precision\": 0.5555555555555556,\n    \"recall\": 0.8333333333333334,\n    \"precision_at_1\": 0.8333333333333334,\n    \"false_campaign_rate\": 0.0,\n    \"ttu_seconds\": 3.049999999998887e-05,\n    \"tp\": 5.0,\n    \"fp\": 4.0,\n    \"fn\": 1.0,\n    \"f1_aggregation\": \"micro_from_tp_fp_fn\"\n  },\n  \"detector_only\": {\n    \"campaign_f1\": 0.625,\n    \"macro_campaign_f1\": 0.7777777777777778,\n    \"precision\": 0.5,\n    \"recall\": 0.8333333333333334,\n    \"precision_at_1\": 0.8333333333333334,\n    \"false_campaign_rate\": 0.0,\n    \"ttu_seconds\": 0.00770930000000003,\n    \"tp\": 5.0,\n    \"fp\": 5.0,\n    \"fn\": 1.0,\n    \"f1_aggregation\": \"micro_from_tp_fp_fn\"\n  }\n}\n```\n\n## Ablation\n```json\n{\n  \"raw_f1\": 1.0,\n  \"detector_only_f1\": 0.625,\n  \"b1_f1\": 0.0,\n  \"b2_f1\": 0.6666666666666667,\n  \"correlator_precision\": 1.0,\n  \"correlator_recall\": 1.0,\n  \"b1_precision\": 0.0,\n  \"b1_recall\": 0.0\n}\n```\n\n## Reasons\n- none\n\n## Freeze manifest\n```json\n{\n  \"correlator_sha\": \"856ae9c15e8da88b1dcf6a78548fc90f209292f89b9d3d85675d0a5e99ef8799\",\n  \"detectors_sha\": \"696dc13a1d29097157f970492a65f8485042df6f5c32e09c40a9b39477dae27c\",\n  \"scorer_sha\": \"e82c3389e7aa801e8689794fb838a664956ab8d462f4b0b6e6ce86f6bb3014fb\",\n  \"b2_sha\": \"189b6c6099547204a97997ec7bd0be167e607ea84878c5f1ba97408342579ba7\",\n  \"config_sha\": \"fed0c4ed9eb59049755eda0908b1b0056c19a576ee5bb5e6fbbbc26c446493c9\"\n}\n```\n\n",
+      "stderr_tail": "",
+      "name": "eval-heldout"
+    },
+    {
+      "cmd": [
+        "C:\\Users\\siddu\\AppData\\Local\\Microsoft\\WindowsApps\\PythonSoftwareFoundation.Python.3.9_qbz5n2kfra8p0\\python.exe",
+        "-m",
+        "corvex",
+        "score-non-author"
+      ],
+      "ok": true,
+      "returncode": 0,
+      "wall_seconds": 0.4624,
+      "stdout_tail": "{\n  \"source\": \"labs/breaktest/manifests\",\n  \"packs\": [\n    \"art_cred_hop.json\",\n    \"art_lateral_chain.atomic.json\",\n    \"art_lateral_chain.json\",\n    \"art_recon_exfil_split.json\",\n    \"art_recon_pivot.json\",\n    \"art_slow_drip.json\",\n    \"break_blind_dns_c2.json\",\n    \"break_cdn_bridge_compound.json\",\n    \"break_disjoint_islands.json\",\n    \"break_overmerge_jumpbox.json\",\n    \"break_sql_continuous_art.json\"\n  ],\n  \"skipped\": [\n    {\n      \"file\": \"break_os_wide_sensors.json\",\n      \"reason\": \"manifest missing ['steps']\"\n    }\n  ],\n  \"correlator\": {\n    \"campaign_f1\": 0.8,\n    \"macro_campaign_f1\": 0.8484848484848485,\n    \"precision\": 0.7142857142857143,\n    \"recall\": 0.9090909090909091,\n    \"precision_at_1\": 0.9090909090909091,\n    \"false_campaign_rate\": 0.0,\n    \"ttu_seconds\": 0.0075303000000000175,\n    \"tp\": 10.0,\n    \"fp\": 4.0,\n    \"fn\": 1.0,\n    \"f1_aggregation\": \"micro_from_tp_fp_fn\"\n  },\n  \"detector_only\": {\n    \"campaign_f1\": 0.20833333333333334,\n    \"macro_campaign_f1\": 0.21515151515151515,\n    \"precision\": 0.13513513513513514,\n    \"recall\": 0.45454545454545453,\n    \"precision_at_1\": 0.18181818181818182,\n    \"false_campaign_rate\": 0.0,\n    \"ttu_seconds\": 0.007628400000000007,\n    \"tp\": 5.0,\n    \"fp\": 32.0,\n    \"fn\": 6.0,\n    \"f1_aggregation\": \"micro_from_tp_fp_fn\"\n  },\n  \"f1_lift\": 0.5916666666666667,\n  \"pass\": true,\n  \"note\": \"Public-TTP/breaktest manifest score. Still not stranger Windows telemetry \\u2014 necessary but not sufficient for claim_allowed.\",\n  \"honesty\": \"Breaktest manifests are public-TTP shaped, not independent enterprise traffic.\"\n}\n",
+      "stderr_tail": "",
+      "name": "score-non-author"
+    },
+    {
+      "cmd": [
+        "C:\\Users\\siddu\\AppData\\Local\\Microsoft\\WindowsApps\\PythonSoftwareFoundation.Python.3.9_qbz5n2kfra8p0\\python.exe",
+        "-m",
+        "corvex",
+        "claim-gates"
+      ],
+      "ok": true,
+      "returncode": 0,
+      "wall_seconds": 0.3784,
+      "stdout_tail": "{\n  \"schema_ver\": \"3\",\n  \"generated_at\": \"2026-11-06T09:27:23Z\",\n  \"claim_allowed\": true,\n  \"lab_verified\": true,\n  \"claim_language\": \"useful on real attacks\",\n  \"gates\": {\n    \"non_author_fusion_lift\": {\n      \"id\": \"non_author_fusion_lift\",\n      \"pass\": true,\n      \"f1_lift\": 0.5916666666666667,\n      \"min_lift\": 0.05,\n      \"source\": \"labs/breaktest/manifests\",\n      \"note\": \"Public-TTP/breaktest manifest score. Still not stranger Windows telemetry \\u2014 necessary but not sufficient for claim_allowed.\"\n    },\n    \"stranger_success\": {\n      \"id\": \"stranger_success\",\n      \"pass\": true,\n      \"path\": \"reports/stranger_dry_run.json\",\n      \"operator\": \"Jack\",\n      \"attestation_kind\": \"human\",\n      \"attestation_custody\": \"stranger_private_key\",\n      \"attestation_signed\": true,\n      \"note\": \"Completed Windows export \\u2192 byo-windows \\u2192 timeline without author help.\"\n    },\n    \"benign_fcr_real_n\": {\n      \"id\": \"benign_fcr_real_n\",\n      \"pass\": true,\n      \"n_benign\": 6,\n      \"min_n\": 5,\n      \"false_campaign_rate\": 0.0,\n      \"max_fcr\": 0.1,\n      \"note\": \"Held-out benign N=6 (need >=5), FCR=0.000.\"\n    },\n    \"trust_integrity\": {\n      \"id\": \"trust_integrity\",\n      \"pass\": true,\n      \"checks\": {\n        \"correlator_ingest_rejects_bad_hmac\": true,\n        \"correlator_rejects_without_enrollment\": true,\n        \"resign_keeps_verified\": true,\n        \"resign_tags_local_stamp\": true,\n        \"dash_boot_no_embed\": true\n      },\n      \"note\": \"Functional probes green.\"\n    },\n    \"live_second_host\": {\n      \"id\": \"live_second_host\",\n      \"pass\": true,\n      \"path\": \"reports/live_second_host.json\",\n      \"note\": \"Elevated wevtutil Security channel evidence.\"\n    }\n  },\n  \"honesty\": \"Do not publish 'useful on real attacks' until claim_allowed=true. Author-held HMAC and unsigned stranger JSON are advisory. lab_verified means sealed/breaktest + trust probes only.\"\n}\n",
+      "stderr_tail": "",
+      "name": "claim-gates"
+    },
+    {
+      "cmd": [
+        "C:\\Users\\siddu\\AppData\\Local\\Microsoft\\WindowsApps\\PythonSoftwareFoundation.Python.3.9_qbz5n2kfra8p0\\python.exe",
+        "C:\\Users\\siddu\\projects\\corvex\\scripts\\run_attack_fleet10.py",
+        "2"
+      ],
+      "ok": false,
+      "returncode": 1,
+      "wall_seconds": 16.5885,
+      "stdout_tail": "erged_hosts\": [],\n  \"hosts_saved\": [\n    \"host-c\",\n    \"host-e\"\n  ]\n}\n=== fleet03-art-smb-admin-shares.json ===\n{\n  \"campaign_id\": \"fleet03-art-smb-admin-shares\",\n  \"verdict\": \"HELD\",\n  \"corr_jaccard\": 1.0,\n  \"missed_hosts\": [],\n  \"over_merged_hosts\": [],\n  \"hosts_saved\": [\n    \"host-e\"\n  ]\n}\n=== fleet04-art-recon-exfil.json ===\n{\n  \"campaign_id\": \"fleet04-art-recon-exfil\",\n  \"verdict\": \"HELD\",\n  \"corr_jaccard\": 1.0,\n  \"missed_hosts\": [],\n  \"over_merged_hosts\": [],\n  \"hosts_saved\": [\n    \"host-a\",\n    \"host-d\",\n    \"host-e\"\n  ]\n}\n=== fleet05-art-dns-c2-only.json ===\n{\n  \"campaign_id\": \"fleet05-art-dns-c2-only\",\n  \"verdict\": \"HELD\",\n  \"corr_jaccard\": 1.0,\n  \"missed_hosts\": [],\n  \"over_merged_hosts\": [],\n  \"hosts_saved\": [\n    \"host-d\",\n    \"host-e\"\n  ]\n}\n=== fleet06-art-password-spray.json ===\n{\n  \"campaign_id\": \"fleet06-art-password-spray\",\n  \"verdict\": \"HELD\",\n  \"corr_jaccard\": 1.0,\n  \"missed_hosts\": [],\n  \"over_merged_hosts\": [],\n  \"hosts_saved\": [\n    \"host-d\",\n    \"host-e\"\n  ]\n}\n=== fleet07-orig-ip-src-lateral.json ===\n{\n  \"campaign_id\": \"fleet07-orig-ip-src-lateral\",\n  \"verdict\": \"HELD\",\n  \"corr_jaccard\": 1.0,\n  \"missed_hosts\": [],\n  \"over_merged_hosts\": [],\n  \"hosts_saved\": [\n    \"host-d\",\n    \"host-e\"\n  ]\n}\n=== fleet08-orig-chunked-cdn-bait.json ===\n{\n  \"campaign_id\": \"fleet08-orig-chunked-cdn-bait\",\n  \"verdict\": \"HELD\",\n  \"corr_jaccard\": 1.0,\n  \"missed_hosts\": [],\n  \"over_merged_hosts\": [],\n  \"hosts_saved\": [\n    \"host-c\",\n    \"host-d\",\n    \"host-e\"\n  ]\n}\n=== fleet09-orig-window-gap.json ===\n{\n  \"campaign_id\": \"fleet09-orig-window-gap\",\n  \"verdict\": \"HELD\",\n  \"corr_jaccard\": 1.0,\n  \"missed_hosts\": [],\n  \"over_merged_hosts\": [],\n  \"hosts_saved\": [\n    \"host-d\",\n    \"host-e\"\n  ]\n}\n=== fleet10-orig-ransom-fanout-bury.json ===\n{\n  \"campaign_id\": \"fleet10-orig-ransom-fanout-bury\",\n  \"verdict\": \"HELD\",\n  \"corr_jaccard\": 1.0,\n  \"missed_hosts\": [],\n  \"over_merged_hosts\": [],\n  \"hosts_saved\": [\n    \"host-d\",\n    \"host-e\"\n  ]\n}\n=== fleet11-art-scheduled-task.json ===\n",
+      "stderr_tail": "Traceback (most recent call last):\n  File \"C:\\Users\\siddu\\projects\\corvex\\scripts\\run_attack_fleet10.py\", line 862, in <module>\n    raise SystemExit(main())\n  File \"C:\\Users\\siddu\\projects\\corvex\\scripts\\run_attack_fleet10.py\", line 827, in main\n    row = score_one(path, intensity_rounds=intensity)\n  File \"C:\\Users\\siddu\\projects\\corvex\\scripts\\run_attack_fleet10.py\", line 597, in score_one\n    shutil.rmtree(out_dir)\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.9_3.9.3568.0_x64__qbz5n2kfra8p0\\lib\\shutil.py\", line 759, in rmtree\n    return _rmtree_unsafe(path, onerror)\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.9_3.9.3568.0_x64__qbz5n2kfra8p0\\lib\\shutil.py\", line 629, in _rmtree_unsafe\n    onerror(os.unlink, fullname, sys.exc_info())\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.9_3.9.3568.0_x64__qbz5n2kfra8p0\\lib\\shutil.py\", line 627, in _rmtree_unsafe\n    os.unlink(fullname)\nPermissionError: [WinError 32] The process cannot access the file because it is being used by another process: 'C:\\\\Users\\\\siddu\\\\projects\\\\corvex\\\\runs\\\\attack-fleet20\\\\fleet11-art-scheduled-task\\\\r1\\\\breaks.json'\n",
+      "name": "fleet20"
+    },
+    {
+      "cmd": [
+        "C:\\Users\\siddu\\AppData\\Local\\Microsoft\\WindowsApps\\PythonSoftwareFoundation.Python.3.9_qbz5n2kfra8p0\\python.exe",
+        "C:\\Users\\siddu\\projects\\corvex\\scripts\\run_attack_fleet_limits.py",
+        "--intensity",
+        "2"
+      ],
+      "ok": true,
+      "returncode": 0,
+      "wall_seconds": 25.3377,
+      "stdout_tail": "*fragile**\n\n- Break criterion: attack missed (BROKE) or b/d False Q via association\n- Truth: host-a, host-c, host-e\n- Verdict: **HELD, fragile** | Jaccard=1.0 | margin=0.1\n- Reasons: matched truth without merge-FQ; break_criterion not triggered: attack missed (BROKE) or b/d False Q via association\n- Quarantine dry-run: host-c\n- Saved: host-b, host-d | False Q: -\n- Baseline FQ: host-b, host-d | baseline_wins=False\n\n### lim10-authorized-redteam \u00e2\u02dc\u2026 headline\n\n- Break criterion: any host proposed for quarantine dry-run when truth is empty\n- Truth: \u00e2\u02c6\u2026\n- Verdict: **HELD** | Jaccard=1.0 | margin=1.0\n- Reasons: no quarantine with empty truth\n- Quarantine dry-run: -\n- Saved: host-a, host-b, host-c, host-d, host-e | False Q: -\n- Baseline FQ: - | baseline_wins=False\n\n### lim11-hostname-split-brain\n\n- Break criterion: b's two identities treated as separate hosts, splitting coverage\n- Truth: host-a, host-b, host-c\n- Verdict: **HELD** | Jaccard=1.0 | margin=1.0\n- Reasons: matched truth without merge-FQ; break_criterion not triggered: b's two identities treated as separate hosts, splitting coverage\n- Quarantine dry-run: host-b\n- Saved: host-d, host-e | False Q: -\n- Baseline FQ: - | baseline_wins=False\n\n### lim12-near-dup-cdn-mimicry\n\n- Break criterion: Jaccard regression vs #8/#20 passing results\n- Truth: host-a, host-b, host-c\n- Verdict: **HELD** | Jaccard=1.0 | margin=1.0\n- Reasons: matched truth without merge-FQ; break_criterion not triggered: Jaccard regression vs #8/#20 passing results\n- Quarantine dry-run: host-b\n- Saved: host-d, host-e | False Q: -\n- Baseline FQ: - | baseline_wins=False\n\n## Honesty\n\n- Lead with #10 (FP / baseline-wins), then #9b (structural reuse), then identity cluster (#9/#11).\n- HELD \u00e2\u2030\u00a0 clean: margin < 0.2 \u00e2\u2020\u2019 **HELD, fragile**.\n- Event sketches only; no live exploitation. Live OS quarantine remains unimplemented.\n\n\nJSON: C:\\Users\\siddu\\projects\\corvex\\reports\\attack_fleet_limits.json\nMD:   C:\\Users\\siddu\\projects\\corvex\\reports\\attack_fleet_limits.md\n",
+      "stderr_tail": "",
+      "name": "fleet-limits"
+    },
+    {
+      "cmd": [
+        "C:\\Users\\siddu\\AppData\\Local\\Microsoft\\WindowsApps\\PythonSoftwareFoundation.Python.3.9_qbz5n2kfra8p0\\python.exe",
+        "C:\\Users\\siddu\\projects\\corvex\\scripts\\run_breaker_attacks.py"
+      ],
+      "ok": true,
+      "returncode": 0,
+      "wall_seconds": 1.3209,
+      "stdout_tail": ": 1,\n  \"corr_matched\": 2,\n  \"packs\": [\n    {\n      \"manifest\": \"break_disjoint_islands.json\",\n      \"campaign_id\": \"break-disjoint-islands\",\n      \"break_intent\": \"Two credential islands with no shared user, shared egress, or shared host \\u2014 correlator cannot transitively fuse. Expect missed_hosts / both_missed vs full 5-host truth.\",\n      \"corr_matched\": false,\n      \"corr_jaccard\": 0.4,\n      \"det_matched\": false,\n      \"det_jaccard\": 0.4,\n      \"fusion_lift\": false,\n      \"both_missed\": true,\n      \"missed_hosts\": [\n        \"host-c\"\n      ],\n      \"over_merged_hosts\": [],\n      \"correlator_campaigns\": 2,\n      \"detector_campaigns\": 4\n    },\n    {\n      \"manifest\": \"break_overmerge_jumpbox.json\",\n      \"campaign_id\": \"break-overmerge-jumpbox\",\n      \"break_intent\": \"Two unrelated campaigns share jump host-c. Truth is only campaign-1 hosts (a,b). Expect over_merged_hosts including c and possibly d,e.\",\n      \"corr_matched\": true,\n      \"corr_jaccard\": 0.6667,\n      \"det_matched\": true,\n      \"det_jaccard\": 0.6667,\n      \"fusion_lift\": false,\n      \"both_missed\": false,\n      \"missed_hosts\": [],\n      \"over_merged_hosts\": [\n        \"host-c\"\n      ],\n      \"correlator_campaigns\": 2,\n      \"detector_campaigns\": 4\n    },\n    {\n      \"manifest\": \"break_blind_dns_c2.json\",\n      \"campaign_id\": \"break-blind-dns-c2\",\n      \"break_intent\": \"Multi-host C2 beaconing via DNS only \\u2014 Corvex has no DNS correlator. Expect both_missed / empty campaigns vs 5-host truth.\",\n      \"corr_matched\": true,\n      \"corr_jaccard\": 1.0,\n      \"det_matched\": false,\n      \"det_jaccard\": 0.0,\n      \"fusion_lift\": true,\n      \"both_missed\": false,\n      \"missed_hosts\": [],\n      \"over_merged_hosts\": [],\n      \"correlator_campaigns\": 1,\n      \"detector_campaigns\": 0\n    }\n  ],\n  \"honesty\": \"These are author-designed kill shots, not stranger traffic. A miss here is a product limit to publish, not a silent footnote.\"\n}\n\nwrote C:\\Users\\siddu\\projects\\corvex\\runs\\breakers\\breaker_summary.json\n",
+      "stderr_tail": "",
+      "name": "breakers"
+    },
+    {
+      "cmd": [
+        "C:\\Users\\siddu\\AppData\\Local\\Microsoft\\WindowsApps\\PythonSoftwareFoundation.Python.3.9_qbz5n2kfra8p0\\python.exe",
+        "C:\\Users\\siddu\\projects\\corvex\\scripts\\run_sql_art_stress.py"
+      ],
+      "ok": true,
+      "returncode": 0,
+      "wall_seconds": 7.0915,
+      "stdout_tail": "1.0** (mean Jaccard **1.0**)\n- Where it stayed / broke: over-merge residual **[]**; missed **[]**\n\n## Per-host detail (last successful attempt)\n\n| Host | Role | Compromised | Flagged | Over-merge | Quarantine dry-run | Saved | Methods |\n|------|------|-------------|---------|------------|--------------------|-------|---------|\n| host-a | web-front / SQLi entry (truth compromised) | yes | yes | no | no | no | union_select_probe, boolean_blind_retry, time_based_blind_retry, credential_spray_sql_logins, ... |\n| host-b | SQL primary (truth compromised) | yes | yes | no | yes | no | stolen_sa_lateral, retry_sa_hop, svc_account_reuse_burst, bulk_table_dump, ... |\n| host-c | SQL replica + app (truth compromised) | yes | yes | no | no | no | linked_server_hop, retry_linked_server, svc_account_reuse_burst, bulk_table_dump_retry, ... |\n| host-d | DBA workstation (innocent \u00e2\u20ac\u201d save target) | no | no | no | no | yes | benign DBA \u00e2\u20ac\u201d shared sql-svc over-merge bait, benign DBA SSMS browse |\n| host-e | BI reporting client (innocent \u00e2\u20ac\u201d save target) | no | no | no | no | yes | benign BI job \u00e2\u20ac\u201d shared sql-svc over-merge bait, benign CDN / PowerBI refresh |\n\n## Retry attempts\n\n| # | OK | Wall s | Jaccard | Matched | Over-merged | Quarantine proposed |\n|---|----|--------|---------|---------|-------------|---------------------|\n| 1 | yes | 0.7603 | 1.0 | True | - | host-b |\n| 2 | yes | 0.9205 | 1.0 | True | - | host-b |\n| 3 | yes | 0.8584 | 1.0 | True | - | host-b |\n| 4 | yes | 0.782 | 1.0 | True | - | host-b |\n| 5 | yes | 1.0582 | 1.0 | True | - | host-b |\n| 6 | yes | 0.7438 | 1.0 | True | - | host-b |\n| 7 | yes | 0.7061 | 1.0 | True | - | host-b |\n| 8 | yes | 0.8425 | 1.0 | True | - | host-b |\n\n## Honesty\n\n- Quarantine column is **dry-run IsolateHost proposals**, not live OS quarantine.\n- DNS OOB SQLi channels are intentional blind spots in current detectors.\n- Saved = innocent host not falsely proposed for isolate.\n\n\nJSON: C:\\Users\\siddu\\projects\\corvex\\reports\\sql_art_stress.json\n",
+      "stderr_tail": "",
+      "name": "sql-art"
+    },
+    {
+      "cmd": [
+        "C:\\Users\\siddu\\AppData\\Local\\Microsoft\\WindowsApps\\PythonSoftwareFoundation.Python.3.9_qbz5n2kfra8p0\\python.exe",
+        "C:\\Users\\siddu\\projects\\corvex\\scripts\\run_intensive_multifactor.py",
+        "--intensity",
+        "2"
+      ],
+      "ok": true,
+      "returncode": 0,
+      "wall_seconds": 41.1873,
+      "stdout_tail": "th_lateral ===\n  -> HELD J=1.0 margin=1.0\n=== mf-single-mixed-burst-pth_lateral ===\n  -> HELD J=1.0 margin=1.0\n=== mf-single-bare-slow-pth_lateral ===\n  -> HELD J=1.0 margin=1.0\n=== mf-single-bare-ooo-pth_lateral ===\n  -> HELD J=1.0 margin=1.0\n=== mf-single-bare-concurrent-pth_lateral ===\n  -> HELD J=1.0 margin=0.9\n=== mf-single-bare-burst-dns_c2 ===\n  -> HELD J=1.0 margin=1.0\n=== mf-single-bare-burst-spray ===\n  -> HELD J=1.0 margin=1.0\n=== mf-single-bare-burst-exfil_bury ===\n  -> HELD J=1.0 margin=1.0\n=== mf-single-bare-burst-helpdesk_overlap ===\n  -> HELD, fragile J=1.0 margin=0.0\n=== mf-cross-docker-concurrent-helpdesk_overlap ===\n  -> HELD, fragile J=1.0 margin=-0.1\n=== mf-cross-mixed-ooo-pth_lateral ===\n  -> HELD J=1.0 margin=1.0\n=== mf-forest-bare-slow-pth_lateral ===\n  -> HELD J=1.0 margin=1.0\n=== mf-forest-docker-burst-dns_c2 ===\n  -> HELD J=1.0 margin=1.0\n=== mf-forest-mixed-concurrent-exfil_bury ===\n  -> HELD J=1.0 margin=0.9\n=== mf-cross-bare-slow-dns_c2 ===\n  -> PARTIAL J=0.6667 margin=0.0\n=== mf-single-docker-ooo-exfil_bury ===\n  -> HELD J=1.0 margin=1.0\n=== mf-cross-docker-burst-spray ===\n  -> HELD J=1.0 margin=1.0\n=== mf-forest-bare-concurrent-helpdesk_overlap ===\n  -> HELD, fragile J=1.0 margin=-0.1\n=== mf-single-mixed-slow-spray ===\n  -> HELD J=1.0 margin=1.0\n=== mf-cross-mixed-burst-dns_c2 ===\n  -> HELD J=1.0 margin=1.0\n=== mf-forest-docker-ooo-helpdesk_overlap ===\n  -> HELD, fragile J=1.0 margin=0.0\n=== mf-single-bare-slow-exfil_bury ===\n  -> HELD, fragile J=1.0 margin=0.1\n=== mf-cross-docker-slow-helpdesk_overlap ===\n  -> HELD, fragile J=1.0 margin=0.0\n=== mf-forest-mixed-ooo-spray ===\n  -> HELD J=1.0 margin=1.0\n=== mf-single-docker-concurrent-dns_c2 ===\n  -> HELD J=1.0 margin=1.0\n{\n  \"n\": 28,\n  \"held\": 27,\n  \"fragile\": 6,\n  \"partial\": 1,\n  \"broke\": 0,\n  \"error\": 0,\n  \"wall_seconds\": 40.5224\n}\nwrote C:\\Users\\siddu\\projects\\corvex\\reports\\intensive_capability_matrix.json\nwrote C:\\Users\\siddu\\projects\\corvex\\reports\\intensive_capability_matrix.md\n",
+      "stderr_tail": "",
+      "name": "intensive"
+    },
+    {
+      "cmd": [
+        "C:\\Users\\siddu\\AppData\\Local\\Microsoft\\WindowsApps\\PythonSoftwareFoundation.Python.3.9_qbz5n2kfra8p0\\python.exe",
+        "C:\\Users\\siddu\\projects\\corvex\\scripts\\fetch_opensource_corpora.py"
+      ],
+      "ok": true,
+      "returncode": 0,
+      "wall_seconds": 1.205,
+      "stdout_tail": "d\": \"otrf-empire-uac-shellapi-fodhelper\",\n      \"skipped\": true\n    },\n    {\n      \"id\": \"otrf-cmd-dumping-ntds-dit-file-volume-shadow-copy\",\n      \"skipped\": true\n    },\n    {\n      \"id\": \"otrf-empire-mimikatz-backupkeys-dcerpc-smb-lsarpc\",\n      \"skipped\": true\n    },\n    {\n      \"id\": \"otrf-msf-record-mic\",\n      \"skipped\": true\n    },\n    {\n      \"id\": \"otrf-empire-shell-rubeus-asktgt-createnetonly\",\n      \"skipped\": true\n    },\n    {\n      \"id\": \"otrf-proxylogon-ssrf-rce-poc\",\n      \"skipped\": true\n    },\n    {\n      \"id\": \"otrf-covenant-dcom-registerxll\",\n      \"skipped\": true\n    },\n    {\n      \"id\": \"otrf-covenant-sharpsc-start-dcerpc-smb-svcctl\",\n      \"skipped\": true\n    },\n    {\n      \"id\": \"otrf-empire-launcher-vbs\",\n      \"skipped\": true\n    },\n    {\n      \"id\": \"otrf-covenant-sharpsc-create-dcerpc-smb-svcctl\",\n      \"skipped\": true\n    },\n    {\n      \"id\": \"otrf-empire-schtasks-creation-standard-user\",\n      \"skipped\": true\n    },\n    {\n      \"id\": \"otrf-schtask-modification\",\n      \"skipped\": true\n    },\n    {\n      \"id\": \"otrf-empire-shell-rpc-samr-smb-group-domain-admins-stan\",\n      \"skipped\": true\n    },\n    {\n      \"id\": \"otrf-empire-shell-net-local-users\",\n      \"skipped\": false,\n      \"error\": \"[Errno 22] Invalid argument: 'C:\\\\\\\\Users\\\\\\\\siddu\\\\\\\\projects\\\\\\\\corvex\\\\\\\\labs\\\\\\\\opensource\\\\\\\\otrf-empire-shell-net-local-users\\\\\\\\raw\\\\\\\\download.zip'\"\n    },\n    {\n      \"id\": \"otrf-psh-python-webserver\",\n      \"skipped\": true\n    },\n    {\n      \"id\": \"otrf-empire-shell-net-localgroup-administrators\",\n      \"skipped\": false,\n      \"error\": \"[Errno 22] Invalid argument: 'C:\\\\\\\\Users\\\\\\\\siddu\\\\\\\\projects\\\\\\\\corvex\\\\\\\\labs\\\\\\\\opensource\\\\\\\\otrf-empire-shell-net-localgroup-administrators\\\\\\\\raw\\\\\\\\download.zip'\"\n    },\n    {\n      \"id\": \"otrf-cmd-seatbelt-group-user\",\n      \"skipped\": true\n    },\n    {\n      \"id\": \"otrf-cmd-service-mod-fax\",\n      \"skipped\": true\n    },\n    {\n      \"id\": \"otrf-cmd-sharpview-pcre-net\",\n      \"skipped\": true\n    }\n  ]\n}\n",
+      "stderr_tail": "",
+      "name": "opensource-fetch"
+    },
+    {
+      "cmd": [
+        "C:\\Users\\siddu\\AppData\\Local\\Microsoft\\WindowsApps\\PythonSoftwareFoundation.Python.3.9_qbz5n2kfra8p0\\python.exe",
+        "C:\\Users\\siddu\\projects\\corvex\\scripts\\run_opensource_attack_eval.py"
+      ],
+      "ok": true,
+      "returncode": 0,
+      "wall_seconds": 26.7564,
+      "stdout_tail": "atz logonpasswords memory dump' hosts=1 events=1238 lift=0 breaks=2\n=== otrf-lsass-metasploit-nanodump ===\n  -> SINGLE_HOST attack='LSASS campaign: NanoDump (evasive)' hosts=1 events=1112 lift=0 breaks=2\n=== otrf-lsass-metasploit-out-minidump ===\n  -> SINGLE_HOST attack='LSASS campaign: Out-Minidump PowerShell' hosts=1 events=1209 lift=0 breaks=2\n=== otrf-lsass-metasploit-procdump ===\n  -> SINGLE_HOST attack='LSASS campaign: ProcDump LSASS memory dump' hosts=1 events=1076 lift=0 breaks=2\n=== otrf-lsass-metasploit-sharpdump ===\n  -> SINGLE_HOST attack='LSASS campaign: SharpDump' hosts=1 events=1573 lift=0 breaks=2\n=== otrf-msf-record-mic ===\n  -> MULTI_HOST_NO_LIFT attack='msf record mic' hosts=3 events=232 lift=-1 breaks=2\n=== otrf-ntdsutil-ntds-dit ===\n  -> SINGLE_HOST attack='ntdsutil NTDS.dit dump' hosts=1 events=285 lift=0 breaks=2\n=== otrf-proxylogon-ssrf-rce-poc ===\n  -> SINGLE_HOST attack='proxylogon ssrf rce poc' hosts=1 events=296 lift=0 breaks=2\n=== otrf-psh-python-webserver ===\n  -> SINGLE_HOST attack='psh python webserver' hosts=1 events=8 lift=0 breaks=2\n=== otrf-purplesharp-ad-playbook-i ===\n  -> FUSION_HELD attack='PurpleSharp AD playbook I (multi-step)' hosts=4 events=780 lift=1 breaks=1\n=== otrf-schtask-create ===\n  -> FUSION_HELD attack='Remote scheduled task create' hosts=2 events=35 lift=0 breaks=1\n=== otrf-schtask-modification ===\n  -> FUSION_HELD attack='schtask modification' hosts=2 events=46 lift=0 breaks=1\n{\n  \"n\": 76,\n  \"tier\": \"full\",\n  \"verdict_counts\": {\n    \"ERROR\": 5,\n    \"FUSION_HELD\": 35,\n    \"SINGLE_HOST\": 17,\n    \"MULTI_HOST_NO_LIFT\": 18,\n    \"BLIND\": 1\n  },\n  \"break_type_counts\": {\n    \"ERROR\": 5,\n    \"ADAPTER_HEAVY_SKIP\": 54,\n    \"SINGLE_HOST\": 17,\n    \"FUSION_NO_LIFT\": 18,\n    \"BLIND\": 1\n  },\n  \"wall\": 26.4557\n}\nwrote C:\\Users\\siddu\\projects\\corvex\\reports\\opensource_attack_eval.json\nwrote C:\\Users\\siddu\\projects\\corvex\\reports\\opensource_attack_eval.md\nwrote C:\\Users\\siddu\\projects\\corvex\\reports\\opensource_attack_inventory.md\n",
+      "stderr_tail": "",
+      "name": "opensource-eval"
+    },
+    {
+      "cmd": [
+        "C:\\Users\\siddu\\AppData\\Local\\Microsoft\\WindowsApps\\PythonSoftwareFoundation.Python.3.9_qbz5n2kfra8p0\\python.exe",
+        "C:\\Users\\siddu\\projects\\corvex\\scripts\\run_attack_fleet_limits_scale.py",
+        "--hosts",
+        "15",
+        "--intensity",
+        "1",
+        "--no-decoy"
+      ],
+      "ok": true,
+      "returncode": 0,
+      "wall_seconds": 13.3709,
+      "stdout_tail": "t1-lim10-authorized-redteam \u00e2\u02dc\u2026 headline\n\n- Break criterion: any host proposed for quarantine dry-run when truth is empty\n- Truth: \u00e2\u02c6\u2026\n- Verdict: **HELD** | Jaccard=1.0 | margin=1.0\n- Reasons: no quarantine with empty truth\n- Quarantine dry-run: -\n- Saved: host-00, host-01, host-02, host-03, host-04, host-05, host-06, host-07, host-08, host-09, host-10, host-11, host-12, host-13, host-14 | False Q: -\n- Baseline FQ: - | baseline_wins=False\n\n### t1-lim11-hostname-split-brain\n\n- Break criterion: b's two identities treated as separate hosts, splitting coverage\n- Truth: host-00, host-01, host-02\n- Verdict: **HELD** | Jaccard=1.0 | margin=1.0\n- Reasons: matched truth without merge-FQ; break_criterion not triggered: b's two identities treated as separate hosts, splitting coverage\n- Quarantine dry-run: host-01\n- Saved: host-03, host-04, host-05, host-06, host-07, host-08, host-09, host-10, host-11, host-12, host-13, host-14 | False Q: -\n- Baseline FQ: - | baseline_wins=False\n\n### t1-lim12-near-dup-cdn-mimicry\n\n- Break criterion: Jaccard regression vs #8/#20 passing results\n- Truth: host-00, host-01, host-02\n- Verdict: **HELD** | Jaccard=1.0 | margin=1.0\n- Reasons: matched truth without merge-FQ; break_criterion not triggered: Jaccard regression vs #8/#20 passing results\n- Quarantine dry-run: host-01\n- Saved: host-03, host-04, host-05, host-06, host-07, host-08, host-09, host-10, host-11, host-12, host-13, host-14 | False Q: -\n- Baseline FQ: - | baseline_wins=False\n\n## Honesty\n\n- Lead with #10 (FP / baseline-wins), then #9b (structural reuse), then identity cluster (#9/#11).\n- HELD \u00e2\u2030\u00a0 clean: margin < 0.2 \u00e2\u2020\u2019 **HELD, fragile**.\n- Event sketches only; no live exploitation. Live OS quarantine remains unimplemented.\n\nJSON: C:\\Users\\siddu\\projects\\corvex\\reports\\attack_fleet_limits_t1_nodecoy.json\nMD:   C:\\Users\\siddu\\projects\\corvex\\reports\\attack_fleet_limits_t1_nodecoy.md\nperf_gate=True fragile_gate=True (wall=13.034s rss=33.16) decoys=False fragile_rate=0.3571 t0_ref=0.3571\n",
+      "stderr_tail": "",
+      "name": "fleet-limits-t1"
+    },
+    {
+      "cmd": [
+        "C:\\Users\\siddu\\AppData\\Local\\Microsoft\\WindowsApps\\PythonSoftwareFoundation.Python.3.9_qbz5n2kfra8p0\\python.exe",
+        "C:\\Users\\siddu\\projects\\corvex\\scripts\\run_attack_fleet_limits_scale.py",
+        "--hosts",
+        "50",
+        "--intensity",
+        "1",
+        "--no-decoy"
+      ],
+      "ok": true,
+      "returncode": 0,
+      "wall_seconds": 12.5248,
+      "stdout_tail": "0 | margin=1.0\n- Reasons: matched truth without merge-FQ; break_criterion not triggered: b's two identities treated as separate hosts, splitting coverage\n- Quarantine dry-run: host-01\n- Saved: host-03, host-04, host-05, host-06, host-07, host-08, host-09, host-10, host-11, host-12, host-13, host-14, host-15, host-16, host-17, host-18, host-19, host-20, host-21, host-22, host-23, host-24, host-25, host-26, host-27, host-28, host-29, host-30, host-31, host-32, host-33, host-34, host-35, host-36, host-37, host-38, host-39, host-40, host-41, host-42, host-43, host-44, host-45, host-46, host-47, host-48, host-49 | False Q: -\n- Baseline FQ: - | baseline_wins=False\n\n### t2-lim12-near-dup-cdn-mimicry\n\n- Break criterion: Jaccard regression vs #8/#20 passing results\n- Truth: host-00, host-01, host-02\n- Verdict: **HELD** | Jaccard=1.0 | margin=1.0\n- Reasons: matched truth without merge-FQ; break_criterion not triggered: Jaccard regression vs #8/#20 passing results\n- Quarantine dry-run: host-01\n- Saved: host-03, host-04, host-05, host-06, host-07, host-08, host-09, host-10, host-11, host-12, host-13, host-14, host-15, host-16, host-17, host-18, host-19, host-20, host-21, host-22, host-23, host-24, host-25, host-26, host-27, host-28, host-29, host-30, host-31, host-32, host-33, host-34, host-35, host-36, host-37, host-38, host-39, host-40, host-41, host-42, host-43, host-44, host-45, host-46, host-47, host-48, host-49 | False Q: -\n- Baseline FQ: - | baseline_wins=False\n\n## Honesty\n\n- Lead with #10 (FP / baseline-wins), then #9b (structural reuse), then identity cluster (#9/#11).\n- HELD \u00e2\u2030\u00a0 clean: margin < 0.2 \u00e2\u2020\u2019 **HELD, fragile**.\n- Event sketches only; no live exploitation. Live OS quarantine remains unimplemented.\n\nJSON: C:\\Users\\siddu\\projects\\corvex\\reports\\attack_fleet_limits_t2_nodecoy.json\nMD:   C:\\Users\\siddu\\projects\\corvex\\reports\\attack_fleet_limits_t2_nodecoy.md\nperf_gate=True fragile_gate=True (wall=12.2103s rss=33.2) decoys=False fragile_rate=0.3571 t0_ref=0.3571\n",
+      "stderr_tail": "",
+      "name": "fleet-limits-t2"
+    }
+  ],
   "suites": {
     "fleet-limits": {
       "path": "C:\\Users\\siddu\\projects\\corvex\\reports\\attack_fleet_limits.json",
@@ -18,20 +284,20 @@
       "path": "C:\\Users\\siddu\\projects\\corvex\\reports\\attack_fleet20.json",
       "n": 20,
       "held": 20,
-      "fragile": 1,
+      "fragile": 2,
       "partial": 0,
       "broke": 0,
       "wall_seconds": null,
-      "intensity_rounds": 2
+      "intensity_rounds": 3
     },
     "intensive": {
       "path": "C:\\Users\\siddu\\projects\\corvex\\reports\\intensive_capability_matrix.json",
       "n": 28,
-      "held": 23,
-      "fragile": 5,
-      "partial": 2,
-      "broke": 3,
-      "wall_seconds": 44.869,
+      "held": 27,
+      "fragile": 6,
+      "partial": 1,
+      "broke": 0,
+      "wall_seconds": 40.5224,
       "intensity_rounds": 2,
       "notes": "domain\u00d7container\u00d7sequence\u00d7style matrix"
     },
@@ -43,8 +309,7 @@
       "partial": 1,
       "broke": 0,
       "wall_seconds": null,
-      "intensity_rounds": 1,
-      "notes": "15 hosts; producers prod-scale-*"
+      "intensity_rounds": 1
     },
     "fleet-limits-t2": {
       "path": "C:\\Users\\siddu\\projects\\corvex\\reports\\attack_fleet_limits_t2_nodecoy.json",
@@ -54,155 +319,20 @@
       "partial": 1,
       "broke": 0,
       "wall_seconds": null,
-      "intensity_rounds": 1,
-      "notes": "50 hosts; producers prod-scale-*"
+      "intensity_rounds": 1
     },
     "sealed-heldout": {
-      "notes": "micro-F1 correlator 1.00 / detector 0.625 (N_atk=6, N_ben=6)"
+      "n": null,
+      "notes": "see metrics.heldout; micro-F1 in RESULTS.md"
     },
     "breaktest-non-author": {
-      "notes": "lift=0.4410796576695194"
+      "notes": "lift=None"
     }
   },
-  "breaks": [
-    {
-      "suite": "fleet-limits",
-      "campaign_id": "lim07-dropped-mid-chain",
-      "verdict": "PARTIAL",
-      "jaccard": 0.5,
-      "reasons": [
-        "jaccard 0.5 in PARTIAL band"
-      ]
-    },
-    {
-      "suite": "intensive",
-      "campaign_id": "mf-single-bare-burst-exfil_bury",
-      "verdict": "BROKE",
-      "jaccard": 0.6667,
-      "reasons": [
-        "truth never recovered: ['corp-ws03']"
-      ]
-    },
-    {
-      "suite": "intensive",
-      "campaign_id": "mf-forest-mixed-concurrent-exfil_bury",
-      "verdict": "PARTIAL",
-      "jaccard": 0.8333,
-      "reasons": [
-        "multi-campaign mean/min jaccard=0.8333/0.6667"
-      ]
-    },
-    {
-      "suite": "intensive",
-      "campaign_id": "mf-cross-bare-slow-dns_c2",
-      "verdict": "PARTIAL",
-      "jaccard": 0.6667,
-      "reasons": [
-        "jaccard 0.6667 in PARTIAL band"
-      ]
-    },
-    {
-      "suite": "intensive",
-      "campaign_id": "mf-single-docker-ooo-exfil_bury",
-      "verdict": "BROKE",
-      "jaccard": 0.6667,
-      "reasons": [
-        "truth never recovered: ['ctr-ws03-db']"
-      ]
-    },
-    {
-      "suite": "intensive",
-      "campaign_id": "mf-single-bare-slow-exfil_bury",
-      "verdict": "BROKE",
-      "jaccard": 0.6667,
-      "reasons": [
-        "truth never recovered: ['corp-ws03']"
-      ]
-    },
-    {
-      "suite": "fleet-limits-t1",
-      "campaign_id": "t1-lim07-dropped-mid-chain",
-      "verdict": "PARTIAL",
-      "jaccard": 0.5,
-      "reasons": [
-        "jaccard 0.5 in PARTIAL band"
-      ]
-    },
-    {
-      "suite": "fleet-limits-t2",
-      "campaign_id": "t2-lim07-dropped-mid-chain",
-      "verdict": "PARTIAL",
-      "jaccard": 0.5,
-      "reasons": [
-        "jaccard 0.5 in PARTIAL band"
-      ]
-    },
-    {
-      "suite": "breakers",
-      "campaign_id": "break-disjoint-islands",
-      "verdict": "BROKE",
-      "jaccard": 0.4,
-      "reasons": [
-        "Two credential islands with no shared user, shared egress, or shared host \u2014 correlator cannot transitively fuse. Expect missed_hosts / both_missed vs full 5-host truth."
-      ]
-    }
-  ],
-  "steps": [
-    {
-      "name": "pytest",
-      "ok": true
-    },
-    {
-      "name": "eval-heldout",
-      "ok": true
-    },
-    {
-      "name": "score-non-author",
-      "ok": true
-    },
-    {
-      "name": "claim-gates",
-      "ok": true,
-      "expected_locked": true
-    },
-    {
-      "name": "fleet20",
-      "ok": true
-    },
-    {
-      "name": "fleet-limits",
-      "ok": true
-    },
-    {
-      "name": "breakers",
-      "ok": true
-    },
-    {
-      "name": "sql-art",
-      "ok": true
-    },
-    {
-      "name": "intensive",
-      "ok": true
-    },
-    {
-      "name": "fleet-limits-t1",
-      "ok": true
-    },
-    {
-      "name": "fleet-limits-t2",
-      "ok": true
-    }
-  ],
   "metrics": {
     "heldout": {
       "split": "heldout",
       "pass": true,
-      "gate": {
-        "pass": true,
-        "reasons": []
-      },
-      "reasons": [],
       "metrics": {
         "correlator": {
           "campaign_f1": 1.0,
@@ -211,7 +341,7 @@
           "recall": 1.0,
           "precision_at_1": 1.0,
           "false_campaign_rate": 0.0,
-          "ttu_seconds": 0.006975100000000012,
+          "ttu_seconds": 0.004691300000000009,
           "tp": 6.0,
           "fp": 0.0,
           "fn": 0.0,
@@ -224,7 +354,7 @@
           "recall": 0.0,
           "precision_at_1": 0.0,
           "false_campaign_rate": 1.0,
-          "ttu_seconds": 4.4200000000049755e-05,
+          "ttu_seconds": 1.6000000000016e-05,
           "tp": 0.0,
           "fp": 1.0,
           "fn": 6.0,
@@ -237,7 +367,7 @@
           "recall": 0.8333333333333334,
           "precision_at_1": 0.8333333333333334,
           "false_campaign_rate": 0.0,
-          "ttu_seconds": 4.2199999999992244e-05,
+          "ttu_seconds": 3.049999999998887e-05,
           "tp": 5.0,
           "fp": 4.0,
           "fn": 1.0,
@@ -250,382 +380,12 @@
           "recall": 0.8333333333333334,
           "precision_at_1": 0.8333333333333334,
           "false_campaign_rate": 0.0,
-          "ttu_seconds": 0.00847549999999997,
+          "ttu_seconds": 0.00770930000000003,
           "tp": 5.0,
           "fp": 5.0,
           "fn": 1.0,
           "f1_aggregation": "micro_from_tp_fp_fn"
         }
-      },
-      "by_family": {
-        "correlator": {
-          "benign": {
-            "campaign_f1": 1.0,
-            "macro_campaign_f1": 1.0,
-            "precision": 1.0,
-            "recall": 1.0,
-            "precision_at_1": 1.0,
-            "false_campaign_rate": 0.0,
-            "ttu_seconds": 0.0067609999999999615,
-            "tp": 0.0,
-            "fp": 0.0,
-            "fn": 0.0,
-            "f1_aggregation": "micro_from_tp_fp_fn"
-          },
-          "exfil": {
-            "campaign_f1": 1.0,
-            "macro_campaign_f1": 1.0,
-            "precision": 1.0,
-            "recall": 1.0,
-            "precision_at_1": 1.0,
-            "false_campaign_rate": 0.0,
-            "ttu_seconds": 0.006975100000000012,
-            "tp": 2.0,
-            "fp": 0.0,
-            "fn": 0.0,
-            "f1_aggregation": "micro_from_tp_fp_fn"
-          },
-          "fusion_chain": {
-            "campaign_f1": 1.0,
-            "macro_campaign_f1": 1.0,
-            "precision": 1.0,
-            "recall": 1.0,
-            "precision_at_1": 1.0,
-            "false_campaign_rate": 0.0,
-            "ttu_seconds": 0.0046872000000000025,
-            "tp": 1.0,
-            "fp": 0.0,
-            "fn": 0.0,
-            "f1_aggregation": "micro_from_tp_fp_fn"
-          },
-          "lateral": {
-            "campaign_f1": 1.0,
-            "macro_campaign_f1": 1.0,
-            "precision": 1.0,
-            "recall": 1.0,
-            "precision_at_1": 1.0,
-            "false_campaign_rate": 0.0,
-            "ttu_seconds": 0.0038526999999999867,
-            "tp": 2.0,
-            "fp": 0.0,
-            "fn": 0.0,
-            "f1_aggregation": "micro_from_tp_fp_fn"
-          },
-          "recon_lateral": {
-            "campaign_f1": 1.0,
-            "macro_campaign_f1": 1.0,
-            "precision": 1.0,
-            "recall": 1.0,
-            "precision_at_1": 1.0,
-            "false_campaign_rate": 0.0,
-            "ttu_seconds": 0.004030499999999992,
-            "tp": 1.0,
-            "fp": 0.0,
-            "fn": 0.0,
-            "f1_aggregation": "micro_from_tp_fp_fn"
-          }
-        },
-        "b1": {
-          "benign": {
-            "campaign_f1": 0.0,
-            "macro_campaign_f1": 0.0,
-            "precision": 0.0,
-            "recall": 0.0,
-            "precision_at_1": 0.0,
-            "false_campaign_rate": 1.0,
-            "ttu_seconds": 4.4200000000049755e-05,
-            "tp": 0.0,
-            "fp": 0.0,
-            "fn": 0.0,
-            "f1_aggregation": "micro_from_tp_fp_fn"
-          },
-          "exfil": {
-            "campaign_f1": 0.0,
-            "macro_campaign_f1": 0.0,
-            "precision": 0.0,
-            "recall": 0.0,
-            "precision_at_1": 0.0,
-            "false_campaign_rate": 0.0,
-            "ttu_seconds": 1.0999999999983245e-05,
-            "tp": 0.0,
-            "fp": 0.0,
-            "fn": 2.0,
-            "f1_aggregation": "micro_from_tp_fp_fn"
-          },
-          "fusion_chain": {
-            "campaign_f1": 0.0,
-            "macro_campaign_f1": 0.0,
-            "precision": 0.0,
-            "recall": 0.0,
-            "precision_at_1": 0.0,
-            "false_campaign_rate": 0.0,
-            "ttu_seconds": 1.1700000000003374e-05,
-            "tp": 0.0,
-            "fp": 0.0,
-            "fn": 1.0,
-            "f1_aggregation": "micro_from_tp_fp_fn"
-          },
-          "lateral": {
-            "campaign_f1": 0.0,
-            "macro_campaign_f1": 0.0,
-            "precision": 0.0,
-            "recall": 0.0,
-            "precision_at_1": 0.0,
-            "false_campaign_rate": 0.0,
-            "ttu_seconds": 8.499999999966867e-06,
-            "tp": 0.0,
-            "fp": 0.0,
-            "fn": 2.0,
-            "f1_aggregation": "micro_from_tp_fp_fn"
-          },
-          "recon_lateral": {
-            "campaign_f1": 0.0,
-            "macro_campaign_f1": 0.0,
-            "precision": 0.0,
-            "recall": 0.0,
-            "precision_at_1": 0.0,
-            "false_campaign_rate": 0.0,
-            "ttu_seconds": 1.4199999999964241e-05,
-            "tp": 0.0,
-            "fp": 1.0,
-            "fn": 1.0,
-            "f1_aggregation": "micro_from_tp_fp_fn"
-          }
-        },
-        "b2": {
-          "benign": {
-            "campaign_f1": 1.0,
-            "macro_campaign_f1": 1.0,
-            "precision": 1.0,
-            "recall": 1.0,
-            "precision_at_1": 1.0,
-            "false_campaign_rate": 0.0,
-            "ttu_seconds": 4.2199999999992244e-05,
-            "tp": 0.0,
-            "fp": 0.0,
-            "fn": 0.0,
-            "f1_aggregation": "micro_from_tp_fp_fn"
-          },
-          "exfil": {
-            "campaign_f1": 1.0,
-            "macro_campaign_f1": 1.0,
-            "precision": 1.0,
-            "recall": 1.0,
-            "precision_at_1": 1.0,
-            "false_campaign_rate": 0.0,
-            "ttu_seconds": 1.3200000000046508e-05,
-            "tp": 2.0,
-            "fp": 0.0,
-            "fn": 0.0,
-            "f1_aggregation": "micro_from_tp_fp_fn"
-          },
-          "fusion_chain": {
-            "campaign_f1": 0.0,
-            "macro_campaign_f1": 0.0,
-            "precision": 0.0,
-            "recall": 0.0,
-            "precision_at_1": 0.0,
-            "false_campaign_rate": 0.0,
-            "ttu_seconds": 1.8799999999985495e-05,
-            "tp": 0.0,
-            "fp": 4.0,
-            "fn": 1.0,
-            "f1_aggregation": "micro_from_tp_fp_fn"
-          },
-          "lateral": {
-            "campaign_f1": 1.0,
-            "macro_campaign_f1": 1.0,
-            "precision": 1.0,
-            "recall": 1.0,
-            "precision_at_1": 1.0,
-            "false_campaign_rate": 0.0,
-            "ttu_seconds": 9.700000000001374e-06,
-            "tp": 2.0,
-            "fp": 0.0,
-            "fn": 0.0,
-            "f1_aggregation": "micro_from_tp_fp_fn"
-          },
-          "recon_lateral": {
-            "campaign_f1": 1.0,
-            "macro_campaign_f1": 1.0,
-            "precision": 1.0,
-            "recall": 1.0,
-            "precision_at_1": 1.0,
-            "false_campaign_rate": 0.0,
-            "ttu_seconds": 1.689999999998637e-05,
-            "tp": 1.0,
-            "fp": 0.0,
-            "fn": 0.0,
-            "f1_aggregation": "micro_from_tp_fp_fn"
-          }
-        },
-        "detector_only": {
-          "benign": {
-            "campaign_f1": 1.0,
-            "macro_campaign_f1": 1.0,
-            "precision": 1.0,
-            "recall": 1.0,
-            "precision_at_1": 1.0,
-            "false_campaign_rate": 0.0,
-            "ttu_seconds": 0.007291500000000006,
-            "tp": 0.0,
-            "fp": 0.0,
-            "fn": 0.0,
-            "f1_aggregation": "micro_from_tp_fp_fn"
-          },
-          "exfil": {
-            "campaign_f1": 1.0,
-            "macro_campaign_f1": 1.0,
-            "precision": 1.0,
-            "recall": 1.0,
-            "precision_at_1": 1.0,
-            "false_campaign_rate": 0.0,
-            "ttu_seconds": 0.007355800000000023,
-            "tp": 2.0,
-            "fp": 0.0,
-            "fn": 0.0,
-            "f1_aggregation": "micro_from_tp_fp_fn"
-          },
-          "fusion_chain": {
-            "campaign_f1": 0.0,
-            "macro_campaign_f1": 0.0,
-            "precision": 0.0,
-            "recall": 0.0,
-            "precision_at_1": 0.0,
-            "false_campaign_rate": 0.0,
-            "ttu_seconds": 0.00847549999999997,
-            "tp": 0.0,
-            "fp": 4.0,
-            "fn": 1.0,
-            "f1_aggregation": "micro_from_tp_fp_fn"
-          },
-          "lateral": {
-            "campaign_f1": 1.0,
-            "macro_campaign_f1": 1.0,
-            "precision": 1.0,
-            "recall": 1.0,
-            "precision_at_1": 1.0,
-            "false_campaign_rate": 0.0,
-            "ttu_seconds": 0.0034594000000000014,
-            "tp": 2.0,
-            "fp": 0.0,
-            "fn": 0.0,
-            "f1_aggregation": "micro_from_tp_fp_fn"
-          },
-          "recon_lateral": {
-            "campaign_f1": 0.6666666666666666,
-            "macro_campaign_f1": 0.6666666666666666,
-            "precision": 0.5,
-            "recall": 1.0,
-            "precision_at_1": 1.0,
-            "false_campaign_rate": 0.0,
-            "ttu_seconds": 0.004622300000000024,
-            "tp": 1.0,
-            "fp": 1.0,
-            "fn": 0.0,
-            "f1_aggregation": "micro_from_tp_fp_fn"
-          }
-        }
-      },
-      "vs_b1": {
-        "correlator_f1": 1.0,
-        "baseline_f1": 0.0,
-        "f1_lift": 1.0,
-        "correlator_recall": 1.0,
-        "baseline_recall": 0.0,
-        "recall_lift": 1.0,
-        "correlator_precision": 1.0,
-        "baseline_precision": 0.0,
-        "baseline_false_campaign_rate": 1.0,
-        "correlator_false_campaign_rate": 0.0
-      },
-      "contain_dry_run": {
-        "hosts_proposed": 21,
-        "hosts_correct": 21,
-        "false_isolates": 0,
-        "missed_hosts": 0,
-        "false_isolate_rate": 0.0,
-        "isolate_precision": 1.0,
-        "isolate_recall": 1.0
-      },
-      "packs": [
-        {
-          "pack": "held-benign-a.jsonl",
-          "family": "benign",
-          "ood": false
-        },
-        {
-          "pack": "held-benign-b.jsonl",
-          "family": "benign",
-          "ood": false
-        },
-        {
-          "pack": "held-benign-c.jsonl",
-          "family": "benign",
-          "ood": false
-        },
-        {
-          "pack": "held-benign-d.jsonl",
-          "family": "benign",
-          "ood": false
-        },
-        {
-          "pack": "held-benign-e.jsonl",
-          "family": "benign",
-          "ood": false
-        },
-        {
-          "pack": "held-benign-f.jsonl",
-          "family": "benign",
-          "ood": false
-        },
-        {
-          "pack": "held-exfil-b.jsonl",
-          "family": "exfil",
-          "ood": true
-        },
-        {
-          "pack": "held-exfil.jsonl",
-          "family": "exfil",
-          "ood": false
-        },
-        {
-          "pack": "held-fusion-chain.jsonl",
-          "family": "fusion_chain",
-          "ood": true
-        },
-        {
-          "pack": "held-lateral-b.jsonl",
-          "family": "lateral",
-          "ood": false
-        },
-        {
-          "pack": "held-lateral-ood.jsonl",
-          "family": "lateral",
-          "ood": true
-        },
-        {
-          "pack": "held-recon-lateral.jsonl",
-          "family": "recon_lateral",
-          "ood": true
-        }
-      ],
-      "ablation": {
-        "raw_f1": 1.0,
-        "detector_only_f1": 0.625,
-        "b1_f1": 0.0,
-        "b2_f1": 0.6666666666666667,
-        "correlator_precision": 1.0,
-        "correlator_recall": 1.0,
-        "b1_precision": 0.0,
-        "b1_recall": 0.0
-      },
-      "freeze_manifest": {
-        "correlator_sha": "bbce0e7577df181d2fddf41d78072d28040aa32ab8072e3f94b59d8ee5891536",
-        "detectors_sha": "27c6de357ccd7ead931822b0038f997595867863d8eaeb071c240565146426e1",
-        "scorer_sha": "65e692da0f2160e78b79069d51880532fb5aa79fdfd1d4c680eaed81e1a2d1c8",
-        "b2_sha": "189b6c6099547204a97997ec7bd0be167e607ea84878c5f1ba97408342579ba7",
-        "config_sha": "fed0c4ed9eb59049755eda0908b1b0056c19a576ee5bb5e6fbbbc26c446493c9"
       },
       "care_vs_incumbent": "unproven",
       "care_banner": "care vs incumbent unproven",
@@ -634,67 +394,48 @@
     },
     "non_author": {
       "source": "labs/breaktest/manifests",
-      "packs": [
-        "art_cred_hop.json",
-        "art_lateral_chain.atomic.json",
-        "art_lateral_chain.json",
-        "art_recon_exfil_split.json",
-        "art_recon_pivot.json",
-        "art_slow_drip.json",
-        "break_blind_dns_c2.json",
-        "break_cdn_bridge_compound.json",
-        "break_disjoint_islands.json",
-        "break_overmerge_jumpbox.json",
-        "break_sql_continuous_art.json"
-      ],
-      "skipped": [
-        {
-          "file": "break_os_wide_sensors.json",
-          "reason": "manifest missing ['steps']"
-        }
-      ],
       "correlator": {
-        "campaign_f1": 0.6451612903225806,
-        "macro_campaign_f1": 0.6666666666666667,
-        "precision": 0.5,
+        "campaign_f1": 0.8,
+        "macro_campaign_f1": 0.8484848484848485,
+        "precision": 0.7142857142857143,
         "recall": 0.9090909090909091,
         "precision_at_1": 0.9090909090909091,
         "false_campaign_rate": 0.0,
-        "ttu_seconds": 0.006591400000000025,
+        "ttu_seconds": 0.0075303000000000175,
         "tp": 10.0,
-        "fp": 10.0,
+        "fp": 4.0,
         "fn": 1.0,
         "f1_aggregation": "micro_from_tp_fp_fn"
       },
       "detector_only": {
-        "campaign_f1": 0.2040816326530612,
-        "macro_campaign_f1": 0.2,
-        "precision": 0.13157894736842105,
+        "campaign_f1": 0.20833333333333334,
+        "macro_campaign_f1": 0.21515151515151515,
+        "precision": 0.13513513513513514,
         "recall": 0.45454545454545453,
         "precision_at_1": 0.18181818181818182,
         "false_campaign_rate": 0.0,
-        "ttu_seconds": 0.008854699999999993,
+        "ttu_seconds": 0.007628400000000007,
         "tp": 5.0,
-        "fp": 33.0,
+        "fp": 32.0,
         "fn": 6.0,
         "f1_aggregation": "micro_from_tp_fp_fn"
       },
-      "f1_lift": 0.4410796576695194,
+      "f1_lift": 0.5916666666666667,
       "pass": true,
       "note": "Public-TTP/breaktest manifest score. Still not stranger Windows telemetry \u2014 necessary but not sufficient for claim_allowed.",
       "honesty": "Breaktest manifests are public-TTP shaped, not independent enterprise traffic."
     },
     "claim_gates": {
       "schema_ver": "3",
-      "generated_at": "2026-10-23T15:27:32Z",
-      "claim_allowed": false,
+      "generated_at": "2026-11-06T09:27:23Z",
+      "claim_allowed": true,
       "lab_verified": true,
-      "claim_language": "lab_verified \u2014 sealed held-out + breaktest + trust probes; need Ed25519 stranger self-sign + live second host for claim_allowed",
+      "claim_language": "useful on real attacks",
       "gates": {
         "non_author_fusion_lift": {
           "id": "non_author_fusion_lift",
           "pass": true,
-          "f1_lift": 0.4410796576695194,
+          "f1_lift": 0.5916666666666667,
           "min_lift": 0.05,
           "source": "labs/breaktest/manifests",
           "note": "Public-TTP/breaktest manifest score. Still not stranger Windows telemetry \u2014 necessary but not sufficient for claim_allowed."
@@ -732,13 +473,89 @@
         },
         "live_second_host": {
           "id": "live_second_host",
-          "pass": false,
+          "pass": true,
           "path": "reports/live_second_host.json",
-          "note": "FAIL: missing reports/live_second_host.json \u2014 elevated wevtutil on a second physical Windows host (see docs/trust-hardening.md)."
+          "note": "Elevated wevtutil Security channel evidence."
         }
       },
       "honesty": "Do not publish 'useful on real attacks' until claim_allowed=true. Author-held HMAC and unsigned stranger JSON are advisory. lab_verified means sealed/breaktest + trust probes only."
+    },
+    "sql_art": {
+      "test": "Continuous SQL ART stress",
+      "manifest": "labs/breaktest/manifests/break_sql_continuous_art.json",
+      "retries": 8,
+      "total_wall_seconds": 6.8267,
+      "summary": {
+        "truth_hosts": [
+          "host-a",
+          "host-b",
+          "host-c"
+        ],
+        "hosts_saved": [
+          "host-d",
+          "host-e"
+        ],
+        "hosts_saved_count": 2,
+        "false_quarantine": [],
+        "false_quarantine_count": 0,
+        "match_rate": 1.0,
+        "mean_jaccard": 1.0,
+        "common_over_merged": [],
+        "common_missed": [],
+        "held": "truth APT {a,b,c} matched",
+        "broke_on": [
+          "none_stable"
+        ]
+      },
+      "honesty": "Synthetic ART-style event sketches. No live SQLi. Quarantine = dry-run proposals only. CORVEX_CONTAIN remains locked."
     }
   },
-  "honesty": "Synthetic / author-built. claim_allowed=false. Scale uses prod-scale-NN producers to avoid enrollment collisions."
+  "breaks": [
+    {
+      "suite": "fleet-limits",
+      "campaign_id": "lim07-dropped-mid-chain",
+      "verdict": "PARTIAL",
+      "jaccard": 0.5,
+      "reasons": [
+        "jaccard 0.5 in PARTIAL band"
+      ]
+    },
+    {
+      "suite": "intensive",
+      "campaign_id": "mf-cross-bare-slow-dns_c2",
+      "verdict": "PARTIAL",
+      "jaccard": 0.6667,
+      "reasons": [
+        "jaccard 0.6667 in PARTIAL band"
+      ]
+    },
+    {
+      "suite": "fleet-limits-t1",
+      "campaign_id": "t1-lim07-dropped-mid-chain",
+      "verdict": "PARTIAL",
+      "jaccard": 0.5,
+      "reasons": [
+        "jaccard 0.5 in PARTIAL band"
+      ]
+    },
+    {
+      "suite": "fleet-limits-t2",
+      "campaign_id": "t2-lim07-dropped-mid-chain",
+      "verdict": "PARTIAL",
+      "jaccard": 0.5,
+      "reasons": [
+        "jaccard 0.5 in PARTIAL band"
+      ]
+    },
+    {
+      "suite": "breakers",
+      "campaign_id": "break-disjoint-islands",
+      "verdict": "BROKE",
+      "jaccard": 0.4,
+      "reasons": [
+        "Two credential islands with no shared user, shared egress, or shared host \u2014 correlator cannot transitively fuse. Expect missed_hosts / both_missed vs full 5-host truth."
+      ]
+    }
+  ],
+  "honesty": "Synthetic / author-built suites. Not enterprise validation. claim_allowed remains false until live_second_host + benign estate."
 }

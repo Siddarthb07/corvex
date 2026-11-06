@@ -3,19 +3,19 @@
   "honesty": "Synthetic factor cells (domain/container/sequence/style). Not enterprise telemetry. claim_allowed remains false.",
   "n": 28,
   "intensity_rounds": 2,
-  "wall_seconds": 44.869,
-  "held": 23,
-  "fragile": 5,
-  "partial": 2,
-  "broke": 3,
+  "wall_seconds": 40.5224,
+  "held": 27,
+  "fragile": 6,
+  "partial": 1,
+  "broke": 0,
   "error": 0,
   "factor_pivots": {
     "domain": {
       "single": {
-        "HELD": 10,
-        "fragile": 1,
+        "HELD": 12,
+        "fragile": 2,
         "PARTIAL": 0,
-        "BROKE": 3,
+        "BROKE": 0,
         "ERROR": 0
       },
       "cross": {
@@ -26,62 +26,62 @@
         "ERROR": 0
       },
       "forest": {
-        "HELD": 4,
+        "HELD": 5,
         "fragile": 2,
-        "PARTIAL": 1,
+        "PARTIAL": 0,
         "BROKE": 0,
         "ERROR": 0
       }
     },
     "container": {
       "bare": {
-        "HELD": 9,
-        "fragile": 2,
+        "HELD": 10,
+        "fragile": 3,
         "PARTIAL": 1,
-        "BROKE": 2,
+        "BROKE": 0,
         "ERROR": 0
       },
       "docker": {
-        "HELD": 4,
+        "HELD": 5,
         "fragile": 3,
         "PARTIAL": 0,
-        "BROKE": 1,
+        "BROKE": 0,
         "ERROR": 0
       },
       "mixed": {
-        "HELD": 5,
+        "HELD": 6,
         "fragile": 0,
-        "PARTIAL": 1,
+        "PARTIAL": 0,
         "BROKE": 0,
         "ERROR": 0
       }
     },
     "sequence": {
       "burst": {
-        "HELD": 10,
+        "HELD": 11,
         "fragile": 1,
         "PARTIAL": 0,
-        "BROKE": 1,
+        "BROKE": 0,
         "ERROR": 0
       },
       "slow": {
         "HELD": 3,
-        "fragile": 1,
+        "fragile": 2,
         "PARTIAL": 1,
-        "BROKE": 1,
+        "BROKE": 0,
         "ERROR": 0
       },
       "ooo": {
-        "HELD": 3,
+        "HELD": 4,
         "fragile": 1,
         "PARTIAL": 0,
-        "BROKE": 1,
+        "BROKE": 0,
         "ERROR": 0
       },
       "concurrent": {
-        "HELD": 2,
+        "HELD": 3,
         "fragile": 2,
-        "PARTIAL": 1,
+        "PARTIAL": 0,
         "BROKE": 0,
         "ERROR": 0
       }
@@ -109,10 +109,10 @@
         "ERROR": 0
       },
       "exfil_bury": {
-        "HELD": 0,
-        "fragile": 0,
-        "PARTIAL": 1,
-        "BROKE": 3,
+        "HELD": 3,
+        "fragile": 1,
+        "PARTIAL": 0,
+        "BROKE": 0,
         "ERROR": 0
       },
       "helpdesk_overlap": {
@@ -147,7 +147,7 @@
         "break_criterion not triggered: Jaccard < 0.5 OR truth host never recovered OR benign merge-FQ"
       ],
       "intensity_rounds": 2,
-      "wall_seconds": 1.5183,
+      "wall_seconds": 1.4522,
       "corr_jaccard": 1.0,
       "confidence_margin": 1.0,
       "confidence_margin_raw": 1.0,
@@ -156,9 +156,7 @@
       "recovered_on_replay": [],
       "over_merged_hosts": [],
       "quarantine_proposed": [
-        "corp-ws01",
-        "corp-ws02",
-        "corp-ws03"
+        "corp-ws02"
       ],
       "hosts_saved": [
         "corp-ws04",
@@ -216,9 +214,7 @@
           "b1_hosts": [],
           "b1_campaigns": [],
           "quarantine_proposed": [
-            "corp-ws01",
-            "corp-ws02",
-            "corp-ws03"
+            "corp-ws02"
           ],
           "recon_hosts": [
             "corp-ws01",
@@ -262,9 +258,7 @@
           "b1_hosts": [],
           "b1_campaigns": [],
           "quarantine_proposed": [
-            "corp-ws01",
-            "corp-ws02",
-            "corp-ws03"
+            "corp-ws02"
           ],
           "recon_hosts": [
             "corp-ws01",
@@ -305,7 +299,7 @@
         "break_criterion not triggered: Jaccard < 0.5 OR truth host never recovered OR benign merge-FQ"
       ],
       "intensity_rounds": 2,
-      "wall_seconds": 1.5475,
+      "wall_seconds": 1.4505,
       "corr_jaccard": 1.0,
       "confidence_margin": 1.0,
       "confidence_margin_raw": 1.0,
@@ -314,9 +308,7 @@
       "recovered_on_replay": [],
       "over_merged_hosts": [],
       "quarantine_proposed": [
-        "corp-ws01",
-        "corp-ws02",
-        "dmz-gw01"
+        "corp-ws02"
       ],
       "hosts_saved": [
         "corp-ws03",
@@ -374,9 +366,7 @@
           "b1_hosts": [],
           "b1_campaigns": [],
           "quarantine_proposed": [
-            "corp-ws01",
-            "corp-ws02",
-            "dmz-gw01"
+            "corp-ws02"
           ],
           "recon_hosts": [
             "corp-ws01",
@@ -420,9 +410,7 @@
           "b1_hosts": [],
           "b1_campaigns": [],
           "quarantine_proposed": [
-            "corp-ws01",
-            "corp-ws02",
-            "dmz-gw01"
+            "corp-ws02"
           ],
           "recon_hosts": [
             "corp-ws01",
@@ -463,7 +451,7 @@
         "break_criterion not triggered: Jaccard < 0.5 OR truth host never recovered OR benign merge-FQ"
       ],
       "intensity_rounds": 2,
-      "wall_seconds": 1.5101,
+      "wall_seconds": 1.3363,
       "corr_jaccard": 1.0,
       "confidence_margin": 1.0,
       "confidence_margin_raw": 1.0,
@@ -472,9 +460,7 @@
       "recovered_on_replay": [],
       "over_merged_hosts": [],
       "quarantine_proposed": [
-        "corp-dc01",
-        "finance-ws01",
-        "partner-ws01"
+        "finance-ws01"
       ],
       "hosts_saved": [
         "corp-ws02",
@@ -533,9 +519,7 @@
           "b1_hosts": [],
           "b1_campaigns": [],
           "quarantine_proposed": [
-            "corp-dc01",
-            "finance-ws01",
-            "partner-ws01"
+            "finance-ws01"
           ],
           "recon_hosts": [
             "corp-dc01",
@@ -579,9 +563,7 @@
           "b1_hosts": [],
           "b1_campaigns": [],
           "quarantine_proposed": [
-            "corp-dc01",
-            "finance-ws01",
-            "partner-ws01"
+            "finance-ws01"
           ],
           "recon_hosts": [
             "corp-dc01",
@@ -622,7 +604,7 @@
         "break_criterion not triggered: Jaccard < 0.5 OR truth host never recovered OR benign merge-FQ"
       ],
       "intensity_rounds": 2,
-      "wall_seconds": 1.5107,
+      "wall_seconds": 1.3614,
       "corr_jaccard": 1.0,
       "confidence_margin": 1.0,
       "confidence_margin_raw": 1.0,
@@ -631,9 +613,7 @@
       "recovered_on_replay": [],
       "over_merged_hosts": [],
       "quarantine_proposed": [
-        "ctr-ws01-web",
-        "ctr-ws02-api",
-        "ctr-ws03-db"
+        "ctr-ws02-api"
       ],
       "hosts_saved": [
         "ctr-ws04-cache",
@@ -691,9 +671,7 @@
           "b1_hosts": [],
           "b1_campaigns": [],
           "quarantine_proposed": [
-            "ctr-ws01-web",
-            "ctr-ws02-api",
-            "ctr-ws03-db"
+            "ctr-ws02-api"
           ],
           "recon_hosts": [
             "ctr-ws01-web",
@@ -737,9 +715,7 @@
           "b1_hosts": [],
           "b1_campaigns": [],
           "quarantine_proposed": [
-            "ctr-ws01-web",
-            "ctr-ws02-api",
-            "ctr-ws03-db"
+            "ctr-ws02-api"
           ],
           "recon_hosts": [
             "ctr-ws01-web",
@@ -780,7 +756,7 @@
         "break_criterion not triggered: Jaccard < 0.5 OR truth host never recovered OR benign merge-FQ"
       ],
       "intensity_rounds": 2,
-      "wall_seconds": 1.6121,
+      "wall_seconds": 1.3505,
       "corr_jaccard": 1.0,
       "confidence_margin": 1.0,
       "confidence_margin_raw": 1.0,
@@ -789,9 +765,7 @@
       "recovered_on_replay": [],
       "over_merged_hosts": [],
       "quarantine_proposed": [
-        "corp-ws01",
-        "corp-ws02",
-        "corp-ws03"
+        "corp-ws02"
       ],
       "hosts_saved": [
         "corp-ws04",
@@ -849,9 +823,7 @@
           "b1_hosts": [],
           "b1_campaigns": [],
           "quarantine_proposed": [
-            "corp-ws01",
-            "corp-ws02",
-            "corp-ws03"
+            "corp-ws02"
           ],
           "recon_hosts": [
             "corp-ws01",
@@ -895,9 +867,7 @@
           "b1_hosts": [],
           "b1_campaigns": [],
           "quarantine_proposed": [
-            "corp-ws01",
-            "corp-ws02",
-            "corp-ws03"
+            "corp-ws02"
           ],
           "recon_hosts": [
             "corp-ws01",
@@ -938,7 +908,7 @@
         "break_criterion not triggered: Jaccard < 0.5 OR truth host never recovered OR benign merge-FQ"
       ],
       "intensity_rounds": 2,
-      "wall_seconds": 1.7866,
+      "wall_seconds": 1.409,
       "corr_jaccard": 1.0,
       "confidence_margin": 1.0,
       "confidence_margin_raw": 1.0,
@@ -1084,7 +1054,7 @@
         "break_criterion not triggered: Jaccard < 0.5 OR truth host never recovered OR benign merge-FQ"
       ],
       "intensity_rounds": 2,
-      "wall_seconds": 1.6819,
+      "wall_seconds": 1.5699,
       "corr_jaccard": 1.0,
       "confidence_margin": 1.0,
       "confidence_margin_raw": 1.0,
@@ -1093,9 +1063,7 @@
       "recovered_on_replay": [],
       "over_merged_hosts": [],
       "quarantine_proposed": [
-        "corp-ws01",
-        "corp-ws02",
-        "corp-ws03"
+        "corp-ws02"
       ],
       "hosts_saved": [
         "corp-ws04",
@@ -1153,9 +1121,7 @@
           "b1_hosts": [],
           "b1_campaigns": [],
           "quarantine_proposed": [
-            "corp-ws01",
-            "corp-ws02",
-            "corp-ws03"
+            "corp-ws02"
           ],
           "recon_hosts": [
             "corp-ws01",
@@ -1199,9 +1165,7 @@
           "b1_hosts": [],
           "b1_campaigns": [],
           "quarantine_proposed": [
-            "corp-ws01",
-            "corp-ws02",
-            "corp-ws03"
+            "corp-ws02"
           ],
           "recon_hosts": [
             "corp-ws01",
@@ -1258,7 +1222,7 @@
         "multi-campaign held"
       ],
       "intensity_rounds": 2,
-      "wall_seconds": 1.6584,
+      "wall_seconds": 1.4128,
       "corr_jaccard": 1.0,
       "confidence_margin": 0.9,
       "confidence_margin_raw": 0.1,
@@ -1267,9 +1231,7 @@
       "recovered_on_replay": [],
       "over_merged_hosts": [],
       "quarantine_proposed": [
-        "corp-ws01",
-        "corp-ws02",
-        "corp-ws03"
+        "corp-ws02"
       ],
       "hosts_saved": [
         "corp-ws05"
@@ -1412,9 +1374,7 @@
             "min_jaccard": 1.0
           },
           "quarantine_proposed": [
-            "corp-ws01",
-            "corp-ws02",
-            "corp-ws03"
+            "corp-ws02"
           ],
           "recon_hosts": [
             "corp-ws01",
@@ -1507,9 +1467,7 @@
             "min_jaccard": 1.0
           },
           "quarantine_proposed": [
-            "corp-ws01",
-            "corp-ws02",
-            "corp-ws03"
+            "corp-ws02"
           ],
           "recon_hosts": [
             "corp-ws01",
@@ -1549,7 +1507,7 @@
         "break_criterion not triggered: Jaccard < 0.5 OR truth host never recovered OR benign merge-FQ"
       ],
       "intensity_rounds": 2,
-      "wall_seconds": 1.6793,
+      "wall_seconds": 1.3966,
       "corr_jaccard": 1.0,
       "confidence_margin": 1.0,
       "confidence_margin_raw": 1.0,
@@ -1558,9 +1516,7 @@
       "recovered_on_replay": [],
       "over_merged_hosts": [],
       "quarantine_proposed": [
-        "corp-ws01",
-        "corp-ws02",
-        "corp-ws03"
+        "corp-ws02"
       ],
       "hosts_saved": [
         "corp-ws04",
@@ -1618,9 +1574,7 @@
           "b1_hosts": [],
           "b1_campaigns": [],
           "quarantine_proposed": [
-            "corp-ws01",
-            "corp-ws02",
-            "corp-ws03"
+            "corp-ws02"
           ],
           "recon_hosts": [
             "corp-ws01",
@@ -1664,9 +1618,7 @@
           "b1_hosts": [],
           "b1_campaigns": [],
           "quarantine_proposed": [
-            "corp-ws01",
-            "corp-ws02",
-            "corp-ws03"
+            "corp-ws02"
           ],
           "recon_hosts": [
             "corp-ws01",
@@ -1707,7 +1659,7 @@
         "break_criterion not triggered: Jaccard < 0.5 OR truth host never recovered OR benign merge-FQ"
       ],
       "intensity_rounds": 2,
-      "wall_seconds": 1.5012,
+      "wall_seconds": 1.5116,
       "corr_jaccard": 1.0,
       "confidence_margin": 1.0,
       "confidence_margin_raw": 1.0,
@@ -1846,22 +1798,23 @@
       ],
       "truth_campaigns": null,
       "break_criterion": "Jaccard < 0.5 OR truth host never recovered OR benign merge-FQ",
-      "verdict": "BROKE",
+      "verdict": "HELD",
       "verdict_reasons": [
-        "truth never recovered: ['corp-ws03']"
+        "matched truth without merge-FQ",
+        "break_criterion not triggered: Jaccard < 0.5 OR truth host never recovered OR benign merge-FQ"
       ],
       "intensity_rounds": 2,
-      "wall_seconds": 1.5929,
-      "corr_jaccard": 0.6667,
-      "confidence_margin": 0.9,
-      "confidence_margin_raw": 0.9,
+      "wall_seconds": 1.4823,
+      "corr_jaccard": 1.0,
+      "confidence_margin": 1.0,
+      "confidence_margin_raw": 1.0,
       "confidence_margin_kind": "top_minus_second",
-      "missed_hosts": [
-        "corp-ws03"
-      ],
+      "missed_hosts": [],
       "recovered_on_replay": [],
       "over_merged_hosts": [],
-      "quarantine_proposed": [],
+      "quarantine_proposed": [
+        "corp-ws02"
+      ],
       "hosts_saved": [
         "corp-ws04",
         "corp-ws05"
@@ -1887,7 +1840,8 @@
         ],
         "corr_truth_coverage": [
           "corp-ws01",
-          "corp-ws02"
+          "corp-ws02",
+          "corp-ws03"
         ],
         "baseline_wins": false
       },
@@ -1898,32 +1852,33 @@
           "round": 1,
           "build_ok": true,
           "corr_matched": true,
-          "corr_jaccard": 0.6667,
-          "det_jaccard": 0.6667,
-          "missed_hosts": [
-            "corp-ws03"
-          ],
+          "corr_jaccard": 1.0,
+          "det_jaccard": 1.0,
+          "missed_hosts": [],
           "over_merged_hosts": [],
           "fusion_lift": false,
           "both_missed": false,
           "corr_hosts": [
             "corp-ws01",
-            "corp-ws02"
+            "corp-ws02",
+            "corp-ws03"
           ],
           "best_campaign_hosts": [
             "corp-ws01",
-            "corp-ws02"
+            "corp-ws02",
+            "corp-ws03"
           ],
-          "confidence_margin": 0.9,
+          "confidence_margin": 1.0,
           "campaigns_ranked": [
             {
               "campaign_id": "camp-lateral-apt-op-1",
               "hosts": [
                 "corp-ws01",
-                "corp-ws02"
+                "corp-ws02",
+                "corp-ws03"
               ],
-              "score": 0.9,
-              "jaccard_vs_truth": 0.6667
+              "score": 1.0,
+              "jaccard_vs_truth": 1.0
             }
           ],
           "b1_hosts": [
@@ -1970,42 +1925,46 @@
               "score": 0.5
             }
           ],
-          "quarantine_proposed": [],
+          "quarantine_proposed": [
+            "corp-ws02"
+          ],
           "recon_hosts": [
             "corp-ws01",
-            "corp-ws02"
+            "corp-ws02",
+            "corp-ws03"
           ]
         },
         {
           "round": 2,
           "build_ok": true,
           "corr_matched": true,
-          "corr_jaccard": 0.6667,
-          "det_jaccard": 0.6667,
-          "missed_hosts": [
-            "corp-ws03"
-          ],
+          "corr_jaccard": 1.0,
+          "det_jaccard": 1.0,
+          "missed_hosts": [],
           "over_merged_hosts": [],
           "fusion_lift": false,
           "both_missed": false,
           "corr_hosts": [
             "corp-ws01",
-            "corp-ws02"
+            "corp-ws02",
+            "corp-ws03"
           ],
           "best_campaign_hosts": [
             "corp-ws01",
-            "corp-ws02"
+            "corp-ws02",
+            "corp-ws03"
           ],
-          "confidence_margin": 0.9,
+          "confidence_margin": 1.0,
           "campaigns_ranked": [
             {
               "campaign_id": "camp-lateral-apt-op-1",
               "hosts": [
                 "corp-ws01",
-                "corp-ws02"
+                "corp-ws02",
+                "corp-ws03"
               ],
-              "score": 0.9,
-              "jaccard_vs_truth": 0.6667
+              "score": 1.0,
+              "jaccard_vs_truth": 1.0
             }
           ],
           "b1_hosts": [
@@ -2052,16 +2011,19 @@
               "score": 0.5
             }
           ],
-          "quarantine_proposed": [],
+          "quarantine_proposed": [
+            "corp-ws02"
+          ],
           "recon_hosts": [
             "corp-ws01",
-            "corp-ws02"
+            "corp-ws02",
+            "corp-ws03"
           ]
         }
       ],
       "narrative": "Factor cell: domain=single container=bare sequence=burst style=exfil_bury.",
       "fragile": false,
-      "verdict_label": "BROKE",
+      "verdict_label": "HELD",
       "factors": {
         "domain": "single",
         "container": "bare",
@@ -2091,7 +2053,7 @@
         "break_criterion not triggered: Jaccard < 0.5 OR truth host never recovered OR benign merge-FQ"
       ],
       "intensity_rounds": 2,
-      "wall_seconds": 1.5658,
+      "wall_seconds": 1.3282,
       "corr_jaccard": 1.0,
       "confidence_margin": 0.0,
       "confidence_margin_raw": 0.0,
@@ -2281,7 +2243,7 @@
         "multi-campaign held"
       ],
       "intensity_rounds": 2,
-      "wall_seconds": 1.513,
+      "wall_seconds": 1.3898,
       "corr_jaccard": 1.0,
       "confidence_margin": -0.1,
       "confidence_margin_raw": 0.0,
@@ -2586,7 +2548,7 @@
         "break_criterion not triggered: Jaccard < 0.5 OR truth host never recovered OR benign merge-FQ"
       ],
       "intensity_rounds": 2,
-      "wall_seconds": 1.707,
+      "wall_seconds": 1.6053,
       "corr_jaccard": 1.0,
       "confidence_margin": 1.0,
       "confidence_margin_raw": 1.0,
@@ -2595,9 +2557,7 @@
       "recovered_on_replay": [],
       "over_merged_hosts": [],
       "quarantine_proposed": [
-        "corp-ws01",
-        "corp-ws02",
-        "dmz-gw01"
+        "corp-ws02"
       ],
       "hosts_saved": [
         "corp-ws03",
@@ -2655,9 +2615,7 @@
           "b1_hosts": [],
           "b1_campaigns": [],
           "quarantine_proposed": [
-            "corp-ws01",
-            "corp-ws02",
-            "dmz-gw01"
+            "corp-ws02"
           ],
           "recon_hosts": [
             "corp-ws01",
@@ -2701,9 +2659,7 @@
           "b1_hosts": [],
           "b1_campaigns": [],
           "quarantine_proposed": [
-            "corp-ws01",
-            "corp-ws02",
-            "dmz-gw01"
+            "corp-ws02"
           ],
           "recon_hosts": [
             "corp-ws01",
@@ -2744,7 +2700,7 @@
         "break_criterion not triggered: Jaccard < 0.5 OR truth host never recovered OR benign merge-FQ"
       ],
       "intensity_rounds": 2,
-      "wall_seconds": 1.5202,
+      "wall_seconds": 1.3988,
       "corr_jaccard": 1.0,
       "confidence_margin": 1.0,
       "confidence_margin_raw": 1.0,
@@ -2889,7 +2845,7 @@
         "break_criterion not triggered: Jaccard < 0.5 OR truth host never recovered OR benign merge-FQ"
       ],
       "intensity_rounds": 2,
-      "wall_seconds": 1.6665,
+      "wall_seconds": 1.5441,
       "corr_jaccard": 1.0,
       "confidence_margin": 1.0,
       "confidence_margin_raw": 1.0,
@@ -2898,9 +2854,7 @@
       "recovered_on_replay": [],
       "over_merged_hosts": [],
       "quarantine_proposed": [
-        "ctr-dc01-web",
-        "ctr-ws01-api",
-        "ctr-ws01-db"
+        "ctr-ws01-api"
       ],
       "hosts_saved": [
         "ctr-ws02-batch",
@@ -2959,9 +2913,7 @@
           "b1_hosts": [],
           "b1_campaigns": [],
           "quarantine_proposed": [
-            "ctr-dc01-web",
-            "ctr-ws01-api",
-            "ctr-ws01-db"
+            "ctr-ws01-api"
           ],
           "recon_hosts": [
             "ctr-dc01-web",
@@ -3005,9 +2957,7 @@
           "b1_hosts": [],
           "b1_campaigns": [],
           "quarantine_proposed": [
-            "ctr-dc01-web",
-            "ctr-ws01-api",
-            "ctr-ws01-db"
+            "ctr-ws01-api"
           ],
           "recon_hosts": [
             "ctr-dc01-web",
@@ -3058,22 +3008,22 @@
         }
       ],
       "break_criterion": "Jaccard < 0.5 OR truth host never recovered OR benign merge-FQ",
-      "verdict": "PARTIAL",
+      "verdict": "HELD",
       "verdict_reasons": [
-        "multi-campaign mean/min jaccard=0.8333/0.6667"
+        "multi-campaign held"
       ],
       "intensity_rounds": 2,
-      "wall_seconds": 1.612,
-      "corr_jaccard": 0.8333,
-      "confidence_margin": 0.0,
-      "confidence_margin_raw": 0.0,
-      "confidence_margin_kind": "top_minus_second",
-      "missed_hosts": [
-        "finance-ws01"
-      ],
+      "wall_seconds": 1.4241,
+      "corr_jaccard": 1.0,
+      "confidence_margin": 0.9,
+      "confidence_margin_raw": 0.1,
+      "confidence_margin_kind": "ambiguity",
+      "missed_hosts": [],
       "recovered_on_replay": [],
       "over_merged_hosts": [],
-      "quarantine_proposed": [],
+      "quarantine_proposed": [
+        "finance-ws01"
+      ],
       "hosts_saved": [
         "finance-ws02",
         "partner-ws02"
@@ -3102,6 +3052,7 @@
         "corr_truth_coverage": [
           "corp-dc01",
           "corp-ws02",
+          "finance-ws01",
           "partner-ws01"
         ],
         "baseline_wins": false
@@ -3115,9 +3066,10 @@
           {
             "truth_id": "camp-primary",
             "pred_id": "camp-lateral-apt-op-1",
-            "jaccard": 0.6667,
+            "jaccard": 1.0,
             "pred_hosts": [
               "corp-dc01",
+              "finance-ws01",
               "partner-ws01"
             ],
             "truth_hosts": [
@@ -3140,8 +3092,8 @@
             ]
           }
         ],
-        "mean_jaccard": 0.8333,
-        "min_jaccard": 0.6667
+        "mean_jaccard": 1.0,
+        "min_jaccard": 1.0
       },
       "fusion_lift": false,
       "rounds": [
@@ -3149,33 +3101,34 @@
           "round": 1,
           "build_ok": true,
           "corr_matched": true,
-          "corr_jaccard": 0.5,
-          "det_jaccard": 0.6667,
-          "missed_hosts": [
-            "finance-ws01"
-          ],
+          "corr_jaccard": 0.75,
+          "det_jaccard": 0.75,
+          "missed_hosts": [],
           "over_merged_hosts": [],
           "fusion_lift": false,
           "both_missed": false,
           "corr_hosts": [
             "corp-dc01",
             "corp-ws02",
+            "finance-ws01",
             "partner-ws01"
           ],
           "best_campaign_hosts": [
             "corp-dc01",
+            "finance-ws01",
             "partner-ws01"
           ],
-          "confidence_margin": 0.0,
+          "confidence_margin": 0.1,
           "campaigns_ranked": [
             {
               "campaign_id": "camp-lateral-apt-op-1",
               "hosts": [
                 "corp-dc01",
+                "finance-ws01",
                 "partner-ws01"
               ],
-              "score": 0.9,
-              "jaccard_vs_truth": 0.5
+              "score": 1.0,
+              "jaccard_vs_truth": 0.75
             },
             {
               "campaign_id": "camp-lateral-camp2-op-2",
@@ -3248,9 +3201,10 @@
               {
                 "truth_id": "camp-primary",
                 "pred_id": "camp-lateral-apt-op-1",
-                "jaccard": 0.6667,
+                "jaccard": 1.0,
                 "pred_hosts": [
                   "corp-dc01",
+                  "finance-ws01",
                   "partner-ws01"
                 ],
                 "truth_hosts": [
@@ -3273,13 +3227,16 @@
                 ]
               }
             ],
-            "mean_jaccard": 0.8333,
-            "min_jaccard": 0.6667
+            "mean_jaccard": 1.0,
+            "min_jaccard": 1.0
           },
-          "quarantine_proposed": [],
+          "quarantine_proposed": [
+            "finance-ws01"
+          ],
           "recon_hosts": [
             "corp-dc01",
             "corp-ws02",
+            "finance-ws01",
             "partner-ws01"
           ]
         },
@@ -3287,33 +3244,34 @@
           "round": 2,
           "build_ok": true,
           "corr_matched": true,
-          "corr_jaccard": 0.5,
-          "det_jaccard": 0.6667,
-          "missed_hosts": [
-            "finance-ws01"
-          ],
+          "corr_jaccard": 0.75,
+          "det_jaccard": 0.75,
+          "missed_hosts": [],
           "over_merged_hosts": [],
           "fusion_lift": false,
           "both_missed": false,
           "corr_hosts": [
             "corp-dc01",
             "corp-ws02",
+            "finance-ws01",
             "partner-ws01"
           ],
           "best_campaign_hosts": [
             "corp-dc01",
+            "finance-ws01",
             "partner-ws01"
           ],
-          "confidence_margin": 0.0,
+          "confidence_margin": 0.1,
           "campaigns_ranked": [
             {
               "campaign_id": "camp-lateral-apt-op-1",
               "hosts": [
                 "corp-dc01",
+                "finance-ws01",
                 "partner-ws01"
               ],
-              "score": 0.9,
-              "jaccard_vs_truth": 0.5
+              "score": 1.0,
+              "jaccard_vs_truth": 0.75
             },
             {
               "campaign_id": "camp-lateral-camp2-op-2",
@@ -3386,9 +3344,10 @@
               {
                 "truth_id": "camp-primary",
                 "pred_id": "camp-lateral-apt-op-1",
-                "jaccard": 0.6667,
+                "jaccard": 1.0,
                 "pred_hosts": [
                   "corp-dc01",
+                  "finance-ws01",
                   "partner-ws01"
                 ],
                 "truth_hosts": [
@@ -3411,20 +3370,23 @@
                 ]
               }
             ],
-            "mean_jaccard": 0.8333,
-            "min_jaccard": 0.6667
+            "mean_jaccard": 1.0,
+            "min_jaccard": 1.0
           },
-          "quarantine_proposed": [],
+          "quarantine_proposed": [
+            "finance-ws01"
+          ],
           "recon_hosts": [
             "corp-dc01",
             "corp-ws02",
+            "finance-ws01",
             "partner-ws01"
           ]
         }
       ],
       "narrative": "Factor cell: domain=forest container=mixed sequence=concurrent style=exfil_bury.",
       "fragile": false,
-      "verdict_label": "PARTIAL",
+      "verdict_label": "HELD",
       "factors": {
         "domain": "forest",
         "container": "mixed",
@@ -3451,7 +3413,7 @@
         "jaccard 0.6667 in PARTIAL band"
       ],
       "intensity_rounds": 2,
-      "wall_seconds": 1.4527,
+      "wall_seconds": 1.3963,
       "corr_jaccard": 0.6667,
       "confidence_margin": 0.0,
       "confidence_margin_raw": 0.0,
@@ -3460,7 +3422,6 @@
       "recovered_on_replay": [],
       "over_merged_hosts": [],
       "quarantine_proposed": [
-        "corp-ws01",
         "corp-ws02",
         "dmz-gw01"
       ],
@@ -3527,7 +3488,6 @@
           "b1_hosts": [],
           "b1_campaigns": [],
           "quarantine_proposed": [
-            "corp-ws01",
             "corp-ws02",
             "dmz-gw01"
           ],
@@ -3580,7 +3540,6 @@
           "b1_hosts": [],
           "b1_campaigns": [],
           "quarantine_proposed": [
-            "corp-ws01",
             "corp-ws02",
             "dmz-gw01"
           ],
@@ -3616,22 +3575,23 @@
       ],
       "truth_campaigns": null,
       "break_criterion": "Jaccard < 0.5 OR truth host never recovered OR benign merge-FQ",
-      "verdict": "BROKE",
+      "verdict": "HELD",
       "verdict_reasons": [
-        "truth never recovered: ['ctr-ws03-db']"
+        "matched truth without merge-FQ",
+        "break_criterion not triggered: Jaccard < 0.5 OR truth host never recovered OR benign merge-FQ"
       ],
       "intensity_rounds": 2,
-      "wall_seconds": 1.5891,
-      "corr_jaccard": 0.6667,
-      "confidence_margin": 0.9,
-      "confidence_margin_raw": 0.9,
+      "wall_seconds": 1.4349,
+      "corr_jaccard": 1.0,
+      "confidence_margin": 1.0,
+      "confidence_margin_raw": 1.0,
       "confidence_margin_kind": "top_minus_second",
-      "missed_hosts": [
-        "ctr-ws03-db"
-      ],
+      "missed_hosts": [],
       "recovered_on_replay": [],
       "over_merged_hosts": [],
-      "quarantine_proposed": [],
+      "quarantine_proposed": [
+        "ctr-ws02-api"
+      ],
       "hosts_saved": [
         "ctr-ws04-cache",
         "node-ws05"
@@ -3657,7 +3617,8 @@
         ],
         "corr_truth_coverage": [
           "ctr-ws01-web",
-          "ctr-ws02-api"
+          "ctr-ws02-api",
+          "ctr-ws03-db"
         ],
         "baseline_wins": false
       },
@@ -3668,32 +3629,33 @@
           "round": 1,
           "build_ok": true,
           "corr_matched": true,
-          "corr_jaccard": 0.6667,
-          "det_jaccard": 0.6667,
-          "missed_hosts": [
-            "ctr-ws03-db"
-          ],
+          "corr_jaccard": 1.0,
+          "det_jaccard": 1.0,
+          "missed_hosts": [],
           "over_merged_hosts": [],
           "fusion_lift": false,
           "both_missed": false,
           "corr_hosts": [
             "ctr-ws01-web",
-            "ctr-ws02-api"
+            "ctr-ws02-api",
+            "ctr-ws03-db"
           ],
           "best_campaign_hosts": [
             "ctr-ws01-web",
-            "ctr-ws02-api"
+            "ctr-ws02-api",
+            "ctr-ws03-db"
           ],
-          "confidence_margin": 0.9,
+          "confidence_margin": 1.0,
           "campaigns_ranked": [
             {
               "campaign_id": "camp-lateral-apt-op-1",
               "hosts": [
                 "ctr-ws01-web",
-                "ctr-ws02-api"
+                "ctr-ws02-api",
+                "ctr-ws03-db"
               ],
-              "score": 0.9,
-              "jaccard_vs_truth": 0.6667
+              "score": 1.0,
+              "jaccard_vs_truth": 1.0
             }
           ],
           "b1_hosts": [
@@ -3705,16 +3667,16 @@
           ],
           "b1_campaigns": [
             {
-              "campaign_id": "b1-ctr-ws01-web",
+              "campaign_id": "b1-ctr-ws02-api",
               "hosts": [
-                "ctr-ws01-web"
+                "ctr-ws02-api"
               ],
               "score": 0.5
             },
             {
-              "campaign_id": "b1-ctr-ws02-api",
+              "campaign_id": "b1-ctr-ws01-web",
               "hosts": [
-                "ctr-ws02-api"
+                "ctr-ws01-web"
               ],
               "score": 0.5
             },
@@ -3740,42 +3702,46 @@
               "score": 0.5
             }
           ],
-          "quarantine_proposed": [],
+          "quarantine_proposed": [
+            "ctr-ws02-api"
+          ],
           "recon_hosts": [
             "ctr-ws01-web",
-            "ctr-ws02-api"
+            "ctr-ws02-api",
+            "ctr-ws03-db"
           ]
         },
         {
           "round": 2,
           "build_ok": true,
           "corr_matched": true,
-          "corr_jaccard": 0.6667,
-          "det_jaccard": 0.6667,
-          "missed_hosts": [
-            "ctr-ws03-db"
-          ],
+          "corr_jaccard": 1.0,
+          "det_jaccard": 1.0,
+          "missed_hosts": [],
           "over_merged_hosts": [],
           "fusion_lift": false,
           "both_missed": false,
           "corr_hosts": [
             "ctr-ws01-web",
-            "ctr-ws02-api"
+            "ctr-ws02-api",
+            "ctr-ws03-db"
           ],
           "best_campaign_hosts": [
             "ctr-ws01-web",
-            "ctr-ws02-api"
+            "ctr-ws02-api",
+            "ctr-ws03-db"
           ],
-          "confidence_margin": 0.9,
+          "confidence_margin": 1.0,
           "campaigns_ranked": [
             {
               "campaign_id": "camp-lateral-apt-op-1",
               "hosts": [
                 "ctr-ws01-web",
-                "ctr-ws02-api"
+                "ctr-ws02-api",
+                "ctr-ws03-db"
               ],
-              "score": 0.9,
-              "jaccard_vs_truth": 0.6667
+              "score": 1.0,
+              "jaccard_vs_truth": 1.0
             }
           ],
           "b1_hosts": [
@@ -3787,16 +3753,16 @@
           ],
           "b1_campaigns": [
             {
-              "campaign_id": "b1-ctr-ws01-web",
+              "campaign_id": "b1-ctr-ws02-api",
               "hosts": [
-                "ctr-ws01-web"
+                "ctr-ws02-api"
               ],
               "score": 0.5
             },
             {
-              "campaign_id": "b1-ctr-ws02-api",
+              "campaign_id": "b1-ctr-ws01-web",
               "hosts": [
-                "ctr-ws02-api"
+                "ctr-ws01-web"
               ],
               "score": 0.5
             },
@@ -3822,16 +3788,19 @@
               "score": 0.5
             }
           ],
-          "quarantine_proposed": [],
+          "quarantine_proposed": [
+            "ctr-ws02-api"
+          ],
           "recon_hosts": [
             "ctr-ws01-web",
-            "ctr-ws02-api"
+            "ctr-ws02-api",
+            "ctr-ws03-db"
           ]
         }
       ],
       "narrative": "Factor cell: domain=single container=docker sequence=ooo style=exfil_bury.",
       "fragile": false,
-      "verdict_label": "BROKE",
+      "verdict_label": "HELD",
       "factors": {
         "domain": "single",
         "container": "docker",
@@ -3861,7 +3830,7 @@
         "break_criterion not triggered: Jaccard < 0.5 OR truth host never recovered OR benign merge-FQ"
       ],
       "intensity_rounds": 2,
-      "wall_seconds": 1.6013,
+      "wall_seconds": 1.4549,
       "corr_jaccard": 1.0,
       "confidence_margin": 1.0,
       "confidence_margin_raw": 1.0,
@@ -4023,7 +3992,7 @@
         "multi-campaign held"
       ],
       "intensity_rounds": 2,
-      "wall_seconds": 1.586,
+      "wall_seconds": 1.5811,
       "corr_jaccard": 1.0,
       "confidence_margin": -0.1,
       "confidence_margin_raw": 0.0,
@@ -4329,7 +4298,7 @@
         "break_criterion not triggered: Jaccard < 0.5 OR truth host never recovered OR benign merge-FQ"
       ],
       "intensity_rounds": 2,
-      "wall_seconds": 1.6141,
+      "wall_seconds": 1.4183,
       "corr_jaccard": 1.0,
       "confidence_margin": 1.0,
       "confidence_margin_raw": 1.0,
@@ -4473,7 +4442,7 @@
         "break_criterion not triggered: Jaccard < 0.5 OR truth host never recovered OR benign merge-FQ"
       ],
       "intensity_rounds": 2,
-      "wall_seconds": 1.54,
+      "wall_seconds": 1.4466,
       "corr_jaccard": 1.0,
       "confidence_margin": 1.0,
       "confidence_margin_raw": 1.0,
@@ -4482,9 +4451,7 @@
       "recovered_on_replay": [],
       "over_merged_hosts": [],
       "quarantine_proposed": [
-        "corp-ws01",
-        "corp-ws02",
-        "dmz-gw01"
+        "corp-ws02"
       ],
       "hosts_saved": [
         "corp-ws03",
@@ -4542,9 +4509,7 @@
           "b1_hosts": [],
           "b1_campaigns": [],
           "quarantine_proposed": [
-            "corp-ws01",
-            "corp-ws02",
-            "dmz-gw01"
+            "corp-ws02"
           ],
           "recon_hosts": [
             "corp-ws01",
@@ -4588,9 +4553,7 @@
           "b1_hosts": [],
           "b1_campaigns": [],
           "quarantine_proposed": [
-            "corp-ws01",
-            "corp-ws02",
-            "dmz-gw01"
+            "corp-ws02"
           ],
           "recon_hosts": [
             "corp-ws01",
@@ -4631,7 +4594,7 @@
         "break_criterion not triggered: Jaccard < 0.5 OR truth host never recovered OR benign merge-FQ"
       ],
       "intensity_rounds": 2,
-      "wall_seconds": 1.8223,
+      "wall_seconds": 1.3617,
       "corr_jaccard": 1.0,
       "confidence_margin": 0.0,
       "confidence_margin_raw": 0.0,
@@ -4799,22 +4762,23 @@
       ],
       "truth_campaigns": null,
       "break_criterion": "Jaccard < 0.5 OR truth host never recovered OR benign merge-FQ",
-      "verdict": "BROKE",
+      "verdict": "HELD",
       "verdict_reasons": [
-        "truth never recovered: ['corp-ws03']"
+        "matched truth without merge-FQ",
+        "break_criterion not triggered: Jaccard < 0.5 OR truth host never recovered OR benign merge-FQ"
       ],
       "intensity_rounds": 2,
-      "wall_seconds": 1.709,
-      "corr_jaccard": 0.6667,
-      "confidence_margin": 0.9,
-      "confidence_margin_raw": 0.9,
+      "wall_seconds": 1.518,
+      "corr_jaccard": 1.0,
+      "confidence_margin": 0.1,
+      "confidence_margin_raw": 0.1,
       "confidence_margin_kind": "top_minus_second",
-      "missed_hosts": [
-        "corp-ws03"
-      ],
+      "missed_hosts": [],
       "recovered_on_replay": [],
       "over_merged_hosts": [],
-      "quarantine_proposed": [],
+      "quarantine_proposed": [
+        "corp-ws03"
+      ],
       "hosts_saved": [
         "corp-ws04",
         "corp-ws05"
@@ -4840,7 +4804,8 @@
         ],
         "corr_truth_coverage": [
           "corp-ws01",
-          "corp-ws02"
+          "corp-ws02",
+          "corp-ws03"
         ],
         "baseline_wins": false
       },
@@ -4851,29 +4816,39 @@
           "round": 1,
           "build_ok": true,
           "corr_matched": true,
-          "corr_jaccard": 0.6667,
-          "det_jaccard": 0.6667,
-          "missed_hosts": [
-            "corp-ws03"
-          ],
+          "corr_jaccard": 1.0,
+          "det_jaccard": 1.0,
+          "missed_hosts": [],
           "over_merged_hosts": [],
           "fusion_lift": false,
           "both_missed": false,
           "corr_hosts": [
             "corp-ws01",
-            "corp-ws02"
+            "corp-ws02",
+            "corp-ws03"
           ],
           "best_campaign_hosts": [
             "corp-ws01",
-            "corp-ws02"
+            "corp-ws02",
+            "corp-ws03"
           ],
-          "confidence_margin": 0.9,
+          "confidence_margin": 0.1,
           "campaigns_ranked": [
             {
               "campaign_id": "camp-lateral-apt-op-1",
               "hosts": [
                 "corp-ws01",
-                "corp-ws02"
+                "corp-ws02",
+                "corp-ws03"
+              ],
+              "score": 1.0,
+              "jaccard_vs_truth": 1.0
+            },
+            {
+              "campaign_id": "camp-exfil-198-51-100-77-2",
+              "hosts": [
+                "corp-ws02",
+                "corp-ws03"
               ],
               "score": 0.9,
               "jaccard_vs_truth": 0.6667
@@ -4923,39 +4898,52 @@
               "score": 0.5
             }
           ],
-          "quarantine_proposed": [],
+          "quarantine_proposed": [
+            "corp-ws03"
+          ],
           "recon_hosts": [
             "corp-ws01",
-            "corp-ws02"
+            "corp-ws02",
+            "corp-ws03"
           ]
         },
         {
           "round": 2,
           "build_ok": true,
           "corr_matched": true,
-          "corr_jaccard": 0.6667,
-          "det_jaccard": 0.6667,
-          "missed_hosts": [
-            "corp-ws03"
-          ],
+          "corr_jaccard": 1.0,
+          "det_jaccard": 1.0,
+          "missed_hosts": [],
           "over_merged_hosts": [],
           "fusion_lift": false,
           "both_missed": false,
           "corr_hosts": [
             "corp-ws01",
-            "corp-ws02"
+            "corp-ws02",
+            "corp-ws03"
           ],
           "best_campaign_hosts": [
             "corp-ws01",
-            "corp-ws02"
+            "corp-ws02",
+            "corp-ws03"
           ],
-          "confidence_margin": 0.9,
+          "confidence_margin": 0.1,
           "campaigns_ranked": [
             {
               "campaign_id": "camp-lateral-apt-op-1",
               "hosts": [
                 "corp-ws01",
-                "corp-ws02"
+                "corp-ws02",
+                "corp-ws03"
+              ],
+              "score": 1.0,
+              "jaccard_vs_truth": 1.0
+            },
+            {
+              "campaign_id": "camp-exfil-198-51-100-77-2",
+              "hosts": [
+                "corp-ws02",
+                "corp-ws03"
               ],
               "score": 0.9,
               "jaccard_vs_truth": 0.6667
@@ -5005,16 +4993,19 @@
               "score": 0.5
             }
           ],
-          "quarantine_proposed": [],
+          "quarantine_proposed": [
+            "corp-ws03"
+          ],
           "recon_hosts": [
             "corp-ws01",
-            "corp-ws02"
+            "corp-ws02",
+            "corp-ws03"
           ]
         }
       ],
       "narrative": "Factor cell: domain=single container=bare sequence=slow style=exfil_bury.",
-      "fragile": false,
-      "verdict_label": "BROKE",
+      "fragile": true,
+      "verdict_label": "HELD, fragile",
       "factors": {
         "domain": "single",
         "container": "bare",
@@ -5044,10 +5035,10 @@
         "break_criterion not triggered: Jaccard < 0.5 OR truth host never recovered OR benign merge-FQ"
       ],
       "intensity_rounds": 2,
-      "wall_seconds": 1.6629,
+      "wall_seconds": 1.3288,
       "corr_jaccard": 1.0,
-      "confidence_margin": 0.1,
-      "confidence_margin_raw": 0.1,
+      "confidence_margin": 0.0,
+      "confidence_margin_raw": 0.0,
       "confidence_margin_kind": "top_minus_second",
       "missed_hosts": [],
       "recovered_on_replay": [],
@@ -5087,14 +5078,15 @@
             "ctr-app01-cache",
             "ctr-gw01-db",
             "ctr-ws01-web",
-            "ctr-ws02-api"
+            "ctr-ws02-api",
+            "node-ws03"
           ],
           "best_campaign_hosts": [
             "ctr-gw01-db",
             "ctr-ws01-web",
             "ctr-ws02-api"
           ],
-          "confidence_margin": 0.1,
+          "confidence_margin": 0.0,
           "campaigns_ranked": [
             {
               "campaign_id": "camp-lateral-apt-rdp-1",
@@ -5110,10 +5102,11 @@
               "campaign_id": "camp-lateral-helpdesk-2",
               "hosts": [
                 "ctr-app01-cache",
-                "ctr-gw01-db"
+                "ctr-gw01-db",
+                "node-ws03"
               ],
-              "score": 0.9,
-              "jaccard_vs_truth": 0.25
+              "score": 1.0,
+              "jaccard_vs_truth": 0.2
             }
           ],
           "b1_hosts": [],
@@ -5123,7 +5116,8 @@
             "ctr-app01-cache",
             "ctr-gw01-db",
             "ctr-ws01-web",
-            "ctr-ws02-api"
+            "ctr-ws02-api",
+            "node-ws03"
           ]
         },
         {
@@ -5140,14 +5134,15 @@
             "ctr-app01-cache",
             "ctr-gw01-db",
             "ctr-ws01-web",
-            "ctr-ws02-api"
+            "ctr-ws02-api",
+            "node-ws03"
           ],
           "best_campaign_hosts": [
             "ctr-gw01-db",
             "ctr-ws01-web",
             "ctr-ws02-api"
           ],
-          "confidence_margin": 0.1,
+          "confidence_margin": 0.0,
           "campaigns_ranked": [
             {
               "campaign_id": "camp-lateral-apt-rdp-1",
@@ -5163,10 +5158,11 @@
               "campaign_id": "camp-lateral-helpdesk-2",
               "hosts": [
                 "ctr-app01-cache",
-                "ctr-gw01-db"
+                "ctr-gw01-db",
+                "node-ws03"
               ],
-              "score": 0.9,
-              "jaccard_vs_truth": 0.25
+              "score": 1.0,
+              "jaccard_vs_truth": 0.2
             }
           ],
           "b1_hosts": [],
@@ -5176,7 +5172,8 @@
             "ctr-app01-cache",
             "ctr-gw01-db",
             "ctr-ws01-web",
-            "ctr-ws02-api"
+            "ctr-ws02-api",
+            "node-ws03"
           ]
         }
       ],
@@ -5212,7 +5209,7 @@
         "break_criterion not triggered: Jaccard < 0.5 OR truth host never recovered OR benign merge-FQ"
       ],
       "intensity_rounds": 2,
-      "wall_seconds": 1.5439,
+      "wall_seconds": 1.4174,
       "corr_jaccard": 1.0,
       "confidence_margin": 1.0,
       "confidence_margin_raw": 1.0,
@@ -5357,7 +5354,7 @@
         "break_criterion not triggered: Jaccard < 0.5 OR truth host never recovered OR benign merge-FQ"
       ],
       "intensity_rounds": 2,
-      "wall_seconds": 1.5205,
+      "wall_seconds": 1.5804,
       "corr_jaccard": 1.0,
       "confidence_margin": 1.0,
       "confidence_margin_raw": 1.0,
@@ -5366,9 +5363,7 @@
       "recovered_on_replay": [],
       "over_merged_hosts": [],
       "quarantine_proposed": [
-        "ctr-ws01-web",
-        "ctr-ws02-api",
-        "ctr-ws03-db"
+        "ctr-ws02-api"
       ],
       "hosts_saved": [
         "ctr-ws04-cache",
@@ -5426,9 +5421,7 @@
           "b1_hosts": [],
           "b1_campaigns": [],
           "quarantine_proposed": [
-            "ctr-ws01-web",
-            "ctr-ws02-api",
-            "ctr-ws03-db"
+            "ctr-ws02-api"
           ],
           "recon_hosts": [
             "ctr-ws01-web",
@@ -5472,9 +5465,7 @@
           "b1_hosts": [],
           "b1_campaigns": [],
           "quarantine_proposed": [
-            "ctr-ws01-web",
-            "ctr-ws02-api",
-            "ctr-ws03-db"
+            "ctr-ws02-api"
           ],
           "recon_hosts": [
             "ctr-ws01-web",
