@@ -22,7 +22,7 @@ not equivalent to a clean HELD). Correctly separated equal-score campaigns are
 
 - Attacks: **15** | Intensity rounds/attack: **2**
 - Baseline: **single-host-isolation**
-- Wall: **23.4339s**
+- Wall: **24.6728s**
 - HELD: **14** (of which **fragile**: 5) | PARTIAL: **1** | BROKE: **0**
 - Baseline wins: **0**
 
@@ -43,7 +43,7 @@ Ordered by operational severity, not by suite index.
 - **lim09d-benign-hub-pivot** — **HELD, fragile** (J=1.0, margin=0.1, FQ=-). Do not read as a clean HELD if fragile — margin < 0.2 with collateral FQ on hub peers.
 - **lim01-dual-ambiguous-lateral** — **HELD, fragile** (J=1.0, margin=0.0, FQ=-). APT matched; helpdesk still False-Q as a separate campaign — soft near-miss (check margin).
 - **lim07-dropped-mid-chain** — **PARTIAL** (J=0.5, margin=0.1, FQ=-). 
-- **lim08-out-of-order-arrival** — **HELD, fragile** (J=1.0, margin=0.1, FQ=host-c, host-d). 
+- **lim08-out-of-order-arrival** — **HELD, fragile** (J=1.0, margin=0.1, FQ=host-d). 
 - **lim09c-positional-bias** — **HELD, fragile** (J=1.0, margin=0.0, FQ=-). 
 
 ## Headline table (priority order)
@@ -71,7 +71,7 @@ Ordered by operational severity, not by suite index.
 | 5 | lim05-technique-sub-kerberoast | **HELD** | 1.0 | 1.0 | - | - | host-d, host-e | - | - | False |
 | 6 | lim06-clock-skew-47s | **HELD** | 1.0 | 1.0 | - | - | host-d, host-e | - | - | False |
 | 7 | lim07-dropped-mid-chain | **PARTIAL** | 0.5 | 0.1 | - | - | host-e | - | - | False |
-| 8 | lim08-out-of-order-arrival | **HELD, fragile** | 1.0 | 0.1 | - | - | host-e | host-c, host-d | - | False |
+| 8 | lim08-out-of-order-arrival | **HELD, fragile** | 1.0 | 0.1 | - | - | host-c, host-e | host-d | - | False |
 | 9 | lim09-max-density-overlap ★ | **HELD** | 1.0 | 1.0 | - | - | - | - | - | False |
 | 10 | lim09b-sequential-reuse ★ | **HELD, fragile** | 1.0 | 0.0 | - | - | host-d, host-e | - | - | False |
 | 11 | lim09c-positional-bias ★ | **HELD, fragile** | 1.0 | 0.0 | - | - | host-c, host-d | - | - | False |
@@ -105,7 +105,7 @@ None — correlator never lost to single-host isolation on FQ/coverage.
 - Truth: host-a, host-b, host-c
 - Verdict: **HELD, fragile** | Jaccard=1.0 | margin=0.0
 - Reasons: matched truth without merge-FQ; break_criterion not triggered: d or e appears in the malicious campaign's Q dry-run list
-- Quarantine dry-run: host-a, host-b, host-c
+- Quarantine dry-run: host-b
 - Saved: host-d, host-e | False Q: -
 - Baseline FQ: - | baseline_wins=False
 
@@ -135,7 +135,7 @@ None — correlator never lost to single-host isolation on FQ/coverage.
 - Truth: host-a, host-b, host-c
 - Verdict: **HELD** | Jaccard=1.0 | margin=1.0
 - Reasons: matched truth without merge-FQ; break_criterion not triggered: Jaccard drop vs #5/#17 baseline at matched technique set
-- Quarantine dry-run: host-a, host-b, host-c
+- Quarantine dry-run: host-b
 - Saved: host-d, host-e | False Q: -
 - Baseline FQ: - | baseline_wins=False
 
@@ -145,7 +145,7 @@ None — correlator never lost to single-host isolation on FQ/coverage.
 - Truth: host-a, host-b, host-c
 - Verdict: **HELD** | Jaccard=1.0 | margin=1.0
 - Reasons: matched truth without merge-FQ; break_criterion not triggered: campaign not detected, or techniques logged but not correlated
-- Quarantine dry-run: host-a, host-b, host-c
+- Quarantine dry-run: host-b
 - Saved: host-d, host-e | False Q: -
 - Baseline FQ: - | baseline_wins=False
 
@@ -155,7 +155,7 @@ None — correlator never lost to single-host isolation on FQ/coverage.
 - Truth: host-a, host-b, host-c
 - Verdict: **HELD** | Jaccard=1.0 | margin=1.0
 - Reasons: matched truth without merge-FQ; break_criterion not triggered: causal ordering a→b→c wrong, or b dropped due to apparent gap
-- Quarantine dry-run: host-a, host-b, host-c
+- Quarantine dry-run: host-b
 - Saved: host-d, host-e | False Q: -
 - Baseline FQ: - | baseline_wins=False
 
@@ -165,7 +165,7 @@ None — correlator never lost to single-host isolation on FQ/coverage.
 - Truth: host-a, host-b, host-c, host-d
 - Verdict: **PARTIAL** | Jaccard=0.5 | margin=0.1
 - Reasons: jaccard 0.5 in PARTIAL band
-- Quarantine dry-run: host-a, host-b
+- Quarantine dry-run: host-b
 - Saved: host-e | False Q: -
 - Baseline FQ: - | baseline_wins=False
 
@@ -175,8 +175,8 @@ None — correlator never lost to single-host isolation on FQ/coverage.
 - Truth: host-a, host-b
 - Verdict: **HELD, fragile** | Jaccard=1.0 | margin=0.1
 - Reasons: matched truth without merge-FQ; break_criterion not triggered: causal chain backwards, or split into two false fragments
-- Quarantine dry-run: host-a, host-b, host-c, host-d
-- Saved: host-e | False Q: host-c, host-d
+- Quarantine dry-run: host-b, host-d
+- Saved: host-c, host-e | False Q: host-d
 - Baseline FQ: - | baseline_wins=False
 
 ### lim09-max-density-overlap ★ headline
@@ -195,7 +195,7 @@ None — correlator never lost to single-host isolation on FQ/coverage.
 - Truth: host-a, host-b, host-c
 - Verdict: **HELD, fragile** | Jaccard=1.0 | margin=0.0
 - Reasons: sequential incidents split across 2 campaigns
-- Quarantine dry-run: host-a, host-b, host-c
+- Quarantine dry-run: host-b
 - Saved: host-d, host-e | False Q: -
 - Baseline FQ: - | baseline_wins=False
 
@@ -215,7 +215,7 @@ None — correlator never lost to single-host isolation on FQ/coverage.
 - Truth: host-a, host-c, host-e
 - Verdict: **HELD, fragile** | Jaccard=1.0 | margin=0.1
 - Reasons: matched truth without merge-FQ; break_criterion not triggered: attack missed (BROKE) or b/d False Q via association
-- Quarantine dry-run: host-a, host-c, host-e
+- Quarantine dry-run: host-c
 - Saved: host-b, host-d | False Q: -
 - Baseline FQ: host-b, host-d | baseline_wins=False
 
@@ -235,7 +235,7 @@ None — correlator never lost to single-host isolation on FQ/coverage.
 - Truth: host-a, host-b, host-c
 - Verdict: **HELD** | Jaccard=1.0 | margin=1.0
 - Reasons: matched truth without merge-FQ; break_criterion not triggered: b's two identities treated as separate hosts, splitting coverage
-- Quarantine dry-run: host-a, host-b, host-c
+- Quarantine dry-run: host-b
 - Saved: host-d, host-e | False Q: -
 - Baseline FQ: - | baseline_wins=False
 
@@ -245,7 +245,7 @@ None — correlator never lost to single-host isolation on FQ/coverage.
 - Truth: host-a, host-b, host-c
 - Verdict: **HELD** | Jaccard=1.0 | margin=1.0
 - Reasons: matched truth without merge-FQ; break_criterion not triggered: Jaccard regression vs #8/#20 passing results
-- Quarantine dry-run: host-a, host-b, host-c
+- Quarantine dry-run: host-b
 - Saved: host-d, host-e | False Q: -
 - Baseline FQ: - | baseline_wins=False
 

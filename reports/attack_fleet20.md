@@ -3,8 +3,8 @@
 Purple-team **event sketches** only. Sources cite [Atomic Red Team](https://github.com/redcanaryco/atomic-red-team) technique IDs where marked `github_art`. No malware executed. Quarantine = dry-run proposals.
 
 - Attacks: **20** | Intensity rounds/attack: **2**
-- Wall: **30.4538s**
-- HELD: **20** (clean: **19**, fragile: **1**, fragile_rate=0.05) | PARTIAL: **0** | BROKE: **0**
+- Wall: **29.7306s**
+- HELD: **20** (clean: **18**, fragile: **2**, fragile_rate=0.1) | PARTIAL: **0** | BROKE: **0**
 - Fragile bar: HELD with confidence_margin < 0.2 → **HELD, fragile** (never summarize as bare 20/20 without fragile count).
 
 ## Fleet scoreboard
@@ -14,7 +14,7 @@ Purple-team **event sketches** only. Sources cite [Atomic Red Team](https://gith
 | 1 | fleet01-art-cred-dump-pth | github_art | **HELD** | 1.0 | 1.0 | - | - | host-d, host-e | - |
 | 2 | fleet02-art-powershell-chain | github_art | **HELD** | 1.0 | 1.0 | - | - | host-c, host-e | - |
 | 3 | fleet03-art-smb-admin-shares | github_art | **HELD** | 1.0 | 1.0 | - | - | host-e | - |
-| 4 | fleet04-art-recon-exfil | github_art | **HELD** | 1.0 | 1.0 | - | - | host-a, host-d, host-e | - |
+| 4 | fleet04-art-recon-exfil | github_art | **HELD, fragile** | 0.1 | 1.0 | - | - | host-a, host-d, host-e | - |
 | 5 | fleet05-art-dns-c2-only | github_art | **HELD** | 1.0 | 1.0 | - | - | host-d, host-e | - |
 | 6 | fleet06-art-password-spray | github_art | **HELD** | 1.0 | 1.0 | - | - | host-d, host-e | - |
 | 7 | fleet07-orig-ip-src-lateral | original | **HELD** | 1.0 | 1.0 | - | - | host-d, host-e | - |
@@ -34,6 +34,7 @@ Purple-team **event sketches** only. Sources cite [Atomic Red Team](https://gith
 
 ## Where it broke / fragile
 
+- **fleet04-art-recon-exfil** (HELD, fragile, margin=0.1): — Map the segment hard, then push loot over an alternate channel.
 - **fleet19-orig-helpdesk-vs-apt** (HELD, fragile, margin=0.1): — APT on a-b-c. Helpdesk also on c-d same minute.
 
 ## Per-attack detail
@@ -42,140 +43,140 @@ Purple-team **event sketches** only. Sources cite [Atomic Red Team](https://gith
 
 - Origin: `github_art` | Techniques: T1003.001, T1550.002, T1021, T1041
 - Verdict: **HELD** | Jaccard=1.0 | margin=1.0 | fusion_lift=False
-- Quarantine dry-run: host-a, host-b, host-c
+- Quarantine dry-run: host-b
 - Saved: host-d, host-e | False Q: -
 
 ### fleet02-art-powershell-chain
 
 - Origin: `github_art` | Techniques: T1059.001, T1078, T1041
 - Verdict: **HELD** | Jaccard=1.0 | margin=1.0 | fusion_lift=False
-- Quarantine dry-run: host-a, host-b, host-d
+- Quarantine dry-run: host-b
 - Saved: host-c, host-e | False Q: -
 
 ### fleet03-art-smb-admin-shares
 
 - Origin: `github_art` | Techniques: T1021.002, T1078, T1041
 - Verdict: **HELD** | Jaccard=1.0 | margin=1.0 | fusion_lift=False
-- Quarantine dry-run: host-a, host-b, host-c, host-d
+- Quarantine dry-run: host-b
 - Saved: host-e | False Q: -
 
 ### fleet04-art-recon-exfil
 
 - Origin: `github_art` | Techniques: T1046, T1048, T1078
-- Verdict: **HELD** | Jaccard=1.0 | margin=1.0 | fusion_lift=False
-- Quarantine dry-run: host-b, host-c
+- Verdict: **HELD, fragile** | Jaccard=1.0 | margin=0.1 | fusion_lift=False
+- Quarantine dry-run: host-c
 - Saved: host-a, host-d, host-e | False Q: -
 
 ### fleet05-art-dns-c2-only
 
 - Origin: `github_art` | Techniques: T1071.004, T1078
 - Verdict: **HELD** | Jaccard=1.0 | margin=1.0 | fusion_lift=True
-- Quarantine dry-run: host-a, host-b, host-c
+- Quarantine dry-run: host-b
 - Saved: host-d, host-e | False Q: -
 
 ### fleet06-art-password-spray
 
 - Origin: `github_art` | Techniques: T1110.003, T1078, T1041
 - Verdict: **HELD** | Jaccard=1.0 | margin=1.0 | fusion_lift=False
-- Quarantine dry-run: host-a, host-b, host-c
+- Quarantine dry-run: host-b
 - Saved: host-d, host-e | False Q: -
 
 ### fleet07-orig-ip-src-lateral
 
 - Origin: `original` | Techniques: T1021, T1078, T1041
 - Verdict: **HELD** | Jaccard=1.0 | margin=1.0 | fusion_lift=False
-- Quarantine dry-run: host-a, host-b, host-c
+- Quarantine dry-run: host-b
 - Saved: host-d, host-e | False Q: -
 
 ### fleet08-orig-chunked-cdn-bait
 
 - Origin: `original` | Techniques: T1041, T1105, T1078
 - Verdict: **HELD** | Jaccard=1.0 | margin=1.0 | fusion_lift=False
-- Quarantine dry-run: host-a, host-b
+- Quarantine dry-run: host-b
 - Saved: host-c, host-d, host-e | False Q: -
 
 ### fleet09-orig-window-gap
 
 - Origin: `original` | Techniques: T1078, T1041
 - Verdict: **HELD** | Jaccard=1.0 | margin=1.0 | fusion_lift=False
-- Quarantine dry-run: host-a, host-b, host-c
+- Quarantine dry-run: host-b
 - Saved: host-d, host-e | False Q: -
 
 ### fleet10-orig-ransom-fanout-bury
 
 - Origin: `original` | Techniques: T1486, T1078, T1041
 - Verdict: **HELD** | Jaccard=1.0 | margin=1.0 | fusion_lift=False
-- Quarantine dry-run: host-a, host-b, host-c
+- Quarantine dry-run: host-b
 - Saved: host-d, host-e | False Q: -
 
 ### fleet11-art-scheduled-task
 
 - Origin: `github_art` | Techniques: T1053.005, T1078, T1041
 - Verdict: **HELD** | Jaccard=1.0 | margin=1.0 | fusion_lift=False
-- Quarantine dry-run: host-a, host-b, host-c
+- Quarantine dry-run: host-b
 - Saved: host-d, host-e | False Q: -
 
 ### fleet12-art-wmi-remote
 
 - Origin: `github_art` | Techniques: T1047, T1021, T1041
 - Verdict: **HELD** | Jaccard=1.0 | margin=1.0 | fusion_lift=False
-- Quarantine dry-run: host-a, host-b, host-d
+- Quarantine dry-run: host-b
 - Saved: host-c, host-e | False Q: -
 
 ### fleet13-art-cloud-cred-egress
 
 - Origin: `github_art` | Techniques: T1552.005, T1078, T1041
 - Verdict: **HELD** | Jaccard=1.0 | margin=1.0 | fusion_lift=False
-- Quarantine dry-run: host-b, host-c
+- Quarantine dry-run: host-c
 - Saved: host-a, host-d, host-e | False Q: -
 
 ### fleet14-art-rdp-hop
 
 - Origin: `github_art` | Techniques: T1021.001, T1078, T1041
 - Verdict: **HELD** | Jaccard=1.0 | margin=1.0 | fusion_lift=False
-- Quarantine dry-run: host-a, host-c, host-e
+- Quarantine dry-run: host-c
 - Saved: host-b, host-d | False Q: -
 
 ### fleet15-art-mail-collect
 
 - Origin: `github_art` | Techniques: T1114, T1078, T1041
 - Verdict: **HELD** | Jaccard=1.0 | margin=1.0 | fusion_lift=False
-- Quarantine dry-run: host-a, host-b
+- Quarantine dry-run: host-b
 - Saved: host-c, host-d, host-e | False Q: -
 
 ### fleet16-orig-dual-user-bridge
 
 - Origin: `original` | Techniques: T1078, T1041
 - Verdict: **HELD** | Jaccard=1.0 | margin=1.0 | fusion_lift=False
-- Quarantine dry-run: host-a, host-b, host-c
+- Quarantine dry-run: host-b
 - Saved: host-d, host-e | False Q: -
 
 ### fleet17-orig-dns-plus-lateral
 
 - Origin: `original` | Techniques: T1071.004, T1078, T1041
 - Verdict: **HELD** | Jaccard=1.0 | margin=1.0 | fusion_lift=False
-- Quarantine dry-run: host-a, host-b, host-c
+- Quarantine dry-run: host-b
 - Saved: host-d, host-e | False Q: -
 
 ### fleet18-orig-burst-retries
 
 - Origin: `original` | Techniques: T1110, T1078, T1041
 - Verdict: **HELD** | Jaccard=1.0 | margin=1.0 | fusion_lift=False
-- Quarantine dry-run: host-a, host-b, host-c
+- Quarantine dry-run: host-b
 - Saved: host-d, host-e | False Q: -
 
 ### fleet19-orig-helpdesk-vs-apt
 
 - Origin: `original` | Techniques: T1078, T1041
 - Verdict: **HELD, fragile** | Jaccard=1.0 | margin=0.1 | fusion_lift=False
-- Quarantine dry-run: host-a, host-b, host-c
+- Quarantine dry-run: host-b
 - Saved: host-d, host-e | False Q: -
 
 ### fleet20-orig-cdn-plus-apt
 
 - Origin: `original` | Techniques: T1105, T1078, T1041
 - Verdict: **HELD** | Jaccard=1.0 | margin=1.0 | fusion_lift=False
-- Quarantine dry-run: host-a, host-b, host-c
+- Quarantine dry-run: host-b
 - Saved: host-d, host-e | False Q: -
 
 ## Honesty

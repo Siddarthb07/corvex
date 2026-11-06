@@ -1,6 +1,6 @@
 # Attack fleet: Limits T2 — 50-host scale
 
-**Scale tier:** T2 | **Hosts:** 50 | **Decoys:** False | **Wall:** 12.8866s | **Peak RSS:** 33.71 MB | **fragile_rate=0.3571**
+**Scale tier:** T2 | **Hosts:** 50 | **Decoys:** False | **Wall:** 12.2103s | **Peak RSS:** 33.2 MB | **fragile_rate=0.3571**
 **Gates:** wall/RSS → PASS; fragile-rate → PASS
 
 
@@ -26,7 +26,7 @@ not equivalent to a clean HELD). Correctly separated equal-score campaigns are
 
 - Attacks: **15** | Intensity rounds/attack: **1**
 - Baseline: **single-host-isolation**
-- Wall: **12.8866s**
+- Wall: **12.2103s**
 - HELD: **14** (of which **fragile**: 5) | PARTIAL: **1** | BROKE: **0**
 - Baseline wins: **0**
 
@@ -42,7 +42,7 @@ Ordered by operational severity, not by suite index.
 - **t2-lim09d-benign-hub-pivot** — **HELD, fragile** (J=1.0, margin=0.1, FQ=-). 
 - **t2-lim01-dual-ambiguous-lateral** — **HELD, fragile** (J=1.0, margin=0.0, FQ=-). 
 - **t2-lim07-dropped-mid-chain** — **PARTIAL** (J=0.5, margin=0.1, FQ=-). 
-- **t2-lim08-out-of-order-arrival** — **HELD, fragile** (J=1.0, margin=0.1, FQ=host-02, host-03). 
+- **t2-lim08-out-of-order-arrival** — **HELD, fragile** (J=1.0, margin=0.1, FQ=host-03). 
 - **t2-lim09c-positional-bias** — **HELD, fragile** (J=1.0, margin=0.0, FQ=-). 
 
 ## Headline table (priority order)
@@ -70,7 +70,7 @@ Ordered by operational severity, not by suite index.
 | 5 | t2-lim05-technique-sub-kerberoast | **HELD** | 1.0 | 1.0 | - | - | host-03, host-04, host-05, host-06, host-07, host-08, host-09, host-10, host-11, host-12, host-13, host-14, host-15, host-16, host-17, host-18, host-19, host-20, host-21, host-22, host-23, host-24, host-25, host-26, host-27, host-28, host-29, host-30, host-31, host-32, host-33, host-34, host-35, host-36, host-37, host-38, host-39, host-40, host-41, host-42, host-43, host-44, host-45, host-46, host-47, host-48, host-49 | - | - | False |
 | 6 | t2-lim06-clock-skew-47s | **HELD** | 1.0 | 1.0 | - | - | host-03, host-04, host-05, host-06, host-07, host-08, host-09, host-10, host-11, host-12, host-13, host-14, host-15, host-16, host-17, host-18, host-19, host-20, host-21, host-22, host-23, host-24, host-25, host-26, host-27, host-28, host-29, host-30, host-31, host-32, host-33, host-34, host-35, host-36, host-37, host-38, host-39, host-40, host-41, host-42, host-43, host-44, host-45, host-46, host-47, host-48, host-49 | - | - | False |
 | 7 | t2-lim07-dropped-mid-chain | **PARTIAL** | 0.5 | 0.1 | - | - | host-04, host-05, host-06, host-07, host-08, host-09, host-10, host-11, host-12, host-13, host-14, host-15, host-16, host-17, host-18, host-19, host-20, host-21, host-22, host-23, host-24, host-25, host-26, host-27, host-28, host-29, host-30, host-31, host-32, host-33, host-34, host-35, host-36, host-37, host-38, host-39, host-40, host-41, host-42, host-43, host-44, host-45, host-46, host-47, host-48, host-49 | - | - | False |
-| 8 | t2-lim08-out-of-order-arrival | **HELD, fragile** | 1.0 | 0.1 | - | - | host-04, host-05, host-06, host-07, host-08, host-09, host-10, host-11, host-12, host-13, host-14, host-15, host-16, host-17, host-18, host-19, host-20, host-21, host-22, host-23, host-24, host-25, host-26, host-27, host-28, host-29, host-30, host-31, host-32, host-33, host-34, host-35, host-36, host-37, host-38, host-39, host-40, host-41, host-42, host-43, host-44, host-45, host-46, host-47, host-48, host-49 | host-02, host-03 | - | False |
+| 8 | t2-lim08-out-of-order-arrival | **HELD, fragile** | 1.0 | 0.1 | - | - | host-02, host-04, host-05, host-06, host-07, host-08, host-09, host-10, host-11, host-12, host-13, host-14, host-15, host-16, host-17, host-18, host-19, host-20, host-21, host-22, host-23, host-24, host-25, host-26, host-27, host-28, host-29, host-30, host-31, host-32, host-33, host-34, host-35, host-36, host-37, host-38, host-39, host-40, host-41, host-42, host-43, host-44, host-45, host-46, host-47, host-48, host-49 | host-03 | - | False |
 | 9 | t2-lim09-max-density-overlap ★ | **HELD** | 1.0 | 1.0 | - | - | host-05, host-06, host-07, host-08, host-09, host-10, host-11, host-12, host-13, host-14, host-15, host-16, host-17, host-18, host-19, host-20, host-21, host-22, host-23, host-24, host-25, host-26, host-27, host-28, host-29, host-30, host-31, host-32, host-33, host-34, host-35, host-36, host-37, host-38, host-39, host-40, host-41, host-42, host-43, host-44, host-45, host-46, host-47, host-48, host-49 | - | - | False |
 | 10 | t2-lim09b-sequential-reuse ★ | **HELD, fragile** | 1.0 | 0.0 | - | - | host-03, host-04, host-05, host-06, host-07, host-08, host-09, host-10, host-11, host-12, host-13, host-14, host-15, host-16, host-17, host-18, host-19, host-20, host-21, host-22, host-23, host-24, host-25, host-26, host-27, host-28, host-29, host-30, host-31, host-32, host-33, host-34, host-35, host-36, host-37, host-38, host-39, host-40, host-41, host-42, host-43, host-44, host-45, host-46, host-47, host-48, host-49 | - | - | False |
 | 11 | t2-lim09c-positional-bias ★ | **HELD, fragile** | 1.0 | 0.0 | - | - | host-02, host-03, host-05, host-06, host-07, host-08, host-09, host-10, host-11, host-12, host-13, host-14, host-15, host-16, host-17, host-18, host-19, host-20, host-21, host-22, host-23, host-24, host-25, host-26, host-27, host-28, host-29, host-30, host-31, host-32, host-33, host-34, host-35, host-36, host-37, host-38, host-39, host-40, host-41, host-42, host-43, host-44, host-45, host-46, host-47, host-48, host-49 | - | - | False |
@@ -104,7 +104,7 @@ None — correlator never lost to single-host isolation on FQ/coverage.
 - Truth: host-00, host-01, host-02
 - Verdict: **HELD, fragile** | Jaccard=1.0 | margin=0.0
 - Reasons: matched truth without merge-FQ; break_criterion not triggered: d or e appears in the malicious campaign's Q dry-run list
-- Quarantine dry-run: host-00, host-01, host-02
+- Quarantine dry-run: host-01
 - Saved: host-03, host-04, host-05, host-06, host-07, host-08, host-09, host-10, host-11, host-12, host-13, host-14, host-15, host-16, host-17, host-18, host-19, host-20, host-21, host-22, host-23, host-24, host-25, host-26, host-27, host-28, host-29, host-30, host-31, host-32, host-33, host-34, host-35, host-36, host-37, host-38, host-39, host-40, host-41, host-42, host-43, host-44, host-45, host-46, host-47, host-48, host-49 | False Q: -
 - Baseline FQ: - | baseline_wins=False
 
@@ -134,7 +134,7 @@ None — correlator never lost to single-host isolation on FQ/coverage.
 - Truth: host-00, host-01, host-02
 - Verdict: **HELD** | Jaccard=1.0 | margin=1.0
 - Reasons: matched truth without merge-FQ; break_criterion not triggered: Jaccard drop vs #5/#17 baseline at matched technique set
-- Quarantine dry-run: host-00, host-01, host-02
+- Quarantine dry-run: host-01
 - Saved: host-03, host-04, host-05, host-06, host-07, host-08, host-09, host-10, host-11, host-12, host-13, host-14, host-15, host-16, host-17, host-18, host-19, host-20, host-21, host-22, host-23, host-24, host-25, host-26, host-27, host-28, host-29, host-30, host-31, host-32, host-33, host-34, host-35, host-36, host-37, host-38, host-39, host-40, host-41, host-42, host-43, host-44, host-45, host-46, host-47, host-48, host-49 | False Q: -
 - Baseline FQ: - | baseline_wins=False
 
@@ -144,7 +144,7 @@ None — correlator never lost to single-host isolation on FQ/coverage.
 - Truth: host-00, host-01, host-02
 - Verdict: **HELD** | Jaccard=1.0 | margin=1.0
 - Reasons: matched truth without merge-FQ; break_criterion not triggered: campaign not detected, or techniques logged but not correlated
-- Quarantine dry-run: host-00, host-01, host-02
+- Quarantine dry-run: host-01
 - Saved: host-03, host-04, host-05, host-06, host-07, host-08, host-09, host-10, host-11, host-12, host-13, host-14, host-15, host-16, host-17, host-18, host-19, host-20, host-21, host-22, host-23, host-24, host-25, host-26, host-27, host-28, host-29, host-30, host-31, host-32, host-33, host-34, host-35, host-36, host-37, host-38, host-39, host-40, host-41, host-42, host-43, host-44, host-45, host-46, host-47, host-48, host-49 | False Q: -
 - Baseline FQ: - | baseline_wins=False
 
@@ -154,7 +154,7 @@ None — correlator never lost to single-host isolation on FQ/coverage.
 - Truth: host-00, host-01, host-02
 - Verdict: **HELD** | Jaccard=1.0 | margin=1.0
 - Reasons: matched truth without merge-FQ; break_criterion not triggered: causal ordering a→b→c wrong, or b dropped due to apparent gap
-- Quarantine dry-run: host-00, host-01, host-02
+- Quarantine dry-run: host-01
 - Saved: host-03, host-04, host-05, host-06, host-07, host-08, host-09, host-10, host-11, host-12, host-13, host-14, host-15, host-16, host-17, host-18, host-19, host-20, host-21, host-22, host-23, host-24, host-25, host-26, host-27, host-28, host-29, host-30, host-31, host-32, host-33, host-34, host-35, host-36, host-37, host-38, host-39, host-40, host-41, host-42, host-43, host-44, host-45, host-46, host-47, host-48, host-49 | False Q: -
 - Baseline FQ: - | baseline_wins=False
 
@@ -164,7 +164,7 @@ None — correlator never lost to single-host isolation on FQ/coverage.
 - Truth: host-00, host-01, host-02, host-03
 - Verdict: **PARTIAL** | Jaccard=0.5 | margin=0.1
 - Reasons: jaccard 0.5 in PARTIAL band
-- Quarantine dry-run: host-00, host-01
+- Quarantine dry-run: host-01
 - Saved: host-04, host-05, host-06, host-07, host-08, host-09, host-10, host-11, host-12, host-13, host-14, host-15, host-16, host-17, host-18, host-19, host-20, host-21, host-22, host-23, host-24, host-25, host-26, host-27, host-28, host-29, host-30, host-31, host-32, host-33, host-34, host-35, host-36, host-37, host-38, host-39, host-40, host-41, host-42, host-43, host-44, host-45, host-46, host-47, host-48, host-49 | False Q: -
 - Baseline FQ: - | baseline_wins=False
 
@@ -174,8 +174,8 @@ None — correlator never lost to single-host isolation on FQ/coverage.
 - Truth: host-00, host-01
 - Verdict: **HELD, fragile** | Jaccard=1.0 | margin=0.1
 - Reasons: matched truth without merge-FQ; break_criterion not triggered: causal chain backwards, or split into two false fragments
-- Quarantine dry-run: host-00, host-01, host-02, host-03
-- Saved: host-04, host-05, host-06, host-07, host-08, host-09, host-10, host-11, host-12, host-13, host-14, host-15, host-16, host-17, host-18, host-19, host-20, host-21, host-22, host-23, host-24, host-25, host-26, host-27, host-28, host-29, host-30, host-31, host-32, host-33, host-34, host-35, host-36, host-37, host-38, host-39, host-40, host-41, host-42, host-43, host-44, host-45, host-46, host-47, host-48, host-49 | False Q: host-02, host-03
+- Quarantine dry-run: host-01, host-03
+- Saved: host-02, host-04, host-05, host-06, host-07, host-08, host-09, host-10, host-11, host-12, host-13, host-14, host-15, host-16, host-17, host-18, host-19, host-20, host-21, host-22, host-23, host-24, host-25, host-26, host-27, host-28, host-29, host-30, host-31, host-32, host-33, host-34, host-35, host-36, host-37, host-38, host-39, host-40, host-41, host-42, host-43, host-44, host-45, host-46, host-47, host-48, host-49 | False Q: host-03
 - Baseline FQ: - | baseline_wins=False
 
 ### t2-lim09-max-density-overlap ★ headline
@@ -194,7 +194,7 @@ None — correlator never lost to single-host isolation on FQ/coverage.
 - Truth: host-00, host-01, host-02
 - Verdict: **HELD, fragile** | Jaccard=1.0 | margin=0.0
 - Reasons: sequential incidents split across 2 campaigns
-- Quarantine dry-run: host-00, host-01, host-02
+- Quarantine dry-run: host-01
 - Saved: host-03, host-04, host-05, host-06, host-07, host-08, host-09, host-10, host-11, host-12, host-13, host-14, host-15, host-16, host-17, host-18, host-19, host-20, host-21, host-22, host-23, host-24, host-25, host-26, host-27, host-28, host-29, host-30, host-31, host-32, host-33, host-34, host-35, host-36, host-37, host-38, host-39, host-40, host-41, host-42, host-43, host-44, host-45, host-46, host-47, host-48, host-49 | False Q: -
 - Baseline FQ: - | baseline_wins=False
 
@@ -214,7 +214,7 @@ None — correlator never lost to single-host isolation on FQ/coverage.
 - Truth: host-00, host-02, host-04
 - Verdict: **HELD, fragile** | Jaccard=1.0 | margin=0.1
 - Reasons: matched truth without merge-FQ; break_criterion not triggered: attack missed (BROKE) or b/d False Q via association
-- Quarantine dry-run: host-00, host-02, host-04
+- Quarantine dry-run: host-02
 - Saved: host-01, host-03, host-05, host-06, host-07, host-08, host-09, host-10, host-11, host-12, host-13, host-14, host-15, host-16, host-17, host-18, host-19, host-20, host-21, host-22, host-23, host-24, host-25, host-26, host-27, host-28, host-29, host-30, host-31, host-32, host-33, host-34, host-35, host-36, host-37, host-38, host-39, host-40, host-41, host-42, host-43, host-44, host-45, host-46, host-47, host-48, host-49 | False Q: -
 - Baseline FQ: host-01, host-03 | baseline_wins=False
 
@@ -234,7 +234,7 @@ None — correlator never lost to single-host isolation on FQ/coverage.
 - Truth: host-00, host-01, host-02
 - Verdict: **HELD** | Jaccard=1.0 | margin=1.0
 - Reasons: matched truth without merge-FQ; break_criterion not triggered: b's two identities treated as separate hosts, splitting coverage
-- Quarantine dry-run: host-00, host-01, host-02
+- Quarantine dry-run: host-01
 - Saved: host-03, host-04, host-05, host-06, host-07, host-08, host-09, host-10, host-11, host-12, host-13, host-14, host-15, host-16, host-17, host-18, host-19, host-20, host-21, host-22, host-23, host-24, host-25, host-26, host-27, host-28, host-29, host-30, host-31, host-32, host-33, host-34, host-35, host-36, host-37, host-38, host-39, host-40, host-41, host-42, host-43, host-44, host-45, host-46, host-47, host-48, host-49 | False Q: -
 - Baseline FQ: - | baseline_wins=False
 
@@ -244,7 +244,7 @@ None — correlator never lost to single-host isolation on FQ/coverage.
 - Truth: host-00, host-01, host-02
 - Verdict: **HELD** | Jaccard=1.0 | margin=1.0
 - Reasons: matched truth without merge-FQ; break_criterion not triggered: Jaccard regression vs #8/#20 passing results
-- Quarantine dry-run: host-00, host-01, host-02
+- Quarantine dry-run: host-01
 - Saved: host-03, host-04, host-05, host-06, host-07, host-08, host-09, host-10, host-11, host-12, host-13, host-14, host-15, host-16, host-17, host-18, host-19, host-20, host-21, host-22, host-23, host-24, host-25, host-26, host-27, host-28, host-29, host-30, host-31, host-32, host-33, host-34, host-35, host-36, host-37, host-38, host-39, host-40, host-41, host-42, host-43, host-44, host-45, host-46, host-47, host-48, host-49 | False Q: -
 - Baseline FQ: - | baseline_wins=False
 

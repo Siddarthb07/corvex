@@ -2,15 +2,15 @@
   "test": "Attack fleet 20 \u2014 full intensity black-box benchmark",
   "n": 20,
   "intensity_rounds": 2,
-  "total_wall_seconds": 30.4538,
+  "total_wall_seconds": 29.7306,
   "counts": {
     "HELD": 20,
     "PARTIAL": 0,
     "BROKE": 0
   },
-  "fragile_held": 1,
-  "clean_held": 19,
-  "fragile_rate_held": 0.05,
+  "fragile_held": 2,
+  "clean_held": 18,
+  "fragile_rate_held": 0.1,
   "fragile_margin_bar": 0.2,
   "attacks": [
     {
@@ -32,16 +32,14 @@
       "fragile": false,
       "confidence_margin": 1.0,
       "intensity_rounds": 2,
-      "wall_seconds": 1.4008,
+      "wall_seconds": 1.3619,
       "corr_jaccard": 1.0,
       "corr_matched": true,
       "det_jaccard": 1.0,
       "missed_hosts": [],
       "over_merged_hosts": [],
       "quarantine_proposed": [
-        "host-a",
-        "host-b",
-        "host-c"
+        "host-b"
       ],
       "hosts_saved": [
         "host-d",
@@ -68,9 +66,7 @@
           ],
           "confidence_margin": 1.0,
           "quarantine_proposed": [
-            "host-a",
-            "host-b",
-            "host-c"
+            "host-b"
           ]
         },
         {
@@ -91,9 +87,7 @@
           ],
           "confidence_margin": 1.0,
           "quarantine_proposed": [
-            "host-a",
-            "host-b",
-            "host-c"
+            "host-b"
           ]
         }
       ],
@@ -117,16 +111,14 @@
       "fragile": false,
       "confidence_margin": 1.0,
       "intensity_rounds": 2,
-      "wall_seconds": 1.5786,
+      "wall_seconds": 1.7462,
       "corr_jaccard": 1.0,
       "corr_matched": true,
       "det_jaccard": 1.0,
       "missed_hosts": [],
       "over_merged_hosts": [],
       "quarantine_proposed": [
-        "host-a",
-        "host-b",
-        "host-d"
+        "host-b"
       ],
       "hosts_saved": [
         "host-c",
@@ -153,9 +145,7 @@
           ],
           "confidence_margin": 1.0,
           "quarantine_proposed": [
-            "host-a",
-            "host-b",
-            "host-d"
+            "host-b"
           ]
         },
         {
@@ -176,9 +166,7 @@
           ],
           "confidence_margin": 1.0,
           "quarantine_proposed": [
-            "host-a",
-            "host-b",
-            "host-d"
+            "host-b"
           ]
         }
       ],
@@ -203,17 +191,14 @@
       "fragile": false,
       "confidence_margin": 1.0,
       "intensity_rounds": 2,
-      "wall_seconds": 1.7553,
+      "wall_seconds": 1.418,
       "corr_jaccard": 1.0,
       "corr_matched": true,
       "det_jaccard": 1.0,
       "missed_hosts": [],
       "over_merged_hosts": [],
       "quarantine_proposed": [
-        "host-a",
-        "host-b",
-        "host-c",
-        "host-d"
+        "host-b"
       ],
       "hosts_saved": [
         "host-e"
@@ -240,10 +225,7 @@
           ],
           "confidence_margin": 1.0,
           "quarantine_proposed": [
-            "host-a",
-            "host-b",
-            "host-c",
-            "host-d"
+            "host-b"
           ]
         },
         {
@@ -265,10 +247,7 @@
           ],
           "confidence_margin": 1.0,
           "quarantine_proposed": [
-            "host-a",
-            "host-b",
-            "host-c",
-            "host-d"
+            "host-b"
           ]
         }
       ],
@@ -287,18 +266,17 @@
         "host-c"
       ],
       "verdict": "HELD",
-      "verdict_label": "HELD",
-      "fragile": false,
-      "confidence_margin": 1.0,
+      "verdict_label": "HELD, fragile",
+      "fragile": true,
+      "confidence_margin": 0.1,
       "intensity_rounds": 2,
-      "wall_seconds": 1.4484,
+      "wall_seconds": 1.477,
       "corr_jaccard": 1.0,
       "corr_matched": true,
       "det_jaccard": 1.0,
       "missed_hosts": [],
       "over_merged_hosts": [],
       "quarantine_proposed": [
-        "host-b",
         "host-c"
       ],
       "hosts_saved": [
@@ -324,9 +302,8 @@
             "host-b",
             "host-c"
           ],
-          "confidence_margin": 1.0,
+          "confidence_margin": 0.1,
           "quarantine_proposed": [
-            "host-b",
             "host-c"
           ]
         },
@@ -345,9 +322,8 @@
             "host-b",
             "host-c"
           ],
-          "confidence_margin": 1.0,
+          "confidence_margin": 0.1,
           "quarantine_proposed": [
-            "host-b",
             "host-c"
           ]
         }
@@ -371,16 +347,14 @@
       "fragile": false,
       "confidence_margin": 1.0,
       "intensity_rounds": 2,
-      "wall_seconds": 1.6015,
+      "wall_seconds": 1.4313,
       "corr_jaccard": 1.0,
       "corr_matched": true,
       "det_jaccard": 0.0,
       "missed_hosts": [],
       "over_merged_hosts": [],
       "quarantine_proposed": [
-        "host-a",
-        "host-b",
-        "host-c"
+        "host-b"
       ],
       "hosts_saved": [
         "host-d",
@@ -407,9 +381,7 @@
           ],
           "confidence_margin": 1.0,
           "quarantine_proposed": [
-            "host-a",
-            "host-b",
-            "host-c"
+            "host-b"
           ]
         },
         {
@@ -430,9 +402,7 @@
           ],
           "confidence_margin": 1.0,
           "quarantine_proposed": [
-            "host-a",
-            "host-b",
-            "host-c"
+            "host-b"
           ]
         }
       ],
@@ -456,16 +426,14 @@
       "fragile": false,
       "confidence_margin": 1.0,
       "intensity_rounds": 2,
-      "wall_seconds": 1.5138,
+      "wall_seconds": 1.4512,
       "corr_jaccard": 1.0,
       "corr_matched": true,
       "det_jaccard": 1.0,
       "missed_hosts": [],
       "over_merged_hosts": [],
       "quarantine_proposed": [
-        "host-a",
-        "host-b",
-        "host-c"
+        "host-b"
       ],
       "hosts_saved": [
         "host-d",
@@ -492,9 +460,7 @@
           ],
           "confidence_margin": 1.0,
           "quarantine_proposed": [
-            "host-a",
-            "host-b",
-            "host-c"
+            "host-b"
           ]
         },
         {
@@ -515,9 +481,7 @@
           ],
           "confidence_margin": 1.0,
           "quarantine_proposed": [
-            "host-a",
-            "host-b",
-            "host-c"
+            "host-b"
           ]
         }
       ],
@@ -541,16 +505,14 @@
       "fragile": false,
       "confidence_margin": 1.0,
       "intensity_rounds": 2,
-      "wall_seconds": 1.5669,
+      "wall_seconds": 1.4557,
       "corr_jaccard": 1.0,
       "corr_matched": true,
       "det_jaccard": 1.0,
       "missed_hosts": [],
       "over_merged_hosts": [],
       "quarantine_proposed": [
-        "host-a",
-        "host-b",
-        "host-c"
+        "host-b"
       ],
       "hosts_saved": [
         "host-d",
@@ -577,9 +539,7 @@
           ],
           "confidence_margin": 1.0,
           "quarantine_proposed": [
-            "host-a",
-            "host-b",
-            "host-c"
+            "host-b"
           ]
         },
         {
@@ -600,9 +560,7 @@
           ],
           "confidence_margin": 1.0,
           "quarantine_proposed": [
-            "host-a",
-            "host-b",
-            "host-c"
+            "host-b"
           ]
         }
       ],
@@ -625,14 +583,13 @@
       "fragile": false,
       "confidence_margin": 1.0,
       "intensity_rounds": 2,
-      "wall_seconds": 1.4427,
+      "wall_seconds": 1.4509,
       "corr_jaccard": 1.0,
       "corr_matched": true,
       "det_jaccard": 1.0,
       "missed_hosts": [],
       "over_merged_hosts": [],
       "quarantine_proposed": [
-        "host-a",
         "host-b"
       ],
       "hosts_saved": [
@@ -660,7 +617,6 @@
           ],
           "confidence_margin": 1.0,
           "quarantine_proposed": [
-            "host-a",
             "host-b"
           ]
         },
@@ -681,7 +637,6 @@
           ],
           "confidence_margin": 1.0,
           "quarantine_proposed": [
-            "host-a",
             "host-b"
           ]
         }
@@ -705,16 +660,14 @@
       "fragile": false,
       "confidence_margin": 1.0,
       "intensity_rounds": 2,
-      "wall_seconds": 1.5709,
+      "wall_seconds": 1.7524,
       "corr_jaccard": 1.0,
       "corr_matched": true,
       "det_jaccard": 1.0,
       "missed_hosts": [],
       "over_merged_hosts": [],
       "quarantine_proposed": [
-        "host-a",
-        "host-b",
-        "host-c"
+        "host-b"
       ],
       "hosts_saved": [
         "host-d",
@@ -741,9 +694,7 @@
           ],
           "confidence_margin": 1.0,
           "quarantine_proposed": [
-            "host-a",
-            "host-b",
-            "host-c"
+            "host-b"
           ]
         },
         {
@@ -764,9 +715,7 @@
           ],
           "confidence_margin": 1.0,
           "quarantine_proposed": [
-            "host-a",
-            "host-b",
-            "host-c"
+            "host-b"
           ]
         }
       ],
@@ -790,16 +739,14 @@
       "fragile": false,
       "confidence_margin": 1.0,
       "intensity_rounds": 2,
-      "wall_seconds": 1.7496,
+      "wall_seconds": 1.3415,
       "corr_jaccard": 1.0,
       "corr_matched": true,
       "det_jaccard": 1.0,
       "missed_hosts": [],
       "over_merged_hosts": [],
       "quarantine_proposed": [
-        "host-a",
-        "host-b",
-        "host-c"
+        "host-b"
       ],
       "hosts_saved": [
         "host-d",
@@ -826,9 +773,7 @@
           ],
           "confidence_margin": 1.0,
           "quarantine_proposed": [
-            "host-a",
-            "host-b",
-            "host-c"
+            "host-b"
           ]
         },
         {
@@ -849,9 +794,7 @@
           ],
           "confidence_margin": 1.0,
           "quarantine_proposed": [
-            "host-a",
-            "host-b",
-            "host-c"
+            "host-b"
           ]
         }
       ],
@@ -875,16 +818,14 @@
       "fragile": false,
       "confidence_margin": 1.0,
       "intensity_rounds": 2,
-      "wall_seconds": 1.5919,
+      "wall_seconds": 1.3202,
       "corr_jaccard": 1.0,
       "corr_matched": true,
       "det_jaccard": 1.0,
       "missed_hosts": [],
       "over_merged_hosts": [],
       "quarantine_proposed": [
-        "host-a",
-        "host-b",
-        "host-c"
+        "host-b"
       ],
       "hosts_saved": [
         "host-d",
@@ -911,9 +852,7 @@
           ],
           "confidence_margin": 1.0,
           "quarantine_proposed": [
-            "host-a",
-            "host-b",
-            "host-c"
+            "host-b"
           ]
         },
         {
@@ -934,9 +873,7 @@
           ],
           "confidence_margin": 1.0,
           "quarantine_proposed": [
-            "host-a",
-            "host-b",
-            "host-c"
+            "host-b"
           ]
         }
       ],
@@ -960,16 +897,14 @@
       "fragile": false,
       "confidence_margin": 1.0,
       "intensity_rounds": 2,
-      "wall_seconds": 1.4396,
+      "wall_seconds": 1.3532,
       "corr_jaccard": 1.0,
       "corr_matched": true,
       "det_jaccard": 1.0,
       "missed_hosts": [],
       "over_merged_hosts": [],
       "quarantine_proposed": [
-        "host-a",
-        "host-b",
-        "host-d"
+        "host-b"
       ],
       "hosts_saved": [
         "host-c",
@@ -996,9 +931,7 @@
           ],
           "confidence_margin": 1.0,
           "quarantine_proposed": [
-            "host-a",
-            "host-b",
-            "host-d"
+            "host-b"
           ]
         },
         {
@@ -1019,9 +952,7 @@
           ],
           "confidence_margin": 1.0,
           "quarantine_proposed": [
-            "host-a",
-            "host-b",
-            "host-d"
+            "host-b"
           ]
         }
       ],
@@ -1044,14 +975,13 @@
       "fragile": false,
       "confidence_margin": 1.0,
       "intensity_rounds": 2,
-      "wall_seconds": 1.4832,
+      "wall_seconds": 1.547,
       "corr_jaccard": 1.0,
       "corr_matched": true,
       "det_jaccard": 1.0,
       "missed_hosts": [],
       "over_merged_hosts": [],
       "quarantine_proposed": [
-        "host-b",
         "host-c"
       ],
       "hosts_saved": [
@@ -1079,7 +1009,6 @@
           ],
           "confidence_margin": 1.0,
           "quarantine_proposed": [
-            "host-b",
             "host-c"
           ]
         },
@@ -1100,7 +1029,6 @@
           ],
           "confidence_margin": 1.0,
           "quarantine_proposed": [
-            "host-b",
             "host-c"
           ]
         }
@@ -1125,16 +1053,14 @@
       "fragile": false,
       "confidence_margin": 1.0,
       "intensity_rounds": 2,
-      "wall_seconds": 1.4542,
+      "wall_seconds": 1.4259,
       "corr_jaccard": 1.0,
       "corr_matched": true,
       "det_jaccard": 1.0,
       "missed_hosts": [],
       "over_merged_hosts": [],
       "quarantine_proposed": [
-        "host-a",
-        "host-c",
-        "host-e"
+        "host-c"
       ],
       "hosts_saved": [
         "host-b",
@@ -1161,9 +1087,7 @@
           ],
           "confidence_margin": 1.0,
           "quarantine_proposed": [
-            "host-a",
-            "host-c",
-            "host-e"
+            "host-c"
           ]
         },
         {
@@ -1184,9 +1108,7 @@
           ],
           "confidence_margin": 1.0,
           "quarantine_proposed": [
-            "host-a",
-            "host-c",
-            "host-e"
+            "host-c"
           ]
         }
       ],
@@ -1209,14 +1131,13 @@
       "fragile": false,
       "confidence_margin": 1.0,
       "intensity_rounds": 2,
-      "wall_seconds": 1.4997,
+      "wall_seconds": 1.4601,
       "corr_jaccard": 1.0,
       "corr_matched": true,
       "det_jaccard": 1.0,
       "missed_hosts": [],
       "over_merged_hosts": [],
       "quarantine_proposed": [
-        "host-a",
         "host-b"
       ],
       "hosts_saved": [
@@ -1244,7 +1165,6 @@
           ],
           "confidence_margin": 1.0,
           "quarantine_proposed": [
-            "host-a",
             "host-b"
           ]
         },
@@ -1265,7 +1185,6 @@
           ],
           "confidence_margin": 1.0,
           "quarantine_proposed": [
-            "host-a",
             "host-b"
           ]
         }
@@ -1289,16 +1208,14 @@
       "fragile": false,
       "confidence_margin": 1.0,
       "intensity_rounds": 2,
-      "wall_seconds": 1.4946,
+      "wall_seconds": 1.9794,
       "corr_jaccard": 1.0,
       "corr_matched": true,
       "det_jaccard": 0.6667,
       "missed_hosts": [],
       "over_merged_hosts": [],
       "quarantine_proposed": [
-        "host-a",
-        "host-b",
-        "host-c"
+        "host-b"
       ],
       "hosts_saved": [
         "host-d",
@@ -1325,9 +1242,7 @@
           ],
           "confidence_margin": 1.0,
           "quarantine_proposed": [
-            "host-a",
-            "host-b",
-            "host-c"
+            "host-b"
           ]
         },
         {
@@ -1348,9 +1263,7 @@
           ],
           "confidence_margin": 1.0,
           "quarantine_proposed": [
-            "host-a",
-            "host-b",
-            "host-c"
+            "host-b"
           ]
         }
       ],
@@ -1374,16 +1287,14 @@
       "fragile": false,
       "confidence_margin": 1.0,
       "intensity_rounds": 2,
-      "wall_seconds": 1.4516,
+      "wall_seconds": 1.5551,
       "corr_jaccard": 1.0,
       "corr_matched": true,
       "det_jaccard": 1.0,
       "missed_hosts": [],
       "over_merged_hosts": [],
       "quarantine_proposed": [
-        "host-a",
-        "host-b",
-        "host-c"
+        "host-b"
       ],
       "hosts_saved": [
         "host-d",
@@ -1410,9 +1321,7 @@
           ],
           "confidence_margin": 1.0,
           "quarantine_proposed": [
-            "host-a",
-            "host-b",
-            "host-c"
+            "host-b"
           ]
         },
         {
@@ -1433,9 +1342,7 @@
           ],
           "confidence_margin": 1.0,
           "quarantine_proposed": [
-            "host-a",
-            "host-b",
-            "host-c"
+            "host-b"
           ]
         }
       ],
@@ -1459,16 +1366,14 @@
       "fragile": false,
       "confidence_margin": 1.0,
       "intensity_rounds": 2,
-      "wall_seconds": 1.4576,
+      "wall_seconds": 1.4135,
       "corr_jaccard": 1.0,
       "corr_matched": true,
       "det_jaccard": 1.0,
       "missed_hosts": [],
       "over_merged_hosts": [],
       "quarantine_proposed": [
-        "host-a",
-        "host-b",
-        "host-c"
+        "host-b"
       ],
       "hosts_saved": [
         "host-d",
@@ -1495,9 +1400,7 @@
           ],
           "confidence_margin": 1.0,
           "quarantine_proposed": [
-            "host-a",
-            "host-b",
-            "host-c"
+            "host-b"
           ]
         },
         {
@@ -1518,9 +1421,7 @@
           ],
           "confidence_margin": 1.0,
           "quarantine_proposed": [
-            "host-a",
-            "host-b",
-            "host-c"
+            "host-b"
           ]
         }
       ],
@@ -1543,16 +1444,14 @@
       "fragile": true,
       "confidence_margin": 0.1,
       "intensity_rounds": 2,
-      "wall_seconds": 1.4731,
+      "wall_seconds": 1.4003,
       "corr_jaccard": 1.0,
       "corr_matched": true,
       "det_jaccard": 1.0,
       "missed_hosts": [],
       "over_merged_hosts": [],
       "quarantine_proposed": [
-        "host-a",
-        "host-b",
-        "host-c"
+        "host-b"
       ],
       "hosts_saved": [
         "host-d",
@@ -1580,9 +1479,7 @@
           ],
           "confidence_margin": 0.1,
           "quarantine_proposed": [
-            "host-a",
-            "host-b",
-            "host-c"
+            "host-b"
           ]
         },
         {
@@ -1604,9 +1501,7 @@
           ],
           "confidence_margin": 0.1,
           "quarantine_proposed": [
-            "host-a",
-            "host-b",
-            "host-c"
+            "host-b"
           ]
         }
       ],
@@ -1630,16 +1525,14 @@
       "fragile": false,
       "confidence_margin": 1.0,
       "intensity_rounds": 2,
-      "wall_seconds": 1.47,
+      "wall_seconds": 1.3794,
       "corr_jaccard": 1.0,
       "corr_matched": true,
       "det_jaccard": 1.0,
       "missed_hosts": [],
       "over_merged_hosts": [],
       "quarantine_proposed": [
-        "host-a",
-        "host-b",
-        "host-c"
+        "host-b"
       ],
       "hosts_saved": [
         "host-d",
@@ -1666,9 +1559,7 @@
           ],
           "confidence_margin": 1.0,
           "quarantine_proposed": [
-            "host-a",
-            "host-b",
-            "host-c"
+            "host-b"
           ]
         },
         {
@@ -1689,9 +1580,7 @@
           ],
           "confidence_margin": 1.0,
           "quarantine_proposed": [
-            "host-a",
-            "host-b",
-            "host-c"
+            "host-b"
           ]
         }
       ],

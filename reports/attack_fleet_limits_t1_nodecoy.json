@@ -6,8 +6,8 @@
   "decoys": false,
   "intensity_rounds": 1,
   "baseline_policy": "single-host-isolation",
-  "total_wall_seconds": 12.2978,
-  "peak_rss_mb": 33.78,
+  "total_wall_seconds": 13.034,
+  "peak_rss_mb": 33.16,
   "t2_gate_pass": true,
   "t0_fragile_rate_ref": 0.3571,
   "fragile_gate_pass": true,
@@ -56,7 +56,7 @@
         "break_criterion not triggered: d or e appears in the malicious campaign's Q dry-run list"
       ],
       "intensity_rounds": 1,
-      "wall_seconds": 0.9109,
+      "wall_seconds": 0.9767,
       "corr_jaccard": 1.0,
       "confidence_margin": 0.0,
       "confidence_margin_raw": 0.0,
@@ -65,9 +65,7 @@
       "recovered_on_replay": [],
       "over_merged_hosts": [],
       "quarantine_proposed": [
-        "host-00",
-        "host-01",
-        "host-02"
+        "host-01"
       ],
       "hosts_saved": [
         "host-03",
@@ -147,9 +145,7 @@
           "b1_hosts": [],
           "b1_campaigns": [],
           "quarantine_proposed": [
-            "host-00",
-            "host-01",
-            "host-02"
+            "host-01"
           ],
           "recon_hosts": [
             "host-00",
@@ -215,7 +211,7 @@
         "multi-campaign held"
       ],
       "intensity_rounds": 1,
-      "wall_seconds": 0.8551,
+      "wall_seconds": 0.8493,
       "corr_jaccard": 1.0,
       "confidence_margin": 0.9,
       "confidence_margin_raw": 0.0,
@@ -452,7 +448,7 @@
         "break_criterion not triggered: any truth-host event outside the window silently dropped from campaign reconstruction"
       ],
       "intensity_rounds": 1,
-      "wall_seconds": 0.8229,
+      "wall_seconds": 0.7913,
       "corr_jaccard": 1.0,
       "confidence_margin": 1.0,
       "confidence_margin_raw": 1.0,
@@ -560,7 +556,7 @@
         "break_criterion not triggered: Jaccard drop vs #5/#17 baseline at matched technique set"
       ],
       "intensity_rounds": 1,
-      "wall_seconds": 0.6976,
+      "wall_seconds": 0.8763,
       "corr_jaccard": 1.0,
       "confidence_margin": 1.0,
       "confidence_margin_raw": 1.0,
@@ -569,9 +565,7 @@
       "recovered_on_replay": [],
       "over_merged_hosts": [],
       "quarantine_proposed": [
-        "host-00",
-        "host-01",
-        "host-02"
+        "host-01"
       ],
       "hosts_saved": [
         "host-03",
@@ -639,9 +633,7 @@
           "b1_hosts": [],
           "b1_campaigns": [],
           "quarantine_proposed": [
-            "host-00",
-            "host-01",
-            "host-02"
+            "host-01"
           ],
           "recon_hosts": [
             "host-00",
@@ -676,7 +668,7 @@
         "break_criterion not triggered: campaign not detected, or techniques logged but not correlated"
       ],
       "intensity_rounds": 1,
-      "wall_seconds": 0.7781,
+      "wall_seconds": 0.887,
       "corr_jaccard": 1.0,
       "confidence_margin": 1.0,
       "confidence_margin_raw": 1.0,
@@ -685,9 +677,7 @@
       "recovered_on_replay": [],
       "over_merged_hosts": [],
       "quarantine_proposed": [
-        "host-00",
-        "host-01",
-        "host-02"
+        "host-01"
       ],
       "hosts_saved": [
         "host-03",
@@ -755,9 +745,7 @@
           "b1_hosts": [],
           "b1_campaigns": [],
           "quarantine_proposed": [
-            "host-00",
-            "host-01",
-            "host-02"
+            "host-01"
           ],
           "recon_hosts": [
             "host-00",
@@ -793,7 +781,7 @@
         "break_criterion not triggered: causal ordering a\u2192b\u2192c wrong, or b dropped due to apparent gap"
       ],
       "intensity_rounds": 1,
-      "wall_seconds": 0.7441,
+      "wall_seconds": 0.8407,
       "corr_jaccard": 1.0,
       "confidence_margin": 1.0,
       "confidence_margin_raw": 1.0,
@@ -802,9 +790,7 @@
       "recovered_on_replay": [],
       "over_merged_hosts": [],
       "quarantine_proposed": [
-        "host-00",
-        "host-01",
-        "host-02"
+        "host-01"
       ],
       "hosts_saved": [
         "host-03",
@@ -872,9 +858,7 @@
           "b1_hosts": [],
           "b1_campaigns": [],
           "quarantine_proposed": [
-            "host-00",
-            "host-01",
-            "host-02"
+            "host-01"
           ],
           "recon_hosts": [
             "host-00",
@@ -909,7 +893,7 @@
         "jaccard 0.5 in PARTIAL band"
       ],
       "intensity_rounds": 1,
-      "wall_seconds": 0.9207,
+      "wall_seconds": 0.8481,
       "corr_jaccard": 0.5,
       "confidence_margin": 0.1,
       "confidence_margin_raw": 0.1,
@@ -918,7 +902,6 @@
       "recovered_on_replay": [],
       "over_merged_hosts": [],
       "quarantine_proposed": [
-        "host-00",
         "host-01"
       ],
       "hosts_saved": [
@@ -995,7 +978,6 @@
           "b1_hosts": [],
           "b1_campaigns": [],
           "quarantine_proposed": [
-            "host-00",
             "host-01"
           ],
           "recon_hosts": [
@@ -1031,7 +1013,7 @@
         "break_criterion not triggered: causal chain backwards, or split into two false fragments"
       ],
       "intensity_rounds": 1,
-      "wall_seconds": 0.8303,
+      "wall_seconds": 0.7341,
       "corr_jaccard": 1.0,
       "confidence_margin": 0.1,
       "confidence_margin_raw": 0.1,
@@ -1040,12 +1022,11 @@
       "recovered_on_replay": [],
       "over_merged_hosts": [],
       "quarantine_proposed": [
-        "host-00",
         "host-01",
-        "host-02",
         "host-03"
       ],
       "hosts_saved": [
+        "host-02",
         "host-04",
         "host-05",
         "host-06",
@@ -1059,7 +1040,6 @@
         "host-14"
       ],
       "false_quarantine": [
-        "host-02",
         "host-03"
       ],
       "baseline": {
@@ -1120,9 +1100,7 @@
           "b1_hosts": [],
           "b1_campaigns": [],
           "quarantine_proposed": [
-            "host-00",
             "host-01",
-            "host-02",
             "host-03"
           ],
           "recon_hosts": [
@@ -1188,7 +1166,7 @@
         "multi-campaign held"
       ],
       "intensity_rounds": 1,
-      "wall_seconds": 0.7268,
+      "wall_seconds": 0.8575,
       "corr_jaccard": 1.0,
       "confidence_margin": 1.0,
       "confidence_margin_raw": 0.0,
@@ -1460,7 +1438,7 @@
         "sequential incidents split across 2 campaigns"
       ],
       "intensity_rounds": 1,
-      "wall_seconds": 0.8379,
+      "wall_seconds": 0.7917,
       "corr_jaccard": 1.0,
       "confidence_margin": 0.0,
       "confidence_margin_raw": 0.0,
@@ -1469,9 +1447,7 @@
       "recovered_on_replay": [],
       "over_merged_hosts": [],
       "quarantine_proposed": [
-        "host-00",
-        "host-01",
-        "host-02"
+        "host-01"
       ],
       "hosts_saved": [
         "host-03",
@@ -1628,9 +1604,7 @@
             "min_jaccard": 1.0
           },
           "quarantine_proposed": [
-            "host-00",
-            "host-01",
-            "host-02"
+            "host-01"
           ],
           "recon_hosts": [
             "host-00",
@@ -1668,7 +1642,7 @@
         "break_criterion not triggered: Jaccard or margin regression vs original #1/#6 from host relabeling alone"
       ],
       "intensity_rounds": 1,
-      "wall_seconds": 0.7337,
+      "wall_seconds": 0.7627,
       "corr_jaccard": 1.0,
       "confidence_margin": 0.0,
       "confidence_margin_raw": 0.0,
@@ -1787,7 +1761,7 @@
         "break_criterion not triggered: attack missed (BROKE) or b/d False Q via association"
       ],
       "intensity_rounds": 1,
-      "wall_seconds": 0.7897,
+      "wall_seconds": 0.9118,
       "corr_jaccard": 1.0,
       "confidence_margin": 0.1,
       "confidence_margin_raw": 0.1,
@@ -1796,9 +1770,7 @@
       "recovered_on_replay": [],
       "over_merged_hosts": [],
       "quarantine_proposed": [
-        "host-00",
-        "host-02",
-        "host-04"
+        "host-02"
       ],
       "hosts_saved": [
         "host-01",
@@ -1941,9 +1913,7 @@
             }
           ],
           "quarantine_proposed": [
-            "host-00",
-            "host-02",
-            "host-04"
+            "host-02"
           ],
           "recon_hosts": [
             "host-00",
@@ -1975,7 +1945,7 @@
         "no quarantine with empty truth"
       ],
       "intensity_rounds": 1,
-      "wall_seconds": 0.811,
+      "wall_seconds": 1.0327,
       "corr_jaccard": 1.0,
       "confidence_margin": 1.0,
       "confidence_margin_raw": 1.0,
@@ -2090,7 +2060,7 @@
         "break_criterion not triggered: b's two identities treated as separate hosts, splitting coverage"
       ],
       "intensity_rounds": 1,
-      "wall_seconds": 0.78,
+      "wall_seconds": 0.8517,
       "corr_jaccard": 1.0,
       "confidence_margin": 1.0,
       "confidence_margin_raw": 1.0,
@@ -2099,9 +2069,7 @@
       "recovered_on_replay": [],
       "over_merged_hosts": [],
       "quarantine_proposed": [
-        "host-00",
-        "host-01",
-        "host-02"
+        "host-01"
       ],
       "hosts_saved": [
         "host-03",
@@ -2169,9 +2137,7 @@
           "b1_hosts": [],
           "b1_campaigns": [],
           "quarantine_proposed": [
-            "host-00",
-            "host-01",
-            "host-02"
+            "host-01"
           ],
           "recon_hosts": [
             "host-00",
@@ -2206,7 +2172,7 @@
         "break_criterion not triggered: Jaccard regression vs #8/#20 passing results"
       ],
       "intensity_rounds": 1,
-      "wall_seconds": 0.8229,
+      "wall_seconds": 0.8431,
       "corr_jaccard": 1.0,
       "confidence_margin": 1.0,
       "confidence_margin_raw": 1.0,
@@ -2215,9 +2181,7 @@
       "recovered_on_replay": [],
       "over_merged_hosts": [],
       "quarantine_proposed": [
-        "host-00",
-        "host-01",
-        "host-02"
+        "host-01"
       ],
       "hosts_saved": [
         "host-03",
@@ -2285,9 +2249,7 @@
           "b1_hosts": [],
           "b1_campaigns": [],
           "quarantine_proposed": [
-            "host-00",
-            "host-01",
-            "host-02"
+            "host-01"
           ],
           "recon_hosts": [
             "host-00",
