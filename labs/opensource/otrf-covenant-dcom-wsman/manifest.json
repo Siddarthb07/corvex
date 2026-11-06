@@ -5,10 +5,16 @@
     "project": "OTRF/Security-Datasets",
     "url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/master/datasets/atomic/windows/lateral_movement/host/covenant_com_wsman_automation.zip",
     "family": "lateral_movement",
-    "note": "Covenant COM/WSMAN automation",
+    "tool": "Covenant",
+    "attack": "COM/WSMAN automation",
+    "techniques": [
+      "T1021.003",
+      "T1021.006"
+    ],
+    "note": "COM/WSMAN automation",
     "authorship": "external"
   },
-  "raw_glob": "raw/*.json",
+  "raw_glob": "raw/*.sanitized.jsonl",
   "host_map": {},
   "fetch": {
     "source_url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/master/datasets/atomic/windows/lateral_movement/host/covenant_com_wsman_automation.zip",
@@ -18,7 +24,7 @@
       "covenant_com_wsman_automation_2020-10-13002455.sanitized.jsonl"
     ],
     "family": "lateral_movement",
-    "note": "Covenant COM/WSMAN automation",
+    "note": null,
     "license_note": "OTRF Security-Datasets \u2014 see upstream LICENSE (GPL-3.0).",
     "authorship": "external \u2014 OTRF / MITRE ATT&CK Evals capture, not Corvex authors"
   }

@@ -5,10 +5,15 @@
     "project": "OTRF/Security-Datasets",
     "url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/master/datasets/atomic/windows/lateral_movement/host/empire_smbexec_dcerpc_smb_svcctl.zip",
     "family": "lateral_movement",
-    "note": "Empire smbexec svcctl",
+    "tool": "Empire",
+    "attack": "smbexec via svcctl",
+    "techniques": [
+      "T1021.002"
+    ],
+    "note": "smbexec via svcctl",
     "authorship": "external"
   },
-  "raw_glob": "raw/*.json",
+  "raw_glob": "raw/*.sanitized.jsonl",
   "host_map": {},
   "fetch": {
     "source_url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/master/datasets/atomic/windows/lateral_movement/host/empire_smbexec_dcerpc_smb_svcctl.zip",
@@ -18,7 +23,7 @@
       "empire_smbexec_dcerpc_smb_svcctl_2020-09-20025716.sanitized.jsonl"
     ],
     "family": "lateral_movement",
-    "note": "Empire smbexec svcctl",
+    "note": null,
     "license_note": "OTRF Security-Datasets \u2014 see upstream LICENSE (GPL-3.0).",
     "authorship": "external \u2014 OTRF / MITRE ATT&CK Evals capture, not Corvex authors"
   }

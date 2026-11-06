@@ -5,10 +5,16 @@
     "project": "OTRF/Security-Datasets",
     "url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/master/datasets/atomic/windows/lateral_movement/host/empire_psexec_dcerpc_tcp_svcctl.zip",
     "family": "lateral_movement",
-    "note": "Empire PsExec / svcctl lateral",
+    "tool": "Empire",
+    "attack": "PsExec / svcctl remote service",
+    "techniques": [
+      "T1021.002",
+      "T1570"
+    ],
+    "note": "PsExec / svcctl remote service",
     "authorship": "external"
   },
-  "raw_glob": "raw/*.json",
+  "raw_glob": "raw/*.sanitized.jsonl",
   "host_map": {},
   "fetch": {
     "source_url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/master/datasets/atomic/windows/lateral_movement/host/empire_psexec_dcerpc_tcp_svcctl.zip",
@@ -18,7 +24,7 @@
       "empire_psexec_dcerpc_tcp_svcctl_2020-09-20121608.sanitized.jsonl"
     ],
     "family": "lateral_movement",
-    "note": "Empire PsExec / svcctl lateral",
+    "note": null,
     "license_note": "OTRF Security-Datasets \u2014 see upstream LICENSE (GPL-3.0).",
     "authorship": "external \u2014 OTRF / MITRE ATT&CK Evals capture, not Corvex authors"
   }

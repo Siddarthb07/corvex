@@ -5,10 +5,17 @@
     "project": "OTRF/Security-Datasets",
     "url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/master/datasets/atomic/windows/lateral_movement/host/purplesharp_ad_playbook_I.zip",
     "family": "playbook",
+    "tool": "PurpleSharp",
+    "attack": "PurpleSharp AD playbook I (multi-step)",
+    "techniques": [
+      "T1021",
+      "T1078",
+      "T1087"
+    ],
     "note": "PurpleSharp AD playbook I (multi-step)",
     "authorship": "external"
   },
-  "raw_glob": "raw/*.json",
+  "raw_glob": "raw/*.sanitized.jsonl",
   "host_map": {},
   "fetch": {
     "source_url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/master/datasets/atomic/windows/lateral_movement/host/purplesharp_ad_playbook_I.zip",
@@ -18,7 +25,7 @@
       "purplesharp_ad_playbook_I_2020-10-22042947.sanitized.jsonl"
     ],
     "family": "playbook",
-    "note": "PurpleSharp AD playbook I (multi-step)",
+    "note": null,
     "license_note": "OTRF Security-Datasets \u2014 see upstream LICENSE (GPL-3.0).",
     "authorship": "external \u2014 OTRF / MITRE ATT&CK Evals capture, not Corvex authors"
   }

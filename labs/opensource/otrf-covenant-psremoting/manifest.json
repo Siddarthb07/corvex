@@ -5,10 +5,15 @@
     "project": "OTRF/Security-Datasets",
     "url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/master/datasets/atomic/windows/lateral_movement/host/covenant_psremoting_command.zip",
     "family": "lateral_movement",
-    "note": "Covenant PS remoting command",
+    "tool": "Covenant",
+    "attack": "PS remoting command",
+    "techniques": [
+      "T1021.006"
+    ],
+    "note": "PS remoting command",
     "authorship": "external"
   },
-  "raw_glob": "raw/*.json",
+  "raw_glob": "raw/*.sanitized.jsonl",
   "host_map": {},
   "fetch": {
     "source_url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/master/datasets/atomic/windows/lateral_movement/host/covenant_psremoting_command.zip",
@@ -18,7 +23,7 @@
       "covenant_psremoting_command_2020-08-06115603.sanitized.jsonl"
     ],
     "family": "lateral_movement",
-    "note": "Covenant PS remoting command",
+    "note": null,
     "license_note": "OTRF Security-Datasets \u2014 see upstream LICENSE (GPL-3.0).",
     "authorship": "external \u2014 OTRF / MITRE ATT&CK Evals capture, not Corvex authors"
   }
