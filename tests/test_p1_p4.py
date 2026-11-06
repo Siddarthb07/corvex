@@ -39,7 +39,8 @@ def test_live_gates_not_ready_by_default(tmp_path: Path, monkeypatch):
     )
     gates = live_gates_satisfied(tmp_path)
     assert gates["ready"] is False
-    assert gates["os_executor_implemented"] is False
+    # Executor exists (Windows Firewall IsolateHost) but stays gated — ready≠implemented.
+    assert gates["os_executor_implemented"] is True
 
 
 def test_claim_gates_locked_without_attestation(tmp_path: Path):

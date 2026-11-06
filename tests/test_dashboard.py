@@ -191,6 +191,23 @@ def test_snapshot_run_centric(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -
     assert len(snap["run"]["campaigns"]) == 1
     assert snap["run"]["reconstruction"]["aggregate_status"] == "partial"
     assert snap["quarantine"]["live_executor"] is False
+    assert "live_executor_kind" in snap["quarantine"]
+    plan = snap["contain_plan"]
+    assert plan["read_only"] is True
+    assert len(plan["campaigns"]) == 1
+    row = plan["campaigns"][0]
+    assert row["campaign_id"] == "camp-test"
+    for key in (
+        "band",
+        "scope",
+        "targets",
+        "pct_of_n",
+        "soc_preserved",
+        "requires_dual_control",
+        "propose",
+        "honesty",
+    ):
+        assert key in row
     assert snap["claim"]["allowed"] is False
     assert snap["sealed_eval"]["binds_to_run"] is False
     assert snap["hero"]["status"] in ("PARTIAL", "CAMPAIGN")
@@ -208,6 +225,7 @@ def test_dashboard_html_has_run_sections_not_toggles(
     out = write_dashboard(tmp_path, embed_snapshot=False)
     html = out.read_text(encoding="utf-8")
     assert "run feed" in html
+    assert "Contain / Isolate" in html
     assert "Activity" in html
     assert "Sealed Day-0" in html
     assert "checkbox" not in html
