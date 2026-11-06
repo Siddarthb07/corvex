@@ -1,8 +1,22 @@
-# One-shot: open SSH + authorize cyborg_1 key so the author machine can finish S2.
-# On PC-2 (Admin PowerShell):
+# One-shot: install/start OpenSSH Server + authorize author (cyborg_1) key.
+# On the NEW Windows lab PC (Admin PowerShell):
 #   irm https://raw.githubusercontent.com/Siddarthb07/corvex/master/scripts/enable_s2_ssh.ps1 | iex
+# Or from a local clone:
+#   powershell -ExecutionPolicy Bypass -File scripts\enable_s2_ssh.ps1
 $ErrorActionPreference = "Continue"
 $pub = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIH8BSq2MukTIAWN79BAjcsVxjzJk/zNrYZ1CpLjf/1ll cyborg_1-to-cyborg-s2"
+
+# Install OpenSSH Server if missing (Windows 10/11)
+$sshd = Get-Service sshd -ErrorAction SilentlyContinue
+if (-not $sshd) {
+    Write-Host "Installing OpenSSH Server..."
+    try {
+        Add-WindowsCapability -Online -Name OpenSSH.Server~~~~0.0.1.0 | Out-Null
+    } catch {
+        Write-Host "Add-WindowsCapability failed; trying optional feature..."
+        DISM /Online /Add-Capability /CapabilityName:OpenSSH.Server~~~~0.0.1.0 | Out-Null
+    }
+}
 
 cmd /c "net start sshd"
 cmd /c "sc config sshd start= auto"
@@ -35,4 +49,9 @@ if (Test-Path $cfg) {
     Set-Content -Path $cfg -Value $t -NoNewline
 }
 cmd /c "net stop sshd & net start sshd"
-Write-Host "SSH ready. hostname=$(hostname) ip check with ipconfig. Tell cyborg_1 to retry."
+
+$ip = (Get-NetIPAddress -AddressFamily IPv4 |
+    Where-Object { $_.IPAddress -notlike "127.*" -and $_.PrefixOrigin -ne "WellKnown" } |
+    Select-Object -ExpandProperty IPAddress -First 3) -join ", "
+Write-Host "SSH ready. hostname=$(hostname) user=$env:USERNAME ip=$ip"
+Write-Host "From author PC:  ssh -i ~/.ssh/corvex_s2 $env:USERNAME@<ip>"
