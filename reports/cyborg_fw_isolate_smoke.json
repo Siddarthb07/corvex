@@ -1,0 +1,145 @@
+{
+  "schema_ver": "1",
+  "test": "cyborg_fw_isolate_smoke",
+  "hostname": "Cyborg",
+  "started_at": "2026-11-06T10:27:44Z",
+  "root": "C:\\Users\\siddu\\Projects\\corvex",
+  "honesty": "Windows Firewall self-isolate on Cyborg only. Not EDR/VLAN. Author laptop untouched. Peer fanout not exercised.",
+  "hostile_bus": {
+    "pass": true,
+    "path": "reports/hostile_bus_selftest.json"
+  },
+  "l1": {
+    "complete": true,
+    "path": "C:\\Users\\siddu\\Projects\\corvex\\reports\\security_l1_checklist.json",
+    "scope": "local_windows_firewall_self_isolate_cyborg_only"
+  },
+  "gates_before": {
+    "ready": true,
+    "corvex_contain": 1,
+    "l1_complete": true,
+    "hostile_bus_ok": true,
+    "hostile_bus_note": "hostile_bus_selftest pass",
+    "os_executor_implemented": true,
+    "os_executor_kind": "windows_firewall_self_isolate",
+    "honesty": "When ready=true, Windows Firewall self-isolate / release is available for the local host_id. Not EDR/VLAN. Lab flags still available via lab_dir."
+  },
+  "quarantine_mode": {
+    "mode": "live_windows",
+    "can_attempt": true,
+    "live_executor": true,
+    "live_executor_kind": "windows_firewall_self_isolate",
+    "corvex_contain": 1,
+    "l1_complete": true,
+    "l1_pct": 100.0,
+    "lab_dir": null,
+    "message": "CORVEX_CONTAIN nonzero and L1 complete \u2014 Windows Firewall self-isolate available for local host_id after hostile-bus + CORVEX_CONTAIN_AUTHZ. Not EDR/VLAN. Fanout/agent required for remote peers.",
+    "honesty": [
+      "Corvex does not claim enterprise EDR quarantine.",
+      "CORVEX_CONTAIN nonzero and L1 complete \u2014 Windows Firewall self-isolate available for local host_id after hostile-bus + CORVEX_CONTAIN_AUTHZ. Not EDR/VLAN. Fanout/agent required for remote peers."
+    ]
+  },
+  "rule_name": "Corvex-Isolate-Cyborg",
+  "rule_exists_before": false,
+  "isolate": {
+    "ok": true,
+    "aggregate": "windows_firewall_isolated",
+    "message": "Windows Firewall isolate verified on all requested non-SOC targets.",
+    "hosts": [
+      {
+        "result": "os_isolated",
+        "enforced": true,
+        "host_id": "Cyborg",
+        "rule": "Corvex-Isolate-Cyborg",
+        "allow_cidrs": [],
+        "honesty": "Local Windows Firewall block rules applied and verified (in+out). Not EDR/VLAN quarantine. Allow-CIDR rules are best-effort \u2014 Windows block precedence may still cut management paths.",
+        "errors": null,
+        "gates": {
+          "ready": true,
+          "corvex_contain": 1,
+          "l1_complete": true,
+          "hostile_bus_ok": true,
+          "hostile_bus_note": "hostile_bus_selftest pass",
+          "os_executor_implemented": true,
+          "os_executor_kind": "windows_firewall_self_isolate",
+          "honesty": "When ready=true, Windows Firewall self-isolate / release is available for the local host_id. Not EDR/VLAN. Lab flags still available via lab_dir."
+        }
+      }
+    ],
+    "soc_stripped": [],
+    "ts": "2026-11-06T10:27:59Z",
+    "live_path": true,
+    "mode": "live_windows",
+    "capability": {
+      "mode": "live_windows",
+      "can_attempt": true,
+      "live_executor": true,
+      "live_executor_kind": "windows_firewall_self_isolate",
+      "corvex_contain": 1,
+      "l1_complete": true,
+      "l1_pct": 100.0,
+      "lab_dir": null,
+      "message": "CORVEX_CONTAIN nonzero and L1 complete \u2014 Windows Firewall self-isolate available for local host_id after hostile-bus + CORVEX_CONTAIN_AUTHZ. Not EDR/VLAN. Fanout/agent required for remote peers.",
+      "honesty": [
+        "Corvex does not claim enterprise EDR quarantine.",
+        "CORVEX_CONTAIN nonzero and L1 complete \u2014 Windows Firewall self-isolate available for local host_id after hostile-bus + CORVEX_CONTAIN_AUTHZ. Not EDR/VLAN. Fanout/agent required for remote peers."
+      ]
+    }
+  },
+  "rule_exists_after_isolate": true,
+  "isolate_enforced": true,
+  "release": {
+    "ok": true,
+    "aggregate": "windows_firewall_released",
+    "message": "Windows Firewall isolate rules removed (or were already absent).",
+    "hosts": [
+      {
+        "result": "released",
+        "enforced": false,
+        "host_id": "Cyborg",
+        "rule": "Corvex-Isolate-Cyborg",
+        "honesty": "Corvex isolate firewall rules removed.",
+        "stderr_tail": "",
+        "gates": {
+          "ready": true,
+          "corvex_contain": 1,
+          "l1_complete": true,
+          "hostile_bus_ok": true,
+          "hostile_bus_note": "hostile_bus_selftest pass",
+          "os_executor_implemented": true,
+          "os_executor_kind": "windows_firewall_self_isolate",
+          "honesty": "When ready=true, Windows Firewall self-isolate / release is available for the local host_id. Not EDR/VLAN. Lab flags still available via lab_dir."
+        }
+      }
+    ],
+    "soc_stripped": [],
+    "ts": "2026-11-06T10:28:16Z",
+    "live_path": true,
+    "mode": "live_windows",
+    "capability": {
+      "mode": "live_windows",
+      "can_attempt": true,
+      "live_executor": true,
+      "live_executor_kind": "windows_firewall_self_isolate",
+      "corvex_contain": 1,
+      "l1_complete": true,
+      "l1_pct": 100.0,
+      "lab_dir": null,
+      "message": "CORVEX_CONTAIN nonzero and L1 complete \u2014 Windows Firewall self-isolate available for local host_id after hostile-bus + CORVEX_CONTAIN_AUTHZ. Not EDR/VLAN. Fanout/agent required for remote peers.",
+      "honesty": [
+        "Corvex does not claim enterprise EDR quarantine.",
+        "CORVEX_CONTAIN nonzero and L1 complete \u2014 Windows Firewall self-isolate available for local host_id after hostile-bus + CORVEX_CONTAIN_AUTHZ. Not EDR/VLAN. Fanout/agent required for remote peers."
+      ]
+    }
+  },
+  "rule_exists_after_release": false,
+  "finished_at": "2026-11-06T10:28:23Z",
+  "ok": true,
+  "pass_criteria": {
+    "rule_appeared": true,
+    "rule_removed": true,
+    "isolate_enforced_flag": true,
+    "release_ok": true
+  },
+  "authz_set": true
+}
