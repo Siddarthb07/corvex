@@ -1,0 +1,16 @@
+{
+  "campaigns": [
+    {
+      "campaign_id": "benign-single-noise",
+      "host_ids": ["pc-a"],
+      "stages": [{"name": "local_noise", "hosts": ["pc-a"]}],
+      "confidence": 0.05
+    },
+    {
+      "campaign_id": "benign-helpdesk-auth",
+      "host_ids": ["pc-a", "pc-b"],
+      "stages": [{"name": "lateral_auth", "hosts": ["pc-a", "pc-b"]}],
+      "confidence": 0.2
+    }
+  ]
+}

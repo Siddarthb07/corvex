@@ -1,0 +1,116 @@
+{
+  "generated_at": "2026-11-06T09:27:01Z",
+  "source": "sealed_benign",
+  "n_packs": 6,
+  "n_campaigns": 0,
+  "n_isolate_propose": 0,
+  "n_estate_lockdown_propose": 0,
+  "pure_benign": true,
+  "estate_lockdown_bar": "PASS",
+  "policy": "ContainPolicy defaults (not ~/.corvex/contain_policy.json)",
+  "packs": [
+    {
+      "pack": "held-benign-a.jsonl",
+      "family": "benign",
+      "n_events": 24,
+      "n_hosts": 3,
+      "estate_hosts": [
+        "host-a",
+        "host-b",
+        "host-c"
+      ],
+      "n_campaigns": 0,
+      "n_isolate_propose": 0,
+      "n_estate_lockdown_propose": 0,
+      "campaigns": []
+    },
+    {
+      "pack": "held-benign-b.jsonl",
+      "family": "benign",
+      "n_events": 24,
+      "n_hosts": 3,
+      "estate_hosts": [
+        "host-b",
+        "host-c",
+        "host-d"
+      ],
+      "n_campaigns": 0,
+      "n_isolate_propose": 0,
+      "n_estate_lockdown_propose": 0,
+      "campaigns": []
+    },
+    {
+      "pack": "held-benign-c.jsonl",
+      "family": "benign",
+      "n_events": 24,
+      "n_hosts": 3,
+      "estate_hosts": [
+        "host-c",
+        "host-d",
+        "host-e"
+      ],
+      "n_campaigns": 0,
+      "n_isolate_propose": 0,
+      "n_estate_lockdown_propose": 0,
+      "campaigns": []
+    },
+    {
+      "pack": "held-benign-d.jsonl",
+      "family": "benign",
+      "n_events": 32,
+      "n_hosts": 4,
+      "estate_hosts": [
+        "host-a",
+        "host-b",
+        "host-c",
+        "host-d"
+      ],
+      "n_campaigns": 0,
+      "n_isolate_propose": 0,
+      "n_estate_lockdown_propose": 0,
+      "campaigns": []
+    },
+    {
+      "pack": "held-benign-e.jsonl",
+      "family": "benign",
+      "n_events": 24,
+      "n_hosts": 3,
+      "estate_hosts": [
+        "host-a",
+        "host-c",
+        "host-e"
+      ],
+      "n_campaigns": 0,
+      "n_isolate_propose": 0,
+      "n_estate_lockdown_propose": 0,
+      "campaigns": []
+    },
+    {
+      "pack": "held-benign-f.jsonl",
+      "family": "benign",
+      "n_events": 32,
+      "n_hosts": 4,
+      "estate_hosts": [
+        "host-b",
+        "host-c",
+        "host-d",
+        "host-e"
+      ],
+      "n_campaigns": 0,
+      "n_isolate_propose": 0,
+      "n_estate_lockdown_propose": 0,
+      "campaigns": []
+    }
+  ],
+  "honesty": [
+    "Counts are resolve_isolate_scope proposals on correlator campaigns. Containment was not executed.",
+    "CORVEX_CONTAIN was not changed. Live OS quarantine stays unimplemented.",
+    "Scored with the in-repo default ContainPolicy (auto_enforce false). A machine-local contain_policy.json, when present, was not applied.",
+    "first_seen/last_seen on each campaign are the min/max event timestamps for its hosts.",
+    "On pure benign, n_estate_lockdown_propose must be 0.",
+    "Scored unsealed held-benign-*.jsonl.sealed with the local held-out key. Plaintext stays under runs/ (gitignored).",
+    "Train and sealed benign packs are synthetic feeder noise (egress false). They are not an enterprise benign baseline.",
+    "This scoreboard does not set claim_allowed.",
+    "Windows DNS-only C2 stays a sensor GAP unless Sysmon EID 22 arrives; the dashboard sensor note already says so when channel_health.dns is down."
+  ]
+}
