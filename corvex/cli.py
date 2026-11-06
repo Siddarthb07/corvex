@@ -336,8 +336,17 @@ def quarantine_cmd(
         None, "--lab-dir", help="Lab shared dir (enables lab_flag isolate)"
     ),
     log: Path = typer.Option(Path("reports/stage_d_dry_run.jsonl"), help="Dry-run log path"),
+    enforce: bool = typer.Option(
+        False,
+        "--enforce/--dry-run",
+        help="Enforce live Windows/lab isolate (requires CORVEX_CONTAIN + gates + --authz)",
+    ),
+    authz: Optional[str] = typer.Option(
+        None, "--authz", help="Dual-control token (must match CORVEX_CONTAIN_AUTHZ)"
+    ),
+    verb: str = typer.Option("IsolateHost", "--verb", help="IsolateHost|ReleaseHost|EstateLockdown"),
 ) -> None:
-    """Attempt isolate/quarantine — dry-run, lab flags, or honest refusal."""
+    """Attempt isolate/quarantine — dry-run, lab flags, or gated live enforce."""
     from corvex.contain.quarantine import attempt_quarantine
 
     host_ids = [h.strip() for h in hosts.split(",") if h.strip()]
@@ -347,6 +356,9 @@ def quarantine_cmd(
         lab_dir=lab_dir,
         log_path=log,
         root=_repo_root(),
+        enforce=enforce,
+        authz_token=authz,
+        verb=verb,
     )
     typer.echo(json.dumps(result, indent=2))
     if not result.get("ok") and result.get("aggregate") == "cannot_quarantine":
@@ -355,10 +367,213 @@ def quarantine_cmd(
 
 @app.command("quarantine-status")
 def quarantine_status_cmd() -> None:
-    """Honest quarantine capability (dry-run / lab_flag / blocked)."""
+    """Honest quarantine capability (dry-run / lab_flag / live_windows)."""
     from corvex.contain.quarantine import resolve_quarantine_mode
 
     typer.echo(json.dumps(resolve_quarantine_mode(root=_repo_root()), indent=2))
+
+
+@app.command("quarantine-apply")
+def quarantine_apply_cmd(
+    envelope_json: Optional[str] = typer.Option(
+        None, "--envelope-json", help="ActionEnvelope JSON string"
+    ),
+    envelope: Optional[Path] = typer.Option(
+        None, "--envelope", help="Path to ActionEnvelope JSON file"
+    ),
+    authz: Optional[str] = typer.Option(None, "--authz", help="Dual-control token"),
+) -> None:
+    """Apply a typed ActionEnvelope on this host (fanout/agent edge)."""
+    from corvex.contain import ContainGateError
+    from corvex.contain.fanout import apply_local_from_envelope
+
+    if envelope_json and envelope is not None:
+        typer.echo("pass only one of --envelope-json or --envelope", err=True)
+        raise typer.Exit(2)
+    if envelope_json:
+        raw = envelope_json
+        label = "--envelope-json"
+    elif envelope is not None:
+        if not envelope.is_file():
+            typer.echo(f"missing envelope file: {envelope}", err=True)
+            raise typer.Exit(2)
+        raw = envelope.read_text(encoding="utf-8-sig")
+        label = str(envelope)
+    else:
+        typer.echo("Provide --envelope-json or --envelope", err=True)
+        raise typer.Exit(2)
+    try:
+        data = json.loads(raw)
+    except json.JSONDecodeError as exc:
+        typer.echo(f"invalid JSON ({label}): {exc}", err=True)
+        raise typer.Exit(2) from exc
+    if not isinstance(data, dict):
+        typer.echo("envelope must be a JSON object", err=True)
+        raise typer.Exit(2)
+    try:
+        result = apply_local_from_envelope(
+            data, root=_repo_root(), authz_token=(authz.strip() if authz else None)
+        )
+    except ContainGateError as exc:
+        typer.echo(
+            json.dumps(
+                {"ok": False, "result": "refused", "enforced": False, "honesty": str(exc)},
+                indent=2,
+            )
+        )
+        raise typer.Exit(2) from exc
+    typer.echo(json.dumps(result, indent=2))
+    if result.get("result") in ("cannot_quarantine", "refused", "refused_not_local"):
+        raise typer.Exit(2)
+
+
+@app.command("quarantine-fanout")
+def quarantine_fanout_cmd(
+    hosts: str = typer.Argument(..., help="Comma-separated host_ids"),
+    rationale: str = typer.Option(..., "--rationale"),
+    dry_run: bool = typer.Option(True, "--dry-run/--enforce"),
+    authz: Optional[str] = typer.Option(None, "--authz"),
+    verb: str = typer.Option("IsolateHost", "--verb", help="IsolateHost|EstateLockdown"),
+) -> None:
+    """Fan out IsolateHost to local + SSH peers (~/.corvex/contain_peers.json)."""
+    from corvex.contain import ContainGateError
+    from corvex.contain.fanout import fanout_isolate
+
+    if verb not in ("IsolateHost", "EstateLockdown"):
+        raise typer.BadParameter("--verb must be IsolateHost or EstateLockdown")
+    host_ids = [h.strip() for h in hosts.split(",") if h.strip()]
+    try:
+        result = fanout_isolate(
+            host_ids,
+            rationale=rationale,
+            dry_run=dry_run,
+            authz_token=(authz.strip() if authz else None),
+            verb=verb,
+            root=_repo_root(),
+        )
+    except ContainGateError as exc:
+        typer.echo(
+            json.dumps(
+                {"ok": False, "result": "refused", "enforced": False, "honesty": str(exc)},
+                indent=2,
+            )
+        )
+        raise typer.Exit(2) from exc
+    typer.echo(json.dumps(result, indent=2))
+
+
+@app.command("contain-policy-show")
+def contain_policy_show_cmd() -> None:
+    """Show contain policy (SOC allowlist, blast caps, severity weights)."""
+    from corvex.contain.policy import load_policy, policy_path
+
+    pol = load_policy()
+    typer.echo(json.dumps({"path": str(policy_path()), "policy": pol.to_dict()}, indent=2))
+
+
+@app.command("contain-policy-init")
+def contain_policy_init_cmd(
+    soc_allowlist: str = typer.Option(
+        "", "--soc-allowlist", help="Comma-separated host_ids never auto-isolated"
+    ),
+    force: bool = typer.Option(False, "--force", help="Overwrite existing policy file"),
+) -> None:
+    """Write default ~/.corvex/contain_policy.json (scale-invariant knobs)."""
+    from corvex.contain.policy import ContainPolicy, load_policy, policy_path, save_policy
+
+    path = policy_path()
+    if path.is_file() and not force:
+        typer.echo(json.dumps({"ok": False, "error": f"exists: {path} (use --force)"}, indent=2))
+        raise typer.Exit(2)
+    pol = ContainPolicy()
+    if soc_allowlist.strip():
+        pol.soc_allowlist = [h.strip() for h in soc_allowlist.split(",") if h.strip()]
+    out = save_policy(pol)
+    payload = {"ok": True, "path": str(out), "policy": load_policy().to_dict()}
+    typer.echo(json.dumps(payload, indent=2))
+
+
+@app.command("contain-severity")
+def contain_severity_cmd(
+    campaign: Optional[Path] = typer.Option(None, "--campaign", help="Campaign JSON file"),
+    hosts: str = typer.Option("", "--hosts", help="Comma host_ids if no --campaign"),
+    estate: str = typer.Option("", "--estate", help="Comma enrolled estate host_ids"),
+    stages: str = typer.Option(
+        "lateral_auth,micro_exfil",
+        "--stages",
+        help="Comma stage names when using --hosts",
+    ),
+    confidence: float = typer.Option(0.8, "--confidence"),
+) -> None:
+    """Score campaign severity and print isolate scope (flagged / peer / estate)."""
+    from corvex.contain.severity import resolve_isolate_scope
+
+    if campaign is not None:
+        if not campaign.is_file():
+            typer.echo(f"missing campaign file: {campaign}", err=True)
+            raise typer.Exit(2)
+        try:
+            camp = json.loads(campaign.read_text(encoding="utf-8-sig"))
+        except json.JSONDecodeError as exc:
+            typer.echo(f"invalid campaign JSON: {exc}", err=True)
+            raise typer.Exit(2) from exc
+        if not isinstance(camp, dict):
+            typer.echo("campaign JSON must be an object", err=True)
+            raise typer.Exit(2)
+    else:
+        host_ids = [h.strip() for h in hosts.split(",") if h.strip()]
+        if not host_ids:
+            typer.echo("Need --campaign or --hosts", err=True)
+            raise typer.Exit(2)
+        stage_names = [s.strip() for s in stages.split(",") if s.strip()]
+        camp = {
+            "host_ids": host_ids,
+            "stages": [{"name": n, "hosts": host_ids} for n in stage_names],
+            "confidence": confidence,
+        }
+    estate_hosts = [h.strip() for h in estate.split(",") if h.strip()]
+    if not estate_hosts:
+        estate_hosts = list(camp.get("host_ids") or camp.get("hosts") or [])
+    result = resolve_isolate_scope(camp, estate_hosts=estate_hosts)
+    typer.echo(json.dumps(result, indent=2))
+
+
+@app.command("agent-contain")
+def agent_contain_cmd(
+    once: bool = typer.Option(False, "--once", help="Drain inbox once and exit"),
+    follow: bool = typer.Option(False, "--follow", help="Poll inbox until Ctrl+C"),
+    poll_seconds: float = typer.Option(2.0, "--poll-seconds"),
+    max_cycles: Optional[int] = typer.Option(None, "--max-cycles"),
+    authz: Optional[str] = typer.Option(None, "--authz"),
+) -> None:
+    """Contain agent: heartbeat + apply signed envelopes from runs/contain-agent/inbox.jsonl."""
+    from corvex.contain.agent import process_inbox_once, run_agent_loop
+
+    if once and follow:
+        raise typer.BadParameter("pass only one of --once or --follow")
+    root = _repo_root()
+    token = authz.strip() if authz else None
+    if follow or (max_cycles is not None and not once):
+        typer.echo(
+            json.dumps(
+                {"status": "agent_follow", "poll_seconds": poll_seconds, "max_cycles": max_cycles},
+                indent=2,
+            )
+        )
+        try:
+            raise typer.Exit(
+                run_agent_loop(
+                    root=root,
+                    poll_seconds=poll_seconds,
+                    max_cycles=max_cycles,
+                    authz_token=token,
+                )
+            )
+        except KeyboardInterrupt:
+            typer.echo("stopped")
+            raise typer.Exit(0)
+    result = process_inbox_once(root=root, authz_token=token)
+    typer.echo(json.dumps(result, indent=2))
 
 
 @app.command("eval-recon")
@@ -788,6 +1003,10 @@ def _predict_from_events(
         camps = baseline_b1(dicts)
     elif mode == "b2":
         camps = baseline_b2(dicts)
+    elif mode in ("b3", "window_entity"):
+        from corvex.baselines import baseline_window_entity
+
+        camps = baseline_window_entity(dicts)
     elif mode == "detector_only":
         store = CampaignStore(Path(tempfile.mkdtemp()) / "c.jsonl")
         audit = AuditLog(Path(tempfile.mkdtemp()) / "a.jsonl")
